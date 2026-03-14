@@ -366,6 +366,7 @@ const MD=['🥇','🥈','🥉'];
 const TSECS=10,MAXP=4,BSPTS=3;
 let tname='',pemails=[],pcnt=2,score=0,bonus=0,answers=[],alive=false;
 let cq=-1,qlist=[],tint=null,tleft=0,answered=false,selIdx=-1,qst=0,rsent=false,cscreen='splash';
+let joinTime=0;
 function renderPF(){
   const c=document.getElementById('pfields');c.innerHTML='';
   for(let i=0;i<pcnt;i++){
@@ -401,7 +402,7 @@ window.joinGame=function(){
     pemails.push(v);
   }
   qlist=shuffle([...AQ]).slice(0,10);
-  score=0;bonus=0;answers=[];cq=-1;alive=true;answered=false;
+  score=0;bonus=0;answers=[];cq=-1;alive=true;answered=false;joinTime=Date.now();
   document.getElementById('sc').style.display='block';
   document.getElementById('tbar').classList.add('show');
   updSC();showWait(0);showScr('waiting');
@@ -420,6 +421,8 @@ function showWait(n){
 function listenHost(){
   onValue(ref(db,'host/command'),snap=>{
     const cmd=snap.val();if(!cmd||!alive)return;
+    // Ignore any command that existed before this player joined
+    if(cmd.timestamp&&cmd.timestamp<joinTime)return;
     if(cmd.action==='question'&&cmd.index!==cq){cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();launchQ(cq);}
     else if(cmd.action==='reveal'){stopT();revealAns(cq,false);}
     else if(cmd.action==='pause'){stopT();showPaused();}
