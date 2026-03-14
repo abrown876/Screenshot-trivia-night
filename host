@@ -287,6 +287,7 @@ window.resetLeaderboard=async function(){
     await remove(ref(db,'race'));
     await remove(ref(db,'reactions'));
     await remove(ref(db,'host/command'));
+    await remove(ref(db,'teams'));
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">Leaderboard cleared — ready for a new game!</div>';
     document.getElementById('status-val').textContent='Reset complete — ready to start';
     alert('Done! Leaderboard cleared and ready for a fresh game.');
