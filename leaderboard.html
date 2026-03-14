@@ -143,38 +143,49 @@ const app=initializeApp(FB);const db=getDatabase(app);
 const MEDALS=['🥇','🥈','🥉'];
 const RC=['first','second','third'];
 
-onValue(ref(db,'scores'),snapshot=>{
-  const data=snapshot.val();
+let teamsC=null,scoresC=null;
+function renderBoard(){
   const board=document.getElementById('board');
   const cnt=document.getElementById('footer-count');
-  if(!data){
-    board.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for tables to finish…</div></div>';
-    cnt.textContent='';return;
-  }
+  const teams=teamsC?Object.values(teamsC):[];
+  const scores=scoresC?Object.values(scoresC):[];
   const best={};
-  Object.values(data).forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
-  const sorted=Object.values(best).sort((a,b)=>b.score-a.score);
-  const maxS=sorted[0]?.score||10;
-  cnt.textContent=sorted.length+' table'+(sorted.length!==1?'s':'')+' completed';
-  board.innerHTML=sorted.slice(0,7).map((e,i)=>{
+  scores.forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
+  const finished=Object.values(best).sort((a,b)=>b.score-a.score);
+  const finNames=new Set(finished.map(e=>e.team));
+  const waiting=teams.filter(t=>!finNames.has(t.name)).sort((a,b)=>a.joinedAt-b.joinedAt);
+  const total=finished.length+waiting.length;
+  cnt.textContent=total+' table'+(total!==1?'s':'')+' registered · '+finished.length+' finished';
+  if(total===0){board.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for teams to join...</div></div>';return;}
+  const maxS=finished[0]?.score||10;
+  let html='';
+  html+=finished.slice(0,6).map((e,i)=>{
     const bw=Math.round((e.score/maxS)*100);
-    const pct=Math.round(((e.correct||0)/e.total)*100);
+    const pct=Math.round(((e.score-(e.bonus||0))/e.total)*100);
     return `<div class="row ${RC[i]||''}">
-      <div class="rank">${i+1}</div>
-      <div class="medal">${MEDALS[i]||''}</div>
-      <div class="info">
-        <div class="team">${e.team}</div>
-        <div class="meta">
-          <span>${e.players} player${e.players!==1?'s':''}</span>
-          <span>${pct}% correct</span>
-          ${e.bonus?`<span class="bonus-tag">⚡ +${e.bonus}</span>`:''}
-        </div>
+      <div class="rank">${i+1}</div><div class="medal">${MEDALS[i]||''}</div>
+      <div class="info"><div class="team">${e.team}</div>
+        <div class="meta"><span>${e.players} player${e.players!==1?'s':''}</span><span class="pct-pill">${pct}% correct</span>${e.bonus?`<span class="bonus-tag">⚡ +${e.bonus}</span>`:''}</div>
       </div>
       <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:${bw}%"></div></div></div>
       <div class="score-col"><div class="score-num">${e.score}</div><div class="score-den">/ ${e.total} pts</div></div>
     </div>`;
   }).join('');
-});
+  if(waiting.length>0&&finished.length<6){
+    html+=waiting.slice(0,6-finished.length).map(t=>`
+      <div class="row" style="opacity:.55;border-style:dashed">
+        <div class="rank" style="font-size:1.2rem">⏳</div><div class="medal"></div>
+        <div class="info"><div class="team">${t.name}</div>
+          <div class="meta"><span>${t.players} player${t.players!==1?'s':''}</span><span>Waiting to play</span></div>
+        </div>
+        <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div></div>
+        <div class="score-col"><div class="score-den" style="font-size:14px">Ready</div></div>
+      </div>`).join('');
+  }
+  board.innerHTML=html;
+}
+onValue(ref(db,'teams'),snap=>{teamsC=snap.val();renderBoard();});
+onValue(ref(db,'scores'),snap=>{scoresC=snap.val();renderBoard();});
 
 onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(20)),snapshot=>{
   const data=snapshot.val();
