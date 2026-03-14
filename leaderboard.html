@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trivia Night — Live Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--gold:#C9A84C;--gold-light:#F5E6C0;--bg:#1A1208;--card:#2A1E0E;--text:#F5E6C0;--muted:#8A7A5A;--border:#3A2A12}
+  html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);overflow:hidden}
+  body{display:flex;flex-direction:column}
+
+  .top{padding:2rem 3rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .title{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);letter-spacing:.02em}
+  .live-dot{display:flex;align-items:center;gap:.5rem;font-size:14px;color:var(--muted)}
+  .dot{width:8px;height:8px;border-radius:50%;background:#E24B4A;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .subtitle{font-size:14px;color:var(--muted);margin-top:.2rem}
+
+  .board{flex:1;padding:1.5rem 3rem 2rem;overflow:hidden;display:flex;flex-direction:column;gap:.75rem}
+
+  .row{background:var(--card);border-radius:16px;padding:1.2rem 1.75rem;display:flex;align-items:center;gap:1.5rem;border:1px solid var(--border);transition:all .5s ease;animation:slideIn .4s ease}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+  .row.first{background:#2A2000;border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,0.15)}
+  .row.second{background:#1E1A0A;border-color:#8A7030}
+  .row.third{background:#221510;border-color:#6A3020}
+
+  .rank{font-family:'Playfair Display',serif;font-size:2rem;min-width:56px;text-align:center;color:var(--muted)}
+  .row.first .rank{color:var(--gold)}
+  .row.second .rank{color:#C0A040}
+  .row.third .rank{color:#C06040}
+
+  .medal{font-size:1.8rem;min-width:40px;text-align:center}
+
+  .info{flex:1}
+  .team{font-size:1.4rem;font-weight:500;color:var(--text);line-height:1.2}
+  .players{font-size:13px;color:var(--muted);margin-top:.2rem}
+
+  .bar-wrap{flex:2;height:12px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+  .bar{height:100%;border-radius:6px;background:var(--gold);transition:width 1s ease}
+  .row.second .bar{background:#C0A040}
+  .row.third .bar{background:#C06040}
+  .row:not(.first):not(.second):not(.third) .bar{background:#5A4A2A}
+
+  .score-col{text-align:right;min-width:80px}
+  .score-num{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1}
+  .row.second .score-num{color:#C0A040}
+  .row.third .score-num{color:#C06040}
+  .row:not(.first):not(.second):not(.third) .score-num{color:var(--muted)}
+  .score-label{font-size:12px;color:var(--muted)}
+
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;opacity:.5}
+  .empty-icon{font-size:4rem}
+  .empty-text{font-size:1.1rem;color:var(--muted)}
+
+  .footer{padding:.75rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .footer-url{font-size:13px;color:var(--muted)}
+  .teams-count{font-size:13px;color:var(--muted)}
+  .refresh-note{font-size:12px;color:var(--muted);opacity:.6}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <div class="title">🎯 Trivia Night — Leaderboard</div>
+    <div class="subtitle">Updates live as tables complete the quiz</div>
+  </div>
+  <div class="live-dot"><span class="dot"></span> Live</div>
+</div>
+
+<div class="board" id="board">
+  <div class="empty">
+    <div class="empty-icon">🎯</div>
+    <div class="empty-text">Waiting for tables to finish...</div>
+  </div>
+</div>
+
+<div class="footer">
+  <span class="footer-url">abrown876.github.io/Screenshot-trivia-night</span>
+  <span class="teams-count" id="teams-count"></span>
+  <span class="refresh-note">Auto-refreshes every 10 seconds</span>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+    authDomain: "screenshot-trivia-night.firebaseapp.com",
+    databaseURL: "https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+    projectId: "screenshot-trivia-night",
+    storageBucket: "screenshot-trivia-night.firebasestorage.app",
+    messagingSenderId: "482758352954",
+    appId: "1:482758352954:web:832d1cba008bc0b789d503"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const MEDALS = ['🥇','🥈','🥉'];
+  const RANK_CLASS = ['first','second','third'];
+
+  onValue(ref(db,'scores'), (snapshot) => {
+    const data = snapshot.val();
+    const board = document.getElementById('board');
+    const countEl = document.getElementById('teams-count');
+
+    if(!data){
+      board.innerHTML=`<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Waiting for tables to finish...</div></div>`;
+      countEl.textContent='';
+      return;
+    }
+
+    // Get best score per team name
+    const best = {};
+    Object.values(data).forEach(entry => {
+      const t = entry.team;
+      if(!best[t] || entry.score > best[t].score) best[t] = entry;
+    });
+
+    const sorted = Object.values(best).sort((a,b) => b.score - a.score);
+    const maxScore = sorted[0]?.score || 20;
+    countEl.textContent = sorted.length + ' team' + (sorted.length!==1?'s':'') + ' completed';
+
+    board.innerHTML = sorted.slice(0,8).map((entry, i) => {
+      const rankClass = RANK_CLASS[i] || '';
+      const pct = Math.round((entry.score / entry.total) * 100);
+      const barWidth = Math.round((entry.score / maxScore) * 100);
+      return `
+        <div class="row ${rankClass}">
+          <div class="rank">${i+1}</div>
+          <div class="medal">${MEDALS[i]||''}</div>
+          <div class="info">
+            <div class="team">${entry.team}</div>
+            <div class="players">${entry.players} player${entry.players!==1?'s':''} · ${pct}% correct</div>
+          </div>
+          <div class="bar-wrap"><div class="bar" style="width:${barWidth}%"></div></div>
+          <div class="score-col">
+            <div class="score-num">${entry.score}</div>
+            <div class="score-label">/ ${entry.total} pts</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+</script>
+</body>
+</html>
