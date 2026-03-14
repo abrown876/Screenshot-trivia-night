@@ -11,26 +11,20 @@
   --purple:#5B5BD6;--purple-dark:#3D3D9E;--purple-light:#EEEEFF;
   --coral:#E8547A;--coral-light:#FDE8EE;--coral-dark:#B03058;
   --gold:#F5A623;--gold-light:#FEF3DC;
-  --green:#1A8A4A;--green-light:#E6F7EE;
+  --green:#1A8A4A;--green-light:#EAF7F0;
   --bg:#F4F4FC;--card:#FFFFFF;--text:#1A1A3E;--muted:#7A7AAA;--border:#E0E0F0;
   --correct:#2D7A4F;--wrong:#C0392B;--correct-bg:#EAF7F0;--wrong-bg:#FDECEA;
-  --radius:20px;--shadow:0 4px 24px rgba(91,91,214,0.10);
-  --timer:15
+  --radius:20px;--shadow:0 4px 24px rgba(91,91,214,0.10)
 }
 html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
-body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
+body{display:flex;flex-direction:column;overflow:hidden}
 
-/* LOGO */
 .logo{display:flex;align-items:center;gap:10px}
 .logo-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:var(--purple);letter-spacing:.04em}
 .logo-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:9px;color:var(--coral);letter-spacing:.12em;text-transform:uppercase}
-
-/* HEADER */
 .header{background:#fff;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border);flex-shrink:0}
-.header-right{display:flex;align-items:center;gap:.75rem}
 .header-score{background:var(--purple);color:#fff;font-size:14px;font-weight:800;padding:5px 16px;border-radius:20px;font-family:'Nunito',sans-serif;display:none}
 
-/* SCREENS */
 .screen{display:none;flex:1;padding:1.5rem;overflow-y:auto;flex-direction:column}
 .screen.active{display:flex}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -44,12 +38,9 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .splash-hero p{font-size:14px;color:rgba(255,255,255,.72);line-height:1.5}
 .pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
 .pill{font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;font-family:'Nunito',sans-serif}
-.pill-history{background:#FEF3DC;color:#8A5500}
-.pill-food{background:#FAECE7;color:#8A2E0F}
-.pill-music{background:#EEF0FF;color:#3D3D9E}
-.pill-geo{background:#E6F7EE;color:#1A6A3A}
-.pill-sports{background:#FDE8EE;color:#8A1840}
-.pill-general{background:#F0F0F8;color:#4A4A8A}
+.pill-history{background:#FEF3DC;color:#8A5500}.pill-food{background:#FAECE7;color:#8A2E0F}
+.pill-music{background:#EEF0FF;color:#3D3D9E}.pill-geo{background:#E6F7EE;color:#1A6A3A}
+.pill-sports{background:#FDE8EE;color:#8A1840}.pill-general{background:#F0F0F8;color:#4A4A8A}
 .form-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem}
 .form-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;display:block;font-family:'Nunito',sans-serif}
 .team-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:17px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none}
@@ -59,12 +50,12 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .count-btn:active{background:var(--purple-light);border-color:var(--purple)}
 .count-val{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--purple)}
 
-/* WAITING SCREEN */
-.waiting-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);margin-bottom:1.25rem}
+/* WAITING */
+.waiting-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);width:100%}
 .waiting-icon{font-size:3.5rem;margin-bottom:.75rem}
 .waiting-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--text);margin-bottom:.4rem}
 .waiting-sub{font-size:14px;color:var(--muted);line-height:1.6}
-.pulse-ring{width:80px;height:80px;border-radius:50%;border:3px solid var(--purple);margin:1.25rem auto;animation:ringPulse 1.8s ease-in-out infinite;opacity:.6}
+.pulse-ring{width:70px;height:70px;border-radius:50%;border:3px solid var(--purple);margin:1.25rem auto;animation:ringPulse 1.8s ease-in-out infinite;opacity:.6}
 @keyframes ringPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.12);opacity:.3}}
 .q-number-badge{background:var(--purple);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;padding:.5rem 1.5rem;border-radius:20px;display:inline-block;margin-bottom:.75rem}
 
@@ -72,21 +63,17 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
 .q-label{font-size:13px;color:var(--muted);font-weight:500}
 .cat-pill{font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;font-family:'Nunito',sans-serif}
-.cat-history{background:#FEF3DC;color:#8A5500}
-.cat-food{background:#FAECE7;color:#8A2E0F}
-.cat-music{background:#EEF0FF;color:#3D3D9E}
-.cat-geo{background:#E6F7EE;color:#1A6A3A}
-.cat-sports{background:#FDE8EE;color:#8A1840}
-.cat-general{background:#F0F0F8;color:#4A4A8A}
+.cat-history{background:#FEF3DC;color:#8A5500}.cat-food{background:#FAECE7;color:#8A2E0F}
+.cat-music{background:#EEF0FF;color:#3D3D9E}.cat-geo{background:#E6F7EE;color:#1A6A3A}
+.cat-sports{background:#FDE8EE;color:#8A1840}.cat-general{background:#F0F0F8;color:#4A4A8A}
 
-/* TIMER */
 .timer-wrap{margin-bottom:1rem}
 .timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
-.timer-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--purple);transition:color .3s}
+.timer-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--purple);transition:color .3s;min-width:32px;text-align:right}
 .timer-num.urgent{color:var(--coral);animation:urgentPulse .5s ease-in-out infinite}
 @keyframes urgentPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 .timer-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
-.timer-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:4px;transition:width .25s linear,background .3s}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:4px;transition:width .25s linear}
 .timer-fill.urgent{background:var(--coral)}
 
 .q-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.1rem;border-left:5px solid var(--purple)}
@@ -97,13 +84,15 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .opt-letter{width:30px;height:30px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted);flex-shrink:0;font-family:'Nunito',sans-serif;transition:all .2s}
 .opt:hover:not(.disabled){border-color:var(--purple);background:var(--purple-light)}
 .opt:hover:not(.disabled) .opt-letter{background:var(--purple);border-color:var(--purple);color:#fff}
+/* correct/wrong only shown after answer or reveal */
 .opt.correct{background:var(--correct-bg);border-color:var(--correct)}
 .opt.correct .opt-letter{background:var(--correct);border-color:var(--correct);color:#fff}
 .opt.wrong{background:var(--wrong-bg);border-color:var(--wrong)}
 .opt.wrong .opt-letter{background:var(--wrong);border-color:var(--wrong);color:#fff}
+.opt.selected-pending{border-color:var(--purple);background:var(--purple-light)}
+.opt.selected-pending .opt-letter{background:var(--purple);border-color:var(--purple);color:#fff}
 .opt.disabled{cursor:default}
-.opt.disabled:not(.correct):not(.wrong){opacity:.5}
-.opt.timeout{background:#FFF8E6;border-color:var(--gold)}
+.opt.disabled:not(.correct):not(.wrong):not(.selected-pending){opacity:.5}
 
 .feedback{border-radius:14px;padding:.85rem 1.1rem;font-size:14px;line-height:1.5;display:none;margin-bottom:.9rem;align-items:center;gap:.65rem}
 .feedback.show{display:flex;animation:fadeUp .3s ease}
@@ -113,23 +102,10 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .feedback-icon{font-size:1.3rem;flex-shrink:0}
 
 /* PAUSED */
-.paused-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);margin-bottom:1.25rem}
-.paused-icon{font-size:3rem;margin-bottom:.75rem}
-.paused-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--text);margin-bottom:.3rem}
-.paused-sub{font-size:14px;color:var(--muted);margin-bottom:1.5rem}
-.score-preview{background:var(--purple-light);border-radius:14px;padding:1rem;margin-bottom:1.25rem}
+.paused-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);width:100%}
+.score-preview{background:var(--purple-light);border-radius:14px;padding:1rem;margin:1rem 0}
 .score-preview-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--purple)}
 .score-preview-label{font-size:13px;color:var(--muted)}
-
-/* BUTTONS */
-.btn{width:100%;padding:15px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.02em}
-.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--purple);color:#fff}
-.btn-primary:hover{opacity:.9}
-.btn-coral{background:var(--coral);color:#fff}
-.btn-green{background:var(--green);color:#fff}
-.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text);margin-top:.65rem}
-.btn-sm{padding:11px;font-size:14px;border-radius:12px}
 
 /* RESULTS */
 .results-hero{background:linear-gradient(135deg,var(--purple),var(--purple-dark));border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1.25rem;color:#fff;position:relative;overflow:hidden}
@@ -143,10 +119,15 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .result-row:last-child{border-bottom:none}
 .result-q{font-size:13px;color:var(--muted);line-height:1.4;flex:1;padding-right:.75rem}
 .result-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
-.dot-correct{background:var(--correct)}
-.dot-wrong{background:var(--wrong)}
-.dot-timeout{background:var(--gold)}
+.dot-correct{background:var(--correct)}.dot-wrong{background:var(--wrong)}.dot-timeout{background:var(--gold)}
 .saving-notice{border-radius:12px;padding:10px 14px;font-size:13px;text-align:center;margin-bottom:1rem;background:var(--purple-light);color:var(--purple-dark);font-weight:600}
+
+/* BUTTONS */
+.btn{width:100%;padding:15px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.02em}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--purple);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-coral{background:var(--coral);color:#fff}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text);margin-top:.65rem}
 
 /* TAB BAR */
 .tab-bar{display:flex;background:#fff;border-top:1.5px solid var(--border);flex-shrink:0}
@@ -170,14 +151,11 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 .lb-players{font-size:11px;color:var(--muted);margin-top:.1rem}
 .lb-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--purple)}
 .lb-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
-.lb-empty-icon{font-size:2.5rem;margin-bottom:.5rem}
-
 .spacer{flex:1}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">
     <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
@@ -185,14 +163,9 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
       <circle cx="17" cy="17" r="14" stroke="#E8547A" stroke-width="2.8" stroke-dasharray="7 81" stroke-dashoffset="-68"/>
       <text x="17" y="22" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="15" fill="#5B5BD6">S</text>
     </svg>
-    <div>
-      <div class="logo-name">SCREENSHOT</div>
-      <div class="logo-sub">Interactive</div>
-    </div>
+    <div><div class="logo-name">SCREENSHOT</div><div class="logo-sub">Interactive</div></div>
   </div>
-  <div class="header-right">
-    <span class="header-score" id="live-score">0 pts</span>
-  </div>
+  <span class="header-score" id="live-score">0 pts</span>
 </div>
 
 <!-- SPLASH -->
@@ -200,19 +173,18 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
   <div class="splash-hero">
     <div class="splash-icon">🇯🇲</div>
     <h1>Jamaica Trivia Night</h1>
-    <p>10 questions · 15 seconds each<br>Hosted round — wait for each question!</p>
+    <p>10 questions · 10 seconds each<br>Host-paced — wait for each question!</p>
   </div>
   <div class="pills">
-    <span class="pill pill-history">History</span>
-    <span class="pill pill-food">Food & Cuisine</span>
-    <span class="pill pill-music">Music & Culture</span>
-    <span class="pill pill-geo">Geography</span>
-    <span class="pill pill-sports">Sports</span>
-    <span class="pill pill-general">General</span>
+    <span class="pill pill-history">History</span><span class="pill pill-food">Food</span>
+    <span class="pill pill-music">Music</span><span class="pill pill-geo">Geography</span>
+    <span class="pill pill-sports">Sports</span><span class="pill pill-general">General</span>
   </div>
   <div class="form-card">
     <label class="form-label">Your table name</label>
     <input class="team-input" id="team-name-input" placeholder="e.g. Table 4" maxlength="30">
+    <label class="form-label" style="margin-top:1rem">Your email address</label>
+    <input class="team-input" id="email-input" placeholder="you@example.com" type="email" maxlength="80">
     <label class="form-label" style="margin-top:1rem">Number of players</label>
     <div class="count-row">
       <button class="count-btn" onclick="adjustCount(-1)">−</button>
@@ -225,11 +197,11 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
 
 <!-- WAITING -->
 <div id="waiting" class="screen anim" style="align-items:center;justify-content:center">
-  <div class="waiting-card" style="width:100%">
+  <div class="waiting-card">
     <div class="q-number-badge" id="waiting-badge">Get ready!</div>
     <div class="waiting-icon">⏳</div>
     <div class="waiting-title" id="waiting-title">Waiting for host...</div>
-    <div class="waiting-sub" id="waiting-sub">Your host will launch the next question shortly. Stay sharp!</div>
+    <div class="waiting-sub" id="waiting-sub">Your host will launch the first question. Stay sharp! 🇯🇲</div>
     <div class="pulse-ring"></div>
     <div style="font-size:13px;color:var(--muted)" id="waiting-score-line"></div>
   </div>
@@ -244,13 +216,11 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
   <div class="timer-wrap">
     <div class="timer-row">
       <span style="font-size:13px;color:var(--muted);font-weight:500">Time remaining</span>
-      <span class="timer-num" id="timer-num">15</span>
+      <span class="timer-num" id="timer-num">10</span>
     </div>
     <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
   </div>
-  <div class="q-card">
-    <div class="q-text" id="q-text"></div>
-  </div>
+  <div class="q-card"><div class="q-text" id="q-text"></div></div>
   <div class="options" id="options"></div>
   <div class="feedback" id="feedback">
     <span class="feedback-icon" id="feedback-icon"></span>
@@ -259,12 +229,12 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
   <div class="spacer"></div>
 </div>
 
-<!-- PAUSED (between questions) -->
+<!-- PAUSED -->
 <div id="paused" class="screen anim" style="align-items:center;justify-content:center">
-  <div class="paused-card" style="width:100%">
-    <div class="paused-icon">☕</div>
-    <div class="paused-title">Question <span id="pause-q-num"></span> done!</div>
-    <div class="paused-sub">Your host will start the next question when everyone's ready.</div>
+  <div class="paused-card">
+    <div style="font-size:3rem;margin-bottom:.75rem">☕</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--text);margin-bottom:.3rem">Question <span id="pause-q-num"></span> done!</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:1rem">Your host will start the next question shortly.</div>
     <div class="score-preview">
       <div class="score-preview-num" id="pause-score"></div>
       <div class="score-preview-label">points so far</div>
@@ -282,37 +252,29 @@ body{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
     <div class="score-pct" id="score-pct"></div>
   </div>
   <div class="saving-notice" id="saving-notice">Saving your score...</div>
-  <div class="result-card">
-    <div id="result-list"></div>
-  </div>
+  <div class="result-card"><div id="result-list"></div></div>
   <button class="btn btn-coral" onclick="showTab('leaderboard')" style="margin-bottom:.65rem">See live leaderboard →</button>
   <button class="btn btn-outline" onclick="restartGame()">Play again</button>
 </div>
 
-<!-- LEADERBOARD TAB -->
+<!-- LEADERBOARD -->
 <div id="leaderboard" class="screen anim">
   <div class="lb-header">
     <div class="lb-title">🏆 Leaderboard</div>
     <div class="live-badge"><span class="live-dot"></span>Live</div>
   </div>
-  <div id="lb-list">
-    <div class="lb-empty"><div class="lb-empty-icon">🏆</div><div>No scores yet!</div></div>
-  </div>
+  <div id="lb-list"><div class="lb-empty">No scores yet!</div></div>
 </div>
 
 <!-- TAB BAR -->
 <div class="tab-bar" id="tab-bar" style="display:none">
-  <button class="tab active" id="tab-play-btn" onclick="showTab('play')">
-    <span class="tab-icon">🎯</span><span>Play</span>
-  </button>
-  <button class="tab" id="tab-lb-btn" onclick="showTab('leaderboard')">
-    <span class="tab-icon">🏆</span><span>Leaderboard</span>
-  </button>
+  <button class="tab active" id="tab-play-btn" onclick="showTab('play')"><span class="tab-icon">🎯</span><span>Play</span></button>
+  <button class="tab" id="tab-lb-btn" onclick="showTab('leaderboard')"><span class="tab-icon">🏆</span><span>Leaderboard</span></button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
@@ -332,35 +294,35 @@ const QUESTIONS = [
   {cat:'music',label:'Music & Culture',q:'Which Jamaican artist is known as the "King of Reggae"?',opts:['Peter Tosh','Jimmy Cliff','Toots Hibbert','Bob Marley'],ans:3},
   {cat:'geo',label:'Geography',q:'What is the capital city of Jamaica?',opts:['Montego Bay','Port Antonio','Ocho Rios','Kingston'],ans:3},
   {cat:'food',label:'Food & Cuisine',q:'What is the national dish of Jamaica?',opts:['Curry goat and rice','Ackee and saltfish','Jerk chicken and breadfruit','Callaloo and dumplings'],ans:1},
-  {cat:'sports',label:'Sports',q:'Which Jamaican sprinter is the world record holder in both the 100m and 200m?',opts:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],ans:3},
+  {cat:'sports',label:'Sports',q:'Which Jamaican sprinter holds world records in both 100m and 200m?',opts:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],ans:3},
   {cat:'general',label:'General',q:'What is the official language of Jamaica?',opts:['Patois only','Spanish','French','English'],ans:3},
-  {cat:'history',label:'History',q:'What was Jamaica\'s original indigenous name before European colonisation?',opts:['Xamayca','Caribia','Hispaniola','Taino'],ans:0},
+  {cat:'history',label:'History',q:'What was Jamaica\'s original indigenous name?',opts:['Xamayca','Caribia','Hispaniola','Taino'],ans:0},
   {cat:'music',label:'Music & Culture',q:'Which music genre originated in Jamaica in the late 1960s?',opts:['Calypso','Soca','Reggae','Dancehall'],ans:2},
-  {cat:'geo',label:'Geography',q:'Which mountain range contains Jamaica\'s highest peak, Blue Mountain Peak?',opts:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],ans:2},
-  {cat:'sports',label:'Sports',q:'Jamaica\'s national sport is cricket, but which sport made Jamaica globally famous at the 1988 Winter Olympics?',opts:['Bobsled','Luge','Skeleton','Ski jumping'],ans:0},
+  {cat:'geo',label:'Geography',q:'Which mountain range contains Jamaica\'s highest peak?',opts:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],ans:2},
+  {cat:'sports',label:'Sports',q:'Which sport made Jamaica famous at the 1988 Winter Olympics?',opts:['Bobsled','Luge','Skeleton','Ski jumping'],ans:0},
 ];
 
 const CAT_CLASS={history:'cat-history',food:'cat-food',music:'cat-music',geo:'cat-geo',sports:'cat-sports',general:'cat-general'};
 const LETTERS=['A','B','C','D'];
 const MEDALS=['🥇','🥈','🥉'];
-const TIMER_SECS=15;
+const TIMER_SECS=10;
 
-let teamName='', playerCount=2, score=0, answers=[], gameJoined=false;
-let currentQ=-1, timerInterval=null, timeLeft=0, answered=false;
-let currentScreen='splash';
+let teamName='',playerEmail='',playerCount=2,score=0,answers=[],gameJoined=false;
+let currentQ=-1,timerInterval=null,timeLeft=0,answered=false,currentScreen='splash';
+let selectedOptIndex=-1;
 
 window.adjustCount=d=>{playerCount=Math.max(1,Math.min(12,playerCount+d));document.getElementById('player-count').textContent=playerCount;};
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
   currentScreen=id;
 }
 
 window.showTab=function(tab){
   if(tab==='play'){
-    show(currentPlayScreen());
+    const s=['question','paused','waiting','results'].includes(currentScreen)?currentScreen:'waiting';
+    show(s);
     document.getElementById('tab-play-btn').classList.add('active');
     document.getElementById('tab-lb-btn').classList.remove('active');
   } else {
@@ -370,20 +332,16 @@ window.showTab=function(tab){
   }
 };
 
-function currentPlayScreen(){
-  if(currentScreen==='leaderboard') return 'waiting';
-  return currentScreen;
-}
-
 window.joinGame=function(){
   teamName=document.getElementById('team-name-input').value.trim();
+  playerEmail=document.getElementById('email-input').value.trim().toLowerCase();
   if(!teamName){alert('Please enter your table name!');return;}
+  if(!playerEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(playerEmail)){alert('Please enter a valid email address!');return;}
   gameJoined=true;score=0;answers=[];currentQ=-1;
   document.getElementById('live-score').style.display='block';
   document.getElementById('tab-bar').style.display='flex';
   updateLiveScore();
-  showWaiting(0);
-  show('waiting');
+  showWaiting(0);show('waiting');
   listenForHostCommands();
 };
 
@@ -395,26 +353,28 @@ function showWaiting(qNum){
   const sub=document.getElementById('waiting-sub');
   const scoreLine=document.getElementById('waiting-score-line');
   if(qNum===0){
-    badge.textContent='Get ready!';
-    title.textContent='Waiting for host...';
-    sub.textContent='Your host will launch the first question shortly. Stay sharp! 🇯🇲';
+    badge.textContent='Get ready!';title.textContent='Waiting for host...';
+    sub.textContent='Your host will launch the first question. Stay sharp! 🇯🇲';
     scoreLine.textContent='';
   } else {
     badge.textContent='Question '+(qNum+1)+' coming up...';
     title.textContent='Nice work!';
-    sub.textContent='Your host will start the next question when everyone\'s ready.';
-    scoreLine.textContent='Your score so far: '+score+' pts ('+answers.filter(a=>a.result==='correct').length+' correct)';
+    sub.textContent='Your host will start the next question when ready.';
+    scoreLine.textContent='Score so far: '+score+' pts ('+answers.filter(a=>a.result==='correct').length+' correct)';
   }
 }
 
 function listenForHostCommands(){
-  onValue(ref(db,'host/command'), snapshot=>{
+  onValue(ref(db,'host/command'),snapshot=>{
     const cmd=snapshot.val();
-    if(!cmd) return;
-    if(cmd.action==='question' && cmd.index !== currentQ){
-      currentQ=cmd.index;
-      answered=false;
+    if(!cmd||!gameJoined) return;
+    if(cmd.action==='question' && cmd.index!==currentQ){
+      currentQ=cmd.index;answered=false;selectedOptIndex=-1;
       launchQuestion(currentQ);
+    } else if(cmd.action==='reveal'){
+      // Host stopped timer and revealed — show answer without scoring if not yet answered
+      if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+      revealAnswerOnTablet(currentQ, false);
     } else if(cmd.action==='pause'){
       if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
       showPausedScreen();
@@ -437,6 +397,7 @@ function launchQuestion(idx){
   cat.textContent=q.label;cat.className='cat-pill '+CAT_CLASS[q.cat];
   document.getElementById('q-text').textContent=q.q;
   document.getElementById('feedback').className='feedback';
+  // Render options with NO correct/wrong styling — plain only
   document.getElementById('options').innerHTML=q.opts.map((o,i)=>`
     <button class="opt" id="opt-${i}" onclick="selectOpt(${i})">
       <span class="opt-letter">${LETTERS[i]}</span><span>${o}</span>
@@ -449,8 +410,7 @@ function startTimer(idx){
   timeLeft=TIMER_SECS;
   updateTimerUI(timeLeft);
   timerInterval=setInterval(()=>{
-    timeLeft--;
-    updateTimerUI(timeLeft);
+    timeLeft--;updateTimerUI(timeLeft);
     if(timeLeft<=0){
       clearInterval(timerInterval);timerInterval=null;
       if(!answered) timeoutQuestion(idx);
@@ -462,59 +422,88 @@ function updateTimerUI(t){
   const num=document.getElementById('timer-num');
   const fill=document.getElementById('timer-fill');
   num.textContent=t;
-  const pct=(t/TIMER_SECS)*100;
-  fill.style.width=pct+'%';
-  if(t<=5){
-    num.classList.add('urgent');
-    fill.classList.add('urgent');
-  } else {
-    num.classList.remove('urgent');
-    fill.classList.remove('urgent');
-  }
+  fill.style.width=((t/TIMER_SECS)*100)+'%';
+  if(t<=3){num.classList.add('urgent');fill.classList.add('urgent');}
+  else{num.classList.remove('urgent');fill.classList.remove('urgent');}
 }
 
 function timeoutQuestion(idx){
+  if(answered) return;
   answered=true;
+  // If they had selected something, record it
+  if(selectedOptIndex>=0){
+    const correct=selectedOptIndex===QUESTIONS[idx].ans;
+    if(correct) score++;
+    answers.push({q:QUESTIONS[idx].q,result:correct?'correct':'wrong'});
+    updateLiveScore();
+    revealAnswerOnTablet(idx, true);
+  } else {
+    answers.push({q:QUESTIONS[idx].q,result:'timeout'});
+    revealAnswerOnTablet(idx, true);
+  }
+}
+
+function revealAnswerOnTablet(idx, fromTimeout){
   const q=QUESTIONS[idx];
-  answers.push({q:q.q,result:'timeout'});
+  // Lock all options
   document.querySelectorAll('.opt').forEach((el,i)=>{
-    el.classList.add('disabled','timeout');el.onclick=null;
-    if(i===q.ans)el.classList.add('correct');
+    el.classList.remove('selected-pending');
+    el.classList.add('disabled');
+    el.onclick=null;
+    if(i===q.ans) el.classList.add('correct');
   });
-  const fb=document.getElementById('feedback');
-  document.getElementById('feedback-icon').textContent='⏰';
-  document.getElementById('feedback-text').textContent='Time\'s up! The answer was '+q.opts[q.ans]+'.';
-  fb.className='feedback timeout show';
+  if(!answered){
+    // Called from host reveal before player answered
+    answered=true;
+    answers.push({q:q.q,result:'timeout'});
+    const fb=document.getElementById('feedback');
+    document.getElementById('feedback-icon').textContent='⏰';
+    document.getElementById('feedback-text').textContent='Time\'s up! The answer was '+q.opts[q.ans]+'.';
+    fb.className='feedback timeout show';
+  } else {
+    const lastAns=answers[answers.length-1];
+    const fb=document.getElementById('feedback');
+    if(lastAns.result==='correct'){
+      document.getElementById('feedback-icon').textContent='🎉';
+      document.getElementById('feedback-text').textContent='Correct! One point for your table!';
+      fb.className='feedback correct show';
+    } else if(lastAns.result==='wrong'){
+      document.getElementById('opt-'+selectedOptIndex)?.classList.add('wrong');
+      document.getElementById('feedback-icon').textContent='😬';
+      document.getElementById('feedback-text').textContent='Not quite — the answer was '+q.opts[q.ans]+'.';
+      fb.className='feedback wrong show';
+    } else {
+      document.getElementById('feedback-icon').textContent='⏰';
+      document.getElementById('feedback-text').textContent='Time\'s up! The answer was '+q.opts[q.ans]+'.';
+      fb.className='feedback timeout show';
+    }
+  }
   updateTimerUI(0);
 }
 
 window.selectOpt=function(i){
-  if(answered)return;
-  answered=true;
-  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  if(answered) return;
+  // Mark as selected-pending (purple highlight) but don't reveal answer yet
+  document.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected-pending'));
+  document.getElementById('opt-'+i).classList.add('selected-pending');
+  selectedOptIndex=i;
+  // Score and record immediately but don't show result until timeout or reveal
   const q=QUESTIONS[currentQ];
   const correct=i===q.ans;
-  if(correct)score++;
+  if(correct) score++;
   answers.push({q:q.q,result:correct?'correct':'wrong'});
+  answered=true;
   updateLiveScore();
-  document.querySelectorAll('.opt').forEach((el,idx)=>{
-    el.classList.add('disabled');el.onclick=null;
-    if(idx===q.ans)el.classList.add('correct');
-    else if(idx===i&&!correct)el.classList.add('wrong');
-  });
-  const fb=document.getElementById('feedback');
-  document.getElementById('feedback-icon').textContent=correct?'🎉':'😬';
-  document.getElementById('feedback-text').textContent=correct?'Correct! One more point for your table!':'Not quite — the answer was '+q.opts[q.ans]+'.';
-  fb.className='feedback '+(correct?'correct':'wrong')+' show';
-  updateTimerUI(timeLeft);
+  // Stop timer and reveal
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  revealAnswerOnTablet(currentQ, false);
 };
 
 function showPausedScreen(){
   const qDone=answers.length;
   document.getElementById('pause-q-num').textContent=qDone;
   document.getElementById('pause-score').textContent=score;
-  const correct=answers.filter(a=>a.result==='correct').length;
-  document.getElementById('pause-correct-count').textContent=correct+' correct out of '+qDone+' so far';
+  document.getElementById('pause-correct-count').textContent=answers.filter(a=>a.result==='correct').length+' correct out of '+qDone;
   show('paused');
   document.getElementById('tab-play-btn').classList.add('active');
   document.getElementById('tab-lb-btn').classList.remove('active');
@@ -524,7 +513,7 @@ async function saveScore(){
   const notice=document.getElementById('saving-notice');
   try{
     const key=teamName.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();
-    await set(ref(db,'scores/'+key),{team:teamName,players:playerCount,score,total:QUESTIONS.length,timestamp:Date.now()});
+    await set(ref(db,'scores/'+key),{team:teamName,email:playerEmail,players:playerCount,score,total:QUESTIONS.length,timestamp:Date.now()});
     notice.textContent='✓ Score saved! Check the leaderboard.';
     notice.style.background='#EAF7F0';notice.style.color='#2D7A4F';
   }catch(e){
@@ -547,27 +536,24 @@ function showResults(){
   show('results');
   document.getElementById('tab-play-btn').classList.add('active');
   document.getElementById('tab-lb-btn').classList.remove('active');
-  saveScore();
-  gameJoined=false;
+  saveScore();gameJoined=false;
 }
 
 window.restartGame=function(){
   document.getElementById('team-name-input').value='';
+  document.getElementById('email-input').value='';
   playerCount=2;document.getElementById('player-count').textContent='2';
   document.getElementById('live-score').style.display='none';
   document.getElementById('tab-bar').style.display='none';
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  gameJoined=false;show('splash');
+  gameJoined=false;answered=false;selectedOptIndex=-1;
+  show('splash');
 };
 
-// Live leaderboard listener
 onValue(ref(db,'scores'),snapshot=>{
   const data=snapshot.val();
   const list=document.getElementById('lb-list');
-  if(!data){
-    list.innerHTML=`<div class="lb-empty"><div class="lb-empty-icon">🏆</div><div>No scores yet!</div></div>`;
-    return;
-  }
+  if(!data){list.innerHTML='<div class="lb-empty">No scores yet!</div>';return;}
   const best={};
   Object.values(data).forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
   const sorted=Object.values(best).sort((a,b)=>b.score-a.score);
