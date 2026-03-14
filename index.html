@@ -14,7 +14,10 @@
   --green:#1A8A4A;--green-light:#EAF7F0;
   --bg:#F4F4FC;--card:#FFFFFF;--text:#1A1A3E;--muted:#7A7AAA;--border:#E0E0F0;
   --correct:#2D7A4F;--wrong:#C0392B;--correct-bg:#EAF7F0;--wrong-bg:#FDECEA;
-  --radius:20px;--shadow:0 4px 24px rgba(91,91,214,0.10)
+  --radius:20px;--shadow:0 4px 24px rgba(91,91,214,0.10);
+  /* ===== SPONSOR CONFIG — swap these two values ===== */
+  --sponsor-name:"YOUR SPONSOR";
+  --sponsor-color:#E8547A;
 }
 html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
 body{display:flex;flex-direction:column;overflow:hidden}
@@ -24,6 +27,14 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .logo-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:9px;color:var(--coral);letter-spacing:.12em;text-transform:uppercase}
 .header{background:#fff;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border);flex-shrink:0}
 .header-score{background:var(--purple);color:#fff;font-size:14px;font-weight:800;padding:5px 16px;border-radius:20px;font-family:'Nunito',sans-serif;display:none}
+
+/* SPONSOR BANNER */
+.sponsor-bar{background:var(--sponsor-color,#E8547A);padding:7px 1.5rem;display:flex;align-items:center;justify-content:center;gap:.6rem;flex-shrink:0}
+.sponsor-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
+.sponsor-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#fff;letter-spacing:.04em}
+/* To swap sponsor: change the content value below */
+.sponsor-name::after{content:var(--sponsor-name,"YOUR SPONSOR")}
+.sponsor-divider{width:1px;height:14px;background:rgba(255,255,255,.35)}
 
 .screen{display:none;flex:1;padding:1.5rem;overflow-y:auto;flex-direction:column}
 .screen.active{display:flex}
@@ -36,6 +47,8 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .splash-icon{font-size:2.5rem;margin-bottom:.6rem}
 .splash-hero h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:2rem;color:#fff;line-height:1.15;margin-bottom:.35rem}
 .splash-hero p{font-size:14px;color:rgba(255,255,255,.72);line-height:1.5}
+.splash-sponsor{background:rgba(255,255,255,.12);border-radius:10px;padding:.5rem 1rem;display:inline-block;margin-top:.75rem;font-size:12px;color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-weight:700}
+.splash-sponsor span{color:#fff;font-weight:900}
 .pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
 .pill{font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;font-family:'Nunito',sans-serif}
 .pill-history{background:#FEF3DC;color:#8A5500}.pill-food{background:#FAECE7;color:#8A2E0F}
@@ -43,7 +56,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .pill-sports{background:#FDE8EE;color:#8A1840}.pill-general{background:#F0F0F8;color:#4A4A8A}
 .form-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem}
 .form-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;display:block;font-family:'Nunito',sans-serif}
-.team-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:17px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.team-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:17px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;margin-bottom:0}
 .team-input:focus{border-color:var(--purple)}
 .count-row{display:flex;align-items:center;justify-content:space-between;margin-top:.9rem}
 .count-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--bg);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-family:'Nunito',sans-serif;font-weight:800;transition:all .15s}
@@ -51,13 +64,19 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .count-val{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--purple)}
 
 /* WAITING */
-.waiting-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);width:100%}
+.waiting-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);width:100%;margin-bottom:1rem}
 .waiting-icon{font-size:3.5rem;margin-bottom:.75rem}
 .waiting-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--text);margin-bottom:.4rem}
 .waiting-sub{font-size:14px;color:var(--muted);line-height:1.6}
 .pulse-ring{width:70px;height:70px;border-radius:50%;border:3px solid var(--purple);margin:1.25rem auto;animation:ringPulse 1.8s ease-in-out infinite;opacity:.6}
 @keyframes ringPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.12);opacity:.3}}
 .q-number-badge{background:var(--purple);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;padding:.5rem 1.5rem;border-radius:20px;display:inline-block;margin-bottom:.75rem}
+/* Waiting sponsor slot */
+.waiting-sponsor{background:var(--gold-light);border-radius:14px;padding:1rem 1.25rem;text-align:center;border:1.5px solid #F5D09A}
+.waiting-sponsor-label{font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;font-family:'Nunito',sans-serif}
+.waiting-sponsor-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:#8A5500}
+.waiting-sponsor-name::after{content:var(--sponsor-name,"YOUR SPONSOR")}
+.waiting-sponsor-tagline{font-size:12px;color:#A07030;margin-top:.2rem}
 
 /* QUESTION */
 .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
@@ -66,7 +85,6 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .cat-history{background:#FEF3DC;color:#8A5500}.cat-food{background:#FAECE7;color:#8A2E0F}
 .cat-music{background:#EEF0FF;color:#3D3D9E}.cat-geo{background:#E6F7EE;color:#1A6A3A}
 .cat-sports{background:#FDE8EE;color:#8A1840}.cat-general{background:#F0F0F8;color:#4A4A8A}
-
 .timer-wrap{margin-bottom:1rem}
 .timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
 .timer-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--purple);transition:color .3s;min-width:32px;text-align:right}
@@ -75,7 +93,6 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .timer-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .timer-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:4px;transition:width .25s linear}
 .timer-fill.urgent{background:var(--coral)}
-
 .q-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.1rem;border-left:5px solid var(--purple)}
 .q-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.3rem;line-height:1.45;color:var(--text)}
 .options{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.9rem}
@@ -84,7 +101,6 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .opt-letter{width:30px;height:30px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted);flex-shrink:0;font-family:'Nunito',sans-serif;transition:all .2s}
 .opt:hover:not(.disabled){border-color:var(--purple);background:var(--purple-light)}
 .opt:hover:not(.disabled) .opt-letter{background:var(--purple);border-color:var(--purple);color:#fff}
-/* correct/wrong only shown after answer or reveal */
 .opt.correct{background:var(--correct-bg);border-color:var(--correct)}
 .opt.correct .opt-letter{background:var(--correct);border-color:var(--correct);color:#fff}
 .opt.wrong{background:var(--wrong-bg);border-color:var(--wrong)}
@@ -93,13 +109,24 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .opt.selected-pending .opt-letter{background:var(--purple);border-color:var(--purple);color:#fff}
 .opt.disabled{cursor:default}
 .opt.disabled:not(.correct):not(.wrong):not(.selected-pending){opacity:.5}
-
-.feedback{border-radius:14px;padding:.85rem 1.1rem;font-size:14px;line-height:1.5;display:none;margin-bottom:.9rem;align-items:center;gap:.65rem}
+.feedback{border-radius:14px;padding:.85rem 1.1rem;font-size:14px;line-height:1.5;display:none;margin-bottom:.75rem;align-items:center;gap:.65rem}
 .feedback.show{display:flex;animation:fadeUp .3s ease}
 .feedback.correct{background:var(--correct-bg);color:var(--correct);border:1px solid #b2dfc8}
 .feedback.wrong{background:var(--wrong-bg);color:var(--wrong);border:1px solid #f5c0bb}
 .feedback.timeout{background:var(--gold-light);color:#8A5500;border:1px solid #F5D09A}
+.feedback.bonus{background:#EEF0FF;color:var(--purple-dark);border:1px solid var(--purple-light)}
 .feedback-icon{font-size:1.3rem;flex-shrink:0}
+
+/* RACE BADGE */
+.race-badge{display:none;background:var(--purple);color:#fff;border-radius:20px;padding:4px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;align-items:center;gap:.4rem}
+.race-badge.show{display:inline-flex;animation:fadeUp .3s ease}
+
+/* EMOJI REACTIONS */
+.reaction-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:.75rem;flex-wrap:wrap}
+.reaction-btn{background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:.5rem .9rem;font-size:1.3rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.35rem;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted)}
+.reaction-btn:active{transform:scale(.9)}
+.reaction-btn.sent{background:var(--purple-light);border-color:var(--purple);color:var(--purple);font-weight:700}
+.reaction-btn span.emoji{font-size:1.2rem}
 
 /* PAUSED */
 .paused-card{background:var(--card);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow);width:100%}
@@ -135,7 +162,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .tab.active{color:var(--purple)}
 .tab-icon{font-size:1.25rem}
 
-/* LEADERBOARD */
+/* LEADERBOARD TAB */
 .lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
 .lb-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--text)}
 .live-badge{display:inline-flex;align-items:center;gap:.35rem;background:var(--coral-light);color:var(--coral-dark);font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;font-family:'Nunito',sans-serif}
@@ -152,6 +179,11 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .lb-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--purple)}
 .lb-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
 .spacer{flex:1}
+
+/* FLOATING REACTION TOAST */
+.reaction-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--purple);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;padding:8px 18px;border-radius:20px;display:none;align-items:center;gap:.4rem;z-index:100;animation:toastIn .3s ease}
+.reaction-toast.show{display:flex}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
 </head>
 <body>
@@ -168,12 +200,21 @@ body{display:flex;flex-direction:column;overflow:hidden}
   <span class="header-score" id="live-score">0 pts</span>
 </div>
 
+<!-- SPONSOR BAR (always visible after header) -->
+<!-- To customise: change --sponsor-name and --sponsor-color in :root above -->
+<div class="sponsor-bar" id="sponsor-bar">
+  <span class="sponsor-label">Presented by</span>
+  <span class="sponsor-divider"></span>
+  <span class="sponsor-name"></span>
+</div>
+
 <!-- SPLASH -->
 <div id="splash" class="screen active anim">
   <div class="splash-hero">
     <div class="splash-icon">🇯🇲</div>
     <h1>Jamaica Trivia Night</h1>
-    <p>10 questions · 10 seconds each<br>Host-paced — wait for each question!</p>
+    <p>10 questions · 10 seconds each<br>Race mode — fastest correct answer wins bonus points!</p>
+    <div class="splash-sponsor">Presented by <span class="sponsor-name"></span></div>
   </div>
   <div class="pills">
     <span class="pill pill-history">History</span><span class="pill pill-food">Food</span>
@@ -182,8 +223,8 @@ body{display:flex;flex-direction:column;overflow:hidden}
   </div>
   <div class="form-card">
     <label class="form-label">Your table name</label>
-    <input class="team-input" id="team-name-input" placeholder="e.g. Table 4" maxlength="30">
-    <label class="form-label" style="margin-top:1rem">Your email address</label>
+    <input class="team-input" id="team-name-input" placeholder="e.g. Table 4" maxlength="30" style="margin-bottom:1rem">
+    <label class="form-label">Email address</label>
     <input class="team-input" id="email-input" placeholder="you@example.com" type="email" maxlength="80">
     <label class="form-label" style="margin-top:1rem">Number of players</label>
     <div class="count-row">
@@ -196,7 +237,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 </div>
 
 <!-- WAITING -->
-<div id="waiting" class="screen anim" style="align-items:center;justify-content:center">
+<div id="waiting" class="screen anim" style="align-items:center;justify-content:center;gap:1rem">
   <div class="waiting-card">
     <div class="q-number-badge" id="waiting-badge">Get ready!</div>
     <div class="waiting-icon">⏳</div>
@@ -204,6 +245,12 @@ body{display:flex;flex-direction:column;overflow:hidden}
     <div class="waiting-sub" id="waiting-sub">Your host will launch the first question. Stay sharp! 🇯🇲</div>
     <div class="pulse-ring"></div>
     <div style="font-size:13px;color:var(--muted)" id="waiting-score-line"></div>
+  </div>
+  <!-- Sponsor slot on waiting screen -->
+  <div class="waiting-sponsor" style="width:100%">
+    <div class="waiting-sponsor-label">Tonight's trivia is brought to you by</div>
+    <div class="waiting-sponsor-name"></div>
+    <div class="waiting-sponsor-tagline" id="sponsor-tagline">Add your sponsor tagline here</div>
   </div>
 </div>
 
@@ -215,7 +262,10 @@ body{display:flex;flex-direction:column;overflow:hidden}
   </div>
   <div class="timer-wrap">
     <div class="timer-row">
-      <span style="font-size:13px;color:var(--muted);font-weight:500">Time remaining</span>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">Time remaining</span>
+        <span class="race-badge" id="race-badge">⚡ Race mode</span>
+      </div>
       <span class="timer-num" id="timer-num">10</span>
     </div>
     <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
@@ -226,20 +276,32 @@ body{display:flex;flex-direction:column;overflow:hidden}
     <span class="feedback-icon" id="feedback-icon"></span>
     <span id="feedback-text"></span>
   </div>
+  <!-- Emoji reactions — shown after answering -->
+  <div class="reaction-bar" id="reaction-bar" style="display:none">
+    <button class="reaction-btn" onclick="sendReaction('🔥')"><span class="emoji">🔥</span> Fire</button>
+    <button class="reaction-btn" onclick="sendReaction('😱')"><span class="emoji">😱</span> Shocked</button>
+    <button class="reaction-btn" onclick="sendReaction('👏')"><span class="emoji">👏</span> Clap</button>
+    <button class="reaction-btn" onclick="sendReaction('🎉')"><span class="emoji">🎉</span> Party</button>
+  </div>
   <div class="spacer"></div>
 </div>
 
 <!-- PAUSED -->
-<div id="paused" class="screen anim" style="align-items:center;justify-content:center">
+<div id="paused" class="screen anim" style="align-items:center;justify-content:center;gap:1rem">
   <div class="paused-card">
     <div style="font-size:3rem;margin-bottom:.75rem">☕</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6rem;color:var(--text);margin-bottom:.3rem">Question <span id="pause-q-num"></span> done!</div>
     <div style="font-size:14px;color:var(--muted);margin-bottom:1rem">Your host will start the next question shortly.</div>
     <div class="score-preview">
       <div class="score-preview-num" id="pause-score"></div>
-      <div class="score-preview-label">points so far</div>
+      <div class="score-preview-label">points so far (incl. bonus)</div>
     </div>
     <div style="font-size:13px;color:var(--muted)" id="pause-correct-count"></div>
+  </div>
+  <div class="waiting-sponsor" style="width:100%">
+    <div class="waiting-sponsor-label">Brought to you by</div>
+    <div class="waiting-sponsor-name"></div>
+    <div class="waiting-sponsor-tagline" id="sponsor-tagline2">Add your sponsor tagline here</div>
   </div>
 </div>
 
@@ -247,7 +309,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 <div id="results" class="screen anim">
   <div class="results-hero">
     <div class="score-big" id="score-num"></div>
-    <div class="score-denom">out of 10</div>
+    <div class="score-denom">out of 10 (+bonus)</div>
     <div class="score-headline" id="result-headline"></div>
     <div class="score-pct" id="score-pct"></div>
   </div>
@@ -272,9 +334,12 @@ body{display:flex;flex-direction:column;overflow:hidden}
   <button class="tab" id="tab-lb-btn" onclick="showTab('leaderboard')"><span class="tab-icon">🏆</span><span>Leaderboard</span></button>
 </div>
 
+<!-- Reaction toast -->
+<div class="reaction-toast" id="reaction-toast"></div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
@@ -288,6 +353,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// =============================================
+// SPONSOR CONFIG — change these two values only
+const SPONSOR_NAME = "YOUR SPONSOR";
+const SPONSOR_TAGLINE = "Add your sponsor tagline here";
+// =============================================
+
+// Inject sponsor name & tagline into all placeholders
+document.querySelectorAll('.sponsor-name').forEach(el => el.textContent = SPONSOR_NAME);
+document.querySelectorAll('.waiting-sponsor-tagline, #sponsor-tagline, #sponsor-tagline2').forEach(el => el.textContent = SPONSOR_TAGLINE);
 
 const QUESTIONS = [
   {cat:'history',label:'History',q:'In what year did Jamaica gain independence from Britain?',opts:['1958','1960','1962','1966'],ans:2},
@@ -306,10 +381,11 @@ const CAT_CLASS={history:'cat-history',food:'cat-food',music:'cat-music',geo:'ca
 const LETTERS=['A','B','C','D'];
 const MEDALS=['🥇','🥈','🥉'];
 const TIMER_SECS=10;
+const BONUS_POSITIONS=3; // top 3 get +1 bonus
 
-let teamName='',playerEmail='',playerCount=2,score=0,answers=[],gameJoined=false;
+let teamName='',playerEmail='',playerCount=2,score=0,bonusPoints=0,answers=[],gameJoined=false;
 let currentQ=-1,timerInterval=null,timeLeft=0,answered=false,currentScreen='splash';
-let selectedOptIndex=-1;
+let selectedOptIndex=-1,questionStartTime=0,reactionSent=false;
 
 window.adjustCount=d=>{playerCount=Math.max(1,Math.min(12,playerCount+d));document.getElementById('player-count').textContent=playerCount;};
 
@@ -337,11 +413,10 @@ window.joinGame=function(){
   playerEmail=document.getElementById('email-input').value.trim().toLowerCase();
   if(!teamName){alert('Please enter your table name!');return;}
   if(!playerEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(playerEmail)){alert('Please enter a valid email address!');return;}
-  gameJoined=true;score=0;answers=[];currentQ=-1;
+  gameJoined=true;score=0;bonusPoints=0;answers=[];currentQ=-1;
   document.getElementById('live-score').style.display='block';
   document.getElementById('tab-bar').style.display='flex';
-  updateLiveScore();
-  showWaiting(0);show('waiting');
+  updateLiveScore();showWaiting(0);show('waiting');
   listenForHostCommands();
 };
 
@@ -357,10 +432,11 @@ function showWaiting(qNum){
     sub.textContent='Your host will launch the first question. Stay sharp! 🇯🇲';
     scoreLine.textContent='';
   } else {
-    badge.textContent='Question '+(qNum+1)+' coming up...';
+    badge.textContent='Q'+(qNum+1)+' coming up...';
     title.textContent='Nice work!';
     sub.textContent='Your host will start the next question when ready.';
-    scoreLine.textContent='Score so far: '+score+' pts ('+answers.filter(a=>a.result==='correct').length+' correct)';
+    const correct=answers.filter(a=>a.result==='correct'||a.result==='bonus').length;
+    scoreLine.textContent='Score: '+score+' pts ('+correct+' correct, '+bonusPoints+' bonus)';
   }
 }
 
@@ -368,19 +444,31 @@ function listenForHostCommands(){
   onValue(ref(db,'host/command'),snapshot=>{
     const cmd=snapshot.val();
     if(!cmd||!gameJoined) return;
-    if(cmd.action==='question' && cmd.index!==currentQ){
-      currentQ=cmd.index;answered=false;selectedOptIndex=-1;
+    if(cmd.action==='question'&&cmd.index!==currentQ){
+      currentQ=cmd.index;answered=false;selectedOptIndex=-1;reactionSent=false;
+      questionStartTime=Date.now();
       launchQuestion(currentQ);
     } else if(cmd.action==='reveal'){
-      // Host stopped timer and revealed — show answer without scoring if not yet answered
       if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-      revealAnswerOnTablet(currentQ, false);
+      revealAnswerOnTablet(currentQ,false);
     } else if(cmd.action==='pause'){
       if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
       showPausedScreen();
     } else if(cmd.action==='end'){
       if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
       showResults();
+    }
+  });
+
+  // Listen for race bonus notifications for this team
+  onValue(ref(db,'race/q'+currentQ),snapshot=>{
+    const data=snapshot.val();
+    if(!data||answered) return;
+    // Check if this team is in top 3
+    const entries=Object.values(data).filter(e=>e.correct).sort((a,b)=>a.time-b.time);
+    const myEntry=entries.findIndex(e=>e.team===teamName);
+    if(myEntry>=0&&myEntry<BONUS_POSITIONS&&!data[teamName+'_bonus_applied']){
+      showBonusNotification(myEntry+1);
     }
   });
 }
@@ -397,7 +485,8 @@ function launchQuestion(idx){
   cat.textContent=q.label;cat.className='cat-pill '+CAT_CLASS[q.cat];
   document.getElementById('q-text').textContent=q.q;
   document.getElementById('feedback').className='feedback';
-  // Render options with NO correct/wrong styling — plain only
+  document.getElementById('reaction-bar').style.display='none';
+  document.getElementById('race-badge').className='race-badge show';
   document.getElementById('options').innerHTML=q.opts.map((o,i)=>`
     <button class="opt" id="opt-${i}" onclick="selectOpt(${i})">
       <span class="opt-letter">${LETTERS[i]}</span><span>${o}</span>
@@ -407,14 +496,10 @@ function launchQuestion(idx){
 
 function startTimer(idx){
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  timeLeft=TIMER_SECS;
-  updateTimerUI(timeLeft);
+  timeLeft=TIMER_SECS;updateTimerUI(timeLeft);
   timerInterval=setInterval(()=>{
     timeLeft--;updateTimerUI(timeLeft);
-    if(timeLeft<=0){
-      clearInterval(timerInterval);timerInterval=null;
-      if(!answered) timeoutQuestion(idx);
-    }
+    if(timeLeft<=0){clearInterval(timerInterval);timerInterval=null;if(!answered)timeoutQuestion(idx);}
   },1000);
 }
 
@@ -430,30 +515,18 @@ function updateTimerUI(t){
 function timeoutQuestion(idx){
   if(answered) return;
   answered=true;
-  // If they had selected something, record it
-  if(selectedOptIndex>=0){
-    const correct=selectedOptIndex===QUESTIONS[idx].ans;
-    if(correct) score++;
-    answers.push({q:QUESTIONS[idx].q,result:correct?'correct':'wrong'});
-    updateLiveScore();
-    revealAnswerOnTablet(idx, true);
-  } else {
-    answers.push({q:QUESTIONS[idx].q,result:'timeout'});
-    revealAnswerOnTablet(idx, true);
-  }
+  answers.push({q:QUESTIONS[idx].q,result:'timeout'});
+  revealAnswerOnTablet(idx,true);
 }
 
-function revealAnswerOnTablet(idx, fromTimeout){
+function revealAnswerOnTablet(idx,fromTimeout){
   const q=QUESTIONS[idx];
-  // Lock all options
   document.querySelectorAll('.opt').forEach((el,i)=>{
     el.classList.remove('selected-pending');
-    el.classList.add('disabled');
-    el.onclick=null;
+    el.classList.add('disabled');el.onclick=null;
     if(i===q.ans) el.classList.add('correct');
   });
   if(!answered){
-    // Called from host reveal before player answered
     answered=true;
     answers.push({q:q.q,result:'timeout'});
     const fb=document.getElementById('feedback');
@@ -463,9 +536,9 @@ function revealAnswerOnTablet(idx, fromTimeout){
   } else {
     const lastAns=answers[answers.length-1];
     const fb=document.getElementById('feedback');
-    if(lastAns.result==='correct'){
+    if(lastAns.result==='correct'||lastAns.result==='bonus'){
       document.getElementById('feedback-icon').textContent='🎉';
-      document.getElementById('feedback-text').textContent='Correct! One point for your table!';
+      document.getElementById('feedback-text').textContent='Correct! Great work — check for bonus points!';
       fb.className='feedback correct show';
     } else if(lastAns.result==='wrong'){
       document.getElementById('opt-'+selectedOptIndex)?.classList.add('wrong');
@@ -479,41 +552,101 @@ function revealAnswerOnTablet(idx, fromTimeout){
     }
   }
   updateTimerUI(0);
+  document.getElementById('reaction-bar').style.display='flex';
+  document.getElementById('race-badge').className='race-badge';
 }
 
-window.selectOpt=function(i){
+window.selectOpt=async function(i){
   if(answered) return;
-  // Mark as selected-pending (purple highlight) but don't reveal answer yet
-  document.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected-pending'));
-  document.getElementById('opt-'+i).classList.add('selected-pending');
-  selectedOptIndex=i;
-  // Score and record immediately but don't show result until timeout or reveal
+  const responseTime=Date.now()-questionStartTime;
+  answered=true;
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
   const q=QUESTIONS[currentQ];
   const correct=i===q.ans;
-  if(correct) score++;
-  answers.push({q:q.q,result:correct?'correct':'wrong'});
-  answered=true;
+  selectedOptIndex=i;
+  document.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected-pending'));
+  document.getElementById('opt-'+i).classList.add('selected-pending');
+
+  if(correct){
+    score++;
+    answers.push({q:q.q,result:'correct'});
+    // Write to race leaderboard for this question
+    try{
+      await set(ref(db,'race/q'+currentQ+'/'+teamName.replace(/[^a-zA-Z0-9]/g,'_')),{
+        team:teamName,correct:true,time:responseTime,timestamp:Date.now()
+      });
+    }catch(e){}
+  } else {
+    answers.push({q:q.q,result:'wrong'});
+  }
   updateLiveScore();
-  // Stop timer and reveal
-  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  revealAnswerOnTablet(currentQ, false);
+  revealAnswerOnTablet(currentQ,false);
+};
+
+// Listen for bonus points awarded by host for this question
+function listenForBonus(qIdx){
+  onValue(ref(db,'race/q'+qIdx),snapshot=>{
+    const data=snapshot.val();
+    if(!data) return;
+    const entries=Object.values(data).filter(e=>e.correct&&e.team).sort((a,b)=>a.time-b.time);
+    const myPos=entries.findIndex(e=>e.team===teamName);
+    if(myPos>=0&&myPos<BONUS_POSITIONS){
+      // Only apply bonus once
+      const bonusKey='bonus_applied_q'+qIdx;
+      if(!window[bonusKey]){
+        window[bonusKey]=true;
+        bonusPoints++;score++;updateLiveScore();
+        showBonusNotification(myPos+1);
+        // Update last answer result
+        if(answers[qIdx]) answers[qIdx].result='bonus';
+      }
+    }
+  });
+}
+
+function showBonusNotification(position){
+  const pos=position===1?'1st':position===2?'2nd':'3rd';
+  const fb=document.getElementById('feedback');
+  document.getElementById('feedback-icon').textContent='⚡';
+  document.getElementById('feedback-text').textContent='Bonus! You were '+pos+' to answer correctly — +1 point!';
+  fb.className='feedback bonus show';
+}
+
+// Emoji reactions
+window.sendReaction=async function(emoji){
+  if(reactionSent) return;
+  reactionSent=true;
+  document.querySelectorAll('.reaction-btn').forEach(b=>{
+    if(b.textContent.includes(emoji)) b.classList.add('sent');
+  });
+  try{
+    await push(ref(db,'reactions'),{
+      emoji,team:teamName,q:currentQ,timestamp:Date.now()
+    });
+  }catch(e){}
+  const toast=document.getElementById('reaction-toast');
+  toast.innerHTML=emoji+' Reaction sent!';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
 };
 
 function showPausedScreen(){
   const qDone=answers.length;
   document.getElementById('pause-q-num').textContent=qDone;
   document.getElementById('pause-score').textContent=score;
-  document.getElementById('pause-correct-count').textContent=answers.filter(a=>a.result==='correct').length+' correct out of '+qDone;
+  const correct=answers.filter(a=>a.result==='correct'||a.result==='bonus').length;
+  document.getElementById('pause-correct-count').textContent=correct+' correct out of '+qDone+' ('+bonusPoints+' bonus pts)';
   show('paused');
   document.getElementById('tab-play-btn').classList.add('active');
   document.getElementById('tab-lb-btn').classList.remove('active');
+  listenForBonus(currentQ);
 }
 
 async function saveScore(){
   const notice=document.getElementById('saving-notice');
   try{
     const key=teamName.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();
-    await set(ref(db,'scores/'+key),{team:teamName,email:playerEmail,players:playerCount,score,total:QUESTIONS.length,timestamp:Date.now()});
+    await set(ref(db,'scores/'+key),{team:teamName,email:playerEmail,players:playerCount,score,bonus:bonusPoints,total:QUESTIONS.length,timestamp:Date.now()});
     notice.textContent='✓ Score saved! Check the leaderboard.';
     notice.style.background='#EAF7F0';notice.style.color='#2D7A4F';
   }catch(e){
@@ -523,15 +656,15 @@ async function saveScore(){
 }
 
 function showResults(){
-  const pct=Math.round((score/QUESTIONS.length)*100);
+  const pct=Math.round(((score-bonusPoints)/QUESTIONS.length)*100);
   const headline=pct===100?'Nuh badda! Perfect! 🏆':pct>=80?'Big up yourself! 🎉':pct>=60?'Respect! 👍':pct>=40?'Keep it up! 😅':'Better luck next time!';
   document.getElementById('score-num').textContent=score;
   document.getElementById('result-headline').textContent=headline;
-  document.getElementById('score-pct').textContent=pct+'% correct · '+teamName;
+  document.getElementById('score-pct').textContent=pct+'% correct · '+bonusPoints+' bonus pts · '+teamName;
   document.getElementById('result-list').innerHTML=answers.map((a,i)=>`
     <div class="result-row">
       <span class="result-q">Q${i+1}. ${QUESTIONS[i].q.length>52?QUESTIONS[i].q.substring(0,52)+'…':QUESTIONS[i].q}</span>
-      <span class="result-dot dot-${a.result}"></span>
+      <span class="result-dot dot-${a.result==='bonus'?'correct':a.result}"></span>
     </div>`).join('');
   show('results');
   document.getElementById('tab-play-btn').classList.add('active');
@@ -546,7 +679,7 @@ window.restartGame=function(){
   document.getElementById('live-score').style.display='none';
   document.getElementById('tab-bar').style.display='none';
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  gameJoined=false;answered=false;selectedOptIndex=-1;
+  gameJoined=false;answered=false;selectedOptIndex=-1;bonusPoints=0;
   show('splash');
 };
 
@@ -563,7 +696,7 @@ onValue(ref(db,'scores'),snapshot=>{
       <div class="lb-medal">${MEDALS[i]||''}</div>
       <div class="lb-info">
         <div class="lb-team">${e.team}</div>
-        <div class="lb-players">${e.players} player${e.players!==1?'s':''} · ${Math.round((e.score/e.total)*100)}%</div>
+        <div class="lb-players">${e.players} player${e.players!==1?'s':''} · ${Math.round(((e.score-(e.bonus||0))/e.total)*100)}%${e.bonus?` · ⚡${e.bonus} bonus`:''}</div>
       </div>
       <div class="lb-score">${e.score}<span style="font-size:.65rem;opacity:.6"> pts</span></div>
     </div>`).join('');
