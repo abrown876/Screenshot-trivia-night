@@ -3,148 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trivia Night — Live Leaderboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<title>Live Leaderboard — Screenshot Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{--gold:#C9A84C;--gold-light:#F5E6C0;--bg:#1A1208;--card:#2A1E0E;--text:#F5E6C0;--muted:#8A7A5A;--border:#3A2A12}
-  html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);overflow:hidden}
-  body{display:flex;flex-direction:column}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7B7BFF;--purple-dim:#5B5BD6;--purple-glow:rgba(123,123,255,0.18);
+  --coral:#FF6B8A;--gold:#FFD166;--green:#06D6A0;
+  --bg:#0A0A1E;--card:#12122A;--card2:#1A1A35;--text:#F0F0FF;--muted:#8888BB;--border:#2A2A50
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+body{display:flex;flex-direction:column}
 
-  .top{padding:2rem 3rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-  .title{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);letter-spacing:.02em}
-  .live-dot{display:flex;align-items:center;gap:.5rem;font-size:14px;color:var(--muted)}
-  .dot{width:8px;height:8px;border-radius:50%;background:#E24B4A;animation:pulse 1.5s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  .subtitle{font-size:14px;color:var(--muted);margin-top:.2rem}
+/* Background grid texture */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(123,123,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(123,123,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
 
-  .board{flex:1;padding:1.5rem 3rem 2rem;overflow:hidden;display:flex;flex-direction:column;gap:.75rem}
+/* Header */
+.header{padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:relative;flex-shrink:0}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--purple);letter-spacing:.04em}
+.logo-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:.68rem;color:var(--coral);letter-spacing:.14em;text-transform:uppercase}
+.header-right{text-align:right}
+.event-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:2rem;color:var(--text);letter-spacing:-.01em}
+.live-chip{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,107,138,0.12);border:1px solid rgba(255,107,138,0.4);color:var(--coral);font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;margin-top:.3rem;font-family:'Nunito',sans-serif}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-  .row{background:var(--card);border-radius:16px;padding:1.2rem 1.75rem;display:flex;align-items:center;gap:1.5rem;border:1px solid var(--border);transition:all .5s ease;animation:slideIn .4s ease}
-  @keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-  .row.first{background:#2A2000;border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,0.15)}
-  .row.second{background:#1E1A0A;border-color:#8A7030}
-  .row.third{background:#221510;border-color:#6A3020}
+/* Board */
+.board{flex:1;padding:1.25rem 3rem 1.5rem;display:flex;flex-direction:column;gap:.7rem;overflow:hidden}
 
-  .rank{font-family:'Playfair Display',serif;font-size:2rem;min-width:56px;text-align:center;color:var(--muted)}
-  .row.first .rank{color:var(--gold)}
-  .row.second .rank{color:#C0A040}
-  .row.third .rank{color:#C06040}
+/* Row */
+.row{background:var(--card);border-radius:18px;padding:1.1rem 1.6rem;display:flex;align-items:center;gap:1.4rem;border:1px solid var(--border);transition:all .6s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
+.row::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
+@keyframes rowIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+.row{animation:rowIn .5s ease forwards}
+.row:nth-child(2){animation-delay:.05s}
+.row:nth-child(3){animation-delay:.1s}
+.row:nth-child(4){animation-delay:.15s}
+.row:nth-child(5){animation-delay:.2s}
 
-  .medal{font-size:1.8rem;min-width:40px;text-align:center}
+/* First place — purple glow */
+.row.first{background:linear-gradient(135deg,#1A1A40,#14144A);border-color:var(--purple-dim);box-shadow:0 0 40px var(--purple-glow),inset 0 0 40px rgba(123,123,255,0.04)}
+.row.first::before{background:linear-gradient(90deg,var(--purple-glow),transparent);opacity:1}
+/* Second */
+.row.second{background:var(--card2);border-color:#3A3A60}
+/* Third */
+.row.third{background:var(--card2);border-color:rgba(255,107,138,0.3)}
 
-  .info{flex:1}
-  .team{font-size:1.4rem;font-weight:500;color:var(--text);line-height:1.2}
-  .players{font-size:13px;color:var(--muted);margin-top:.2rem}
+.rank{font-family:'Nunito',sans-serif;font-weight:900;font-size:2rem;min-width:52px;text-align:center;color:var(--muted);position:relative;z-index:1}
+.row.first .rank{color:var(--purple)}
+.row.second .rank{color:#9090CC}
+.row.third .rank{color:var(--coral)}
 
-  .bar-wrap{flex:2;height:12px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
-  .bar{height:100%;border-radius:6px;background:var(--gold);transition:width 1s ease}
-  .row.second .bar{background:#C0A040}
-  .row.third .bar{background:#C06040}
-  .row:not(.first):not(.second):not(.third) .bar{background:#5A4A2A}
+.medal{font-size:1.8rem;min-width:38px;text-align:center;position:relative;z-index:1}
 
-  .score-col{text-align:right;min-width:80px}
-  .score-num{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1}
-  .row.second .score-num{color:#C0A040}
-  .row.third .score-num{color:#C06040}
-  .row:not(.first):not(.second):not(.third) .score-num{color:var(--muted)}
-  .score-label{font-size:12px;color:var(--muted)}
+.info{flex:1;position:relative;z-index:1}
+.team{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--text);letter-spacing:-.01em}
+.row.first .team{color:#fff}
+.meta{font-size:13px;color:var(--muted);margin-top:.2rem;display:flex;align-items:center;gap:.6rem}
+.pct-pill{background:rgba(255,255,255,.06);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
+.row.first .pct-pill{background:rgba(123,123,255,.2);color:var(--purple)}
 
-  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;opacity:.5}
-  .empty-icon{font-size:4rem}
-  .empty-text{font-size:1.1rem;color:var(--muted)}
+/* Bar */
+.bar-col{flex:1.8;position:relative;z-index:1}
+.bar-track{height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--purple-dim),var(--purple));transition:width 1.4s cubic-bezier(.34,1.2,.64,1)}
+.row.second .bar-fill{background:linear-gradient(90deg,#6060AA,#9090CC)}
+.row.third .bar-fill{background:linear-gradient(90deg,#A04060,var(--coral))}
+.row:not(.first):not(.second):not(.third) .bar-fill{background:linear-gradient(90deg,#2A2A50,#4A4A70)}
 
-  .footer{padding:.75rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-  .footer-url{font-size:13px;color:var(--muted)}
-  .teams-count{font-size:13px;color:var(--muted)}
-  .refresh-note{font-size:12px;color:var(--muted);opacity:.6}
+/* Score */
+.score-col{text-align:right;min-width:88px;position:relative;z-index:1}
+.score-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.4rem;line-height:1;color:var(--purple)}
+.row.second .score-num{color:#9090CC}
+.row.third .score-num{color:var(--coral)}
+.row:not(.first):not(.second):not(.third) .score-num{color:var(--muted)}
+.score-denom{font-size:12px;color:var(--muted)}
+
+/* Empty state */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.empty-icon{font-size:5rem;opacity:.3}
+.empty-text{font-family:'Nunito',sans-serif;font-weight:700;font-size:1.2rem;color:var(--muted)}
+
+/* Footer */
+.footer{padding:.8rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.footer-url{font-size:13px;color:var(--muted)}
+.footer-count{font-size:13px;color:var(--muted)}
+.jm-flag{font-size:1.2rem}
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div>
-    <div class="title">🎯 Trivia Night — Leaderboard</div>
-    <div class="subtitle">Updates live as tables complete the quiz</div>
+<div class="header">
+  <div class="logo">
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+      <circle cx="23" cy="23" r="19" stroke="#7B7BFF" stroke-width="2.2" stroke-dasharray="5 2.5"/>
+      <circle cx="23" cy="23" r="19" stroke="#FF6B8A" stroke-width="3" stroke-dasharray="9 110" stroke-dashoffset="-94"/>
+      <text x="23" y="30" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="22" fill="#7B7BFF">S</text>
+    </svg>
+    <div>
+      <div class="logo-name">SCREENSHOT</div>
+      <div class="logo-sub">Interactive</div>
+    </div>
   </div>
-  <div class="live-dot"><span class="dot"></span> Live</div>
+  <div class="header-right">
+    <div class="event-title">🇯🇲 Jamaica Trivia Night</div>
+    <div class="live-chip"><span class="live-dot"></span>Live leaderboard</div>
+  </div>
 </div>
 
 <div class="board" id="board">
   <div class="empty">
-    <div class="empty-icon">🎯</div>
+    <div class="empty-icon">🏆</div>
     <div class="empty-text">Waiting for tables to finish...</div>
   </div>
 </div>
 
 <div class="footer">
-  <span class="footer-url">abrown876.github.io/Screenshot-trivia-night</span>
-  <span class="teams-count" id="teams-count"></span>
-  <span class="refresh-note">Auto-refreshes every 10 seconds</span>
+  <div style="display:flex;align-items:center;gap:.5rem">
+    <span class="jm-flag">🇯🇲</span>
+    <span class="footer-url">Play at: abrown876.github.io/Screenshot-trivia-night</span>
+  </div>
+  <span class="footer-count" id="footer-count"></span>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
-    authDomain: "screenshot-trivia-night.firebaseapp.com",
-    databaseURL: "https://screenshot-trivia-night-default-rtdb.firebaseio.com",
-    projectId: "screenshot-trivia-night",
-    storageBucket: "screenshot-trivia-night.firebasestorage.app",
-    messagingSenderId: "482758352954",
-    appId: "1:482758352954:web:832d1cba008bc0b789d503"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+  authDomain: "screenshot-trivia-night.firebaseapp.com",
+  databaseURL: "https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+  projectId: "screenshot-trivia-night",
+  storageBucket: "screenshot-trivia-night.firebasestorage.app",
+  messagingSenderId: "482758352954",
+  appId: "1:482758352954:web:832d1cba008bc0b789d503"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const MEDALS = ['🥇','🥈','🥉'];
-  const RANK_CLASS = ['first','second','third'];
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const MEDALS=['🥇','🥈','🥉'];
+const RANK_CLASS=['first','second','third'];
 
-  onValue(ref(db,'scores'), (snapshot) => {
-    const data = snapshot.val();
-    const board = document.getElementById('board');
-    const countEl = document.getElementById('teams-count');
-
-    if(!data){
-      board.innerHTML=`<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Waiting for tables to finish...</div></div>`;
-      countEl.textContent='';
-      return;
-    }
-
-    // Get best score per team name
-    const best = {};
-    Object.values(data).forEach(entry => {
-      const t = entry.team;
-      if(!best[t] || entry.score > best[t].score) best[t] = entry;
-    });
-
-    const sorted = Object.values(best).sort((a,b) => b.score - a.score);
-    const maxScore = sorted[0]?.score || 20;
-    countEl.textContent = sorted.length + ' team' + (sorted.length!==1?'s':'') + ' completed';
-
-    board.innerHTML = sorted.slice(0,8).map((entry, i) => {
-      const rankClass = RANK_CLASS[i] || '';
-      const pct = Math.round((entry.score / entry.total) * 100);
-      const barWidth = Math.round((entry.score / maxScore) * 100);
-      return `
-        <div class="row ${rankClass}">
-          <div class="rank">${i+1}</div>
-          <div class="medal">${MEDALS[i]||''}</div>
-          <div class="info">
-            <div class="team">${entry.team}</div>
-            <div class="players">${entry.players} player${entry.players!==1?'s':''} · ${pct}% correct</div>
-          </div>
-          <div class="bar-wrap"><div class="bar" style="width:${barWidth}%"></div></div>
-          <div class="score-col">
-            <div class="score-num">${entry.score}</div>
-            <div class="score-label">/ ${entry.total} pts</div>
-          </div>
+onValue(ref(db,'scores'),snapshot=>{
+  const data=snapshot.val();
+  const board=document.getElementById('board');
+  const countEl=document.getElementById('footer-count');
+  if(!data){
+    board.innerHTML=`<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for tables to finish...</div></div>`;
+    countEl.textContent='';return;
+  }
+  const best={};
+  Object.values(data).forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
+  const sorted=Object.values(best).sort((a,b)=>b.score-a.score);
+  const maxScore=sorted[0]?.score||10;
+  countEl.textContent=sorted.length+' table'+(sorted.length!==1?'s':'')+' completed';
+  board.innerHTML=sorted.slice(0,7).map((e,i)=>{
+    const barW=Math.round((e.score/maxScore)*100);
+    const pct=Math.round((e.score/e.total)*100);
+    return `<div class="row ${RANK_CLASS[i]||''}">
+      <div class="rank">${i+1}</div>
+      <div class="medal">${MEDALS[i]||''}</div>
+      <div class="info">
+        <div class="team">${e.team}</div>
+        <div class="meta">
+          <span>${e.players} player${e.players!==1?'s':''}</span>
+          <span class="pct-pill">${pct}% correct</span>
         </div>
-      `;
-    }).join('');
-  });
+      </div>
+      <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:${barW}%"></div></div></div>
+      <div class="score-col">
+        <div class="score-num">${e.score}</div>
+        <div class="score-denom">/ ${e.total} pts</div>
+      </div>
+    </div>`;
+  }).join('');
+});
 </script>
 </body>
 </html>
