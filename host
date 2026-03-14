@@ -20,74 +20,67 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .header-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:#fff}
 .header-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:.1rem}
 .host-badge{background:var(--coral);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;padding:4px 14px;border-radius:20px}
-.main{max-width:720px;margin:0 auto;padding:1.5rem}
+.main{max-width:720px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem}
 
-/* Status bar */
-.status-bar{background:var(--card);border-radius:var(--radius);padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);margin-bottom:1.25rem;border-left:5px solid var(--purple)}
-.status-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem;font-family:'Nunito',sans-serif}
-.status-val{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--text)}
-.tables-count{background:var(--purple-light);color:var(--purple);font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;padding:.4rem 1rem;border-radius:20px}
+.card{background:var(--card);border-radius:var(--radius);padding:1.25rem 1.5rem;box-shadow:var(--shadow)}
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.7rem;font-family:'Nunito',sans-serif}
 
-/* Current question card */
-.q-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem}
-.q-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.q-card-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text)}
+/* Status */
+.status-bar{display:flex;align-items:center;justify-content:space-between;border-left:5px solid var(--purple)}
+.status-val{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:var(--text)}
+.tables-pill{background:var(--purple-light);color:var(--purple);font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;padding:.4rem 1rem;border-radius:20px}
+
+/* Question card */
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.q-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--text)}
 .cat-pill{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:'Nunito',sans-serif}
-.cat-history{background:#FEF3DC;color:#8A5500}
-.cat-food{background:#FAECE7;color:#8A2E0F}
-.cat-music{background:#EEF0FF;color:#3D3D9E}
-.cat-geo{background:#E6F7EE;color:#1A6A3A}
-.cat-sports{background:#FDE8EE;color:#8A1840}
-.cat-general{background:#F0F0F8;color:#4A4A8A}
-.q-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.4;color:var(--text);margin-bottom:.9rem}
-.answer-reveal{background:var(--green-light);border:1.5px solid #90D4A8;border-radius:10px;padding:.7rem 1rem;font-size:14px;color:var(--green);font-weight:600;display:none;margin-bottom:.9rem}
-.answer-reveal.show{display:block}
-.opts-preview{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem}
-.opt-prev{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .9rem;font-size:13px;display:flex;align-items:center;gap:.5rem}
-.opt-prev.correct-opt{background:var(--green-light);border-color:#90D4A8;color:var(--green)}
+.cat-history{background:#FEF3DC;color:#8A5500}.cat-food{background:#FAECE7;color:#8A2E0F}
+.cat-music{background:#EEF0FF;color:#3D3D9E}.cat-geo{background:#E6F7EE;color:#1A6A3A}
+.cat-sports{background:#FDE8EE;color:#8A1840}.cat-general{background:#F0F0F8;color:#4A4A8A}
+.q-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;line-height:1.4;color:var(--text);margin-bottom:.85rem}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.85rem}
+.opt-prev{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .9rem;font-size:13px;display:flex;align-items:center;gap:.5rem;transition:all .2s}
+.opt-prev.correct-opt{background:var(--green-light);border-color:#90D4A8;color:var(--green);font-weight:600}
 .opt-letter{width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;font-family:'Nunito',sans-serif}
 .correct-opt .opt-letter{background:var(--green);color:#fff}
+.answer-box{background:var(--green-light);border:1.5px solid #90D4A8;border-radius:10px;padding:.7rem 1rem;font-size:14px;color:var(--green);font-weight:700;display:none;margin-bottom:.85rem}
+.answer-box.show{display:block}
 
-/* Timer display */
-.timer-display{background:var(--purple-light);border-radius:12px;padding:.75rem 1rem;text-align:center;margin-bottom:.9rem}
-.timer-big{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.5rem;color:var(--purple);line-height:1}
-.timer-bar-wrap{height:8px;background:rgba(91,91,214,.2);border-radius:4px;margin-top:.4rem;overflow:hidden}
-.timer-bar-fill{height:100%;background:var(--purple);border-radius:4px;transition:width .25s linear}
-.timer-bar-fill.urgent{background:var(--coral)}
+/* Timer */
+.timer-block{background:var(--purple-light);border-radius:12px;padding:.85rem 1rem;text-align:center}
+.timer-big{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.8rem;color:var(--purple);line-height:1;transition:color .3s}
+.timer-big.urgent{color:var(--coral)}
+.timer-track{height:8px;background:rgba(91,91,214,.2);border-radius:4px;margin-top:.5rem;overflow:hidden}
+.timer-fill{height:100%;background:var(--purple);border-radius:4px;transition:width .25s linear}
+.timer-fill.urgent{background:var(--coral)}
 
-/* Control buttons */
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
-.btn{width:100%;padding:14px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:.5rem}
+/* Buttons */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.btn{width:100%;padding:13px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:.4rem}
 .btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-launch{background:var(--purple);color:#fff;grid-column:1/-1}
-.btn-pause{background:var(--amber);color:#fff}
-.btn-reveal{background:var(--green);color:#fff}
-.btn-end{background:var(--coral);color:#fff;grid-column:1/-1}
-.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+.btn-purple{background:var(--purple);color:#fff;grid-column:1/-1;font-size:16px;padding:15px}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-coral{background:var(--coral);color:#fff;grid-column:1/-1}
 
-/* Question nav */
-.q-nav{background:var(--card);border-radius:var(--radius);padding:1.25rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem}
-.q-nav-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.07em}
+/* Q dots */
 .q-dots{display:flex;flex-wrap:wrap;gap:.5rem}
-.q-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.q-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);transition:all .2s;display:flex;align-items:center;justify-content:center}
 .q-dot.done{background:var(--green-light);border-color:var(--green);color:var(--green)}
 .q-dot.active{background:var(--purple);border-color:var(--purple);color:#fff}
-.q-dot.skipped{background:var(--coral-light);border-color:var(--coral);color:var(--coral)}
 
-/* Leaderboard preview */
-.lb-section{background:var(--card);border-radius:var(--radius);padding:1.25rem 1.5rem;box-shadow:var(--shadow)}
-.lb-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text);margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between}
-.live-dot-wrap{display:flex;align-items:center;gap:.35rem;font-size:12px;color:var(--coral);font-weight:700}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* Leaderboard */
 .lb-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)}
 .lb-row:last-child{border-bottom:none}
+.lb-left{display:flex;align-items:center;gap:.5rem}
+.lb-medal{font-size:1.1rem;min-width:22px}
 .lb-team{font-weight:500;font-size:14px}
 .lb-score{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--purple)}
-.lb-empty{text-align:center;font-size:13px;color:var(--muted);padding:1.5rem 0}
-
-.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;font-family:'Nunito',sans-serif}
+.lb-empty{text-align:center;font-size:13px;color:var(--muted);padding:1.25rem 0}
+.live-row{display:flex;align-items:center;gap:.5rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
 </head>
 <body>
@@ -103,49 +96,51 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 <div class="main">
 
   <!-- Status -->
-  <div class="status-bar">
+  <div class="card status-bar">
     <div>
-      <div class="status-label">Current status</div>
+      <div class="section-label">Status</div>
       <div class="status-val" id="status-val">Ready to start</div>
     </div>
-    <div class="tables-count" id="tables-count">0 tables</div>
+    <div class="tables-pill" id="tables-count">0 tables</div>
   </div>
 
-  <!-- Current Q Card -->
-  <div class="q-card">
-    <div class="q-card-header">
-      <div class="q-card-title" id="q-card-title">No question launched</div>
+  <!-- Current question -->
+  <div class="card">
+    <div class="q-header">
+      <div class="q-title" id="q-card-title">No question selected</div>
       <span class="cat-pill" id="q-cat-pill"></span>
     </div>
-    <div class="q-text" id="q-text-host">Select a question below and hit Launch ↓</div>
-    <div class="answer-reveal" id="answer-reveal"></div>
-    <div class="opts-preview" id="opts-preview"></div>
-    <div class="timer-display" id="timer-display" style="display:none">
-      <div class="timer-big" id="host-timer-num">15</div>
-      <div class="timer-bar-wrap"><div class="timer-bar-fill" id="host-timer-fill" style="width:100%"></div></div>
+    <div class="q-text" id="q-text-host">Select a question below then hit Launch.</div>
+    <div class="answer-box" id="answer-box"></div>
+    <div class="opts-grid" id="opts-preview"></div>
+    <div class="timer-block" id="timer-block" style="display:none">
+      <div class="timer-big" id="host-timer-num">10</div>
+      <div class="timer-track"><div class="timer-fill" id="host-timer-fill" style="width:100%"></div></div>
     </div>
   </div>
 
   <!-- Controls -->
-  <div class="section-label">Controls</div>
-  <div class="controls">
-    <button class="btn btn-launch" id="btn-launch" onclick="launchQuestion()">▶ Launch Question <span id="launch-q-label">1</span></button>
-    <button class="btn btn-pause" id="btn-pause" onclick="pauseGame()" disabled>⏸ Pause</button>
-    <button class="btn btn-reveal" id="btn-reveal" onclick="revealAnswer()" disabled>👁 Reveal Answer</button>
-    <button class="btn btn-end" id="btn-end" onclick="endGame()" disabled>🏁 End Game & Show Results</button>
+  <div class="card">
+    <div class="section-label" style="margin-bottom:.85rem">Controls</div>
+    <div class="controls">
+      <button class="btn btn-purple" id="btn-launch" onclick="launchQuestion()">▶ Launch Q<span id="launch-label">1</span></button>
+      <button class="btn btn-amber" id="btn-pause" onclick="pauseGame()" disabled>⏸ Pause</button>
+      <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()" disabled>👁 Reveal &amp; Stop</button>
+      <button class="btn btn-coral" id="btn-end" onclick="endGame()" disabled>🏁 End Game</button>
+    </div>
   </div>
 
-  <!-- Question nav -->
-  <div class="q-nav">
-    <div class="q-nav-title">Questions</div>
+  <!-- Q dots -->
+  <div class="card">
+    <div class="section-label">Questions</div>
     <div class="q-dots" id="q-dots"></div>
   </div>
 
   <!-- Leaderboard -->
-  <div class="lb-section">
-    <div class="lb-title">
-      Live Leaderboard
-      <div class="live-dot-wrap"><span class="live-dot"></span>Live</div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
+      <div class="section-label" style="margin-bottom:0">Live Leaderboard</div>
+      <div class="live-row" style="font-size:12px;color:var(--coral);font-weight:700"><span class="live-dot"></span> Live</div>
     </div>
     <div id="lb-list"><div class="lb-empty">No scores yet</div></div>
   </div>
@@ -154,7 +149,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
@@ -174,48 +169,43 @@ const QUESTIONS = [
   {cat:'music',label:'Music & Culture',q:'Which Jamaican artist is known as the "King of Reggae"?',opts:['Peter Tosh','Jimmy Cliff','Toots Hibbert','Bob Marley'],ans:3},
   {cat:'geo',label:'Geography',q:'What is the capital city of Jamaica?',opts:['Montego Bay','Port Antonio','Ocho Rios','Kingston'],ans:3},
   {cat:'food',label:'Food & Cuisine',q:'What is the national dish of Jamaica?',opts:['Curry goat and rice','Ackee and saltfish','Jerk chicken and breadfruit','Callaloo and dumplings'],ans:1},
-  {cat:'sports',label:'Sports',q:'Which Jamaican sprinter holds the world records in both 100m and 200m?',opts:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],ans:3},
+  {cat:'sports',label:'Sports',q:'Which Jamaican sprinter holds world records in both 100m and 200m?',opts:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],ans:3},
   {cat:'general',label:'General',q:'What is the official language of Jamaica?',opts:['Patois only','Spanish','French','English'],ans:3},
   {cat:'history',label:'History',q:'What was Jamaica\'s original indigenous name?',opts:['Xamayca','Caribia','Hispaniola','Taino'],ans:0},
   {cat:'music',label:'Music & Culture',q:'Which music genre originated in Jamaica in the late 1960s?',opts:['Calypso','Soca','Reggae','Dancehall'],ans:2},
-  {cat:'geo',label:'Geography',q:'Which range contains Jamaica\'s highest peak, Blue Mountain Peak?',opts:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],ans:2},
+  {cat:'geo',label:'Geography',q:'Which mountain range contains Jamaica\'s highest peak?',opts:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],ans:2},
   {cat:'sports',label:'Sports',q:'Which sport made Jamaica famous at the 1988 Winter Olympics?',opts:['Bobsled','Luge','Skeleton','Ski jumping'],ans:0},
 ];
 
 const CAT_CLASS={history:'cat-history',food:'cat-food',music:'cat-music',geo:'cat-geo',sports:'cat-sports',general:'cat-general'};
 const LETTERS=['A','B','C','D'];
 const MEDALS=['🥇','🥈','🥉'];
-const TIMER_SECS=15;
+const TIMER_SECS=10;
 
-let currentQ=-1, timerInterval=null, timeLeft=0, gameActive=false, questionLive=false;
+let selectedQ=0,currentQ=-1,timerInterval=null,timeLeft=0,questionLive=false;
 let doneQuestions=new Set();
 
-// Build dot nav
-function buildDots(){
-  document.getElementById('q-dots').innerHTML=QUESTIONS.map((_,i)=>`
-    <div class="q-dot ${i===0?'active':''}" id="dot-${i}" onclick="selectQ(${i})">${i+1}</div>`).join('');
-}
-buildDots();
+// Build dots
+document.getElementById('q-dots').innerHTML=QUESTIONS.map((_,i)=>`
+  <div class="q-dot ${i===0?'active':''}" id="dot-${i}" onclick="selectQ(${i})">${i+1}</div>`).join('');
 
-let selectedQ=0;
 window.selectQ=function(i){
-  if(doneQuestions.has(i)) return;
+  if(doneQuestions.has(i)||questionLive) return;
   selectedQ=i;
-  document.querySelectorAll('.q-dot').forEach((d,idx)=>{
-    if(!doneQuestions.has(idx)) d.classList.remove('active');
-  });
+  document.querySelectorAll('.q-dot').forEach((d,idx)=>{if(!doneQuestions.has(idx))d.classList.remove('active');});
   document.getElementById('dot-'+i).classList.add('active');
   previewQ(i);
-  document.getElementById('launch-q-label').textContent=i+1;
+  document.getElementById('launch-label').textContent=i+1;
 };
 
 function previewQ(i){
   const q=QUESTIONS[i];
-  document.getElementById('q-card-title').textContent='Question '+(i+1)+' of '+QUESTIONS.length;
+  document.getElementById('q-card-title').textContent='Q'+(i+1)+' of '+QUESTIONS.length;
   const cat=document.getElementById('q-cat-pill');
   cat.textContent=q.label;cat.className='cat-pill '+CAT_CLASS[q.cat];
   document.getElementById('q-text-host').textContent=q.q;
-  document.getElementById('answer-reveal').classList.remove('show');
+  document.getElementById('answer-box').classList.remove('show');
+  // Show answer in opts preview on host side only
   document.getElementById('opts-preview').innerHTML=q.opts.map((o,idx)=>`
     <div class="opt-prev ${idx===q.ans?'correct-opt':''}">
       <span class="opt-letter">${LETTERS[idx]}</span>${o}
@@ -226,55 +216,79 @@ previewQ(0);
 window.launchQuestion=async function(){
   if(questionLive) return;
   const idx=selectedQ;
-  questionLive=true;gameActive=true;
+  questionLive=true;
   document.getElementById('btn-launch').disabled=true;
   document.getElementById('btn-pause').disabled=false;
   document.getElementById('btn-reveal').disabled=false;
   document.getElementById('btn-end').disabled=false;
+  document.getElementById('answer-box').classList.remove('show');
+  document.getElementById('timer-block').style.display='block';
   document.getElementById('status-val').textContent='Q'+(idx+1)+' live — '+TIMER_SECS+'s countdown';
-  document.getElementById('answer-reveal').classList.remove('show');
-  document.getElementById('timer-display').style.display='block';
   await set(ref(db,'host/command'),{action:'question',index:idx,timestamp:Date.now()});
   startHostTimer(idx);
 };
 
 function startHostTimer(idx){
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  timeLeft=TIMER_SECS;
-  updateHostTimer(timeLeft);
+  timeLeft=TIMER_SECS;updateHostTimer(timeLeft);
   timerInterval=setInterval(()=>{
     timeLeft--;updateHostTimer(timeLeft);
     document.getElementById('status-val').textContent='Q'+(idx+1)+' live — '+timeLeft+'s remaining';
     if(timeLeft<=0){
       clearInterval(timerInterval);timerInterval=null;
-      questionLive=false;
-      doneQuestions.add(idx);
-      document.getElementById('dot-'+idx).classList.remove('active');
-      document.getElementById('dot-'+idx).classList.add('done');
-      document.getElementById('status-val').textContent='Q'+(idx+1)+' finished — paused';
-      document.getElementById('btn-launch').disabled=false;
-      document.getElementById('btn-pause').disabled=true;
-      document.getElementById('btn-reveal').disabled=true;
-      // Auto advance selected to next
-      const next=idx+1;
-      if(next<QUESTIONS.length){
-        selectedQ=next;
-        document.getElementById('dot-'+next).classList.add('active');
-        document.getElementById('launch-q-label').textContent=next+1;
-        previewQ(next);
-      } else {
-        document.getElementById('btn-launch').disabled=true;
-        document.getElementById('status-val').textContent='All questions done — end game when ready';
-      }
+      finishQuestion(idx);
     }
   },1000);
 }
 
 function updateHostTimer(t){
-  document.getElementById('host-timer-num').textContent=t;
-  document.getElementById('host-timer-fill').style.width=((t/TIMER_SECS)*100)+'%';
-  document.getElementById('host-timer-fill').className='timer-bar-fill'+(t<=5?' urgent':'');
+  const num=document.getElementById('host-timer-num');
+  const fill=document.getElementById('host-timer-fill');
+  num.textContent=t;
+  fill.style.width=((t/TIMER_SECS)*100)+'%';
+  num.className='timer-big'+(t<=3?' urgent':'');
+  fill.className='timer-fill'+(t<=3?' urgent':'');
 }
+
+function finishQuestion(idx){
+  questionLive=false;
+  doneQuestions.add(idx);
+  document.getElementById('dot-'+idx).classList.remove('active');
+  document.getElementById('dot-'+idx).classList.add('done');
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('status-val').textContent='Q'+(idx+1)+' done — paused';
+  // Auto-advance
+  const next=idx+1;
+  if(next<QUESTIONS.length){
+    selectedQ=next;
+    document.getElementById('dot-'+next).classList.add('active');
+    document.getElementById('launch-label').textContent=next+1;
+    previewQ(next);
+    document.getElementById('btn-launch').disabled=false;
+  } else {
+    document.getElementById('btn-launch').disabled=true;
+    document.getElementById('status-val').textContent='All questions done — end game when ready';
+  }
+}
+
+window.revealAnswer=async function(){
+  // Stop timer immediately
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  const idx=selectedQ;
+  const q=QUESTIONS[idx];
+  // Show answer on host panel
+  const box=document.getElementById('answer-box');
+  box.textContent='✓ Answer: '+LETTERS[q.ans]+' — '+q.opts[q.ans];
+  box.classList.add('show');
+  updateHostTimer(0);
+  document.getElementById('status-val').textContent='Q'+(idx+1)+' — answer revealed';
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-pause').disabled=true;
+  // Send reveal command to tablets
+  await set(ref(db,'host/command'),{action:'reveal',index:idx,timestamp:Date.now()});
+  finishQuestion(idx);
+};
 
 window.pauseGame=async function(){
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
@@ -285,30 +299,19 @@ window.pauseGame=async function(){
   await set(ref(db,'host/command'),{action:'pause',timestamp:Date.now()});
 };
 
-window.revealAnswer=function(){
-  const q=QUESTIONS[selectedQ];
-  const el=document.getElementById('answer-reveal');
-  el.textContent='✓ Answer: '+LETTERS[q.ans]+' — '+q.opts[q.ans];
-  el.classList.add('show');
-};
-
 window.endGame=async function(){
   if(!confirm('End the game and show final results to all tables?')) return;
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  document.getElementById('btn-end').disabled=true;
-  document.getElementById('btn-launch').disabled=true;
-  document.getElementById('btn-pause').disabled=true;
-  document.getElementById('status-val').textContent='Game ended — results showing on tablets';
+  ['btn-end','btn-launch','btn-pause','btn-reveal'].forEach(id=>document.getElementById(id).disabled=true);
+  document.getElementById('status-val').textContent='Game ended — results on tablets';
   await set(ref(db,'host/command'),{action:'end',timestamp:Date.now()});
 };
 
-// Watch completed scores for table count + leaderboard
 onValue(ref(db,'scores'),snapshot=>{
   const data=snapshot.val();
   if(!data){
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
-    document.getElementById('tables-count').textContent='0 tables';
-    return;
+    document.getElementById('tables-count').textContent='0 tables';return;
   }
   const best={};
   Object.values(data).forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
@@ -316,7 +319,12 @@ onValue(ref(db,'scores'),snapshot=>{
   document.getElementById('tables-count').textContent=sorted.length+' table'+(sorted.length!==1?'s':'');
   document.getElementById('lb-list').innerHTML=sorted.slice(0,8).map((e,i)=>`
     <div class="lb-row">
-      <span class="lb-team">${MEDALS[i]||'#'+(i+1)} ${e.team}</span>
+      <div class="lb-left"><span class="lb-medal">${MEDALS[i]||'#'+(i+1)}</span>
+        <div>
+          <div class="lb-team">${e.team}</div>
+          ${e.email?`<div style="font-size:11px;color:var(--muted)">${e.email}</div>`:''}
+        </div>
+      </div>
       <span class="lb-score">${e.score} / ${e.total}</span>
     </div>`).join('');
 });
