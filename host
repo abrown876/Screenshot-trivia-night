@@ -136,6 +136,15 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     <div class="q-dots" id="q-dots"></div>
   </div>
 
+  <!-- Reactions -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
+      <div class="section-label" style="margin-bottom:0">💬 Table reactions</div>
+      <div class="live-row" style="font-size:12px;color:var(--coral);font-weight:700"><span class="live-dot"></span> Live</div>
+    </div>
+    <div id="reactions-preview"><div class="lb-empty">No reactions yet</div></div>
+  </div>
+
   <!-- Leaderboard -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
@@ -149,7 +158,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
@@ -306,6 +315,19 @@ window.endGame=async function(){
   document.getElementById('status-val').textContent='Game ended — results on tablets';
   await set(ref(db,'host/command'),{action:'end',timestamp:Date.now()});
 };
+
+onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(6)),snapshot=>{
+  const data=snapshot.val();
+  const el=document.getElementById('reactions-preview');
+  if(!data){el.innerHTML='<div class="lb-empty">No reactions yet</div>';return;}
+  const items=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp);
+  el.innerHTML=items.map(r=>`
+    <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="font-size:1.2rem">${r.emoji}</span>
+      <span style="font-weight:500">${r.team}</span>
+      <span style="color:var(--muted);font-size:11px;margin-left:auto">Q${r.q+1}</span>
+    </div>`).join('');
+});
 
 onValue(ref(db,'scores'),snapshot=>{
   const data=snapshot.val();
