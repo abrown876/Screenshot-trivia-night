@@ -16,18 +16,12 @@
   }
   html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
   body{display:flex;flex-direction:column;min-height:100vh}
-
-  /* Header */
   .header{background:var(--text);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
   .header-title{font-family:'Playfair Display',serif;color:#C9A84C;font-size:1.15rem;letter-spacing:.03em}
   .header-score{background:var(--gold);color:#fff;font-size:13px;font-weight:500;padding:4px 12px;border-radius:20px}
-
-  /* Screens */
   .screen{display:none;flex:1;padding:1.5rem 1.25rem;animation:fadeUp .35s ease}
   .screen.active{display:flex;flex-direction:column}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
-  /* Splash */
   .splash-art{width:72px;height:72px;background:var(--gold-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem}
   .splash h1{font-family:'Playfair Display',serif;font-size:2.2rem;text-align:center;line-height:1.2;margin-bottom:.5rem}
   .splash p{text-align:center;color:var(--muted);font-size:15px;margin-bottom:2rem;line-height:1.6}
@@ -37,16 +31,12 @@
   .cat-music{background:#FAEEDA;color:#7A4A00}
   .cat-food{background:#FAECE7;color:#8A2E0F}
   .cat-general{background:#E6F1FB;color:#0F4A8A}
-
-  /* Team setup */
   .setup-label{font-size:13px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
   .team-input{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;transition:border-color .2s}
   .team-input:focus{border-color:var(--gold)}
   .count-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:1rem}
   .count-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
   .count-val{font-size:20px;font-weight:500}
-
-  /* Question */
   .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
   .q-num{font-size:13px;color:var(--muted)}
   .progress{height:5px;background:var(--border);border-radius:3px;margin-bottom:1.5rem;overflow:hidden}
@@ -67,16 +57,12 @@
   .feedback.show{display:block;animation:fadeUp .3s ease}
   .feedback.correct{background:var(--correct-bg);color:var(--correct);border:1px solid #b2dfc8}
   .feedback.wrong{background:var(--wrong-bg);color:var(--wrong);border:1px solid #f5c0bb}
-
-  /* Buttons */
   .btn{width:100%;padding:16px;border-radius:14px;border:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:opacity .2s,transform .1s}
   .btn:active{transform:scale(.98)}
   .btn-primary{background:var(--gold);color:#fff}
   .btn-primary:hover{opacity:.9}
   .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);margin-top:.65rem}
   .btn-dark{background:var(--text);color:var(--gold)}
-
-  /* Score / Results */
   .score-ring{width:120px;height:120px;margin:0 auto 1.25rem;position:relative}
   .score-ring svg{transform:rotate(-90deg)}
   .score-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -89,16 +75,12 @@
   .result-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-left:12px}
   .dot-correct{background:var(--correct)}
   .dot-wrong{background:var(--wrong)}
-  .share-row{display:flex;gap:.65rem;margin-top:.65rem}
-  .share-row .btn{width:auto;flex:1;padding:13px}
-
-  /* Spacer */
+  .saving-notice{border-radius:10px;padding:10px 14px;font-size:13px;text-align:center;margin-bottom:1rem;background:var(--gold-light);color:var(--gold-dark)}
   .spacer{flex:1}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
 <div id="splash" class="screen active splash">
   <div class="splash-art">🎯</div>
   <h1>Trivia Night</h1>
@@ -121,7 +103,6 @@
   <button class="btn btn-dark" onclick="startGame()" style="margin-top:.5rem">Let's play →</button>
 </div>
 
-<!-- GAME -->
 <div class="header" id="game-header" style="display:none">
   <span class="header-title">Trivia Night</span>
   <span class="header-score" id="live-score">0 pts</span>
@@ -141,7 +122,6 @@
   <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none"></button>
 </div>
 
-<!-- RESULTS -->
 <div id="results" class="screen">
   <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:.25rem" id="result-headline"></h2>
   <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem" id="result-team"></p>
@@ -157,6 +137,7 @@
     </div>
   </div>
   <p style="text-align:center;font-size:14px;color:var(--muted);margin-bottom:1.5rem" id="score-pct"></p>
+  <div class="saving-notice" id="saving-notice">Saving your score to the leaderboard...</div>
   <div class="result-card">
     <div id="result-list"></div>
   </div>
@@ -164,138 +145,121 @@
   <button class="btn btn-dark" onclick="restartGame()" style="margin-top:.5rem">Play again</button>
 </div>
 
-<script>
-const QUESTIONS = [
-  {cat:'movies',label:'Movies & TV',q:'Which film won the first-ever Academy Award for Best Picture?',opts:['Sunrise','Wings','The Jazz Singer','Metropolis'],ans:1},
-  {cat:'movies',label:'Movies & TV',q:'What is the highest-grossing film of all time (not adjusted for inflation)?',opts:['Avengers: Endgame','Titanic','Avatar','The Lion King'],ans:2},
-  {cat:'movies',label:'Movies & TV',q:'In "The Lion King," what is the name of Simba\'s father?',opts:['Scar','Rafiki','Mufasa','Zazu'],ans:2},
-  {cat:'movies',label:'Movies & TV',q:'Which TV series features a chemistry teacher who becomes a drug lord?',opts:['Ozark','Narcos','Breaking Bad','Dexter'],ans:2},
-  {cat:'movies',label:'Movies & TV',q:'Who played Jack Dawson in the 1997 film "Titanic"?',opts:['Brad Pitt','Johnny Depp','Tom Hanks','Leonardo DiCaprio'],ans:3},
-  {cat:'music',label:'Music',q:'Which artist released "Thriller," the best-selling album of all time?',opts:['Prince','Michael Jackson','Madonna','David Bowie'],ans:1},
-  {cat:'music',label:'Music',q:'Which band performed "Bohemian Rhapsody"?',opts:['The Beatles','Led Zeppelin','Queen','The Rolling Stones'],ans:2},
-  {cat:'music',label:'Music',q:'How many strings does a standard guitar have?',opts:['4','5','6','7'],ans:2},
-  {cat:'music',label:'Music',q:'What country does reggae music originate from?',opts:['Trinidad','Cuba','Brazil','Jamaica'],ans:3},
-  {cat:'music',label:'Music',q:'Which singer is known as the "Queen of Pop"?',opts:['Beyoncé','Rihanna','Madonna','Whitney Houston'],ans:2},
-  {cat:'food',label:'Food & Drink',q:'What is the main ingredient in traditional hummus?',opts:['Lentils','Black beans','Chickpeas','Edamame'],ans:2},
-  {cat:'food',label:'Food & Drink',q:'Which country is credited with inventing pizza?',opts:['Greece','France','Spain','Italy'],ans:3},
-  {cat:'food',label:'Food & Drink',q:'What is the Japanese dish of sliced raw fish called?',opts:['Tempura','Ramen','Sashimi','Udon'],ans:2},
-  {cat:'food',label:'Food & Drink',q:'How many shots of espresso are in a standard double espresso?',opts:['1','2','3','4'],ans:1},
-  {cat:'food',label:'Food & Drink',q:'What type of pastry is used to make a croissant?',opts:['Shortcrust','Choux','Filo','Laminated/puff'],ans:3},
-  {cat:'general',label:'General Knowledge',q:'How many continents are there on Earth?',opts:['5','6','7','8'],ans:2},
-  {cat:'general',label:'General Knowledge',q:'What is the chemical symbol for gold?',opts:['Go','Gd','Gl','Au'],ans:3},
-  {cat:'general',label:'General Knowledge',q:'Which planet is known as the Red Planet?',opts:['Venus','Saturn','Jupiter','Mars'],ans:3},
-  {cat:'general',label:'General Knowledge',q:'How many sides does a hexagon have?',opts:['5','6','7','8'],ans:1},
-  {cat:'general',label:'General Knowledge',q:'What is the capital city of Japan?',opts:['Osaka','Kyoto','Hiroshima','Tokyo'],ans:3},
-];
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-const CAT_CLASS={movies:'cat-movies',music:'cat-music',food:'cat-food',general:'cat-general'};
-const LETTERS=['A','B','C','D'];
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+    authDomain: "screenshot-trivia-night.firebaseapp.com",
+    databaseURL: "https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+    projectId: "screenshot-trivia-night",
+    storageBucket: "screenshot-trivia-night.firebasestorage.app",
+    messagingSenderId: "482758352954",
+    appId: "1:482758352954:web:832d1cba008bc0b789d503"
+  };
 
-let qIndex=0, score=0, answers=[], teamName='', playerCount=2;
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-function adjustCount(d){
-  playerCount=Math.max(1,Math.min(12,playerCount+d));
-  document.getElementById('player-count').textContent=playerCount;
-}
+  const QUESTIONS = [
+    {cat:'movies',label:'Movies & TV',q:'Which film won the first-ever Academy Award for Best Picture?',opts:['Sunrise','Wings','The Jazz Singer','Metropolis'],ans:1},
+    {cat:'movies',label:'Movies & TV',q:'What is the highest-grossing film of all time (not adjusted for inflation)?',opts:['Avengers: Endgame','Titanic','Avatar','The Lion King'],ans:2},
+    {cat:'movies',label:'Movies & TV',q:'In "The Lion King," what is the name of Simba\'s father?',opts:['Scar','Rafiki','Mufasa','Zazu'],ans:2},
+    {cat:'movies',label:'Movies & TV',q:'Which TV series features a chemistry teacher who becomes a drug lord?',opts:['Ozark','Narcos','Breaking Bad','Dexter'],ans:2},
+    {cat:'movies',label:'Movies & TV',q:'Who played Jack Dawson in the 1997 film "Titanic"?',opts:['Brad Pitt','Johnny Depp','Tom Hanks','Leonardo DiCaprio'],ans:3},
+    {cat:'music',label:'Music',q:'Which artist released "Thriller," the best-selling album of all time?',opts:['Prince','Michael Jackson','Madonna','David Bowie'],ans:1},
+    {cat:'music',label:'Music',q:'Which band performed "Bohemian Rhapsody"?',opts:['The Beatles','Led Zeppelin','Queen','The Rolling Stones'],ans:2},
+    {cat:'music',label:'Music',q:'How many strings does a standard guitar have?',opts:['4','5','6','7'],ans:2},
+    {cat:'music',label:'Music',q:'What country does reggae music originate from?',opts:['Trinidad','Cuba','Brazil','Jamaica'],ans:3},
+    {cat:'music',label:'Music',q:'Which singer is known as the "Queen of Pop"?',opts:['Beyoncé','Rihanna','Madonna','Whitney Houston'],ans:2},
+    {cat:'food',label:'Food & Drink',q:'What is the main ingredient in traditional hummus?',opts:['Lentils','Black beans','Chickpeas','Edamame'],ans:2},
+    {cat:'food',label:'Food & Drink',q:'Which country is credited with inventing pizza?',opts:['Greece','France','Spain','Italy'],ans:3},
+    {cat:'food',label:'Food & Drink',q:'What is the Japanese dish of sliced raw fish called?',opts:['Tempura','Ramen','Sashimi','Udon'],ans:2},
+    {cat:'food',label:'Food & Drink',q:'How many shots of espresso are in a standard double espresso?',opts:['1','2','3','4'],ans:1},
+    {cat:'food',label:'Food & Drink',q:'What type of pastry is used to make a croissant?',opts:['Shortcrust','Choux','Filo','Laminated/puff'],ans:3},
+    {cat:'general',label:'General Knowledge',q:'How many continents are there on Earth?',opts:['5','6','7','8'],ans:2},
+    {cat:'general',label:'General Knowledge',q:'What is the chemical symbol for gold?',opts:['Go','Gd','Gl','Au'],ans:3},
+    {cat:'general',label:'General Knowledge',q:'Which planet is known as the Red Planet?',opts:['Venus','Saturn','Jupiter','Mars'],ans:3},
+    {cat:'general',label:'General Knowledge',q:'How many sides does a hexagon have?',opts:['5','6','7','8'],ans:1},
+    {cat:'general',label:'General Knowledge',q:'What is the capital city of Japan?',opts:['Osaka','Kyoto','Hiroshima','Tokyo'],ans:3},
+  ];
 
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+  const CAT_CLASS={movies:'cat-movies',music:'cat-music',food:'cat-food',general:'cat-general'};
+  const LETTERS=['A','B','C','D'];
+  let qIndex=0,score=0,answers=[],teamName='',playerCount=2;
 
-function startGame(){
-  teamName=document.getElementById('team-name-input').value.trim()||'Your Table';
-  qIndex=0; score=0; answers=[];
-  document.getElementById('game-header').style.display='flex';
-  updateLiveScore();
-  loadQ();
-  show('game');
-}
+  window.adjustCount=function(d){playerCount=Math.max(1,Math.min(12,playerCount+d));document.getElementById('player-count').textContent=playerCount;};
 
-function updateLiveScore(){
-  document.getElementById('live-score').textContent=score+' pts';
-}
+  function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function loadQ(){
-  const q=QUESTIONS[qIndex];
-  document.getElementById('q-num').textContent='Question '+(qIndex+1)+' of '+QUESTIONS.length;
-  const catEl=document.getElementById('q-cat');
-  catEl.textContent=q.label;
-  catEl.className='cat-pill '+CAT_CLASS[q.cat];
-  document.getElementById('q-prog').style.width=((qIndex/QUESTIONS.length)*100)+'%';
-  document.getElementById('q-text').textContent=q.q;
-  const fb=document.getElementById('feedback');
-  fb.className='feedback'; fb.textContent='';
-  document.getElementById('next-btn').style.display='none';
-  const opts=document.getElementById('options');
-  opts.innerHTML=q.opts.map((o,i)=>`
-    <button class="opt" id="opt-${i}" onclick="selectOpt(${i})">
-      <span class="opt-letter">${LETTERS[i]}</span>
-      <span>${o}</span>
-    </button>
-  `).join('');
-}
+  window.startGame=function(){
+    teamName=document.getElementById('team-name-input').value.trim()||'Table';
+    qIndex=0;score=0;answers=[];
+    document.getElementById('game-header').style.display='flex';
+    updateLiveScore();loadQ();show('game');
+  };
 
-function selectOpt(i){
-  const q=QUESTIONS[qIndex];
-  const correct=i===q.ans;
-  if(correct) score++;
-  answers.push({q:q.q,correct});
-  updateLiveScore();
-  document.querySelectorAll('.opt').forEach((el,idx)=>{
-    el.classList.add('disabled');
-    el.onclick=null;
-    if(idx===q.ans) el.classList.add('correct');
-    else if(idx===i&&!correct) el.classList.add('wrong');
-  });
-  const fb=document.getElementById('feedback');
-  fb.className='feedback '+(correct?'correct':'wrong')+' show';
-  fb.textContent=correct?'Correct! Well done 🎉':'Not quite — the correct answer was '+q.opts[q.ans]+'.';
-  const nb=document.getElementById('next-btn');
-  nb.style.display='block';
-  nb.textContent=qIndex<QUESTIONS.length-1?'Next question →':'See my results →';
-}
+  function updateLiveScore(){document.getElementById('live-score').textContent=score+' pts';}
 
-function nextQuestion(){
-  qIndex++;
-  if(qIndex>=QUESTIONS.length){ showResults(); return; }
-  loadQ();
-}
+  function loadQ(){
+    const q=QUESTIONS[qIndex];
+    document.getElementById('q-num').textContent='Question '+(qIndex+1)+' of '+QUESTIONS.length;
+    const catEl=document.getElementById('q-cat');
+    catEl.textContent=q.label;catEl.className='cat-pill '+CAT_CLASS[q.cat];
+    document.getElementById('q-prog').style.width=((qIndex/QUESTIONS.length)*100)+'%';
+    document.getElementById('q-text').textContent=q.q;
+    const fb=document.getElementById('feedback');fb.className='feedback';fb.textContent='';
+    document.getElementById('next-btn').style.display='none';
+    document.getElementById('options').innerHTML=q.opts.map((o,i)=>`<button class="opt" id="opt-${i}" onclick="selectOpt(${i})"><span class="opt-letter">${LETTERS[i]}</span><span>${o}</span></button>`).join('');
+  }
 
-function showResults(){
-  document.getElementById('game-header').style.display='none';
-  const pct=Math.round((score/QUESTIONS.length)*100);
-  let headline='';
-  if(pct===100) headline='Perfect score! 🏆';
-  else if(pct>=80) headline='Great job! 🎉';
-  else if(pct>=60) headline='Not bad! 👍';
-  else if(pct>=40) headline='Keep practising 😅';
-  else headline='Better luck next time!';
-  document.getElementById('result-headline').textContent=headline;
-  document.getElementById('result-team').textContent=teamName+' · '+playerCount+' player'+(playerCount!==1?'s':'');
-  document.getElementById('score-num').textContent=score;
-  document.getElementById('score-pct').textContent=pct+'% correct';
-  const arc=document.getElementById('score-arc');
-  const circumference=326.7;
-  arc.style.strokeDashoffset=circumference-(circumference*(score/QUESTIONS.length));
-  document.getElementById('result-list').innerHTML=answers.map((a,i)=>`
-    <div class="result-row">
-      <span class="result-q">Q${i+1}. ${a.q.length>60?a.q.substring(0,60)+'…':a.q}</span>
-      <span class="result-dot ${a.correct?'dot-correct':'dot-wrong'}"></span>
-    </div>
-  `).join('');
-  show('results');
-  setTimeout(()=>{
-    arc.style.transition='stroke-dashoffset 1s ease';
-  },100);
-}
+  window.selectOpt=function(i){
+    const q=QUESTIONS[qIndex];const correct=i===q.ans;
+    if(correct)score++;answers.push({q:q.q,correct});updateLiveScore();
+    document.querySelectorAll('.opt').forEach((el,idx)=>{
+      el.classList.add('disabled');el.onclick=null;
+      if(idx===q.ans)el.classList.add('correct');
+      else if(idx===i&&!correct)el.classList.add('wrong');
+    });
+    const fb=document.getElementById('feedback');
+    fb.className='feedback '+(correct?'correct':'wrong')+' show';
+    fb.textContent=correct?'Correct! Well done 🎉':'Not quite — the correct answer was '+q.opts[q.ans]+'.';
+    const nb=document.getElementById('next-btn');nb.style.display='block';
+    nb.textContent=qIndex<QUESTIONS.length-1?'Next question →':'See my results →';
+  };
 
-function restartGame(){
-  document.getElementById('team-name-input').value='';
-  playerCount=2;
-  document.getElementById('player-count').textContent='2';
-  show('splash');
-}
+  window.nextQuestion=function(){qIndex++;if(qIndex>=QUESTIONS.length){showResults();return;}loadQ();};
+
+  async function saveScore(){
+    const notice=document.getElementById('saving-notice');
+    try{
+      const key=teamName.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();
+      await set(ref(db,'scores/'+key),{team:teamName,players:playerCount,score,total:QUESTIONS.length,timestamp:Date.now()});
+      notice.textContent='✓ Score saved to leaderboard!';
+      notice.style.background='#EAF7F0';notice.style.color='#2D7A4F';
+    }catch(e){
+      notice.textContent='Could not save score — check your connection.';
+      notice.style.background='#FDECEA';notice.style.color='#C0392B';
+    }
+  }
+
+  function showResults(){
+    document.getElementById('game-header').style.display='none';
+    const pct=Math.round((score/QUESTIONS.length)*100);
+    let headline=pct===100?'Perfect score! 🏆':pct>=80?'Great job! 🎉':pct>=60?'Not bad! 👍':pct>=40?'Keep practising 😅':'Better luck next time!';
+    document.getElementById('result-headline').textContent=headline;
+    document.getElementById('result-team').textContent=teamName+' · '+playerCount+' player'+(playerCount!==1?'s':'');
+    document.getElementById('score-num').textContent=score;
+    document.getElementById('score-pct').textContent=pct+'% correct';
+    const arc=document.getElementById('score-arc');
+    arc.style.strokeDashoffset=326.7-(326.7*(score/QUESTIONS.length));
+    document.getElementById('result-list').innerHTML=answers.map((a,i)=>`<div class="result-row"><span class="result-q">Q${i+1}. ${a.q.length>60?a.q.substring(0,60)+'…':a.q}</span><span class="result-dot ${a.correct?'dot-correct':'dot-wrong'}"></span></div>`).join('');
+    show('results');saveScore();
+    setTimeout(()=>{arc.style.transition='stroke-dashoffset 1s ease';},100);
+  }
+
+  window.restartGame=function(){document.getElementById('team-name-input').value='';playerCount=2;document.getElementById('player-count').textContent='2';show('splash');};
 </script>
 </body>
 </html>
