@@ -354,13 +354,12 @@ function launchQ(){
     if(timerVal <= 3){ big.className='timer-big urg'; fill.className='timer-fill urg'; }
     if(timerVal <= 0){
       clearInterval(timer);
-      // Timer expired — enable next launch, disable reveal
-      document.getElementById('btn-launch').disabled = false;
-      document.getElementById('btn-reveal').disabled = true;
+      // Timer expired — show current Q still, enable reveal or next launch
+      document.getElementById('btn-reveal').disabled = false; // host can still reveal answer
       document.getElementById('btn-pause').disabled = true;
-      document.getElementById('btn-break').disabled = false;
-      document.getElementById('status-val').textContent = 'Time up — launch next question';
-      setChip('ready','Time up — next Q');
+      document.getElementById('btn-break').disabled = true;
+      document.getElementById('status-val').textContent = 'Time up! Reveal answer or launch next Q';
+      setChip('paused', 'Time up');
     }
   }, 1000);
   document.getElementById('btn-launch').disabled = true;
@@ -407,17 +406,22 @@ function revealQ(){
   } else {
     // More questions remain — advance and enable next launch
     selQ++;
-    // Hide timer for next question preview
+    // Reset timer display for next question
     document.getElementById('timer-block').style.display = 'none';
     document.getElementById('timer-big').textContent = '10';
-    document.getElementById('timer-fill').style.width = '100%';
     document.getElementById('timer-big').className = 'timer-big';
+    document.getElementById('timer-fill').style.width = '100%';
+    document.getElementById('timer-fill').className = 'timer-fill';
+    // Preview next question
     renderDots();
     renderQuestion();
+    // Enable Launch, disable Break (break only after last Q in round)
     document.getElementById('btn-launch').disabled = false;
+    document.getElementById('btn-pause').disabled = true;
+    document.getElementById('btn-reveal').disabled = true;
     document.getElementById('btn-break').disabled = true;
-    document.getElementById('status-val').textContent = 'Next up: Q'+(selQ+1)+' — launch when ready';
-    setChip('ready','Q'+(selQ+1)+' ready to launch');
+    document.getElementById('status-val').textContent = '&#x1F449; Preview: Q'+selQ+' of '+getRoundQuestions().length+' — click Launch when ready';
+    setChip('ready', 'Q'+selQ+' preview');
   }
 }
 
@@ -462,20 +466,30 @@ function endGame(){
 }
 
 function resetGame(){
-  // Reset scores only — teams stay registered
-  if(!confirm('Reset scores & round progress? Teams stay registered.')) return;
+  if(!confirm('Reset scores? Teams stay registered.')) return;
   if(!db) return;
   db.ref('scores').remove();
   db.ref('live_scores').remove();
   db.ref('reactions').remove();
   db.ref('race').remove();
+  db.ref('game/current').remove();
   db.ref('host/command').set({action:'reset',timestamp:Date.now()});
-  selRound(1);
-  document.getElementById('status-val').textContent = 'Scores reset — teams still registered';
+  roundDone=[false,false,false];
+  roundStarted=[false,false,false];
+  clearInterval(timer);
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-break').disabled=true;
   document.getElementById('btn-endgame').style.display='none';
+  document.getElementById('timer-block').style.display='none';
+  document.getElementById('answer-box').className='answer-box';
+  document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
+  [1,2,3].forEach(function(n){ document.getElementById('rtab'+n).className='rtab'+(n===1?' active':''); });
+  selRound(1);
+  setChip('ready', teamCount+' team'+(teamCount!==1?'s':'')+' ready');
+  document.getElementById('status-val').textContent='Scores reset — teams still registered';
 }
 function resetAll(){
-  // Full wipe — scores AND teams
   if(!confirm('Wipe everything? Scores and teams will be deleted.')) return;
   if(!db) return;
   db.ref('scores').remove();
@@ -483,11 +497,29 @@ function resetAll(){
   db.ref('teams').remove();
   db.ref('reactions').remove();
   db.ref('race').remove();
+  db.ref('game').remove();
   db.ref('host/command').set({action:'reset',timestamp:Date.now()});
-  selRound(1);
-  document.getElementById('status-val').textContent = 'Full reset complete';
-  document.getElementById('lb-list').innerHTML = '<div class="lb-empty">No teams yet</div>';
+  // Reset round state
+  roundDone=[false,false,false];
+  roundStarted=[false,false,false];
+  teamCount=0;
+  clearInterval(timer);
+  // Reset UI
+  document.getElementById('cnt-wait').textContent='0';
+  document.getElementById('cnt-play').textContent='0';
+  document.getElementById('cnt-done').textContent='0';
+  document.getElementById('btn-launch').disabled=true;
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-break').disabled=true;
   document.getElementById('btn-endgame').style.display='none';
+  document.getElementById('timer-block').style.display='none';
+  document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
+  document.getElementById('answer-box').className='answer-box';
+  [1,2,3].forEach(function(n){ document.getElementById('rtab'+n).className='rtab'+(n===1?' active':''); });
+  selRound(1);
+  setChip('waiting');
+  document.getElementById('status-val').textContent='Reset complete — waiting for teams';
 }
 
 // ── Live leaderboard listener ──────────────────────────────────────
@@ -495,7 +527,10 @@ if(db){
   db.ref('live_scores').on('value', function(snap){
     var data = snap.val() || {};
     var teams = Object.entries(data).map(function(e){
-      return {name:e[0], pts: Object.values(e[1]).reduce(function(a,b){return a+b;},0)};
+      var s = e[1];
+      // Sum only r0+r1+r2 (round scores) — avoid summing timestamps/flags
+      var pts = (s.r0||0) + (s.r1||0) + (s.r2||0);
+      return {name: s.team||e[0], pts: pts};
     }).sort(function(a,b){return b.pts-a.pts;});
     var el = document.getElementById('lb-list');
     if(!teams.length){ el.innerHTML='<div class="lb-empty">No scores yet</div>'; return; }
