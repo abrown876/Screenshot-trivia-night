@@ -127,83 +127,112 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <span class="footer-count" id="footer-count"></span>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-// ── SPONSOR CONFIG ──
-const SPONSOR_NAME    = "YOUR SPONSOR";
-const SPONSOR_TAGLINE = "Add your sponsor tagline here";
-// ───────────────────
-document.getElementById('st-name').textContent=SPONSOR_NAME;
-document.getElementById('st-tag').textContent=SPONSOR_TAGLINE;
-
-const FB={apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"};
-const app=initializeApp(FB);const db=getDatabase(app);
-const MEDALS=['🥇','🥈','🥉'];
-const RC=['first','second','third'];
-
-let teamsC=null,scoresC=null;
-function renderBoard(){
-  const board=document.getElementById('board');
-  const cnt=document.getElementById('footer-count');
-  const teams=teamsC?Object.values(teamsC):[];
-  const scores=scoresC?Object.values(scoresC):[];
-  const best={};
-  scores.forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
-  const finished=Object.values(best).sort((a,b)=>b.score-a.score);
-  const finNames=new Set(finished.map(e=>e.team));
-  const waiting=teams.filter(t=>!finNames.has(t.name)).sort((a,b)=>a.joinedAt-b.joinedAt);
-  const total=finished.length+waiting.length;
-  cnt.textContent=total+' table'+(total!==1?'s':'')+' registered · '+finished.length+' finished';
-  if(total===0){board.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for teams to join...</div></div>';return;}
-  const maxS=finished[0]?.score||10;
-  let html='';
-  html+=finished.slice(0,6).map((e,i)=>{
-    const bw=Math.round((e.score/maxS)*100);
-    const pct=Math.round(((e.score-(e.bonus||0))/e.total)*100);
-    return `<div class="row ${RC[i]||''}">
-      <div class="rank">${i+1}</div><div class="medal">${MEDALS[i]||''}</div>
-      <div class="info"><div class="team">${e.team}</div>
-        <div class="meta"><span>${e.players} player${e.players!==1?'s':''}</span><span class="pct-pill">${pct}% correct</span>${e.bonus?`<span class="bonus-tag">⚡ +${e.bonus}</span>`:''}</div>
-      </div>
-      <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:${bw}%"></div></div></div>
-      <div class="score-col"><div class="score-num">${e.score}</div><div class="score-den">/ ${e.total} pts</div></div>
-    </div>`;
-  }).join('');
-  if(waiting.length>0&&finished.length<6){
-    html+=waiting.slice(0,6-finished.length).map(t=>`
-      <div class="row" style="opacity:.55;border-style:dashed">
-        <div class="rank" style="font-size:1.2rem">⏳</div><div class="medal"></div>
-        <div class="info"><div class="team">${t.name}</div>
-          <div class="meta"><span>${t.players} player${t.players!==1?'s':''}</span><span>Waiting to play</span></div>
-        </div>
-        <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div></div>
-        <div class="score-col"><div class="score-den" style="font-size:14px">Ready</div></div>
-      </div>`).join('');
-  }
-  board.innerHTML=html;
-}
-onValue(ref(db,'teams'),snap=>{teamsC=snap.val();renderBoard();});
-onValue(ref(db,'scores'),snap=>{scoresC=snap.val();renderBoard();});
-
-onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(20)),snapshot=>{
-  const data=snapshot.val();
-  const feed=document.getElementById('rxn-feed');
-  if(!data){feed.innerHTML='<div class="no-rxn">Reactions will appear here as tables play</div>';return;}
-  const items=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).slice(0,12);
-  feed.innerHTML=items.map(r=>{
-    const age=Math.round((Date.now()-r.timestamp)/1000);
-    const t=age<60?age+'s ago':Math.round(age/60)+'m ago';
-    return `<div class="rxn-item">
-      <span class="rxn-emoji">${r.emoji}</span>
-      <div style="flex:1;min-width:0">
-        <div class="rxn-team">${r.team}</div>
-        <div class="rxn-time">${t}</div>
-      </div>
-    </div>`;
-  }).join('');
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+  authDomain:"screenshot-trivia-night.firebaseapp.com",
+  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+  projectId:"screenshot-trivia-night",
+  storageBucket:"screenshot-trivia-night.firebasestorage.app",
+  messagingSenderId:"482758352954",
+  appId:"1:482758352954:web:832d1cba008bc0b789d503"
 });
+var db = firebase.database();
+
+var SPONSOR_NAME = "YOUR SPONSOR";
+var SPONSOR_TAG  = "Your sponsor tagline here";
+document.querySelectorAll('.sp-name').forEach(function(e){e.textContent=SPONSOR_NAME;});
+document.querySelectorAll('.sp-tag').forEach(function(e){e.textContent=SPONSOR_TAG;});
+
+var MD = ['🥇','🥈','🥉'];
+var teamsC={}, scoresC={}, liveC={};
+
+function renderBoard(){
+  var el = document.getElementById('lb-rows');
+  if(!el) return;
+
+  // Build totals — live_scores are the source of truth during game
+  var totals={};
+  Object.values(liveC).forEach(function(e){
+    totals[e.team]={team:e.team,score:e.score,bonus:e.bonus,players:e.players||1,
+      r0:e.r0||0,r1:e.r1||0,r2:e.r2||0,live:true};
+  });
+  // Merge final round scores
+  Object.values(scoresC).forEach(function(e){
+    if(!totals[e.team]) totals[e.team]={team:e.team,score:0,bonus:0,players:e.players||1,r0:0,r1:0,r2:0};
+    var rk='r'+e.round;
+    if((e.base||0)>(totals[e.team][rk]||0)) totals[e.team][rk]=e.base||0;
+    if(!totals[e.team].live){
+      totals[e.team].score=(totals[e.team].r0||0)+(totals[e.team].r1||0)+(totals[e.team].r2||0)+(totals[e.team].bonus||0);
+    }
+  });
+
+  var sorted=Object.values(totals).sort(function(a,b){return b.score-a.score;});
+
+  // Waiting teams
+  var playing={};
+  sorted.forEach(function(t){playing[t.team]=true;});
+  var waiting=Object.values(teamsC).filter(function(t){return !playing[t.name];});
+
+  if(!sorted.length && !waiting.length){
+    el.innerHTML='<div class="lb-empty">Waiting for teams to join...</div>';
+    return;
+  }
+
+  var html='';
+  sorted.slice(0,8).forEach(function(e,i){
+    var isTop = i===0;
+    var rounds='R1:'+(e.r0||0)+' · R2:'+(e.r1||0)+' · R3:'+(e.r2||0);
+    html+='<div class="lb-row'+(isTop?' lb-top':'')+'">';
+    html+='<div class="lb-rank">'+(i+1)+'</div>';
+    html+='<div class="lb-medal">'+(MD[i]||'')+'</div>';
+    html+='<div class="lb-info"><div class="lb-team">'+e.team+'</div>';
+    html+='<div class="lb-sub">'+rounds+(e.bonus?' · ⚡'+e.bonus+' bonus':'')+'</div></div>';
+    html+='<div class="lb-score">'+e.score+'<span class="lb-pts"> pts</span></div>';
+    html+='</div>';
+  });
+
+  if(waiting.length){
+    html+='<div class="lb-waiting-label">Waiting to play</div>';
+    waiting.slice(0,5).forEach(function(t){
+      html+='<div class="lb-row lb-wait"><div class="lb-rank">—</div><div class="lb-medal">⏳</div>';
+      html+='<div class="lb-info"><div class="lb-team">'+t.name+'</div><div class="lb-sub">'+t.players+' player'+(t.players!==1?'s':'')+' registered</div></div>';
+      html+='<div class="lb-score" style="font-size:.9rem;color:#7A7AAA">Ready</div></div>';
+    });
+  }
+
+  el.innerHTML=html;
+  // Update team count
+  var total=sorted.length+waiting.length;
+  var tc=document.getElementById('team-count');
+  if(tc) tc.textContent=total+' team'+(total!==1?'s':'');
+}
+
+db.ref('teams').on('value',function(snap){teamsC=snap.val()||{};renderBoard();});
+db.ref('scores').on('value',function(snap){scoresC=snap.val()||{};renderBoard();});
+db.ref('live_scores').on('value',function(snap){liveC=snap.val()||{};renderBoard();});
+
+// Reactions ticker
+var rxnQueue=[], rxnTimer=null;
+db.ref('reactions').orderByChild('timestamp').limitToLast(20).on('value',function(snap){
+  var data=snap.val(); if(!data) return;
+  var items=Object.values(data).sort(function(a,b){return a.timestamp-b.timestamp;});
+  items.forEach(function(r){
+    var key=r.team+'_r'+r.round+'_q'+r.q+'_'+r.emoji;
+    if(rxnQueue.indexOf(key)<0){rxnQueue.push(key);showReaction(r);}
+  });
+});
+function showReaction(r){
+  var ticker=document.getElementById('rxn-ticker');
+  if(!ticker) return;
+  var item=document.createElement('span');
+  item.className='rxn-item';
+  item.textContent=r.emoji+' '+r.team;
+  ticker.appendChild(item);
+  setTimeout(function(){if(item.parentNode)item.parentNode.removeChild(item);},4000);
+}
 </script>
 </body>
 </html>
