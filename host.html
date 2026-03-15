@@ -183,7 +183,14 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script>
+<script>var CC = {h:'ch',f:'cf',m:'cm',s:'cs',x:'cx'};
+var MEDALS = ['&#x1F947;','&#x1F948;','&#x1F949;'];
+var curRound = 1, selQ = 0, timer = null, timerVal = 0, db = null;
+var teamCount = 0;
+var roundDone = [false,false,false];
+var roundStarted = [false,false,false];
+
+
 var QUESTIONS=[
 {cat:'h',lb:'History',q:`What year did the Morant Bay Rebellion take place?`,o:['1831','1865','1882','1907'],a:1},
 {cat:'h',lb:'History',q:`Which national hero is known as Father of the Nation?`,o:['Norman Manley','Paul Bogle','Marcus Garvey','Alexander Bustamante'],a:3},
@@ -237,16 +244,6 @@ function setChip(state, label){
   if(dot){ dot.style.background=s.color; dot.style.animation=s.pulse?'pulse 1.2s infinite':'none'; }
   if(chip){ chip.style.background=s.bg; chip.style.borderColor=s.border; }
 }
-var CC = {h:'ch',f:'cf',m:'cm',s:'cs',x:'cx'};
-var MEDALS = ['&#x1F947;','&#x1F948;','&#x1F949;'];
-var curRound = 1;
-var selQ = 0;
-var timer = null;
-var timerVal = 0;
-var db = null;
-var teamCount = 0;
-var roundDone = [false,false,false];
-var roundStarted = [false,false,false];
 
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
@@ -269,10 +266,10 @@ function selRound(r){
   });
   renderDots();
   renderQuestion();
-  // Update status
+  // Update status — only re-enable launch if not called from endRound
+  // endRound sets its own status after calling selRound
   if(teamCount > 0 && !roundDone[r-1]){
     document.getElementById('btn-launch').disabled = false;
-    document.getElementById('status-val').textContent = 'Round '+r+' ready — '+teamCount+' team'+(teamCount!==1?'s':'')+' waiting';
   }
 }
 
@@ -429,8 +426,8 @@ function revealQ(){
     document.getElementById('btn-pause').disabled = true;
     document.getElementById('btn-reveal').disabled = true;
     document.getElementById('btn-break').disabled = false; // can end round at any time
-    document.getElementById('status-val').textContent = '👉 Preview: Q'+selQ+' of '+getRoundQuestions().length+' — click Launch when ready';
-    setChip('ready', 'Q'+selQ+' preview');
+    document.getElementById('status-val').textContent = '👉 Preview: Q'+(selQ+1)+' of '+getRoundQuestions().length+' — click Launch when ready';
+    setChip('ready', 'Q'+(selQ+1)+' preview');
   }
 }
 
