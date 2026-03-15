@@ -24,7 +24,7 @@ body{display:flex;flex-direction:column}
 .logo-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:var(--purple);letter-spacing:.04em}
 .logo-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:7px;color:var(--coral);letter-spacing:.12em;text-transform:uppercase}
 .header-mid{flex:1;text-align:center;min-width:0;padding:0 .25rem}
-.table-name-display{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
+.table-name-display{font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:var(--purple);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none;background:var(--purple-light);padding:3px 10px;border-radius:20px;letter-spacing:.02em}
 .score-chip{background:var(--purple);color:#fff;font-size:13px;font-weight:800;padding:4px 12px;border-radius:20px;font-family:'Nunito',sans-serif;display:none;white-space:nowrap;flex-shrink:0}
 .sponsor-bar{background:var(--sponsor-color);padding:5px 1.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-shrink:0}
 .sp-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
@@ -213,7 +213,7 @@ body{display:flex;flex-direction:column}
       <label class="lbl">How many players at your table? (1–4)</label>
       <div class="cr">
         <button class="cbtn" onclick="chgCnt(-1)">−</button>
-        <span class="cval" id="cdisp">2</span>
+        <span class="cval" id="cdisp">1</span>
         <button class="cbtn" onclick="chgCnt(1)">+</button>
       </div>
       <label class="lbl">Player email addresses</label>
@@ -317,7 +317,7 @@ body{display:flex;flex-direction:column}
 
 <div class="tab-bar" id="tbar">
   <button class="tab active" id="tplay" onclick="showTab('play')"><span class="tab-icon">🎯</span><span>Play</span></button>
-  <button class="tab" id="tlb" onclick="showTab('lb')"><span class="tab-icon">🏆</span><span>Leaderboard</span></button>
+  <button class="tab" id="tlb" onclick="showTab('lb')" style="display:none"><span class="tab-icon">🏆</span><span>Leaderboard</span></button>
 </div>
 <div class="stoast" id="stoast"></div>
 
@@ -394,7 +394,7 @@ const MD=['🥇','🥈','🥉'];
 const TSECS=10,MAXP=4,BSPTS=3;
 
 // State
-let tname='',pemails=[],pcnt=2,score=0,bonus=0,answers=[],alive=false;
+let tname='',pemails=[],pcnt=1,score=0,bonus=0,answers=[],alive=false;
 let cq=-1,qlist=[],tint=null,tleft=0,answered=false,selIdx=-1,qst=0,rsent=false;
 let activeScreen='splash'; // tracks which non-lb screen is active
 let lastCmdKey=''; // used to ignore stale command on join
@@ -428,7 +428,7 @@ function showScr(id){
   if(id!=='lb') activeScreen=id;
 }
 
-window.showTab=function(t){
+window.showTab=async function(t){
   if(t==='lb'){
     ['splash','waiting','paused','results'].forEach(sid=>document.getElementById(sid)?.classList.remove('active'));
     document.getElementById('question').classList.add('tab-hidden');
@@ -445,6 +445,14 @@ window.showTab=function(t){
 
     if(lastHostCmd&&alive){
       const cmd=lastHostCmd;
+      // If we don't have questions yet, try loading them
+      if(qlist.length===0&&cmd.action==='question'){
+        try{
+          const qsnap=await get(ref(db,'game/questions'));
+          const qdata=qsnap.val();
+          if(qdata) qlist=qdata;
+        }catch(e){}
+      }
       // Force re-apply the current host state regardless of local state
       if(cmd.action==='question'){
         if(cmd.index!==cq){
@@ -508,12 +516,12 @@ window.joinGame=async function(){
     if(pemails.includes(v)){showAlert('Player '+(i+1)+' has a duplicate email — each player needs a unique address.');return;}
     pemails.push(v);
   }
-  qlist=shuffle([...AQ]).slice(0,10);
+  qlist=[];// will be populated from Firebase when host launches first question
   score=0;bonus=0;answers=[];cq=-1;alive=true;answered=false;
 
   // Show table name in header
   const td=document.getElementById('tname-display');
-  td.textContent=tname;td.style.display='block';
+  td.textContent='Team: '+tname;td.style.display='block';
   document.getElementById('sc').style.display='block';
   document.getElementById('tbar').classList.add('show');
   updSC();
@@ -553,23 +561,31 @@ function showWait(n){
 }
 
 function listenHost(){
-  onValue(ref(db,'host/command'),snap=>{
+  onValue(ref(db,'host/command'),async snap=>{
     const cmd=snap.val();if(!cmd||!alive)return;
     const cmdKey=JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
-    lastHostCmd=cmd; // always track latest, even if we skip acting on it
+    lastHostCmd=cmd;
     if(cmdKey===lastCmdKey)return;
     lastCmdKey=cmdKey;
-    // Always switch to play tab when host sends a command
+    // Always switch back to play tab on any host command
     if(cmd.action==='question'||cmd.action==='reveal'||cmd.action==='pause'||cmd.action==='end'){
       document.getElementById('lb').classList.remove('active');
       document.getElementById('tlb').classList.remove('active');
       document.getElementById('tplay').classList.add('active');
     }
     if(cmd.action==='question'){
-      // Sync to host question index — always match exactly
+      // Load question list from Firebase if not yet loaded
+      if(qlist.length===0){
+        try{
+          const qsnap=await get(ref(db,'game/questions'));
+          const qdata=qsnap.val();
+          if(qdata) qlist=qdata;
+        }catch(e){}
+      }
+      if(qlist.length===0) return; // still no questions, wait
       if(cmd.index!==cq){cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;launchQ(cq);}
       else if(timerPaused){resumeTimer();}
-    } else if(cmd.action==='reveal'){stopT();timerPaused=false;revealAns(cq,false);}
+    } else if(cmd.action==='reveal'){stopT();timerPaused=false;if(qlist.length>0)revealAns(cq,false);}
     else if(cmd.action==='pause'){stopT();timerPaused=false;showPaused();}
     else if(cmd.action==='end'){stopT();timerPaused=false;showResults();}
   });
@@ -591,6 +607,10 @@ function listenHost(){
 }
 
 function launchQ(idx){
+  // Hide leaderboard tab — only shown after answering
+  document.getElementById('tlb').style.display='none';
+  document.getElementById('tplay').classList.add('active');
+  document.getElementById('tlb').classList.remove('active');
   showScr('question');
   activeScreen='question';
   const q=qlist[idx];
@@ -625,15 +645,15 @@ function lockOpts(){
     const c=el.cloneNode(true);c.classList.add('lk');el.parentNode.replaceChild(c,el);
   });
 }
+function showLbTab(){document.getElementById('tlb').style.display='flex';}
+
 function timeoutQ(idx){
   if(answered)return;answered=true;
   if(!answers[idx])answers[idx]={q:qlist[idx].q,r:'t'};
   lockOpts();
   const ce=document.getElementById('op'+qlist[idx].a);if(ce)ce.classList.add('correct');
   showFB('timeout','⏰','Time\'s up! The correct answer was '+qlist[idx].o[qlist[idx].a]+'.');
-  document.getElementById('rbar').style.display='flex';renderT(0);
-}
-function revealAns(idx,_){
+  document.getElementById('rbar').style.display='flex';renderT(0);showLbTab();
   const q=qlist[idx];lockOpts();
   const ce=document.getElementById('op'+q.a);if(ce)ce.classList.add('correct');
   if(!answered){
@@ -645,7 +665,7 @@ function revealAns(idx,_){
     else if(a&&a.r==='w'){const we=document.getElementById('op'+selIdx);if(we)we.classList.add('wrong');showFB('wrong','😬','Not quite — the answer was '+q.o[q.a]+'.');}
     else showFB('timeout','⏰','Time\'s up! The answer was '+q.o[q.a]+'.');
   }
-  document.getElementById('rbar').style.display='flex';renderT(0);
+  document.getElementById('rbar').style.display='flex';renderT(0);showLbTab();
 }
 function selOpt(i){
   if(answered)return;stopT();answered=true;selIdx=i;
@@ -669,7 +689,7 @@ function showPaused(){
   document.getElementById('pscore').textContent=score;
   const cor=answers.filter(a=>a&&(a.r==='c'||a.r==='b')).length;
   document.getElementById('pdetail').textContent=cor+' correct out of '+done+(bonus?' · ⚡ '+bonus+' bonus pt'+(bonus!==1?'s':''):'');
-  showScr('paused');activeScreen='paused';
+  showScr('paused');activeScreen='paused';showLbTab();
   document.getElementById('tplay').classList.add('active');document.getElementById('tlb').classList.remove('active');
   showWait(done);
   // Update team status
@@ -696,7 +716,7 @@ function showResults(){
     const a=answers[i],r=a?a.r:'t',cl=r==='c'||r==='b'?'dc':r==='w'?'dw':'dt';
     return`<div class="rrow"><span class="rqt">Q${i+1}. ${q.q.length>50?q.q.substring(0,50)+'…':q.q}</span><span class="rdot ${cl}"></span></div>`;
   }).join('');
-  showScr('results');activeScreen='results';
+  showScr('results');activeScreen='results';showLbTab();
   document.getElementById('tplay').classList.add('active');document.getElementById('tlb').classList.remove('active');
   document.getElementById('qprog').style.width='100%';
   saveScore();alive=false;
@@ -704,7 +724,7 @@ function showResults(){
 window.restartGame=function(){
   document.getElementById('tname').value='';
   document.getElementById('tname-display').style.display='none';
-  pcnt=2;document.getElementById('cdisp').textContent='2';renderPF();
+  pcnt=1;document.getElementById('cdisp').textContent='1';renderPF();
   document.getElementById('sc').style.display='none';
   document.getElementById('tbar').classList.remove('show');
   stopT();alive=false;answered=false;selIdx=-1;bonus=0;score=0;answers=[];
