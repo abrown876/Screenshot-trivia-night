@@ -178,10 +178,10 @@ document.getElementById('btn-reg').onclick = function() {
   document.querySelectorAll('.pinp').forEach(function(el) { if (el.value.trim()) emails.push(el.value.trim()); });
   db.ref('teams/' + name.replace(/[.#$\[\]]/g, '_')).set({ name: name, players: playerCount, emails: emails, status: 'waiting', score: 0, joinedAt: Date.now() })
     .then(function() {
-      successbox.innerHTML = '&#x1F3C6; <strong>' + name + '</strong> registered! Head to your tablet to play.';
+      sessionStorage.setItem('trivia_team', JSON.stringify({name: name, players: playerCount, emails: emails}));
+      successbox.innerHTML = '&#x1F3C6; <strong>' + name + '</strong> registered! Taking you to the game...';
       successbox.style.display = 'block';
-      document.getElementById('f-tname').value = '';
-      playerCount = 1; cvalEl.textContent = 1; clblEl.textContent = 'player'; renderPlayerFields();
+      setTimeout(function() { window.location.href = 'index.html'; }, 1000);
     })
     .catch(function(e) { alertbox.textContent = 'Error: ' + e.message; alertbox.style.display = 'block'; });
 };
