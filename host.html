@@ -2,22 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Host Panel — Screenshot Quiz Night</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --purple:#5B5BD6;--purpled:#3D3D9E;--purplel:#EEEEFF;
+  --purple:#5B5BD6;--purplel:#EEEEFF;--purpled:#3D3D9E;
   --coral:#E8547A;--corall:#FDE8EE;
   --green:#1A8A4A;--greenl:#EAF7F0;
   --amber:#E8930A;--amberl:#FEF3DC;
+  --gold:#F5A623;--goldl:#FEF3DC;
   --bg:#F4F4FC;--card:#fff;--text:#1A1A3E;--muted:#7A7AAA;--bd:#E0E0F0;
   --r:16px;--sh:0 4px 20px rgba(91,91,214,.10)
 }
 html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column}
-.hdr{background:var(--purpled);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,.2);flex-shrink:0}
+.hdr{background:var(--purpled);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 16px rgba(0,0,0,.2)}
 .hdr-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#fff}
+.host-badge{background:var(--coral);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;padding:4px 14px;border-radius:20px}
 .main{max-width:720px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;flex:1;width:100%}
 .card{background:var(--card);border-radius:var(--r);padding:1.25rem 1.5rem;box-shadow:var(--sh)}
 .slabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.7rem;font-family:'Nunito',sans-serif}
@@ -64,20 +66,27 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .qdot{width:38px;height:38px;border-radius:50%;border:2px solid var(--bd);background:var(--bg);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .qdot.done{background:var(--greenl);border-color:var(--green);color:var(--green)}
 .qdot.active{background:var(--purple);border-color:var(--purple);color:#fff}
-.ldot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:pulse 1.5s infinite;display:inline-block}
+.live-row{display:flex;align-items:center;gap:.5rem;font-size:12px;color:var(--coral);font-weight:700}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .lb-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--bd)}
 .lb-row:last-child{border-bottom:none}
 .lb-left{display:flex;align-items:center;gap:.5rem}
 .lb-medal{font-size:1.1rem;min-width:22px}
 .lb-team{font-weight:500;font-size:14px}
+.lb-email{font-size:11px;color:var(--muted)}
 .lb-score{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--purple)}
 .lb-empty{text-align:center;font-size:13px;color:var(--muted);padding:1.25rem 0}
 .rxn-item{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--bd);font-size:13px}
 .rxn-item:last-child{border-bottom:none}
+.round-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem}
+.rs-card{background:var(--bg);border-radius:10px;padding:.6rem .75rem;text-align:center;border:1.5px solid var(--bd)}
+.rs-card.active{border-color:var(--purple);background:var(--purplel)}
+.rs-card.done{border-color:var(--green);background:var(--greenl)}
+.rs-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--purple)}
+.rs-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .sponsor-footer{background:#FEF3DC;border-top:1.5px solid #F5D09A;padding:.65rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:.75rem;flex-shrink:0}
 .sf-label{font-size:10px;font-weight:700;color:#8A5500;text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif;white-space:nowrap}
-#game-chip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#fff}
 </style>
 </head>
 <body>
@@ -88,49 +97,54 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     <div style="width:1px;height:22px;background:rgba(255,255,255,.2)"></div>
     <div class="hdr-title">Host Control Panel</div>
   </div>
-  <div id="game-chip">
-    <span id="chip-dot" style="width:8px;height:8px;border-radius:50%;background:#8888BB;display:inline-block"></span>
-    <span id="chip-text">Ready</span>
-  </div>
+  <div id="game-chip" style="display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#fff"><span id="chip-dot" style="width:8px;height:8px;border-radius:50%;background:#8888BB;display:inline-block"></span><span id="chip-text">Ready</span></div>
 </div>
 
 <div class="main">
 
+  <!-- Status -->
   <div class="card status-bar">
     <div>
       <div class="slabel" style="margin-bottom:.2rem">Status</div>
-      <div class="status-val" id="status-val">Ready to launch</div>
+      <div class="status-val" id="status-val">Ready to start Round 1</div>
     </div>
     <div class="count-pills">
-      <div class="pill pill-wait">&#x23F3; <span id="cnt-wait">0</span> registered</div>
+      <div class="pill pill-wait">&#x23F3; <span id="cnt-wait">0</span> waiting</div>
       <div class="pill pill-play">&#x1F3AE; <span id="cnt-play">0</span> playing</div>
       <div class="pill pill-done">&#x2705; <span id="cnt-done">0</span> done</div>
     </div>
   </div>
 
+  <!-- Round tabs -->
   <div class="card">
-    <div class="slabel" style="margin-bottom:.85rem">Select round then launch</div>
     <div class="round-tabs">
-      <button class="rtab active" id="rtab1" onclick="selRound(1)">&#x1F7E3; Round 1</button>
-      <button class="rtab" id="rtab2" onclick="selRound(2)">&#x1F7E1; Round 2</button>
-      <button class="rtab" id="rtab3" onclick="selRound(3)">&#x1F7E2; Round 3</button>
-    </div>
-    <!-- Question preview -->
-    <div id="q-preview" style="margin:.85rem 0;padding:1rem;background:var(--bg);border-radius:12px;border:1.5px solid var(--bd)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:.8rem;color:var(--muted)" id="q-counter">Q1 of 10</div>
-        <div class="cpill" id="q-cat" style="font-size:11px"></div>
-      </div>
-      <div id="q-text" style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;line-height:1.4;color:var(--text);margin-bottom:.75rem">Select a round to begin</div>
-      <div id="opts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem"></div>
-      <div id="answer-box" class="answer-box"></div>
+      <button class="rtab active" id="rtab1" onclick="selRound(1)">Round 1</button>
+      <button class="rtab" id="rtab2" onclick="selRound(2)">Round 2</button>
+      <button class="rtab" id="rtab3" onclick="selRound(3)">Round 3</button>
     </div>
 
-    <div class="timer-block" id="timer-block" style="margin-bottom:1rem">
+    <!-- Question navigator dots -->
+    <div class="qdots" id="qdots"></div>
+
+    <!-- Current question preview -->
+    <div style="margin-top:1rem">
+      <div class="q-header">
+        <div class="q-title" id="q-title">Q1 / 10</div>
+        <div class="cpill" id="q-cat"></div>
+      </div>
+      <div class="q-text" id="q-text"></div>
+      <div class="answer-box" id="answer-box"></div>
+      <div class="opts-grid" id="opts-grid"></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-block" id="timer-block">
       <div class="timer-big" id="timer-big">10</div>
       <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
     </div>
-    <div class="controls">
+
+    <!-- Controls -->
+    <div class="controls" style="margin-top:1rem">
       <button class="btn btn-purple" id="btn-launch" onclick="launchQ()">&#x1F680; Launch Question</button>
       <button class="btn btn-amber" id="btn-pause" onclick="pauseQ()" disabled>&#x23F8; Pause</button>
       <button class="btn btn-green" id="btn-reveal" onclick="revealQ()" disabled>&#x2705; Reveal &amp; Stop</button>
@@ -139,25 +153,25 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     </div>
   </div>
 
+  <!-- Live leaderboard -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
       <div class="slabel" style="margin-bottom:0">Live Leaderboard</div>
-      <div style="display:flex;align-items:center;gap:.4rem;font-size:12px;color:var(--coral);font-weight:700"><div class="ldot"></div> Live</div>
+      <div class="live-row"><div class="ldot"></div> Live</div>
     </div>
-    <div id="lb-list"><div class="lb-empty">No scores yet</div></div>
+    <div id="lb-list"><div class="lb-empty">No teams yet</div></div>
   </div>
 
+  <!-- Reactions -->
   <div class="card">
     <div class="slabel">&#x1F4AC; Live Reactions</div>
-    <div id="rxn-list"><div class="lb-empty">No reactions yet</div></div>
+    <div id="rxn-list"><div class="lb-empty">Reactions will appear here</div></div>
   </div>
 
+  <!-- Reset -->
   <div class="card">
     <div class="slabel">Danger Zone</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
-      <button class="btn btn-amber" onclick="resetScores()">&#x1F504; Reset Scores</button>
-      <button class="btn btn-red" onclick="resetAll()">&#x1F5D1; Reset Everything</button>
-    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem"><button class="btn btn-amber" onclick="resetGame()">&#x1F504; Reset Scores</button><button class="btn btn-red" onclick="resetAll()">&#x1F5D1; Reset Everything</button></div>
   </div>
 
 </div>
@@ -171,263 +185,258 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 var QUESTIONS=[
-{cat:'h',lb:'History',q:'What year did the Morant Bay Rebellion take place?',o:['1831','1865','1882','1907'],a:1},
-{cat:'h',lb:'History',q:'Which national hero is known as Father of the Nation?',o:['Norman Manley','Paul Bogle','Marcus Garvey','Alexander Bustamante'],a:3},
-{cat:'h',lb:'History',q:'The 1831 Christmas Rebellion was led by which preacher?',o:['Paul Bogle','Sam Sharpe','Cudjoe','Nanny'],a:1},
-{cat:'h',lb:'History',q:'Which pirate captain was most associated with Port Royal in the 1670s?',o:['Henry Morgan','Horatio Nelson','Francis Drake','Edward Teach'],a:0},
-{cat:'h',lb:'History',q:'Which parish is the birthplace of Marcus Garvey?',o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1},
-{cat:'h',lb:'History',q:'In what year did Jamaica first participate in the Olympics?',o:['1936','1948','1952','1960'],a:1},
-{cat:'m',lb:'Music',q:'Which genre preceded reggae in Jamaica in the 1960s?',o:['Calypso','Mento','Rocksteady','Ska'],a:3},
-{cat:'m',lb:'Music',q:"What was Bob Marley's full birth name?",o:['Robert Nesta Marley','Neville Livingston','Winston McIntosh','Robbie Marley'],a:0},
-{cat:'m',lb:'Music',q:'Which neighbourhood is most associated with the birth of dancehall?',o:['Trench Town','Tivoli Gardens','August Town','Arnett Gardens'],a:1},
-{cat:'m',lb:'Music',q:"Sean Paul's hit Temperature was released in which year?",o:['2003','2005','2007','2009'],a:1},
-{cat:'m',lb:'Music',q:'Which artist is known as the King of Dancehall?',o:['Buju Banton','Damian Marley','Busy Signal','Beenie Man'],a:3},
-{cat:'m',lb:'Music',q:'Rocksteady music emerged in Jamaica in which decade?',o:['1950s','1960s','1970s','1980s'],a:1},
-{cat:'f',lb:'Food',q:'Which part of the ackee fruit is toxic if eaten unripe?',o:['The seed','The aril','The husk','The root'],a:0},
-{cat:'f',lb:'Food',q:'What is festival in Jamaican cuisine?',o:['A sweet fried dumpling','A fish soup','A cornmeal porridge','A sugarcane drink'],a:0},
-{cat:'f',lb:'Food',q:'Blue Mountain coffee is grown at what minimum altitude?',o:['500m','1000m','1500m','2000m'],a:2},
-{cat:'f',lb:'Food',q:'Which dish is made from goat offal and said to be an aphrodisiac?',o:['Pepper pot','Cow foot soup','Mannish water','Run down'],a:2},
-{cat:'f',lb:'Food',q:'What is the main ingredient in Jamaican run down?',o:['Saltfish','Mackerel in coconut milk','Ackee','Callaloo'],a:1},
-{cat:'f',lb:'Food',q:'Which spice is essential to authentic Jamaican jerk seasoning?',o:['Cumin','Allspice','Turmeric','Coriander'],a:1},
-{cat:'s',lb:'Sports',q:"Usain Bolt's 9.58s world record was set at which championship?",o:['2008 Beijing Olympics','2009 Berlin Worlds','2012 London Olympics','2011 Daegu Worlds'],a:1},
-{cat:'s',lb:'Sports',q:'Which Jamaican won 100m gold at BOTH the 2016 and 2020 Olympics?',o:['Shelly-Ann Fraser-Pryce','Elaine Thompson-Herah','Veronica Campbell-Brown','Merlene Ottey'],a:1},
-{cat:'s',lb:'Sports',q:'The Jamaican bobsled team first competed in the Olympics in which year?',o:['1984','1988','1992','1994'],a:1},
-{cat:'s',lb:'Sports',q:'Merlene Ottey competed in how many Olympic Games?',o:['4','5','6','7'],a:2},
-{cat:'s',lb:'Sports',q:'Which Jamaican cricketer is the West Indies all-time leading run scorer?',o:['Michael Holding','Courtney Walsh','Chris Gayle','George Headley'],a:2},
-{cat:'s',lb:'Sports',q:'How many World Championship 100m gold medals has Shelly-Ann Fraser-Pryce won?',o:['3','4','5','6'],a:2},
-{cat:'x',lb:'General',q:'What is the motto of Jamaica?',o:['One Love One Heart','Out of Many One People','Forward Ever Backward Never','Unity is Strength'],a:1},
-{cat:'x',lb:'General',q:'Kingston became Jamaica's capital in which year?',o:['1692','1703','1872','1962'],a:2},
-{cat:'x',lb:'General',q:'Which of these is NOT a Jamaican parish?',o:['Trelawny','Hanover','Portland','Bridgeton'],a:3},
-{cat:'x',lb:'General',q:'The Doctor Bird is a type of what?',o:['Parrot','Hummingbird','Kingfisher','Finch'],a:1},
-{cat:'x',lb:'General',q:"What is Jamaica's longest river?",o:['Black River','Rio Cobre','Rio Minho','White River'],a:0},
-{cat:'x',lb:'General',q:'Which city is NOT in Jamaica?',o:['Montego Bay','Ocho Rios','Nassau','Mandeville'],a:2}
+{cat:'h',lb:'History',q:`What year did the Morant Bay Rebellion take place?`,o:['1831','1865','1882','1907'],a:1},
+{cat:'h',lb:'History',q:`Which national hero is known as Father of the Nation?`,o:['Norman Manley','Paul Bogle','Marcus Garvey','Alexander Bustamante'],a:3},
+{cat:'h',lb:'History',q:`The 1831 Christmas Rebellion was led by which preacher?`,o:['Paul Bogle','Sam Sharpe','Cudjoe','Nanny'],a:1},
+{cat:'h',lb:'History',q:`Which pirate captain was most associated with Port Royal in the 1670s?`,o:['Henry Morgan','Horatio Nelson','Francis Drake','Edward Teach'],a:0},
+{cat:'h',lb:'History',q:`Which parish is the birthplace of Marcus Garvey?`,o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1},
+{cat:'h',lb:'History',q:`In what year did Jamaica first participate in the Olympics?`,o:['1936','1948','1952','1960'],a:1},
+{cat:'m',lb:'Music',q:`Which genre preceded reggae in Jamaica in the 1960s?`,o:['Calypso','Mento','Rocksteady','Ska'],a:3},
+{cat:'m',lb:'Music',q:`What was Bob Marley's full birth name?`,o:['Robert Nesta Marley','Neville Livingston','Winston McIntosh','Robbie Marley'],a:0},
+{cat:'m',lb:'Music',q:`Which neighbourhood is most associated with the birth of dancehall?`,o:['Trench Town','Tivoli Gardens','August Town','Arnett Gardens'],a:1},
+{cat:'m',lb:'Music',q:`Sean Paul's hit Temperature was released in which year?`,o:['2003','2005','2007','2009'],a:1},
+{cat:'m',lb:'Music',q:`Which artist is known as the King of Dancehall?`,o:['Buju Banton','Damian Marley','Busy Signal','Beenie Man'],a:3},
+{cat:'m',lb:'Music',q:`Rocksteady music emerged in Jamaica in which decade?`,o:['1950s','1960s','1970s','1980s'],a:1},
+{cat:'f',lb:'Food',q:`Which part of the ackee fruit is toxic if eaten unripe?`,o:['The seed','The aril','The husk','The root'],a:0},
+{cat:'f',lb:'Food',q:`What is festival in Jamaican cuisine?`,o:['A sweet fried dumpling','A fish soup','A cornmeal porridge','A sugarcane drink'],a:0},
+{cat:'f',lb:'Food',q:`Blue Mountain coffee is grown at what minimum altitude?`,o:['500m','1000m','1500m','2000m'],a:2},
+{cat:'f',lb:'Food',q:`Which dish is made from goat offal and said to be an aphrodisiac?`,o:['Pepper pot','Cow foot soup','Mannish water','Run down'],a:2},
+{cat:'f',lb:'Food',q:`What is the main ingredient in Jamaican run down?`,o:['Saltfish','Mackerel in coconut milk','Ackee','Callaloo'],a:1},
+{cat:'f',lb:'Food',q:`Which spice is essential to authentic Jamaican jerk seasoning?`,o:['Cumin','Allspice','Turmeric','Coriander'],a:1},
+{cat:'s',lb:'Sports',q:`Usain Bolt's 9.58s world record was set at which championship?`,o:['2008 Beijing Olympics','2009 Berlin Worlds','2012 London Olympics','2011 Daegu Worlds'],a:1},
+{cat:'s',lb:'Sports',q:`Which Jamaican won 100m gold at BOTH the 2016 and 2020 Olympics?`,o:['Shelly-Ann Fraser-Pryce','Elaine Thompson-Herah','Veronica Campbell-Brown','Merlene Ottey'],a:1},
+{cat:'s',lb:'Sports',q:`The Jamaican bobsled team first competed in the Olympics in which year?`,o:['1984','1988','1992','1994'],a:1},
+{cat:'s',lb:'Sports',q:`Merlene Ottey competed in how many Olympic Games?`,o:['4','5','6','7'],a:2},
+{cat:'s',lb:'Sports',q:`Which Jamaican cricketer is the West Indies all-time leading run scorer?`,o:['Michael Holding','Courtney Walsh','Chris Gayle','George Headley'],a:2},
+{cat:'s',lb:'Sports',q:`How many World Championship 100m gold medals has Shelly-Ann Fraser-Pryce won?`,o:['3','4','5','6'],a:2},
+{cat:'x',lb:'General',q:`What is the motto of Jamaica?`,o:['One Love One Heart','Out of Many One People','Forward Ever Backward Never','Unity is Strength'],a:1},
+{cat:'x',lb:'General',q:`Kingston became Jamaica's capital in which year?`,o:['1692','1703','1872','1962'],a:2},
+{cat:'x',lb:'General',q:`Which of these is NOT a Jamaican parish?`,o:['Trelawny','Hanover','Portland','Bridgeton'],a:3},
+{cat:'x',lb:'General',q:`The Doctor Bird is a type of what?`,o:['Parrot','Hummingbird','Kingfisher','Finch'],a:1},
+{cat:'x',lb:'General',q:`What is Jamaica's longest river?`,o:['Black River','Rio Cobre','Rio Minho','White River'],a:0},
+{cat:'x',lb:'General',q:`Which city is NOT in Jamaica?`,o:['Montego Bay','Ocho Rios','Nassau','Mandeville'],a:2}
 ];
 
-var CC={'h':'ch','f':'cf','m':'cm','s':'cs','x':'cx'};
-var MEDALS=['&#x1F947;','&#x1F948;','&#x1F949;'];
-var curRound=1,selQ=0,timer=null,timerVal=0,db=null;
-var _rounds=[[],[],[]],_built=false;
+var CC = {h:'ch',f:'cf',m:'cm',s:'cs',x:'cx'};
+var MEDALS = ['&#x1F947;','&#x1F948;','&#x1F949;'];
+var curRound = 1;
+var selQ = 0;
+var timer = null;
+var timerVal = 0;
+var db = null;
 
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
-// ── Firebase ──────────────────────────────────────────────────────────
-try{
+try {
   firebase.initializeApp({apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"});
-  db=firebase.database();
-} catch(e){console.error('Firebase',e);}
-
-// ── Build & push rounds to Firebase immediately ───────────────────────
-function buildAndPush(){
-  if(_built)return;
-  var all=shuffle(QUESTIONS.slice());
-  var n=Math.ceil(all.length/3);
-  _rounds[0]=all.slice(0,n);
-  _rounds[1]=all.slice(n,n*2);
-  _rounds[2]=all.slice(n*2);
-  _built=true;
-  setStatus('Ready to launch','');
-  document.getElementById('btn-launch').disabled=false;
-
-}
-
-function setStatus(txt,col){
-  document.getElementById('status-val').textContent=txt;
-  setChip(txt);
-}
-function setChip(txt){
-  var dot=document.getElementById('chip-dot');
-  var lbl=document.getElementById('chip-text');
-  if(!lbl)return;
-  if(txt.indexOf('live')!==-1||txt.indexOf('Q')!==-1&&txt.indexOf('Round')!==-1){
-    dot.style.background='#E8547A';dot.style.animation='pulse 1.5s infinite';
-    lbl.textContent=txt;
-  }else if(txt.indexOf('complete')!==-1||txt.indexOf('break')!==-1){
-    dot.style.background='#E8930A';dot.style.animation='none';
-    lbl.textContent='Break';
-  }else if(txt.indexOf('over')!==-1||txt.indexOf('Result')!==-1){
-    dot.style.background='#1A8A4A';dot.style.animation='none';
-    lbl.textContent='Game over';
-  }else{
-    dot.style.background='#8888BB';dot.style.animation='none';
-    lbl.textContent='Ready';
-  }
-}
+  db = firebase.database();
+} catch(e){ console.error('Firebase init failed',e); }
 
 function selRound(r){
-  curRound=r;selQ=0;
+  curRound = r;
   [1,2,3].forEach(function(n){
-    document.getElementById('rtab'+n).className='rtab'+(n===r?' active':'');
+    var t = document.getElementById('rtab'+n);
+    t.className = 'rtab' + (n===r?' active':'');
   });
+  selQ = 0;
+  renderDots();
   renderQuestion();
 }
 
-function getQ(){return _rounds[curRound-1]||[];}
-
-var CC={'h':'ch','f':'cf','m':'cm','s':'cs','x':'cx'};
-
-function renderQuestion(){
-  var qs=getQ();var q=qs[selQ];
-  if(!q)return;
-  var counter=document.getElementById('q-counter');
-  if(counter) counter.textContent='Q'+(selQ+1)+' of '+qs.length;
-  var cat=document.getElementById('q-cat');
-  if(cat){cat.textContent=q.lb;cat.className='cpill '+(CC[q.cat]||'cx');}
-  var txt=document.getElementById('q-text');
-  if(txt) txt.textContent=q.q;
-  var ab=document.getElementById('answer-box');
-  if(ab) ab.className='answer-box';
-  var grid=document.getElementById('opts-grid');
-  if(grid) grid.innerHTML=q.o.map(function(opt,i){
-    return '<div style="background:'+(i===q.a?'var(--greenl)':'#fff')+';border:1.5px solid '+(i===q.a?'#90D4A8':'var(--bd)')+';border-radius:10px;padding:.5rem .75rem;font-size:13px;display:flex;align-items:center;gap:.5rem"><div style="width:22px;height:22px;border-radius:50%;background:'+(i===q.a?'var(--green)':'var(--bd)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+(i===q.a?'#fff':'var(--muted)')+';flex-shrink:0;font-family:Nunito,sans-serif">'+String.fromCharCode(65+i)+'</div>'+opt+'</div>';
-  }).join('');
+function getRoundQuestions(){
+  var all = QUESTIONS.slice();
+  var perRound = Math.ceil(all.length/3);
+  var start = (curRound-1)*perRound;
+  return all.slice(start, start+perRound);
 }
 
 function renderDots(){
-  var qs=getQ();
-  document.getElementById('qdots').innerHTML=qs.map(function(q,i){
-    return '<button class="qdot'+(i===selQ?' active':'')+'" onclick="selQ='+i+';renderDots();renderQuestion();">'+(i+1)+'</button>';
+  var qs = getRoundQuestions();
+  document.getElementById('qdots').innerHTML = qs.map(function(q,i){
+    return '<button class="qdot'+(i===selQ?' active':'')+'" onclick="selQuestion('+i+')">'+(i+1)+'</button>';
   }).join('');
+}
+
+function selQuestion(i){
+  selQ = i;
+  renderDots();
+  renderQuestion();
 }
 
 function renderQuestion(){
-  var qs=getQ();var q=qs[selQ];if(!q)return;
-  document.getElementById('q-title').textContent='Q'+(selQ+1)+' / '+qs.length;
-  var cat=document.getElementById('q-cat');cat.textContent=q.lb;cat.className='cpill '+(CC[q.cat]||'cx');
-  document.getElementById('q-text').textContent=q.q;
-  document.getElementById('answer-box').className='answer-box';
-  document.getElementById('opts-grid').innerHTML=q.o.map(function(opt,i){
+  var qs = getRoundQuestions();
+  var q = qs[selQ];
+  if(!q) return;
+  document.getElementById('q-title').textContent = 'Q'+(selQ+1)+' / '+qs.length;
+  var catEl = document.getElementById('q-cat');
+  catEl.textContent = q.lb;
+  catEl.className = 'cpill ' + (CC[q.cat]||'cx');
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('answer-box').className = 'answer-box';
+  document.getElementById('answer-box').textContent = '';
+  var grid = document.getElementById('opts-grid');
+  grid.innerHTML = q.o.map(function(opt,i){
     return '<div class="opt-prev'+(i===q.a?' correct-opt':'')+'"><div class="opt-ltr">'+String.fromCharCode(65+i)+'</div>'+opt+'</div>';
   }).join('');
+  document.getElementById('btn-launch').disabled = false;
+  document.getElementById('btn-reveal').disabled = true;
+  document.getElementById('btn-pause').disabled = true;
 }
 
 function launchQ(){
-  var qs=getQ();var q=qs[selQ];if(!q||!db)return;
-  var ts=Date.now();
-  // Write the current question to Firebase so index can read it directly
-  db.ref('game/current').set({round:curRound,index:selQ,question:q,timestamp:ts});
+  var qs = getRoundQuestions();
+  var q = qs[selQ];
+  if(!q || !db) return;
+  var ts = Date.now();
   db.ref('host/command').set({action:'question',round:curRound,index:selQ,timestamp:ts});
-  clearInterval(timer);timerVal=10;
-  var block=document.getElementById('timer-block');
-  var big=document.getElementById('timer-big');
-  var fill=document.getElementById('timer-fill');
-  block.style.display='block';big.textContent=timerVal;
-  big.className='timer-big';fill.style.width='100%';fill.className='timer-fill';
-  timer=setInterval(function(){
-    timerVal--;big.textContent=timerVal;fill.style.width=(timerVal/10*100)+'%';
-    if(timerVal<=3){big.className='timer-big urg';fill.className='timer-fill urg';}
-    if(timerVal<=0)clearInterval(timer);
-  },1000);
-  document.getElementById('btn-launch').disabled=true;
-  document.getElementById('btn-pause').disabled=false;
-  document.getElementById('btn-reveal').disabled=false;
-  setStatus('Round '+curRound+' — Q'+(selQ+1)+' live','');
+  db.ref('game/rounds/r'+curRound+'/q'+selQ).set(q);
+  // Start local timer display
+  clearInterval(timer);
+  timerVal = 10;
+  var block = document.getElementById('timer-block');
+  var big = document.getElementById('timer-big');
+  var fill = document.getElementById('timer-fill');
+  block.style.display='block';
+  big.textContent = timerVal;
+  big.className = 'timer-big';
+  fill.style.width='100%';
+  fill.className = 'timer-fill';
+  timer = setInterval(function(){
+    timerVal--;
+    big.textContent = timerVal;
+    fill.style.width = (timerVal/10*100)+'%';
+    if(timerVal <= 3){ big.className='timer-big urg'; fill.className='timer-fill urg'; }
+    if(timerVal <= 0){ clearInterval(timer); }
+  }, 1000);
+  document.getElementById('btn-launch').disabled = true;
+  document.getElementById('btn-pause').disabled = false;
+  document.getElementById('btn-reveal').disabled = false;
+  document.getElementById('status-val').textContent = 'Round '+curRound+' — Q'+(selQ+1)+' live';
 }
 
 function pauseQ(){
-  if(!db)return;
-  clearInterval(timer);
+  if(!db) return;
   db.ref('host/command').set({action:'pause',round:curRound,index:selQ,timestamp:Date.now()});
-  setStatus('Paused','');
+  clearInterval(timer);
+  document.getElementById('status-val').textContent = 'Paused';
 }
 
 function revealQ(){
-  if(!db)return;
+  if(!db) return;
   clearInterval(timer);
   db.ref('host/command').set({action:'reveal',round:curRound,index:selQ,timestamp:Date.now()});
-  // Show answer in preview
-  var q=getQ()[selQ];
+  var qs = getRoundQuestions();
+  var q = qs[selQ];
   if(q){
-    var ab=document.getElementById('answer-box');
-    if(ab){ab.innerHTML='&#x2705; <strong>Answer:</strong> '+q.o[q.a];ab.className='answer-box show';}
+    var ab = document.getElementById('answer-box');
+    ab.textContent = '&#x2705; Answer: ' + q.o[q.a];
+    ab.className = 'answer-box show';
+    ab.innerHTML = '&#x2705; <strong>Answer:</strong> ' + q.o[q.a];
   }
-  document.getElementById('btn-break').disabled=false;
-  // Auto-advance to next question
-  if(selQ<getQ().length-1){selQ++;setTimeout(renderQuestion,800);}
+  document.getElementById('btn-break').disabled = false;
+  // Auto advance dot
+  var qs2 = getRoundQuestions();
+  if(selQ < qs2.length-1){
+    selQ++;
+    renderDots();
+    renderQuestion();
+  }
 }
 
 function endRound(){
-  if(!db)return;
+  if(!db) return;
   clearInterval(timer);
   db.ref('host/command').set({action:'roundbreak',round:curRound,timestamp:Date.now()});
-  setStatus('Round '+curRound+' complete — on break','');
-  document.getElementById('btn-break').disabled=true;
-  document.getElementById('rtab'+curRound).className='rtab done';
-  if(curRound<3){selRound(curRound+1);}
-  else{document.getElementById('btn-endgame').style.display='block';}
+  document.getElementById('status-val').textContent = 'Round '+curRound+' complete — on break';
+  document.getElementById('btn-break').disabled = true;
+  if(curRound < 3){
+    var next = curRound+1;
+    document.getElementById('rtab'+curRound).className='rtab done';
+    selRound(next);
+  } else {
+    document.getElementById('btn-endgame').style.display='block';
+  }
 }
 
 function endGame(){
-  if(!db)return;
+  if(!db) return;
   db.ref('host/command').set({action:'results',round:3,timestamp:Date.now()});
-  setStatus('Game over — results shown','');
+  document.getElementById('status-val').textContent = 'Game over — results shown';
 }
 
-function resetScores(){
-  if(!confirm('Reset scores? Teams stay registered.'))return;
-  if(!db)return;
-  db.ref('scores').remove();db.ref('live_scores').remove();
-  db.ref('reactions').remove();db.ref('race').remove();
+function resetGame(){
+  // Reset scores only — teams stay registered
+  if(!confirm('Reset scores & round progress? Teams stay registered.')) return;
+  if(!db) return;
+  db.ref('scores').remove();
+  db.ref('live_scores').remove();
+  db.ref('reactions').remove();
+  db.ref('race').remove();
   db.ref('host/command').set({action:'reset',timestamp:Date.now()});
-  _built=false;_rounds=[[],[],[]];
-  buildAndPush();
-  setStatus('Scores reset — re-pushing questions','');
-  document.getElementById('btn-endgame').style.display='none';
   selRound(1);
+  document.getElementById('status-val').textContent = 'Scores reset — teams still registered';
+  document.getElementById('btn-endgame').style.display='none';
 }
-
 function resetAll(){
-  if(!confirm('Wipe everything including teams?'))return;
-  if(!db)return;
-  db.ref('scores').remove();db.ref('live_scores').remove();
-  db.ref('teams').remove();db.ref('reactions').remove();
-  db.ref('race').remove();db.ref('game/current').remove();db.ref('game/rounds').remove();
+  // Full wipe — scores AND teams
+  if(!confirm('Wipe everything? Scores and teams will be deleted.')) return;
+  if(!db) return;
+  db.ref('scores').remove();
+  db.ref('live_scores').remove();
+  db.ref('teams').remove();
+  db.ref('reactions').remove();
+  db.ref('race').remove();
   db.ref('host/command').set({action:'reset',timestamp:Date.now()});
-  _built=false;_rounds=[[],[],[]];
-  buildAndPush();
-  setStatus('Full reset — re-pushing questions','');
-  document.getElementById('btn-endgame').style.display='none';
-  document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
   selRound(1);
+  document.getElementById('status-val').textContent = 'Full reset complete';
+  document.getElementById('lb-list').innerHTML = '<div class="lb-empty">No teams yet</div>';
+  document.getElementById('btn-endgame').style.display='none';
 }
 
-// ── Listeners ─────────────────────────────────────────────────────────
+// ── Live leaderboard listener ──────────────────────────────────────
 if(db){
-  db.ref('live_scores').on('value',function(snap){
-    var data=snap.val()||{};
-    var teams=Object.entries(data).map(function(e){
-      return {name:e[0],pts:Object.values(e[1]).reduce(function(a,b){return a+b;},0)};
+  db.ref('live_scores').on('value', function(snap){
+    var data = snap.val() || {};
+    var teams = Object.entries(data).map(function(e){
+      return {name:e[0], pts: Object.values(e[1]).reduce(function(a,b){return a+b;},0)};
     }).sort(function(a,b){return b.pts-a.pts;});
-    var el=document.getElementById('lb-list');
-    if(!teams.length){el.innerHTML='<div class="lb-empty">No scores yet</div>';return;}
-    el.innerHTML=teams.map(function(t,i){
+    var el = document.getElementById('lb-list');
+    if(!teams.length){ el.innerHTML='<div class="lb-empty">No scores yet</div>'; return; }
+    el.innerHTML = teams.map(function(t,i){
       return '<div class="lb-row"><div class="lb-left"><div class="lb-medal">'+(MEDALS[i]||'')+'</div><div class="lb-team">'+t.name+'</div></div><div class="lb-score">'+t.pts+' pts</div></div>';
     }).join('');
   });
-  db.ref('teams').on('value',function(snap){
-    var data=snap.val()||{};
+
+  // ── Team counts listener ──────────────────────────────────────────
+  db.ref('teams').on('value', function(snap){
+    var data = snap.val() || {};
     var wait=0,play=0,done=0;
     Object.values(data).forEach(function(t){
-      if(t.status==='waiting')wait++;
-      else if(t.status==='playing')play++;
-      else if(t.status==='finished')done++;
+      if(t.status==='waiting') wait++;
+      else if(t.status==='playing') play++;
+      else if(t.status==='finished') done++;
     });
-    document.getElementById('cnt-wait').textContent=wait;
-    document.getElementById('cnt-play').textContent=play;
-    document.getElementById('cnt-done').textContent=done;
+    document.getElementById('cnt-wait').textContent = wait;
+    document.getElementById('cnt-play').textContent = play;
+    document.getElementById('cnt-done').textContent = done;
   });
-  db.ref('reactions').limitToLast(20).on('value',function(snap){
-    var data=snap.val()||{};
-    var rxns=Object.values(data).reverse();
-    var el=document.getElementById('rxn-list');
-    if(!rxns.length){el.innerHTML='<div class="lb-empty">No reactions yet</div>';return;}
-    el.innerHTML=rxns.map(function(r){
-      return '<div class="rxn-item"><span>'+r.emoji+'</span><span><strong>'+r.team+'</strong></span></div>';
+
+  // ── Reactions listener ───────────────────────────────────────────
+  db.ref('reactions').limitToLast(20).on('value', function(snap){
+    var data = snap.val() || {};
+    var rxns = Object.values(data).reverse();
+    var el = document.getElementById('rxn-list');
+    if(!rxns.length){ el.innerHTML='<div class="lb-empty">No reactions yet</div>'; return; }
+    el.innerHTML = rxns.map(function(r){
+      return '<div class="rxn-item"><span>'+r.emoji+'</span><span><strong>'+r.team+'</strong> — '+r.label+'</span></div>';
     }).join('');
   });
 }
 
-// ── Init ──────────────────────────────────────────────────────────────
-buildAndPush();
+// Init
+selRound(1);
+renderDots();
+renderQuestion();
 </script>
 </body>
 </html>
