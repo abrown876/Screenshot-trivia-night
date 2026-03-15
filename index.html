@@ -397,7 +397,8 @@ const TSECS=10,MAXP=4,BSPTS=3;
 let tname='',pemails=[],pcnt=2,score=0,bonus=0,answers=[],alive=false;
 let cq=-1,qlist=[],tint=null,tleft=0,answered=false,selIdx=-1,qst=0,rsent=false;
 let activeScreen='splash'; // tracks which non-lb screen is active
-let lastCmdKey='';
+let lastCmdKey=''; // used to ignore stale command on join
+let lastHostCmd=null; // always tracks the most recent host command
 
 function renderPF(){
   const c=document.getElementById('pfields');c.innerHTML='';
@@ -429,25 +430,50 @@ function showScr(id){
 
 window.showTab=function(t){
   if(t==='lb'){
-    // Hide everything except lb
     ['splash','waiting','paused','results'].forEach(sid=>document.getElementById(sid)?.classList.remove('active'));
     document.getElementById('question').classList.add('tab-hidden');
     document.getElementById('lb').classList.add('active');
     document.getElementById('tlb').classList.add('active');
     document.getElementById('tplay').classList.remove('active');
-    // Pause timer while on leaderboard
+    // Pause local timer while viewing leaderboard
     if(tint&&!answered){pauseTimer();}
   } else {
-    // Return to wherever the play session is
+    // Returning to play — always re-sync to host's current command
     document.getElementById('lb').classList.remove('active');
     document.getElementById('tlb').classList.remove('active');
     document.getElementById('tplay').classList.add('active');
-    if(activeScreen==='question'){
-      document.getElementById('question').classList.remove('tab-hidden');
-      // Resume timer if not yet answered
-      if(!answered&&tleft>0) resumeTimer();
+
+    if(lastHostCmd&&alive){
+      const cmd=lastHostCmd;
+      // Force re-apply the current host state regardless of local state
+      if(cmd.action==='question'){
+        if(cmd.index!==cq){
+          // Host has moved to a different question — jump to it
+          cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
+          launchQ(cq);
+        } else {
+          // Same question — just show it and resume timer if needed
+          document.getElementById('question').classList.remove('tab-hidden');
+          activeScreen='question';
+          if(!answered&&timerPaused) resumeTimer();
+        }
+      } else if(cmd.action==='pause'){
+        document.getElementById(activeScreen==='question'?'paused':activeScreen)?.classList.add('active');
+        document.getElementById('question').classList.add('tab-hidden');
+      } else if(cmd.action==='reveal'){
+        document.getElementById('question').classList.remove('tab-hidden');
+        activeScreen='question';
+      } else if(cmd.action==='end'){
+        if(activeScreen==='results'){document.getElementById('results').classList.add('active');}
+      } else {
+        // Fallback — show whatever screen was active
+        if(activeScreen==='question'){document.getElementById('question').classList.remove('tab-hidden');}
+        else{document.getElementById(activeScreen)?.classList.add('active');}
+      }
     } else {
-      document.getElementById(activeScreen)?.classList.add('active');
+      // No host command yet — show whatever screen was active
+      if(activeScreen==='question'){document.getElementById('question').classList.remove('tab-hidden');}
+      else{document.getElementById(activeScreen)?.classList.add('active');}
     }
   }
 };
@@ -530,6 +556,7 @@ function listenHost(){
   onValue(ref(db,'host/command'),snap=>{
     const cmd=snap.val();if(!cmd||!alive)return;
     const cmdKey=JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
+    lastHostCmd=cmd; // always track latest, even if we skip acting on it
     if(cmdKey===lastCmdKey)return;
     lastCmdKey=cmdKey;
     // Always switch to play tab when host sends a command
