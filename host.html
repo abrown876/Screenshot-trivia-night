@@ -233,14 +233,23 @@ try {
 } catch(e){ console.error('Firebase init failed',e); }
 
 function selRound(r){
+  // Prevent jumping to a round that hasn't been unlocked
+  // Round 1 always available; Round 2 only after Round 1 done; Round 3 only after Round 2 done
+  if(r === 2 && !roundDone[0]){ alert('Complete Round 1 first.'); return; }
+  if(r === 3 && !roundDone[1]){ alert('Complete Round 2 first.'); return; }
   curRound = r;
+  selQ = 0;
   [1,2,3].forEach(function(n){
     var t = document.getElementById('rtab'+n);
-    t.className = 'rtab' + (n===r?' active':'');
+    t.className = 'rtab' + (roundDone[n-1]?' done' : n===r?' active':'');
   });
-  selQ = 0;
   renderDots();
   renderQuestion();
+  // Update status
+  if(teamCount > 0 && !roundDone[r-1]){
+    document.getElementById('btn-launch').disabled = false;
+    document.getElementById('status-val').textContent = 'Round '+r+' ready — '+teamCount+' team'+(teamCount!==1?'s':'')+' waiting';
+  }
 }
 
 function getRoundQuestions(){
@@ -289,6 +298,14 @@ function launchQ(){
   if(!q || !db) return;
   if(teamCount === 0){ alert('No teams registered yet. Wait for at least 1 team to join.'); return; }
   var ts = Date.now();
+  roundStarted[curRound-1] = true;
+  // Update all waiting teams to 'playing'
+  db.ref('teams').once('value', function(snap){
+    var teams = snap.val() || {};
+    Object.keys(teams).forEach(function(k){
+      if(teams[k].status === 'waiting') db.ref('teams/'+k+'/status').set('playing');
+    });
+  });
   db.ref('game/current').set({round:curRound,index:selQ,question:q,timestamp:ts});
   db.ref('host/command').set({action:'question',round:curRound,index:selQ,timestamp:ts});
   db.ref('game/rounds/r'+curRound+'/q'+selQ).set(q);
@@ -335,43 +352,64 @@ function pauseQ(){
 function revealQ(){
   if(!db) return;
   clearInterval(timer);
+  // Tell players to reveal
   db.ref('host/command').set({action:'reveal',round:curRound,index:selQ,timestamp:Date.now()});
+  // Show answer in host panel
   var qs = getRoundQuestions();
   var q = qs[selQ];
   if(q){
     var ab = document.getElementById('answer-box');
-    ab.textContent = '&#x2705; Answer: ' + q.o[q.a];
-    ab.className = 'answer-box show';
     ab.innerHTML = '&#x2705; <strong>Answer:</strong> ' + q.o[q.a];
+    ab.className = 'answer-box show';
   }
+  // Disable timer controls
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('btn-pause').disabled = true;
-  document.getElementById('btn-break').disabled = false;
-  // Auto advance to next question
+  // Check if this was the last question in the round
   var qs2 = getRoundQuestions();
-  if(selQ < qs2.length-1){
+  var isLastQ = selQ >= qs2.length-1;
+  if(isLastQ){
+    // Last question done — only option is End Round
+    document.getElementById('btn-launch').disabled = true;
+    document.getElementById('btn-break').disabled = false;
+    document.getElementById('status-val').textContent = 'Round '+curRound+' complete — click End Round';
+  } else {
+    // More questions remain — advance and enable next launch
     selQ++;
     renderDots();
     renderQuestion();
     document.getElementById('btn-launch').disabled = false;
-    document.getElementById('status-val').textContent = 'Ready — launch Q'+(selQ+1);
-  } else {
-    document.getElementById('btn-launch').disabled = true;
-    document.getElementById('status-val').textContent = 'All questions done — end round';
+    document.getElementById('btn-break').disabled = true;
+    document.getElementById('status-val').textContent = 'Revealed — launch Q'+(selQ+1)+' when ready';
   }
 }
 
 function endRound(){
   if(!db) return;
   clearInterval(timer);
+  // Mark round as done
+  roundDone[curRound-1] = true;
   db.ref('host/command').set({action:'roundbreak',round:curRound,timestamp:Date.now()});
-  document.getElementById('status-val').textContent = 'Round '+curRound+' complete — on break';
+  // Mark round tab as done
+  document.getElementById('rtab'+curRound).className='rtab done';
   document.getElementById('btn-break').disabled = true;
+  document.getElementById('btn-launch').disabled = true;
+  document.getElementById('btn-reveal').disabled = true;
   if(curRound < 3){
     var next = curRound+1;
-    document.getElementById('rtab'+curRound).className='rtab done';
+    document.getElementById('status-val').textContent = 'Round '+curRound+' done — break time. Start Round '+next+' when ready.';
+    // Unlock next round tab
+    document.getElementById('rtab'+next).disabled = false;
     selRound(next);
   } else {
+    // All 3 rounds done — update all playing teams to finished
+    db.ref('teams').once('value', function(snap){
+      var teams = snap.val() || {};
+      Object.keys(teams).forEach(function(k){
+        if(teams[k].status === 'playing') db.ref('teams/'+k+'/status').set('finished');
+      });
+    });
+    document.getElementById('status-val').textContent = 'All rounds complete!';
     document.getElementById('btn-endgame').style.display='block';
   }
 }
