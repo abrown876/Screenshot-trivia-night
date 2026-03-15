@@ -404,20 +404,20 @@ function joinGame(){
   updSC();
   joinTime=Date.now();
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:joinTime});
-  dbOnce('game/rounds',function(snap){
+  // Listen persistently for rounds pushed by host
+  dbOn('game/rounds',function(snap){
     var rd=snap.val();
-    if(rd){roundQuestions[0]=rd[0]||[];roundQuestions[1]=rd[1]||[];roundQuestions[2]=rd[2]||[];}
-    dbOnce('host/command',function(snap2){
-      var ex=snap2.val();
-      if(ex&&ex.timestamp&&ex.timestamp>(joinTime-5000)&&(ex.action==='question'||ex.action==='pause'||ex.action==='reveal')){
-        curRound=(ex.round||1)-1;qlist=roundQuestions[curRound]||[];answers=roundAnswers[curRound];
-        if(ex.index>0){document.getElementById('wbadge').textContent='Joining late!';document.getElementById('wbadge').style.background='#E8547A';document.getElementById('wtitle').textContent='Round '+(curRound+1)+' in progress!';document.getElementById('wsub').textContent=tname+' jumping in at Q'+(ex.index+1)+'.';}
-        else{showWait(0);}
-      } else {showWait(0);}
-      showScr('waiting');
-      listenHost();
-    });
+    if(!rd) return;
+    roundQuestions[0]=rd[0]||[];
+    roundQuestions[1]=rd[1]||[];
+    roundQuestions[2]=rd[2]||[];
+    // Refresh current qlist if round is active
+    if(alive) qlist=roundQuestions[curRound]||[];
   });
+  // Show waiting screen and start listening for host commands
+  showWait(0);
+  showScr('waiting');
+  listenHost();
 }
 
 function showWait(n){
@@ -437,9 +437,10 @@ function listenHost(){
     document.getElementById('lb').classList.remove('on');document.getElementById('tab-lb').classList.remove('on');document.getElementById('tab-play').classList.add('on');
     if(cmd.action==='question'){
       var r=(cmd.round||1)-1;
-      if(r!==curRound){curRound=r;roundAnswers[curRound]=[];answers=roundAnswers[curRound];qlist=roundQuestions[curRound]||[];}
-      if(qlist.length===0){dbOnce('game/rounds',function(qsnap){var rd=qsnap.val();if(rd){roundQuestions[0]=rd[0]||[];roundQuestions[1]=rd[1]||[];roundQuestions[2]=rd[2]||[];qlist=roundQuestions[curRound]||[];}if(qlist.length>0){cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;launchQ(cq);}});}
-      else{cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;launchQ(cq);}
+      if(r!==curRound){curRound=r;roundAnswers[curRound]=[];answers=roundAnswers[curRound];}
+      qlist=roundQuestions[curRound]||[];
+      cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
+      launchQ(cq);
     } else if(cmd.action==='reveal'){stopT();if(qlist.length>0)revealAns(cq);}
     else if(cmd.action==='pause'){stopT();showPaused();}
     else if(cmd.action==='round_end'){stopT();showRoundBreak((cmd.round||1)-1);}
@@ -455,15 +456,6 @@ function listenHost(){
     if(mp>=0&&mp<BSPTS&&!window[bk]){window[bk]=true;bonus++;roundBonus[curRound]++;score++;roundScores[curRound]++;updSC();var pos=mp===0?'1st':mp===1?'2nd':'3rd';showToast('\u26a1 Bonus! '+pos+' \u2014 +1 pt!');if(answers[cq])answers[cq].r='b';pushLive();}
   });
 
-  // Sync questions from host — fires when host shuffles and writes rounds
-  dbOn('game/rounds',function(snap){
-    var rd=snap.val();
-    if(!rd) return;
-    roundQuestions[0]=rd[0]||[];
-    roundQuestions[1]=rd[1]||[];
-    roundQuestions[2]=rd[2]||[];
-    qlist=roundQuestions[curRound]||[];
-  });
 }
 
 function launchQ(idx){
@@ -541,38 +533,7 @@ dbOn('teams',function(snap){teamsC=snap.val();if(!teamsC){liveC=null;scoresC=nul
 dbOn('scores',function(snap){scoresC=snap.val();renderLB();});
 dbOn('live_scores',function(snap){liveC=snap.val();renderLB();});
 
-var QUESTIONS = [
-  {cat:'h',lb:'History',q:'What year did the Morant Bay Rebellion take place?',o:['1831','1865','1882','1907'],a:1},
-  {cat:'h',lb:'History',q:'Which Jamaican national hero is known as the \'Father of the Nation\'?',o:['Norman Manley','Paul Bogle','Marcus Garvey','Alexander Bustamante'],a:3},
-  {cat:'h',lb:'History',q:'The 1831 Christmas Rebellion was led by which enslaved preacher?',o:['Paul Bogle','Sam Sharpe','Cudjoe','Nanny'],a:1},
-  {cat:'h',lb:'History',q:'What was the name of the pirate captain most associated with Port Royal in the 1670s?',o:['Henry Morgan','Horatio Nelson','Francis Drake','Edward Teach'],a:0},
-  {cat:'h',lb:'History',q:'Which parish is the birthplace of Marcus Garvey?',o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1},
-  {cat:'h',lb:'History',q:'In what year did Jamaica first participate in the Olympic Games?',o:['1936','1948','1952','1960'],a:1},
-  {cat:'m',lb:'Music & Culture',q:'Which genre preceded reggae in Jamaica during the 1960s?',o:['Calypso','Mento','Rocksteady','Ska'],a:3},
-  {cat:'m',lb:'Music & Culture',q:'What was Bob Marley\'s full birth name?',o:['Robert Nesta Marley','Neville Livingston','Winston Hubert McIntosh','Robbie Marley'],a:0},
-  {cat:'m',lb:'Music & Culture',q:'Which Kingston neighbourhood is most associated with the birth of dancehall?',o:['Trench Town','Tivoli Gardens','August Town','Arnett Gardens'],a:1},
-  {cat:'m',lb:'Music & Culture',q:'Sean Paul\'s hit \'Temperature\' was released in which year?',o:['2003','2005','2007','2009'],a:1},
-  {cat:'m',lb:'Music & Culture',q:'Which Jamaican artist is known as the \'King of Dancehall\'?',o:['Buju Banton','Damian Marley','Busy Signal','Beenie Man'],a:3},
-  {cat:'m',lb:'Music & Culture',q:'Rocksteady music emerged in Jamaica in which decade?',o:['1950s','1960s','1970s','1980s'],a:1},
-  {cat:'f',lb:'Food & Cuisine',q:'Which part of the ackee fruit is poisonous if eaten unripe?',o:['The seed','The aril','The husk','The root'],a:0},
-  {cat:'f',lb:'Food & Cuisine',q:'What is \'festival\' in Jamaican cuisine?',o:['A sweet fried dumpling','A fish soup','A cornmeal porridge','A sugarcane drink'],a:0},
-  {cat:'f',lb:'Food & Cuisine',q:'Blue Mountain coffee is grown at what minimum altitude?',o:['500m','1,000m','1,500m','2,000m'],a:2},
-  {cat:'f',lb:'Food & Cuisine',q:'Which Jamaican dish is made from goat offal and is said to be an aphrodisiac?',o:['Pepper pot','Cow foot soup','Mannish water','Run down'],a:2},
-  {cat:'f',lb:'Food & Cuisine',q:'What is the main ingredient in Jamaican \'run down\'?',o:['Saltfish','Mackerel cooked in coconut milk','Ackee','Callaloo'],a:1},
-  {cat:'f',lb:'Food & Cuisine',q:'Which spice is essential to authentic Jamaican jerk seasoning?',o:['Cumin','Allspice','Turmeric','Coriander'],a:1},
-  {cat:'s',lb:'Sports',q:'Usain Bolt set his 100m world record of 9.58s at which championship?',o:['2008 Beijing Olympics','2009 Berlin World Championships','2012 London Olympics','2011 Daegu Worlds'],a:1},
-  {cat:'s',lb:'Sports',q:'Which Jamaican sprinter won gold in the 100m at BOTH the 2016 and 2020 Olympics?',o:['Shelly-Ann Fraser-Pryce','Elaine Thompson-Herah','Veronica Campbell-Brown','Merlene Ottey'],a:1},
-  {cat:'s',lb:'Sports',q:'The Jamaican bobsled team first competed at the Calgary Winter Olympics in which year?',o:['1984','1988','1992','1994'],a:1},
-  {cat:'s',lb:'Sports',q:'Merlene Ottey competed in how many Olympic Games throughout her career?',o:['4','5','6','7'],a:2},
-  {cat:'s',lb:'Sports',q:'Which Jamaican cricketer is the all-time leading run scorer for the West Indies?',o:['Michael Holding','Courtney Walsh','Chris Gayle','George Headley'],a:2},
-  {cat:'s',lb:'Sports',q:'Jamaica\'s Shelly-Ann Fraser-Pryce has won how many World Championship 100m gold medals?',o:['3','4','5','6'],a:2},
-  {cat:'x',lb:'General',q:'What is the motto of Jamaica?',o:['One Love One Heart','Out of Many One People','Forward Ever Backward Never','Unity is Strength'],a:1},
-  {cat:'x',lb:'General',q:'Kingston became Jamaica\'s capital in which year?',o:['1692','1703','1872','1962'],a:2},
-  {cat:'x',lb:'General',q:'Which of these is NOT a Jamaican parish?',o:['Trelawny','Hanover','Portland','Bridgeton'],a:3},
-  {cat:'x',lb:'General',q:'The Doctor Bird, Jamaica\'s national bird, is a type of what?',o:['Parrot','Hummingbird','Kingfisher','Finch'],a:1},
-  {cat:'x',lb:'General',q:'What is the name of Jamaica\'s longest river?',o:['Black River','Rio Cobre','Rio Minho','White River'],a:0},
-  {cat:'x',lb:'General',q:'Which of these cities is NOT in Jamaica?',o:['Montego Bay','Ocho Rios','Nassau','Mandeville'],a:2},
-];
+
 
 // ── Auto-join from join.html ──────────────────────────────────────────
 (function() {
