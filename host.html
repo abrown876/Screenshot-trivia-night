@@ -288,6 +288,7 @@ function launchQ(){
   var q = qs[selQ];
   if(!q || !db) return;
   var ts = Date.now();
+  db.ref('game/current').set({round:curRound,index:selQ,question:q,timestamp:ts});
   db.ref('host/command').set({action:'question',round:curRound,index:selQ,timestamp:ts});
   db.ref('game/rounds/r'+curRound+'/q'+selQ).set(q);
   // Start local timer display
