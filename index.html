@@ -395,9 +395,9 @@ function joinGame(){
   pemails=[];
   for(var i=0;i<pcnt;i++){
     var el=document.getElementById('em'+i);var v=el?el.value.trim().toLowerCase():'';
-    if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){showAlert('Please enter a valid email for Player '+(i+1)+'.');return;}
-    if(pemails.indexOf(v)>=0){showAlert('Player '+(i+1)+' email is a duplicate.');return;}
-    pemails.push(v);
+    if(v&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){showAlert('Please enter a valid email for Player '+(i+1)+'.');return;}
+    if(v&&pemails.indexOf(v)>=0){showAlert('Player '+(i+1)+' email is a duplicate.');return;}
+    pemails.push(v||('guest'+(i+1)+'@sqn.app'));
   }
   curRound=0;roundScores=[0,0,0];roundBonus=[0,0,0];roundAnswers=[[],[],[]];roundQuestions=[[],[],[]];
   score=0;bonus=0;answers=[];qlist=[];cq=-1;alive=true;answered=false;
@@ -529,7 +529,10 @@ function renderLB(){
   var list=document.getElementById('lblist');
   var teams=teamsC?Object.values(teamsC):[];
   var totals={};
-  if(liveC){Object.values(liveC).forEach(function(e){totals[e.team]={team:e.team,score:e.score,bonus:e.bonus,players:e.players,r0:e.r0||0,r1:e.r1||0,r2:e.r2||0,live:true};});}
+  if(liveC){Object.values(liveC).forEach(function(e){
+    var pts=(e.r0||0)+(e.r1||0)+(e.r2||0);
+    totals[e.team]={team:e.team,score:pts,bonus:e.bonus||0,players:e.players,r0:e.r0||0,r1:e.r1||0,r2:e.r2||0,live:true};
+  });}
   if(scoresC){Object.values(scoresC).forEach(function(e){if(!totals[e.team])totals[e.team]={team:e.team,score:0,bonus:0,players:e.players,r0:0,r1:0,r2:0};var rk='r'+e.round;if((e.base||0)>(totals[e.team][rk]||0))totals[e.team][rk]=e.base||0;});Object.values(totals).forEach(function(t){if(!t.live){t.score=(t.r0||0)+(t.r1||0)+(t.r2||0)+(t.bonus||0);}});}
   var sorted=Object.values(totals).sort(function(a,b){return b.score-a.score;});
   var inGame={};sorted.forEach(function(t){inGame[t.team]=true;});
