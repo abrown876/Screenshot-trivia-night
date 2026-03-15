@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jamaica Trivia - Screenshot Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#5B5BD6;--purpled:#3D3D9E;--purplel:#EEEEFF;
+  --coral:#E8547A;--corall:#FDE8EE;--corald:#B03058;
+  --gold:#F5A623;--goldl:#FEF3DC;
+  --green:#1A8A4A;--greenl:#EAF7F0;
+  --bg:#F4F4FC;--card:#FFF;--text:#1A1A3E;--muted:#7A7AAA;--bd:#E0E0F0;
+  --ok:#2D7A4F;--no:#C0392B;--okbg:#EAF7F0;--nobg:#FDECEA;
+  --r:16px;--sh:0 2px 12px rgba(91,91,214,.08);
+}
+html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);overflow:hidden}
+body{display:flex;flex-direction:column}
+.hdr{background:#fff;padding:.7rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--bd);flex-shrink:0;gap:.5rem}
+.logo{display:flex;align-items:center;gap:8px}
+.logon{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:var(--purple);letter-spacing:.04em}
+.logos{font-family:'Nunito',sans-serif;font-weight:700;font-size:8px;color:var(--coral);letter-spacing:.1em;text-transform:uppercase}
+.tname-chip{display:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:var(--purple);background:var(--purplel);padding:3px 10px;border-radius:20px}
+.sc{display:none;background:var(--purple);color:#fff;font-size:13px;font-weight:800;padding:4px 12px;border-radius:20px;font-family:'Nunito',sans-serif;white-space:nowrap}
+.spbar{background:var(--coral);padding:5px 1.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-shrink:0}
+.splbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
+.spnm{font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;color:#fff}
+.spdv{width:1px;height:11px;background:rgba(255,255,255,.35)}
+.scr{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.scr.on{display:flex}
+.si{padding:1.25rem}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.an{animation:fu .25s ease}
+#qscr{display:flex;flex-direction:column}
+#qscr.off{display:none}
+.tabbar{display:none;background:#fff;border-top:1.5px solid var(--bd);flex-shrink:0}
+.tabbar.on{display:flex}
+.tab{flex:1;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;font-size:10px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif}
+.tab.on{color:var(--purple)}
+.hero{background:linear-gradient(135deg,var(--purple),var(--purpled));border-radius:var(--r);padding:1.5rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
+.hero h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;margin-bottom:.3rem;line-height:1.15}
+.hero p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.5}
+.hero-sp{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 12px;display:inline-block;margin-top:.6rem;font-size:12px;color:rgba(255,255,255,.85);font-family:'Nunito',sans-serif;font-weight:700}
+.pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.pill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;font-family:'Nunito',sans-serif}
+.ph{background:#FEF3DC;color:#8A5500}.pf{background:#FAECE7;color:#8A2E0F}
+.pm{background:#EEF0FF;color:#3D3D9E}.pg{background:#E6F7EE;color:#1A6A3A}
+.ps{background:#FDE8EE;color:#8A1840}.px{background:#F0F0F8;color:#4A4A8A}
+.fcard{background:var(--card);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh);margin-bottom:1rem}
+.flbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;display:block;font-family:'Nunito',sans-serif}
+.alertbox{display:none;background:var(--nobg);color:var(--no);border:1px solid #f5c0bb;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:.75rem}
+.wc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem;gap:1rem}
+.wcard{background:var(--card);border-radius:var(--r);padding:1.75rem 1.5rem;text-align:center;box-shadow:var(--sh);width:100%}
+.wbadge{background:var(--purple);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;padding:.4rem 1.25rem;border-radius:20px;display:inline-block;margin-bottom:.75rem}
+.wtitle{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.35rem;color:var(--text);margin-bottom:.3rem}
+.wsub{font-size:13px;color:var(--muted);line-height:1.6}
+.pulse{width:60px;height:60px;border-radius:50%;border:3px solid var(--purple);margin:1rem auto;animation:rp 1.8s ease-in-out infinite;opacity:.5}
+@keyframes rp{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:.25}}
+.sline{font-size:13px;color:var(--muted);margin-top:.25rem}
+.spw{background:var(--goldl);border-radius:var(--r);padding:1rem 1.25rem;text-align:center;border:1.5px solid #F5D09A;width:100%}
+.spwl{font-size:10px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:'Nunito',sans-serif;margin-bottom:.25rem}
+.spwn{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:#7A5000}
+.spwt{font-size:12px;color:#9A6520;margin-top:.15rem}
+.qsi{padding:1.25rem;display:flex;flex-direction:column;flex:1}
+.qmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.qct{font-size:12px;color:var(--muted);font-weight:500}
+.cpill{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:'Nunito',sans-serif}
+.ch{background:#FEF3DC;color:#8A5500}.cf{background:#FAECE7;color:#8A2E0F}
+.cm{background:#EEF0FF;color:#3D3D9E}.cg{background:#E6F7EE;color:#1A6A3A}
+.cs{background:#FDE8EE;color:#8A1840}.cx{background:#F0F0F8;color:#4A4A8A}
+.prog{height:5px;background:var(--bd);border-radius:3px;margin-bottom:.6rem;overflow:hidden}
+.progf{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:3px;transition:width .4s}
+.trow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.tlbl{font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:.4rem}
+.rchip{background:var(--purplel);color:var(--purple);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;font-family:'Nunito',sans-serif}
+.tnum{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--purple);min-width:28px;text-align:right}
+.tnum.urg{color:var(--coral);animation:np .5s ease-in-out infinite}
+@keyframes np{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.tbar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:.85rem}
+.tbarf{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:3px;transition:width .25s linear}
+.tbarf.urg{background:var(--coral)}
+.qcard{background:var(--card);border-radius:var(--r);padding:1.1rem 1.25rem;box-shadow:var(--sh);margin-bottom:.85rem;border-left:4px solid var(--purple)}
+.qtxt{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.4;color:var(--text)}
+.opts{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.75rem}
+.opt{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:.85rem 1rem;font-size:15px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);display:flex;align-items:center;gap:.75rem;width:100%}
+.oltr{width:28px;height:28px;border-radius:50%;background:var(--bg);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;font-family:'Nunito',sans-serif}
+.opt.correct{background:var(--okbg)!important;border-color:var(--ok)!important}
+.opt.correct .oltr{background:var(--ok)!important;border-color:var(--ok)!important;color:#fff!important}
+.opt.wrong{background:var(--nobg)!important;border-color:var(--no)!important}
+.opt.wrong .oltr{background:var(--no)!important;border-color:var(--no)!important;color:#fff!important}
+.opt.pend{border-color:var(--purple)!important;background:var(--purplel)!important}
+.opt.pend .oltr{background:var(--purple)!important;border-color:var(--purple)!important;color:#fff!important}
+.opt.lk{cursor:default;pointer-events:none}
+.opt.lk:not(.correct):not(.wrong):not(.pend){opacity:.4}
+.fb{border-radius:12px;padding:.8rem 1rem;font-size:14px;line-height:1.5;display:none;margin-bottom:.65rem;align-items:flex-start;gap:.6rem}
+.fb.on{display:flex;animation:fu .25s ease}
+.fb.correct{background:var(--okbg);color:var(--ok);border:1px solid #b2dfc8}
+.fb.wrong{background:var(--nobg);color:var(--no);border:1px solid #f5c0bb}
+.fb.timeout{background:var(--goldl);color:#7A5000;border:1px solid #F5D09A}
+.fb.bonus{background:var(--purplel);color:var(--purpled);border:1px solid #CECBF6}
+.fbic{font-size:1.2rem;flex-shrink:0;margin-top:.05rem}
+.rbar{display:flex;gap:.45rem;justify-content:center;flex-wrap:wrap}
+.rbtn{background:var(--card);border:1.5px solid var(--bd);border-radius:50px;padding:.4rem .8rem;cursor:pointer;display:flex;align-items:center;gap:.3rem;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted)}
+.rbtn.sent{background:var(--purplel);border-color:var(--purple);color:var(--purple);font-weight:700}
+.re{font-size:1.1rem}
+.pc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem;gap:1rem}
+.pcard{background:var(--card);border-radius:var(--r);padding:1.75rem 1.5rem;text-align:center;box-shadow:var(--sh);width:100%}
+.sprv{background:var(--purplel);border-radius:12px;padding:.9rem;margin:.85rem 0}
+.sprvn{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.5rem;color:var(--purple);line-height:1}
+.sprvl{font-size:12px;color:var(--muted);margin-top:.2rem}
+.rhero{background:linear-gradient(135deg,var(--purple),var(--purpled));border-radius:var(--r);padding:1.75rem;text-align:center;margin-bottom:1rem;color:#fff;position:relative;overflow:hidden}
+.rscore{font-family:'Nunito',sans-serif;font-weight:900;font-size:3.5rem;line-height:1;position:relative;z-index:1}
+.rdenom{font-size:1rem;opacity:.7;position:relative;z-index:1}
+.rhl{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;margin-top:.4rem;position:relative;z-index:1}
+.rpct{font-size:12px;opacity:.7;margin-top:.15rem;position:relative;z-index:1}
+.rlcard{background:var(--card);border-radius:var(--r);padding:1rem 1.25rem;box-shadow:var(--sh);margin-bottom:1rem}
+.rrow{display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--bd)}
+.rrow:last-child{border-bottom:none}
+.rqt{font-size:12px;color:var(--muted);line-height:1.4;flex:1;padding-right:.6rem}
+.rdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dc{background:var(--ok)}.dw{background:var(--no)}.dt{background:var(--gold)}
+.snotice{border-radius:10px;padding:9px 12px;font-size:13px;text-align:center;margin-bottom:.85rem;background:var(--purplel);color:var(--purpled);font-weight:600}
+.lbtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.lbtitle{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--text)}
+.lchip{display:inline-flex;align-items:center;gap:.35rem;background:var(--corall);color:var(--corald);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:'Nunito',sans-serif}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--coral);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.lbrow{background:var(--card);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;border:1.5px solid var(--bd);margin-bottom:.55rem}
+.lbrow.top{border-color:var(--purple);background:var(--purplel)}
+.lbrow.wrow{border-style:dashed;opacity:.7}
+.lbrank{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--muted);min-width:24px;text-align:center}
+.lbrow.top .lbrank{color:var(--purple)}
+.lbmed{font-size:1.2rem;min-width:22px;text-align:center}
+.lbi{flex:1;min-width:0}
+.lbteam{font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbmeta{font-size:10px;color:var(--muted);margin-top:.1rem}
+.lbpts{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--purple)}
+.lbempty{text-align:center;padding:2rem;color:var(--muted);font-size:13px}
+.lbsec{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-family:'Nunito',sans-serif;margin:.75rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--bd)}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:block;margin-bottom:.5rem}
+.bpp{background:var(--purple);color:#fff}
+.bpc{background:var(--coral);color:#fff}
+.bpo{background:transparent;border:2px solid var(--bd);color:var(--text)}
+.stoast{background:var(--purple);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;padding:7px 16px;border-radius:20px;position:fixed;top:66px;right:1rem;z-index:200;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s}
+.stoast.on{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="13" stroke="#5B5BD6" stroke-width="2" stroke-dasharray="4 2"/>
+      <circle cx="16" cy="16" r="13" stroke="#E8547A" stroke-width="2.5" stroke-dasharray="6 76" stroke-dashoffset="-64"/>
+      <text x="16" y="21" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="14" fill="#5B5BD6">S</text>
+    </svg>
+    <div><div class="logon">SCREENSHOT</div><div class="logos">Interactive</div></div>
+  </div>
+  <div style="flex:1;text-align:center;min-width:0;padding:0 .25rem">
+    <div class="tname-chip" id="tname-chip"></div>
+  </div>
+  <div class="sc" id="sc">0 pts</div>
+</div>
+<div class="spbar"><span class="splbl">Presented by</span><span class="spdv"></span><span class="spnm" id="spnm">YOUR SPONSOR</span></div>
+
+<!-- SPLASH -->
+<div id="splash" class="scr on an">
+  <div class="si">
+    <div class="hero">
+      <div style="font-size:2.2rem;margin-bottom:.5rem">&#x1F1EF;&#x1F1F2;</div>
+      <h1>Jamaica Trivia Night</h1>
+      <p>10 questions &middot; 10 seconds each<br>Race mode &mdash; fastest correct answer earns bonus points!</p>
+      <div class="hero-sp">Brought to you by <b id="hspnm">YOUR SPONSOR</b></div>
+    </div>
+    <div class="pills">
+      <span class="pill ph">History</span><span class="pill pf">Food</span>
+      <span class="pill pm">Music</span><span class="pill pg">Geography</span>
+      <span class="pill ps">Sports</span><span class="pill px">General</span>
+    </div>
+    <div class="alertbox" id="alertbox"></div>
+    <div class="fcard">
+      <label class="flbl">Table name</label>
+      <input id="f-tname" type="text" placeholder="e.g. Table 4 or The Legends" maxlength="30"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#fff;font-size:16px;color:#1A1A3E;outline:none;display:block;margin-bottom:1rem;font-family:'DM Sans',sans-serif;box-sizing:border-box">
+      <label class="flbl">Number of players (1&ndash;4)</label>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <button id="btn-minus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8722;</button>
+        <span id="cval" style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#5B5BD6;min-width:24px;text-align:center">1</span>
+        <span id="clbl" style="font-size:13px;color:#7A7AAA">player</span>
+        <button id="btn-plus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#43;</button>
+      </div>
+      <label class="flbl">Player email addresses</label>
+      <div id="pfields"></div>
+    </div>
+    <button class="btn bpp" id="btn-join">Let's play! &#8594;</button>
+    <div style="height:1.5rem"></div>
+  </div>
+</div>
+
+<!-- WAITING -->
+<div id="waiting" class="scr an">
+  <div class="wc">
+    <div class="wcard">
+      <div class="wbadge" id="wbadge">You're in!</div>
+      <div style="font-size:3rem;margin-bottom:.6rem">&#x23F3;</div>
+      <div class="wtitle" id="wtitle">Waiting for host...</div>
+      <div class="wsub" id="wsub">Your host will launch the first question shortly!</div>
+      <div class="pulse"></div>
+      <div class="sline" id="wsline"></div>
+    </div>
+    <div class="spw"><div class="spwl">Tonight's trivia brought to you by</div><div class="spwn" id="spwn">YOUR SPONSOR</div><div class="spwt" id="spwt">Your sponsor tagline here</div></div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="qscr" class="off an">
+  <div class="qsi">
+    <div class="qmeta"><span class="qct" id="qct">Q1 / 10</span><span class="cpill" id="qcat"></span></div>
+    <div class="prog"><div class="progf" id="qprog"></div></div>
+    <div class="trow">
+      <div class="tlbl"><span>Time left</span><span class="rchip">&#x26A1; Race mode</span></div>
+      <span class="tnum" id="tnum">10</span>
+    </div>
+    <div class="tbar"><div class="tbarf" id="tbarf" style="width:100%"></div></div>
+    <div class="qcard"><div class="qtxt" id="qtxt"></div></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb"><span class="fbic" id="fbic"></span><span id="fbtxt"></span></div>
+    <div class="rbar" id="rbar" style="display:none">
+      <button class="rbtn" id="r1"><span class="re">&#x1F525;</span>Fire</button>
+      <button class="rbtn" id="r2"><span class="re">&#x1F631;</span>Shocked</button>
+      <button class="rbtn" id="r3"><span class="re">&#x1F44F;</span>Clap</button>
+      <button class="rbtn" id="r4"><span class="re">&#x1F389;</span>Party</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSED -->
+<div id="paused" class="scr an">
+  <div class="pc">
+    <div class="pcard">
+      <div style="font-size:2.5rem;margin-bottom:.6rem">&#x2615;</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--text);margin-bottom:.25rem">Question <span id="pausenum"></span> done!</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:.5rem">Your host will kick off the next question soon.</div>
+      <div class="sprv"><div class="sprvn" id="pscore">0</div><div class="sprvl">points so far</div></div>
+      <div style="font-size:13px;color:var(--muted)" id="pdetail"></div>
+    </div>
+    <div class="spw"><div class="spwl">A word from our sponsor</div><div class="spwn" id="sppn">YOUR SPONSOR</div><div class="spwt" id="sppt">Your sponsor tagline here</div></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="scr an">
+  <div class="si">
+    <div class="rhero">
+      <div class="rscore" id="rscore">0</div>
+      <div class="rdenom">out of 10 pts</div>
+      <div class="rhl" id="rhl"></div>
+      <div class="rpct" id="rpct"></div>
+    </div>
+    <div class="snotice" id="snotice">Saving your score...</div>
+    <div class="rlcard"><div id="rlist"></div></div>
+    <button class="btn bpc" id="btn-seelb">See the leaderboard &#8594;</button>
+    <button class="btn bpo" id="btn-restart">Play again</button>
+    <div style="height:1rem"></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="lb" class="scr an">
+  <div class="si">
+    <div class="lbtop"><div class="lbtitle">&#x1F3C6; Leaderboard</div><div class="lchip"><span class="ldot"></span>Live</div></div>
+    <div id="lblist"><div class="lbempty">No teams yet!</div></div>
+    <div style="height:1rem"></div>
+  </div>
+</div>
+
+<div class="tabbar" id="tabbar">
+  <button class="tab on" id="tab-play">&#x1F3AF; Play</button>
+  <button class="tab" id="tab-lb" style="display:none">&#x1F3C6; Leaderboard</button>
+</div>
+<div class="stoast" id="stoast"></div>
+
+<!-- Firebase compat (no modules needed) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ── SPONSOR CONFIG ──────────────────
+var SPONSOR_NAME = "YOUR SPONSOR";
+var SPONSOR_TAG  = "Your sponsor tagline here";
+// ────────────────────────────────────
+
+var FIREBASE_CONFIG = {
+  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+  authDomain:"screenshot-trivia-night.firebaseapp.com",
+  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+  projectId:"screenshot-trivia-night",
+  storageBucket:"screenshot-trivia-night.firebasestorage.app",
+  messagingSenderId:"482758352954",
+  appId:"1:482758352954:web:832d1cba008bc0b789d503"
+};
+var db = null;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+} catch(e) { console.warn('Firebase init failed:', e); }
+
+function dbRef(path) { return db ? db.ref(path) : null; }
+function dbSet(path, val, cb) { var r=dbRef(path); if(r) r.set(val, cb||function(){}); else if(cb) cb(new Error('no db')); }
+function dbOn(path, cb) { var r=dbRef(path); if(r) r.on('value', cb); }
+function dbOnce(path, cb) { var r=dbRef(path); if(r) r.once('value', cb); else cb({val:function(){return null;}}); }
+function dbPush(path, val) { var r=dbRef(path); if(r) r.push(val); }
+
+// Set sponsor names
+['spnm','hspnm','spwn','sppn'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=SPONSOR_NAME; });
+['spwt','sppt'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=SPONSOR_TAG; });
+
+// ── QUESTIONS ───────────────────────
+var AQ=[
+  {cat:'h',lb:'History',q:'In what year did Jamaica gain independence from Britain?',o:['1958','1960','1962','1966'],a:2},
+  {cat:'h',lb:'History',q:"Who was Jamaica's first Prime Minister after independence?",o:['Michael Manley','Norman Washington Manley','Alexander Bustamante','Hugh Shearer'],a:2},
+  {cat:'h',lb:'History',q:"What was Jamaica's original indigenous name?",o:['Xamayca','Caribia','Hispaniola','Boriken'],a:0},
+  {cat:'h',lb:'History',q:'In which year was slavery abolished in Jamaica?',o:['1807','1833','1838','1865'],a:2},
+  {cat:'h',lb:'History',q:'The Morant Bay Rebellion of 1865 was led by which figure?',o:['Sam Sharpe','Marcus Garvey','Paul Bogle','Nanny of the Maroons'],a:2},
+  {cat:'h',lb:'History',q:'Marcus Garvey founded which influential movement?',o:['Rastafari','Pan-Africanism and UNIA','Black Power','Negritude'],a:1},
+  {cat:'h',lb:'History',q:'Nanny of the Maroons led resistance against which colonial power?',o:['The Spanish','The French','The British','The Portuguese'],a:2},
+  {cat:'h',lb:'History',q:"Jamaica joined which federation briefly before full independence?",o:['Caribbean Community','West Indies Federation','Commonwealth of the Caribbean','Atlantic Union'],a:1},
+  {cat:'h',lb:'History',q:"Sam Sharpe led which major Jamaican uprising in 1831?",o:['Morant Bay Rebellion','Baptist War','Easter Uprising','Maroon War'],a:1},
+  {cat:'h',lb:'History',q:'Which country colonised Jamaica before the British?',o:['France','Portugal','Spain','Netherlands'],a:2},
+  {cat:'m',lb:'Music & Culture',q:'Which Jamaican artist is known as the King of Reggae?',o:['Peter Tosh','Jimmy Cliff','Toots Hibbert','Bob Marley'],a:3},
+  {cat:'m',lb:'Music & Culture',q:'Which music genre originated in Jamaica in the late 1960s?',o:['Calypso','Soca','Reggae','Dancehall'],a:2},
+  {cat:'m',lb:'Music & Culture',q:'What Jamaican music style directly preceded reggae?',o:['Mento','Ska','Rocksteady','Dub'],a:2},
+  {cat:'m',lb:'Music & Culture',q:"Bob Marley's backing band was called The...?",o:['Wailers','Skatalites','Upsetters','Gladiators'],a:0},
+  {cat:'m',lb:'Music & Culture',q:'What does Irie mean in Jamaican culture?',o:['Goodbye','Feeling good and all is well','Watch out','Hurry up'],a:1},
+  {cat:'m',lb:'Music & Culture',q:'Which Jamaican film released in 1972 helped spread reggae globally?',o:['Dancehall Queen','The Harder They Come','Shottas','Rockers'],a:1},
+  {cat:'m',lb:'Music & Culture',q:'Rastafari originated in Jamaica in which decade?',o:['1910s','1920s','1930s','1940s'],a:2},
+  {cat:'m',lb:'Music & Culture',q:'Which Jamaican singer had a 1968 hit with Israelites?',o:['Jimmy Cliff','Desmond Dekker','Toots Hibbert','Ken Boothe'],a:1},
+  {cat:'m',lb:'Music & Culture',q:'What are the colours of the Rastafarian flag?',o:['Red white and blue','Red gold and green','Black gold and green','Red black and green'],a:1},
+  {cat:'m',lb:'Music & Culture',q:'Which Jamaican DJ is widely credited as a pioneer of dancehall?',o:['Yellowman','Shabba Ranks','U-Roy','DJ Kool Herc'],a:2},
+  {cat:'f',lb:'Food & Cuisine',q:'What is the national dish of Jamaica?',o:['Curry goat and rice','Ackee and saltfish','Jerk chicken','Callaloo and dumplings'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'Where did ackee originally come from?',o:['South America','India','West Africa','The Caribbean'],a:2},
+  {cat:'f',lb:'Food & Cuisine',q:'Which spice blend is most associated with Jamaican jerk cooking?',o:['Allspice and Scotch bonnet pepper','Cumin and chilli','Turmeric and ginger','Paprika and thyme'],a:0},
+  {cat:'f',lb:'Food & Cuisine',q:'What is bammy made from?',o:['Corn','Cassava','Sweet potato','Breadfruit'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'Which festive Jamaican drink is made from sorrel and ginger?',o:['Rum punch','Sorrel drink','Irish moss','Carrot juice'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'What is escovitch fish?',o:['Raw fish in lime','Fried fish pickled in vinegar with vegetables','Smoked fish with coconut','Steamed fish with okra'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'Blue Mountain coffee is known for which characteristic?',o:['Very strong and bitter','Mild flavour with low acidity','Sweet and fruity','Smoky and dark'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'What is festival in Jamaican cuisine?',o:['A corn porridge','A sweet fried bread','A type of dumpling','A coconut pastry'],a:1},
+  {cat:'f',lb:'Food & Cuisine',q:'Which Jamaican soup is traditionally eaten on Saturdays?',o:['Fish tea','Pumpkin soup','Red peas soup','Mannish water'],a:2},
+  {cat:'f',lb:'Food & Cuisine',q:'What is callaloo?',o:['A type of yam','A leafy green vegetable dish','A fried dumpling','A coconut dessert'],a:1},
+  {cat:'g',lb:'Geography',q:'What is the capital city of Jamaica?',o:['Montego Bay','Port Antonio','Ocho Rios','Kingston'],a:3},
+  {cat:'g',lb:'Geography',q:"Which mountain range contains Jamaica's highest peak?",o:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],a:2},
+  {cat:'g',lb:'Geography',q:'How tall is Blue Mountain Peak approximately?',o:['1500m','2000m','2256m','3000m'],a:2},
+  {cat:'g',lb:'Geography',q:'Which sea lies to the south of Jamaica?',o:['Atlantic Ocean','Gulf of Mexico','Pacific Ocean','Caribbean Sea'],a:3},
+  {cat:'g',lb:'Geography',q:'Which parish is Montego Bay located in?',o:['St James','St Ann','Westmoreland','Hanover'],a:0},
+  {cat:'g',lb:'Geography',q:'The Bob Marley Museum is located in which city?',o:['Montego Bay','Spanish Town','Kingston','Ocho Rios'],a:2},
+  {cat:'g',lb:'Geography',q:'How many parishes does Jamaica have?',o:['10','12','14','16'],a:2},
+  {cat:'g',lb:'Geography',q:"What is Jamaica's main international airport in Kingston?",o:['Kingston Airport','Norman Manley International','Donald Sangster International','Tinson Pen'],a:1},
+  {cat:'g',lb:'Geography',q:'Which body of water separates Jamaica from Cuba?',o:['Windward Passage','Yucatan Channel','Cayman Trough','Jamaica Channel'],a:3},
+  {cat:'s',lb:'Sports',q:'Which Jamaican sprinter holds world records in both 100m and 200m?',o:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],a:3},
+  {cat:'s',lb:'Sports',q:'Which sport made Jamaica famous at the 1988 Winter Olympics?',o:['Bobsled','Luge','Skeleton','Ski jumping'],a:0},
+  {cat:'s',lb:'Sports',q:"Usain Bolt's world record 100m time is?",o:['9.72s','9.58s','9.69s','9.84s'],a:1},
+  {cat:'s',lb:'Sports',q:'Which Jamaican athlete is the most decorated female sprinter?',o:['Merlene Ottey','Elaine Thompson-Herah','Shelly-Ann Fraser-Pryce','Veronica Campbell-Brown'],a:2},
+  {cat:'s',lb:'Sports',q:"The Reggae Boyz is Jamaica's national team in which sport?",o:['Cricket','Athletics','Football','Basketball'],a:2},
+  {cat:'s',lb:'Sports',q:'Which legendary Jamaican cricketer was known as the Black Bradman?',o:['Courtney Walsh','Michael Holding','George Headley','Jimmy Adams'],a:2},
+  {cat:'x',lb:'General',q:'What is the official language of Jamaica?',o:['Patois only','Spanish','French','English'],a:3},
+  {cat:'x',lb:'General',q:'What is the currency of Jamaica?',o:['Jamaican Pound','Jamaican Dollar','Caribbean Dollar','Jamaican Franc'],a:1},
+  {cat:'x',lb:'General',q:'What is the approximate population of Jamaica?',o:['1 million','2.8 million','4.5 million','6 million'],a:1},
+  {cat:'x',lb:'General',q:"The Jamaican coat of arms features which two animals?",o:['Lion and crocodile','Crocodile and hummingbird','Eagle and snake','Parrot and turtle'],a:0},
+  {cat:'x',lb:'General',q:"What is Jamaica's national bird?",o:['Jamaican Parrot','Red-billed Streamertail hummingbird','Jamaican Oriole','Doctor Bird'],a:1}
+];
+
+var CC={h:'ch',f:'cf',m:'cm',g:'cg',s:'cs',x:'cx'};
+var LT=['A','B','C','D'];
+var MD=['🥇','🥈','🥉'];
+var TSECS=10, MAXP=4, BSPTS=3;
+
+// State
+var tname='', pemails=[], pcnt=1, score=0, bonus=0, answers=[], alive=false;
+var cq=-1, qlist=[], tint=null, tleft=0, answered=false, selIdx=-1, qst=0, rsent=false;
+var activeScreen='splash', lastCmdKey='', lastHostCmd=null, timerPaused=false;
+
+// ── FORM ─────────────────────────────
+function renderPF() {
+  var c = document.getElementById('pfields');
+  c.innerHTML = '';
+  for (var i = 0; i < pcnt; i++) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px';
+    var num = document.createElement('span');
+    num.textContent = i + 1;
+    num.style.cssText = 'font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#5B5BD6;min-width:20px;text-align:center;flex-shrink:0';
+    var inp = document.createElement('input');
+    inp.type = 'email';
+    inp.placeholder = 'player' + (i+1) + '@example.com';
+    inp.maxLength = 80;
+    inp.id = 'em' + i;
+    inp.style.cssText = 'flex:1;padding:13px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#ffffff;font-size:16px;color:#1A1A3E;outline:none;font-family:DM Sans,sans-serif;min-width:0;box-sizing:border-box';
+    row.appendChild(num);
+    row.appendChild(inp);
+    c.appendChild(row);
+  }
+  document.getElementById('cval').textContent = pcnt;
+  document.getElementById('clbl').textContent = pcnt === 1 ? 'player' : 'players';
+}
+
+document.getElementById('btn-minus').onclick = function() { if(pcnt>1){pcnt--;renderPF();} };
+document.getElementById('btn-plus').onclick  = function() { if(pcnt<MAXP){pcnt++;renderPF();} };
+document.getElementById('btn-join').onclick   = function() { joinGame(); };
+document.getElementById('btn-seelb').onclick  = function() { showTab('lb'); };
+document.getElementById('btn-restart').onclick = function() { restartGame(); };
+document.getElementById('tab-play').onclick   = function() { showTab('play'); };
+document.getElementById('tab-lb').onclick     = function() { showTab('lb'); };
+document.getElementById('r1').onclick = function() { sendR('🔥'); };
+document.getElementById('r2').onclick = function() { sendR('😱'); };
+document.getElementById('r3').onclick = function() { sendR('👏'); };
+document.getElementById('r4').onclick = function() { sendR('🎉'); };
+
+renderPF();
+
+// ── HELPERS ──────────────────────────
+function showAlert(msg) {
+  var a = document.getElementById('alertbox');
+  a.textContent = msg; a.style.display = 'block';
+  setTimeout(function(){ a.style.display='none'; }, 4000);
+}
+function updSC() { document.getElementById('sc').textContent = score + ' pts'; }
+function showToast(msg) {
+  var t = document.getElementById('stoast');
+  t.textContent = msg; t.className = 'stoast on';
+  setTimeout(function(){ t.className='stoast'; }, 2200);
+}
+function showLbTab() { document.getElementById('tab-lb').style.display = 'flex'; }
+function shuffle(a) {
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i];a[i]=a[j];a[j]=tmp; }
+  return a;
+}
+
+// ── SCREENS ──────────────────────────
+function showScr(id) {
+  var all = ['splash','waiting','paused','results','lb'];
+  for(var i=0;i<all.length;i++) {
+    var el = document.getElementById(all[i]);
+    if(el) el.classList.remove('on');
+  }
+  document.getElementById('qscr').classList.add('off');
+  if(id==='qscr') {
+    document.getElementById('qscr').classList.remove('off');
+  } else if(id !== 'lb') {
+    var el = document.getElementById(id);
+    if(el) el.classList.add('on');
+  }
+  if(id !== 'lb') activeScreen = id;
+}
+
+function showTab(t) {
+  if(t === 'lb') {
+    var all = ['splash','waiting','paused','results'];
+    for(var i=0;i<all.length;i++) document.getElementById(all[i]).classList.remove('on');
+    document.getElementById('qscr').classList.add('off');
+    document.getElementById('lb').classList.add('on');
+    document.getElementById('tab-lb').classList.add('on');
+    document.getElementById('tab-play').classList.remove('on');
+    if(tint && !answered) pauseTimer();
+  } else {
+    document.getElementById('lb').classList.remove('on');
+    document.getElementById('tab-lb').classList.remove('on');
+    document.getElementById('tab-play').classList.add('on');
+    if(lastHostCmd && alive) {
+      var cmd = lastHostCmd;
+      if(cmd.action === 'question') {
+        if(qlist.length > 0 && cmd.index !== cq) {
+          cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false;
+          launchQ(cq);
+        } else {
+          document.getElementById('qscr').classList.remove('off');
+          activeScreen = 'qscr';
+          if(!answered && timerPaused) resumeTimer();
+        }
+      } else if(cmd.action === 'pause') {
+        document.getElementById(activeScreen==='qscr'?'paused':activeScreen).classList.add('on');
+      } else {
+        if(activeScreen==='qscr') document.getElementById('qscr').classList.remove('off');
+        else { var el=document.getElementById(activeScreen); if(el) el.classList.add('on'); }
+      }
+    } else {
+      if(activeScreen==='qscr') document.getElementById('qscr').classList.remove('off');
+      else { var el=document.getElementById(activeScreen); if(el) el.classList.add('on'); }
+    }
+  }
+}
+
+// ── TIMER ────────────────────────────
+function pauseTimer() { if(tint){clearInterval(tint);tint=null;timerPaused=true;} }
+function resumeTimer() {
+  if(!timerPaused||answered||tleft<=0) return;
+  timerPaused=false;
+  tint=setInterval(function(){
+    tleft--; renderT(tleft);
+    if(tleft<=0){stopT(); if(!answered) timeoutQ(cq);}
+  },1000);
+}
+function stopT() { if(tint){clearInterval(tint);tint=null;} timerPaused=false; }
+function renderT(t) {
+  document.getElementById('tnum').textContent = t;
+  document.getElementById('tbarf').style.width = ((t/TSECS)*100)+'%';
+  var urg = t<=3;
+  document.getElementById('tnum').className = urg?'tnum urg':'tnum';
+  document.getElementById('tbarf').className = urg?'tbarf urg':'tbarf';
+}
+
+// ── JOIN ─────────────────────────────
+function joinGame() {
+  tname = document.getElementById('f-tname').value.trim();
+  if(!tname){ showAlert('Please enter a table name!'); return; }
+  pemails = [];
+  for(var i=0;i<pcnt;i++){
+    var el = document.getElementById('em'+i);
+    var v = el ? el.value.trim().toLowerCase() : '';
+    if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ showAlert('Please enter a valid email for Player '+(i+1)+'.'); return; }
+    if(pemails.indexOf(v)>=0){ showAlert('Player '+(i+1)+' email is a duplicate.'); return; }
+    pemails.push(v);
+  }
+  qlist=[]; score=0; bonus=0; answers=[]; cq=-1; alive=true; answered=false;
+  var chip=document.getElementById('tname-chip');
+  chip.textContent='Team: '+tname; chip.style.display='block';
+  document.getElementById('sc').style.display='block';
+  document.getElementById('tabbar').classList.add('on');
+  updSC();
+  // Register team
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:Date.now()});
+  // Snapshot current command to ignore
+  dbOnce('host/command', function(snap){
+    var ex = snap.val();
+    lastCmdKey = ex ? JSON.stringify({a:ex.action,i:ex.index,t:ex.timestamp}) : '';
+    showWait(0); showScr('waiting');
+    listenHost();
+  });
+}
+
+function showWait(n) {
+  var b=document.getElementById('wbadge'),tt=document.getElementById('wtitle'),sb=document.getElementById('wsub'),sl=document.getElementById('wsline');
+  if(n===0){
+    b.textContent="You're in!"; tt.textContent='Waiting for host...';
+    sb.textContent='Sit tight — '+tname+' is registered. Your host will launch the first question shortly!';
+    sl.textContent='';
+  } else {
+    b.textContent='Q'+(n+1)+' coming up...'; tt.textContent='Nice one!';
+    var cor=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))cor++;}
+    sb.textContent=tname+' — '+cor+' correct out of '+n+' so far. Next question coming soon!';
+    sl.textContent='Score: '+score+' pts'+(bonus?' (including ⚡'+bonus+' bonus)':'');
+  }
+}
+
+// ── HOST LISTENER ────────────────────
+function listenHost() {
+  dbOn('host/command', function(snap){
+    var cmd = snap.val();
+    if(!cmd||!alive) return;
+    lastHostCmd = cmd;
+    var cmdKey = JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
+    if(cmdKey === lastCmdKey) return;
+    lastCmdKey = cmdKey;
+    // Switch to play tab on any command
+    document.getElementById('lb').classList.remove('on');
+    document.getElementById('tab-lb').classList.remove('on');
+    document.getElementById('tab-play').classList.add('on');
+    if(cmd.action==='question'){
+      if(qlist.length===0){
+        dbOnce('game/questions',function(qsnap){
+          var qd=qsnap.val(); if(qd) qlist=qd;
+          if(qlist.length>0){ cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq); }
+        });
+      } else {
+        if(cmd.index!==cq){ cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq); }
+        else if(timerPaused){ resumeTimer(); }
+      }
+    } else if(cmd.action==='reveal'){ stopT(); if(qlist.length>0) revealAns(cq); }
+    else if(cmd.action==='pause'){ stopT(); showPaused(); }
+    else if(cmd.action==='end'){ stopT(); showResults(); }
+  });
+  // Race bonus listener
+  dbOn('race', function(rsnap){
+    var rd=rsnap.val(); if(!rd||!alive) return;
+    var qk='q'+cq; if(!rd[qk]) return;
+    var ents=[]; for(var k in rd[qk]){if(rd[qk][k].correct)ents.push(rd[qk][k]);}
+    ents.sort(function(a,b){return a.time-b.time;});
+    var mp=-1; for(var i=0;i<ents.length;i++){if(ents[i].team===tname){mp=i;break;}}
+    var bk='_bq'+cq;
+    if(mp>=0&&mp<BSPTS&&!window[bk]){
+      window[bk]=true; bonus++; score++; updSC();
+      var pos=mp===0?'1st':mp===1?'2nd':'3rd';
+      showToast('⚡ Bonus! '+pos+' to answer — +1 pt!');
+      if(answers[cq]) answers[cq].r='b';
+    }
+  });
+}
+
+// ── LAUNCH QUESTION ──────────────────
+function launchQ(idx) {
+  document.getElementById('tab-lb').style.display='none';
+  document.getElementById('tab-play').classList.add('on');
+  document.getElementById('tab-lb').classList.remove('on');
+  showScr('qscr'); activeScreen='qscr';
+  var q=qlist[idx];
+  document.getElementById('qct').textContent='Q'+(idx+1)+' / '+qlist.length;
+  var cat=document.getElementById('qcat'); cat.textContent=q.lb; cat.className='cpill '+CC[q.cat];
+  document.getElementById('qprog').style.width=((idx/qlist.length)*100)+'%';
+  document.getElementById('qtxt').textContent=q.q;
+  document.getElementById('fb').className='fb';
+  document.getElementById('rbar').style.display='none';
+  var oc=document.getElementById('opts'); oc.innerHTML='';
+  for(var i=0;i<q.o.length;i++){
+    (function(idx2,i2){
+      var btn=document.createElement('button');
+      btn.className='opt'; btn.id='op'+i2;
+      btn.innerHTML='<span class="oltr">'+LT[i2]+'</span><span>'+q.o[i2]+'</span>';
+      btn.onclick=function(){selOpt(i2);};
+      oc.appendChild(btn);
+    })(idx,i);
+  }
+  stopT(); timerPaused=false; tleft=TSECS; renderT(tleft);
+  tint=setInterval(function(){
+    tleft--; renderT(tleft);
+    if(tleft<=0){stopT(); if(!answered) timeoutQ(idx);}
+  },1000);
+}
+
+function lockOpts() {
+  var opts=document.querySelectorAll('.opt');
+  for(var i=0;i<opts.length;i++){
+    opts[i].className=opts[i].className+' lk';
+    opts[i].onclick=null;
+  }
+}
+
+function timeoutQ(idx) {
+  if(answered) return; answered=true;
+  if(!answers[idx]) answers[idx]={q:qlist[idx].q,r:'t'};
+  lockOpts();
+  var ce=document.getElementById('op'+qlist[idx].a); if(ce) ce.classList.add('correct');
+  showFB('timeout','⏰','Time's up! The correct answer was '+qlist[idx].o[qlist[idx].a]+'.');
+  document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
+}
+
+function revealAns(idx) {
+  var q=qlist[idx]; lockOpts();
+  var ce=document.getElementById('op'+q.a); if(ce) ce.classList.add('correct');
+  if(!answered){
+    answered=true; if(!answers[idx]) answers[idx]={q:q.q,r:'t'};
+    showFB('timeout','⏰','Time's up! The correct answer was '+q.o[q.a]+'.');
+  } else {
+    var ar=answers[idx];
+    if(ar&&(ar.r==='c'||ar.r==='b')) showFB('correct','🎉','Correct! Great answer!');
+    else if(ar&&ar.r==='w'){
+      var we=document.getElementById('op'+selIdx); if(we) we.classList.add('wrong');
+      showFB('wrong','😬','Not quite — the answer was '+q.o[q.a]+'.');
+    } else showFB('timeout','⏰','Time's up! The answer was '+q.o[q.a]+'.');
+  }
+  document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
+}
+
+function selOpt(i) {
+  if(answered) return; stopT(); answered=true; selIdx=i;
+  var rt=Date.now()-qst, q=qlist[cq], cor=i===q.a;
+  var btn=document.getElementById('op'+i); if(btn) btn.classList.add('pend');
+  lockOpts();
+  if(cor){
+    score++; answers[cq]={q:q.q,r:'c'}; updSC(); showToast('+1 pt! ✓');
+    dbSet('race/q'+cq+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});
+  } else { answers[cq]={q:q.q,r:'w'}; }
+  revealAns(cq);
+}
+
+function showFB(type,icon,text){
+  var fb=document.getElementById('fb');
+  document.getElementById('fbic').textContent=icon;
+  document.getElementById('fbtxt').textContent=text;
+  fb.className='fb '+type+' on';
+}
+
+function sendR(emoji) {
+  if(rsent) return; rsent=true;
+  var btns=document.querySelectorAll('.rbtn');
+  for(var i=0;i<btns.length;i++){
+    var re=btns[i].querySelector('.re');
+    if(re&&re.textContent===emoji) btns[i].classList.add('sent');
+  }
+  dbPush('reactions',{emoji:emoji,team:tname,q:cq,timestamp:Date.now()});
+}
+
+function showPaused() {
+  var done=0; for(var i=0;i<answers.length;i++){if(answers[i])done++;}
+  document.getElementById('pausenum').textContent=done;
+  document.getElementById('pscore').textContent=score;
+  var cor=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))cor++;}
+  document.getElementById('pdetail').textContent=cor+' correct out of '+done+(bonus?' · ⚡ '+bonus+' bonus pt'+(bonus!==1?'s':''):'');
+  showScr('paused'); activeScreen='paused';
+  document.getElementById('tab-play').classList.add('on');
+  document.getElementById('tab-lb').classList.remove('on');
+  showLbTab(); showWait(done);
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','playing');
+}
+
+function saveScore() {
+  var n=document.getElementById('snotice');
+  var k=tname.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();
+  dbSet('scores/'+k,{team:tname,emails:pemails,players:pcnt,score:score,bonus:bonus,total:qlist.length,timestamp:Date.now()},function(err){
+    if(!err){
+      n.textContent='✓ Score saved to the leaderboard!'; n.style.background='#EAF7F0'; n.style.color='#2D7A4F';
+      dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','finished');
+    } else {
+      n.textContent="Couldn't save your score — check your connection."; n.style.background='#FDECEA'; n.style.color='#C0392B';
+    }
+  });
+}
+
+function showResults() {
+  var base=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))base++;}
+  var pct=Math.round((base/qlist.length)*100);
+  var hl=pct===100?'Nuh badda — perfect! 🏆':pct>=80?'Big up yourself! 🎉':pct>=60?'Respect! 👍':pct>=40?'Keep at it! 😅':'Room to grow — try again!';
+  document.getElementById('rscore').textContent=score;
+  document.getElementById('rhl').textContent=hl;
+  document.getElementById('rpct').textContent=pct+'% correct · '+tname+(bonus?' · ⚡'+bonus+' bonus pts':'');
+  var rl='';
+  for(var i=0;i<qlist.length;i++){
+    var ar=answers[i], r=ar?ar.r:'t', cl=r==='c'||r==='b'?'dc':r==='w'?'dw':'dt';
+    var qtxt=qlist[i].q; if(qtxt.length>50) qtxt=qtxt.substring(0,50)+'…';
+    rl+='<div class="rrow"><span class="rqt">Q'+(i+1)+'. '+qtxt+'</span><span class="rdot '+cl+'"></span></div>';
+  }
+  document.getElementById('rlist').innerHTML=rl;
+  showScr('results'); activeScreen='results';
+  document.getElementById('tab-play').classList.add('on');
+  document.getElementById('tab-lb').classList.remove('on');
+  document.getElementById('qprog').style.width='100%';
+  showLbTab(); saveScore(); alive=false;
+}
+
+function restartGame() {
+  document.getElementById('f-tname').value='';
+  document.getElementById('tname-chip').style.display='none';
+  pcnt=1; renderPF();
+  document.getElementById('sc').style.display='none';
+  document.getElementById('tabbar').classList.remove('on');
+  document.getElementById('tab-lb').style.display='none';
+  stopT(); alive=false; answered=false; selIdx=-1; bonus=0; score=0; answers=[];
+  activeScreen='splash'; showScr('splash');
+}
+
+// ── LEADERBOARD ──────────────────────
+var teamsC=null, scoresC=null;
+function renderLB() {
+  var list=document.getElementById('lblist');
+  var teams=teamsC?Object.values(teamsC):[];
+  var scores=scoresC?Object.values(scoresC):[];
+  var best={};
+  for(var i=0;i<scores.length;i++){var e=scores[i];if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;}
+  var finished=Object.values(best).sort(function(a,b){return b.score-a.score;});
+  var finNames={};
+  for(var i=0;i<finished.length;i++) finNames[finished[i].team]=true;
+  var waiting=teams.filter(function(t){return !finNames[t.name];}).sort(function(a,b){return a.joinedAt-b.joinedAt;});
+  if(finished.length===0&&waiting.length===0){list.innerHTML='<div class="lbempty">No teams yet — be the first! 🏆</div>';return;}
+  var html='';
+  if(finished.length>0){
+    if(waiting.length>0) html+='<div class="lbsec">Finished</div>';
+    for(var i=0;i<Math.min(finished.length,10);i++){
+      var e=finished[i];
+      var pct=Math.round(((e.score-(e.bonus||0))/e.total)*100);
+      html+='<div class="lbrow '+(i===0?'top':'')+'"><div class="lbrank">'+(i+1)+'</div><div class="lbmed">'+(MD[i]||'')+'</div><div class="lbi"><div class="lbteam">'+e.team+'</div><div class="lbmeta">'+e.players+' player'+(e.players!==1?'s':'')+' · '+pct+'%'+(e.bonus?' · ⚡'+e.bonus+' bonus':'')+'</div></div><div class="lbpts">'+e.score+'<span style="font-size:.6rem;opacity:.6"> pts</span></div></div>';
+    }
+  }
+  if(waiting.length>0){
+    html+='<div class="lbsec">'+(finished.length>0?'Waiting to play':'Teams registered')+'</div>';
+    for(var i=0;i<waiting.length;i++){
+      var t=waiting[i];
+      html+='<div class="lbrow wrow"><div class="lbrank">—</div><div class="lbmed">⏳</div><div class="lbi"><div class="lbteam">'+t.name+'</div><div class="lbmeta">'+t.players+' player'+(t.players!==1?'s':'')+' · waiting</div></div><div class="lbpts" style="font-size:.8rem;color:var(--muted);font-weight:500">Ready</div></div>';
+    }
+  }
+  list.innerHTML=html;
+}
+dbOn('teams', function(snap){teamsC=snap.val();renderLB();});
+dbOn('scores', function(snap){scoresC=snap.val();renderLB();});
+</script>
+</body>
+</html>

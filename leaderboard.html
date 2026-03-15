@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Leaderboard — Screenshot Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7B7BFF;--purple-dim:#5B5BD6;--purple-glow:rgba(123,123,255,0.18);
+  --coral:#FF6B8A;--gold:#FFD166;
+  --bg:#0A0A1E;--card:#12122A;--card2:#1A1A35;--text:#F0F0FF;--muted:#8888BB;--border:#2A2A50;
+  --sponsor-color:#E8547A;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+body{display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(123,123,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(123,123,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+.sponsor-ticker{background:var(--sponsor-color);padding:8px 3rem;display:flex;align-items:center;gap:1rem;flex-shrink:0}
+.st-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif;white-space:nowrap}
+.st-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#fff}
+.st-tag{font-size:13px;color:rgba(255,255,255,.8);margin-left:auto}
+
+.header{padding:1.2rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--purple);letter-spacing:.04em}
+.logo-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:.65rem;color:var(--coral);letter-spacing:.14em;text-transform:uppercase}
+.hdr-right{text-align:right}
+.event-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.8rem;color:var(--text)}
+.live-chip{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,107,138,.12);border:1px solid rgba(255,107,138,.4);color:var(--coral);font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;margin-top:.3rem;font-family:'Nunito',sans-serif}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--coral);animation:ldp 1.4s infinite}
+@keyframes ldp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+.main{flex:1;display:grid;grid-template-columns:1fr 270px;overflow:hidden}
+.board{padding:1rem 2rem 1rem 3rem;display:flex;flex-direction:column;gap:.6rem;overflow:hidden}
+
+.row{background:var(--card);border-radius:18px;padding:1rem 1.5rem;display:flex;align-items:center;gap:1.3rem;border:1px solid var(--border);position:relative;overflow:hidden}
+@keyframes rowIn{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.row{animation:rowIn .5s ease forwards}
+.row:nth-child(2){animation-delay:.05s}.row:nth-child(3){animation-delay:.1s}
+.row:nth-child(4){animation-delay:.15s}.row:nth-child(5){animation-delay:.2s}
+.row.first{background:linear-gradient(135deg,#1A1A40,#14144A);border-color:var(--purple-dim);box-shadow:0 0 40px var(--purple-glow)}
+.row.first::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--purple-glow),transparent)}
+.row.second{background:var(--card2);border-color:#3A3A60}
+.row.third{background:var(--card2);border-color:rgba(255,107,138,.3)}
+.rank{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.7rem;min-width:46px;text-align:center;color:var(--muted);position:relative;z-index:1}
+.row.first .rank{color:var(--purple)}.row.second .rank{color:#9090CC}.row.third .rank{color:var(--coral)}
+.medal{font-size:1.6rem;min-width:34px;text-align:center;position:relative;z-index:1}
+.info{flex:1;position:relative;z-index:1}
+.team{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;color:var(--text)}
+.row.first .team{color:#fff}
+.meta{font-size:12px;color:var(--muted);margin-top:.15rem;display:flex;align-items:center;gap:.5rem}
+.bonus-tag{background:rgba(123,123,255,.2);color:var(--purple);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
+.bar-col{flex:1.6;position:relative;z-index:1}
+.bar-track{height:9px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--purple-dim),var(--purple));transition:width 1.4s cubic-bezier(.34,1.2,.64,1)}
+.row.second .bar-fill{background:linear-gradient(90deg,#6060AA,#9090CC)}
+.row.third .bar-fill{background:linear-gradient(90deg,#A04060,var(--coral))}
+.row:not(.first):not(.second):not(.third) .bar-fill{background:linear-gradient(90deg,#2A2A50,#4A4A70)}
+.score-col{text-align:right;min-width:80px;position:relative;z-index:1}
+.score-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;line-height:1;color:var(--purple)}
+.row.second .score-num{color:#9090CC}.row.third .score-num{color:var(--coral)}
+.row:not(.first):not(.second):not(.third) .score-num{color:var(--muted)}
+.score-den{font-size:11px;color:var(--muted)}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;opacity:.4}
+.empty-icon{font-size:4rem}.empty-text{font-family:'Nunito',sans-serif;font-weight:700;font-size:1.1rem;color:var(--muted)}
+
+.sidebar{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:rgba(18,18,42,.6)}
+.sb-hdr{padding:.9rem 1.1rem .7rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;color:var(--text)}
+.sb-sub{font-size:10px;color:var(--muted);margin-top:.1rem}
+.rxn-feed{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.45rem;padding:.7rem 1.1rem;justify-content:flex-end}
+.rxn-item{display:flex;align-items:center;gap:.55rem;padding:.45rem .7rem;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid var(--border);animation:rxnIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes rxnIn{from{opacity:0;transform:scale(.8) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.rxn-emoji{font-size:1.3rem;flex-shrink:0}
+.rxn-team{font-family:'Nunito',sans-serif;font-weight:800;font-size:.75rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rxn-time{font-size:10px;color:var(--muted)}
+.no-rxn{text-align:center;color:var(--muted);font-size:12px;padding:2rem 1rem;opacity:.5}
+
+.footer{padding:.6rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.footer-url{font-size:12px;color:var(--muted)}
+.footer-count{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="sponsor-ticker">
+  <span class="st-label">Presented by</span>
+  <span class="st-name" id="st-name">YOUR SPONSOR</span>
+  <span class="st-tag" id="st-tag">Add your sponsor tagline here</span>
+</div>
+
+<div class="header">
+  <div class="logo">
+    <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+      <circle cx="21" cy="21" r="17" stroke="#7B7BFF" stroke-width="2.2" stroke-dasharray="5 2.5"/>
+      <circle cx="21" cy="21" r="17" stroke="#FF6B8A" stroke-width="3" stroke-dasharray="8 100" stroke-dashoffset="-85"/>
+      <text x="21" y="27" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="19" fill="#7B7BFF">S</text>
+    </svg>
+    <div><div class="logo-name">SCREENSHOT</div><div class="logo-sub">Interactive</div></div>
+  </div>
+  <div class="hdr-right">
+    <div class="event-title">🇯🇲 Jamaica Trivia Night</div>
+    <div class="live-chip"><span class="ldot"></span>Live leaderboard</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="board" id="board">
+    <div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for tables to finish…</div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sb-hdr">
+      <div class="sb-title">💬 Table reactions</div>
+      <div class="sb-sub">Live from the tables</div>
+    </div>
+    <div class="rxn-feed" id="rxn-feed">
+      <div class="no-rxn">Reactions will appear here as tables play</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div style="display:flex;align-items:center;gap:.5rem"><span>🇯🇲</span><span class="footer-url">Screenshot Interactive — Jamaica Trivia Night</span></div>
+  <span class="footer-count" id="footer-count"></span>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+// ── SPONSOR CONFIG ──
+const SPONSOR_NAME    = "YOUR SPONSOR";
+const SPONSOR_TAGLINE = "Add your sponsor tagline here";
+// ───────────────────
+document.getElementById('st-name').textContent=SPONSOR_NAME;
+document.getElementById('st-tag').textContent=SPONSOR_TAGLINE;
+
+const FB={apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"};
+const app=initializeApp(FB);const db=getDatabase(app);
+const MEDALS=['🥇','🥈','🥉'];
+const RC=['first','second','third'];
+
+let teamsC=null,scoresC=null;
+function renderBoard(){
+  const board=document.getElementById('board');
+  const cnt=document.getElementById('footer-count');
+  const teams=teamsC?Object.values(teamsC):[];
+  const scores=scoresC?Object.values(scoresC):[];
+  const best={};
+  scores.forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
+  const finished=Object.values(best).sort((a,b)=>b.score-a.score);
+  const finNames=new Set(finished.map(e=>e.team));
+  const waiting=teams.filter(t=>!finNames.has(t.name)).sort((a,b)=>a.joinedAt-b.joinedAt);
+  const total=finished.length+waiting.length;
+  cnt.textContent=total+' table'+(total!==1?'s':'')+' registered · '+finished.length+' finished';
+  if(total===0){board.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Waiting for teams to join...</div></div>';return;}
+  const maxS=finished[0]?.score||10;
+  let html='';
+  html+=finished.slice(0,6).map((e,i)=>{
+    const bw=Math.round((e.score/maxS)*100);
+    const pct=Math.round(((e.score-(e.bonus||0))/e.total)*100);
+    return `<div class="row ${RC[i]||''}">
+      <div class="rank">${i+1}</div><div class="medal">${MEDALS[i]||''}</div>
+      <div class="info"><div class="team">${e.team}</div>
+        <div class="meta"><span>${e.players} player${e.players!==1?'s':''}</span><span class="pct-pill">${pct}% correct</span>${e.bonus?`<span class="bonus-tag">⚡ +${e.bonus}</span>`:''}</div>
+      </div>
+      <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:${bw}%"></div></div></div>
+      <div class="score-col"><div class="score-num">${e.score}</div><div class="score-den">/ ${e.total} pts</div></div>
+    </div>`;
+  }).join('');
+  if(waiting.length>0&&finished.length<6){
+    html+=waiting.slice(0,6-finished.length).map(t=>`
+      <div class="row" style="opacity:.55;border-style:dashed">
+        <div class="rank" style="font-size:1.2rem">⏳</div><div class="medal"></div>
+        <div class="info"><div class="team">${t.name}</div>
+          <div class="meta"><span>${t.players} player${t.players!==1?'s':''}</span><span>Waiting to play</span></div>
+        </div>
+        <div class="bar-col"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div></div>
+        <div class="score-col"><div class="score-den" style="font-size:14px">Ready</div></div>
+      </div>`).join('');
+  }
+  board.innerHTML=html;
+}
+onValue(ref(db,'teams'),snap=>{teamsC=snap.val();renderBoard();});
+onValue(ref(db,'scores'),snap=>{scoresC=snap.val();renderBoard();});
+
+onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(20)),snapshot=>{
+  const data=snapshot.val();
+  const feed=document.getElementById('rxn-feed');
+  if(!data){feed.innerHTML='<div class="no-rxn">Reactions will appear here as tables play</div>';return;}
+  const items=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp).slice(0,12);
+  feed.innerHTML=items.map(r=>{
+    const age=Math.round((Date.now()-r.timestamp)/1000);
+    const t=age<60?age+'s ago':Math.round(age/60)+'m ago';
+    return `<div class="rxn-item">
+      <span class="rxn-emoji">${r.emoji}</span>
+      <div style="flex:1;min-width:0">
+        <div class="rxn-team">${r.team}</div>
+        <div class="rxn-time">${t}</div>
+      </div>
+    </div>`;
+  }).join('');
+});
+</script>
+</body>
+</html>
