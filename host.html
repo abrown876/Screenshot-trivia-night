@@ -106,13 +106,19 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
   <div class="card status-bar">
     <div>
       <div class="slabel" style="margin-bottom:.2rem">Status</div>
-      <div class="status-val" id="status-val">Ready to start Round 1</div>
+      <div class="status-val" id="status-val">Ready — push questions to start</div>
     </div>
     <div class="count-pills">
       <div class="pill pill-wait">&#x23F3; <span id="cnt-wait">0</span> registered</div>
       <div class="pill pill-play">&#x1F3AE; <span id="cnt-play">0</span> playing</div>
       <div class="pill pill-done">&#x2705; <span id="cnt-done">0</span> done</div>
     </div>
+  </div>
+
+  <!-- Push Questions -->
+  <div class="card" style="text-align:center">
+    <div class="slabel" style="margin-bottom:.75rem">Step 1 — Push questions to all tablets</div>
+    <button class="btn btn-purple" onclick="startGame()" id="btn-start" style="max-width:320px;margin:0 auto">&#x1F680; Push Questions to Tablets</button>
   </div>
 
   <!-- Round tabs -->
@@ -230,6 +236,7 @@ function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()
 try {
   firebase.initializeApp({apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"});
   db = firebase.database();
+  setTimeout(function(){ if(db && !_roundsBuilt) buildRounds(); }, 1500);
 } catch(e){ console.error('Firebase init failed',e); }
 
 function selRound(r){
@@ -296,13 +303,23 @@ function buildRounds(){
   _rounds[0] = all.slice(0, perRound);
   _rounds[1] = all.slice(perRound, perRound*2);
   _rounds[2] = all.slice(perRound*2);
-  // Write ALL rounds to Firebase so index.html can read them
+  // Push ALL rounds to Firebase immediately so tablets can load questions
   db.ref('game/rounds').set({
     0: _rounds[0],
     1: _rounds[1],
     2: _rounds[2]
+  }, function(){
+    document.getElementById('status-val').textContent = 'Questions pushed to all tablets';
+    syncStatusChip('Questions ready');
+    document.getElementById('btn-launch').disabled = false;
   });
   _roundsBuilt = true;
+}
+
+function startGame(){
+  if(!db){ alert('Firebase not connected'); return; }
+  if(_roundsBuilt){ alert('Questions already pushed. Reset first for a new game.'); return; }
+  buildRounds();
 }
 
 function launchQ(){
