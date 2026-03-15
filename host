@@ -152,6 +152,7 @@ import { getDatabase, ref, set, onValue, query, orderByChild, limitToLast, remov
 const FB={apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"};
 const app=initializeApp(FB);const db=getDatabase(app);
 
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 const QUESTIONS=[
   {cat:'history',q:'In what year did Jamaica gain independence from Britain?',opts:['1958','1960','1962','1966'],ans:2},
   {cat:'music',q:'Which Jamaican artist is known as the "King of Reggae"?',opts:['Peter Tosh','Jimmy Cliff','Toots Hibbert','Bob Marley'],ans:3},
@@ -200,6 +201,12 @@ previewQ(0);
 window.launchQ=async function(){
   if(qLive) return;
   const idx=selQ;qLive=true;
+  // On first question launch, write shuffled question order to Firebase for all players
+  if(idx===0&&!window._qSaved){
+    window._qSaved=true;
+    const shuffled=shuffle([...QUESTIONS]);
+    try{ await set(ref(db,'game/questions'),shuffled); }catch(e){}
+  }
   document.getElementById('btn-launch').disabled=true;
   document.getElementById('btn-pause').disabled=false;
   document.getElementById('btn-reveal').disabled=false;
@@ -288,6 +295,8 @@ window.resetLeaderboard=async function(){
     await remove(ref(db,'reactions'));
     await remove(ref(db,'host/command'));
     await remove(ref(db,'teams'));
+    await remove(ref(db,'game'));
+    window._qSaved=false;
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">Leaderboard cleared — ready for a new game!</div>';
     document.getElementById('status-val').textContent='Reset complete — ready to start';
     alert('Done! Leaderboard cleared and ready for a fresh game.');
