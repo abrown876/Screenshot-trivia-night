@@ -560,6 +560,7 @@ function listenHost(){
       var pos=mp===0?'1st':mp===1?'2nd':'3rd';
       showToast('⚡ Bonus! '+pos+' to answer — +1 pt!');
       if(answers[cq]) answers[cq].r='b';
+      pushLiveScore();
     }
   });
 }
@@ -619,6 +620,17 @@ function revealAns(idx){
   document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
 }
 
+function pushLiveScore(){
+  var k = tname.replace(/[^a-zA-Z0-9]/g,'_');
+  dbSet('live_scores/'+k,{
+    team:tname, players:pcnt,
+    score:score, bonus:bonus,
+    r0:roundScores[0], r1:roundScores[1], r2:roundScores[2],
+    b0:roundBonus[0],  b1:roundBonus[1],  b2:roundBonus[2],
+    round:curRound, updatedAt:Date.now()
+  });
+}
+
 function selOpt(i){
   if(answered) return; stopT(); answered=true; selIdx=i;
   var rt=Date.now()-qst, q=qlist[cq], cor=i===q.a;
@@ -627,6 +639,7 @@ function selOpt(i){
   if(cor){
     score++; roundScores[curRound]++; answers[cq]={q:q.q,r:'c'}; updSC(); showToast('+1 pt! ✓');
     dbSet('race/r'+curRound+'q'+cq+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});
+    pushLiveScore();
   } else { answers[cq]={q:q.q,r:'w'}; }
   revealAns(cq);
 }
@@ -730,38 +743,57 @@ function restartGame(){
   score=0; bonus=0; answers=[]; qlist=[]; cq=-1; curRound=0;
   roundScores=[0,0,0]; roundBonus=[0,0,0]; roundAnswers=[[],[],[]]; roundQuestions=[[],[],[]];
   activeScreen='splash'; showScr('splash');
+  dbSet('live_scores/'+tname.replace(/[^a-zA-Z0-9]/g,'_'), null);
 }
 
 // ── LEADERBOARD ──────────────────────
-var teamsC=null, scoresC=null;
+var teamsC=null, scoresC=null, liveC=null;
 function renderLB(){
   var list=document.getElementById('lblist');
   var teams=teamsC?Object.values(teamsC):[];
-  var scores=scoresC?Object.values(scoresC):[];
-  // Aggregate by team
+  // Merge live scores (per question) with final round scores
   var totals={};
-  scores.forEach(function(e){
-    if(!totals[e.team]) totals[e.team]={team:e.team,base:0,bonus:0,rounds:{}};
-    totals[e.team].base+=(e.base||e.score||0);
-    totals[e.team].bonus+=(e.bonus||0);
-    totals[e.team].rounds['r'+(e.round+1)]=(e.base||e.score||0);
-  });
-  var finished=Object.values(totals).sort(function(a,b){return (b.base+b.bonus)-(a.base+a.bonus);});
-  var finNames={};
-  finished.forEach(function(t){finNames[t.team]=true;});
-  var waiting=teams.filter(function(t){return !finNames[t.name];}).sort(function(a,b){return a.joinedAt-b.joinedAt;});
-  if(finished.length===0&&waiting.length===0){list.innerHTML='<div class="lbempty">No teams yet! 🏆</div>';return;}
+  // Live scores take priority during game
+  if(liveC){
+    Object.values(liveC).forEach(function(e){
+      totals[e.team]={team:e.team,score:e.score,bonus:e.bonus,players:e.players,
+        r0:e.r0||0,r1:e.r1||0,r2:e.r2||0,b0:e.b0||0,b1:e.b1||0,b2:e.b2||0,live:true};
+    });
+  }
+  // Overlay final round scores for completed rounds
+  if(scoresC){
+    Object.values(scoresC).forEach(function(e){
+      if(!totals[e.team]) totals[e.team]={team:e.team,score:0,bonus:0,players:e.players,r0:0,r1:0,r2:0,b0:0,b1:0,b2:0};
+      // Only use final scores if higher (round completed)
+      var rk='r'+e.round;
+      var bk='b'+e.round;
+      if((e.base||0) > (totals[e.team][rk]||0)) totals[e.team][rk]=e.base||0;
+      if((e.bonus||0) > (totals[e.team][bk]||0)) totals[e.team][bk]=e.bonus||0;
+    });
+    // Recalculate totals from rounds for final display
+    Object.values(totals).forEach(function(t){
+      if(!t.live){
+        t.score=(t.r0||0)+(t.r1||0)+(t.r2||0)+(t.b0||0)+(t.b1||0)+(t.b2||0);
+        t.bonus=(t.b0||0)+(t.b1||0)+(t.b2||0);
+      }
+    });
+  }
+  var sorted=Object.values(totals).sort(function(a,b){return b.score-a.score;});
+  var teamsInGame={};
+  sorted.forEach(function(t){teamsInGame[t.team]=true;});
+  var waiting=teams.filter(function(t){return !teamsInGame[t.name];}).sort(function(a,b){return a.joinedAt-b.joinedAt;});
+  if(sorted.length===0&&waiting.length===0){list.innerHTML='<div class="lbempty">No teams yet! 🏆</div>';return;}
   var html='';
-  if(finished.length>0){
-    if(waiting.length>0) html+='<div class="lbsec">Finished</div>';
-    finished.slice(0,10).forEach(function(e,i){
-      var total=e.base+e.bonus;
-      var rounds=[1,2,3].map(function(r){return 'R'+r+':'+(e.rounds['r'+r]!==undefined?e.rounds['r'+r]:'—');}).join(' ');
-      html+='<div class="lbrow '+(i===0?'top':'')+'"><div class="lbrank">'+(i+1)+'</div><div class="lbmed">'+(MD[i]||'')+'</div><div class="lbi"><div class="lbteam">'+e.team+'</div><div class="lbmeta">'+rounds+(e.bonus?' · ⚡'+e.bonus+' bonus':'')+'</div></div><div class="lbpts">'+total+'<span style="font-size:.6rem;opacity:.6"> pts</span></div></div>';
+  if(sorted.length>0){
+    if(waiting.length>0) html+='<div class="lbsec">Playing</div>';
+    sorted.slice(0,10).forEach(function(e,i){
+      var rounds='R1:'+(e.r0||0)+' R2:'+(e.r1||0)+' R3:'+(e.r2||0);
+      var bonusStr=e.bonus?' · ⚡'+e.bonus:'';
+      html+='<div class="lbrow '+(i===0?'top':'')+'"><div class="lbrank">'+(i+1)+'</div><div class="lbmed">'+(MD[i]||'')+'</div><div class="lbi"><div class="lbteam">'+e.team+'</div><div class="lbmeta">'+rounds+bonusStr+'</div></div><div class="lbpts">'+e.score+'<span style="font-size:.6rem;opacity:.6"> pts</span></div></div>';
     });
   }
   if(waiting.length>0){
-    html+='<div class="lbsec">'+(finished.length>0?'Still playing':'Teams registered')+'</div>';
+    html+='<div class="lbsec">'+(sorted.length>0?'Waiting':'Teams registered')+'</div>';
     waiting.forEach(function(t){
       html+='<div class="lbrow wrow"><div class="lbrank">—</div><div class="lbmed">⏳</div><div class="lbi"><div class="lbteam">'+t.name+'</div><div class="lbmeta">'+t.players+' player'+(t.players!==1?'s':'')+' · waiting</div></div><div class="lbpts" style="font-size:.8rem;color:var(--muted);font-weight:500">Ready</div></div>';
     });
@@ -770,6 +802,7 @@ function renderLB(){
 }
 dbOn('teams',function(snap){teamsC=snap.val();renderLB();});
 dbOn('scores',function(snap){scoresC=snap.val();renderLB();});
+dbOn('live_scores',function(snap){liveC=snap.val();renderLB();});
 </script>
 </body>
 </html>
