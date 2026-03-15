@@ -570,9 +570,11 @@ function listenHost() {
     var cmd = snap.val();
     if(!cmd||!alive) return;
     lastHostCmd = cmd;
-    // Only skip if we've already processed this exact command
+    // Ignore stale commands from before this player joined
+    if(cmd.timestamp && cmd.timestamp < joinTime) return;
+    // Ignore already-processed commands
     var cmdKey = JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
-    if(cmdKey === lastCmdKey && cq >= 0) return;
+    if(cmdKey === lastCmdKey) return;
     lastCmdKey = cmdKey;
     // Switch to play tab on any command
     document.getElementById('lb').classList.remove('on');
