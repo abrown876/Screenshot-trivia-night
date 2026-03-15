@@ -119,7 +119,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div id="qr-container" style="line-height:0;border-radius:8px;overflow:hidden"></div>
   </div>
   <div class="qr-scan">&#128247; Scan to join</div>
-  <div class="qr-url">https://abrown876.github.io/Screenshot-trivia-night/index.html</div>
+  <div class="qr-url">https://trivia.screenshotinteractive.com/index.html</div>
   <div class="qr-sp">
     <div class="qr-sp-lbl">Tonight brought to you by</div>
     <div class="qr-sp-nm sp-name">YOUR SPONSOR</div>
@@ -170,7 +170,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
 // ── QR SCREEN ────────────────────────
-var JOIN_URL = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
+var JOIN_URL = "https://trivia.screenshotinteractive.com/index.html";
 var gameStarted = false;
 
 
@@ -315,7 +315,7 @@ function showReaction(r){
 
   // Generate QR code using qrcodejs
   new QRCode(document.getElementById('qr-container'), {
-    text: 'https://abrown876.github.io/Screenshot-trivia-night/index.html',
+    text: 'https://trivia.screenshotinteractive.com/index.html',
     width: 240, height: 240,
     colorDark: '#1A1A3E',
     colorLight: '#ffffff',
