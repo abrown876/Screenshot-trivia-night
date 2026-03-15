@@ -383,6 +383,24 @@ document.getElementById('r3').onclick=function(){sendR('👏');};
 document.getElementById('r4').onclick=function(){sendR('🎉');};
 renderPF();
 
+// Auto-join if arriving from join.html registration
+(function(){
+  try {
+    if(sessionStorage.getItem('trivia_registered')==='1'){
+      var stn=sessionStorage.getItem('trivia_tname');
+      var spc=parseInt(sessionStorage.getItem('trivia_pcnt')||'1',10);
+      var sem=JSON.parse(sessionStorage.getItem('trivia_emails')||'[]');
+      sessionStorage.removeItem('trivia_registered');
+      if(stn&&sem.length>0){
+        document.getElementById('f-tname').value=stn;
+        pcnt=spc; renderPF();
+        for(var i=0;i<sem.length;i++){var el=document.getElementById('em'+i);if(el)el.value=sem[i];}
+        setTimeout(function(){ joinGame(); }, 400);
+      }
+    }
+  } catch(e){}
+})();
+
 function showAlert(msg){var a=document.getElementById('alertbox');a.textContent=msg;a.style.display='block';setTimeout(function(){a.style.display='none';},4000);}
 function updSC(){document.getElementById('sc').textContent=score+' pts';}
 function showToast(msg){var t=document.getElementById('stoast');t.textContent=msg;t.className='stoast on';setTimeout(function(){t.className='stoast';},2200);}
