@@ -465,7 +465,7 @@ function resetAll() {
   if(timerInt){ clearInterval(timerInt); timerInt=null; }
   curRound=0; selQ=0; qLive=false; doneQs=[]; roundDone=[false,false,false]; roundsSaved=[false,false,false];
   db.ref('scores').remove(); db.ref('race').remove(); db.ref('reactions').remove();
-  db.ref('host/command').remove(); db.ref('teams').remove(); db.ref('game').remove();
+  db.ref('host/command').remove(); db.ref('teams').remove(); db.ref('game').remove(); db.ref('live_scores').remove();
   initRounds();
   buildDots(); previewQ(0); updateRoundTabs();
   document.getElementById('launch-round').textContent='1';
@@ -508,25 +508,27 @@ db.ref('reactions').orderByChild('timestamp').limitToLast(6).on('value', functio
 });
 
 // Leaderboard — show total across all rounds
-db.ref('scores').on('value', function(snap){
-  var data = snap.val();
+var _hostLive={}, _hostFinal={};
+function renderHostLB(){
   var el = document.getElementById('lb-list');
-  if(!data){ el.innerHTML='<div class="lb-empty">No scores yet</div>'; return; }
-  // Aggregate by team across rounds
   var totals = {};
-  Object.values(data).forEach(function(e){
-    if(!totals[e.team]) totals[e.team] = {team:e.team, base:0, bonus:0, rounds:{}};
-    totals[e.team].base  += (e.base  || e.score || 0);
-    totals[e.team].bonus += (e.bonus || 0);
-    totals[e.team].rounds['r'+(e.round+1)] = (e.base||e.score||0) + '+'+(e.bonus||0);
+  Object.values(_hostLive).forEach(function(e){
+    totals[e.team]={team:e.team,score:e.score,bonus:e.bonus,r0:e.r0||0,r1:e.r1||0,r2:e.r2||0};
   });
-  var sorted = Object.values(totals).sort(function(a,b){return (b.base+b.bonus)-(a.base+a.bonus);});
-  el.innerHTML = sorted.slice(0,8).map(function(e,i){
-    var total = e.base + e.bonus;
-    var roundStr = [1,2,3].map(function(r){ return 'R'+r+':'+(e.rounds['r'+r]||'—'); }).join(' · ');
-    return '<div class="lb-row"><div class="lb-left"><span class="lb-medal">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1))+'</span><div><div class="lb-team">'+e.team+'</div><div class="lb-email">'+roundStr+'</div></div></div><span class="lb-score">'+total+' pts</span></div>';
+  Object.values(_hostFinal).forEach(function(e){
+    if(!totals[e.team]) totals[e.team]={team:e.team,score:0,bonus:0,r0:0,r1:0,r2:0};
+    var rk='r'+e.round;
+    if((e.base||0)>(totals[e.team][rk]||0)) totals[e.team][rk]=e.base||0;
+  });
+  var sorted=Object.values(totals).sort(function(a,b){return b.score-a.score;});
+  if(!sorted.length){ el.innerHTML='<div class="lb-empty">No scores yet</div>'; return; }
+  el.innerHTML=sorted.slice(0,8).map(function(e,i){
+    var rounds='R1:'+(e.r0||0)+' R2:'+(e.r1||0)+' R3:'+(e.r2||0);
+    return '<div class="lb-row"><div class="lb-left"><span class="lb-medal">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1))+'</span><div><div class="lb-team">'+e.team+'</div><div class="lb-email">'+rounds+(e.bonus?' · ⚡'+e.bonus:'')+'</div></div></div><span class="lb-score">'+e.score+' pts</span></div>';
   }).join('');
-});
+}
+db.ref('live_scores').on('value',function(snap){_hostLive=snap.val()||{};renderHostLB();});
+db.ref('scores').on('value',function(snap){_hostFinal=snap.val()||{};renderHostLB();});
 </script>
 </body>
 </html>
