@@ -53,10 +53,10 @@ button{touch-action:manipulation;cursor:pointer}
 .cval-wrap{text-align:center;min-width:56px}
 .cval{font-family:'Nunito',sans-serif;font-size:38px;font-weight:900;color:var(--purple);line-height:1}
 .clbl{font-size:10px;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
-.prow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.prow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .pnum{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:var(--purple);min-width:20px;text-align:center;flex-shrink:0}
-.pinp{flex:1;padding:12px 13px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;font-size:15px;color:var(--text);outline:none;min-width:0;font-family:'DM Sans',sans-serif}
-.pinp:focus{border-color:var(--purple)}
+.pinp{flex:1;padding:14px 13px;border-radius:12px;border:2px solid var(--bd);background:#fff;font-size:16px;color:var(--text);outline:none;min-width:0;font-family:'DM Sans',sans-serif;transition:border-color .15s}
+.pinp:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,91,214,.1)}
 .btn{width:100%;padding:17px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;display:block;min-height:58px;margin-top:.75rem;touch-action:manipulation;letter-spacing:.01em;cursor:pointer}
 .bpp{background:var(--purple);color:#fff}
 .bpc{background:var(--coral);color:#fff}
@@ -130,7 +130,7 @@ button{touch-action:manipulation;cursor:pointer}
         <button class="cbtn" id="btn-plus">&#43;</button>
       </div>
 
-      <label class="flbl">Player emails <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px">(optional)</span></label>
+      <label class="flbl">Player emails</label>
       <div id="pfields"></div>
 
       <button class="btn bpc" id="btn-reg">&#x1F4DD; Register Team &#8594;</button>
@@ -181,31 +181,38 @@ try {
 } catch(e) { console.error('Firebase init failed', e); }
 
 // ── Player count ─────────────────────────────────────────────────────
-var btnMinus = document.getElementById('btn-minus');
-var btnPlus  = document.getElementById('btn-plus');
-var cvalEl   = document.getElementById('cval');
-var clblEl   = document.getElementById('clbl');
-var pfields  = document.getElementById('pfields');
+var pcnt = 1;
+var MAXP = 4;
 
-function renderPlayerFields() {
-  pfields.innerHTML = '';
-  for (var i = 1; i <= playerCount; i++) {
+function renderPF() {
+  var pf = document.getElementById('pfields');
+  pf.innerHTML = '';
+  for (var i = 0; i < pcnt; i++) {
     var row = document.createElement('div');
-    row.className = 'prow';
-    row.innerHTML =
-      '<div class="pnum">' + i + '</div>' +
-      '<input class="pinp" type="email" placeholder="player' + i + '@example.com" autocomplete="off">';
-    pfields.appendChild(row);
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
+    var num = document.createElement('span');
+    num.textContent = i + 1;
+    num.style.cssText = 'font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#5B5BD6;min-width:20px;text-align:center;flex-shrink:0';
+    var inp = document.createElement('input');
+    inp.type = 'email';
+    inp.required = true;
+    inp.placeholder = 'player' + (i + 1) + '@example.com';
+    inp.maxLength = 80;
+    inp.id = 'em' + i;
+    inp.style.cssText = 'flex:1;padding:14px 13px;border-radius:12px;border:2px solid #E0E0F0;background:#fff;font-size:16px;color:#1A1A3E;outline:none;font-family:DM Sans,sans-serif;min-width:0;box-sizing:border-box;transition:border-color .15s';
+    inp.onfocus = function() { this.style.borderColor = '#5B5BD6'; };
+    inp.onblur  = function() { this.style.borderColor = '#E0E0F0'; };
+    row.appendChild(num);
+    row.appendChild(inp);
+    pf.appendChild(row);
   }
+  document.getElementById('cval').textContent = pcnt;
+  document.getElementById('clbl').textContent = pcnt === 1 ? 'player' : 'players';
 }
 
-btnMinus.onclick = function() {
-  if (playerCount > 1) { playerCount--; cvalEl.textContent = playerCount; clblEl.textContent = playerCount === 1 ? 'player' : 'players'; renderPlayerFields(); }
-};
-btnPlus.onclick = function() {
-  if (playerCount < 4) { playerCount++; cvalEl.textContent = playerCount; clblEl.textContent = playerCount === 1 ? 'player' : 'players'; renderPlayerFields(); }
-};
-renderPlayerFields();
+document.getElementById('btn-minus').onclick = function() { if (pcnt > 1) { pcnt--; renderPF(); } };
+document.getElementById('btn-plus').onclick  = function() { if (pcnt < MAXP) { pcnt++; renderPF(); } };
+renderPF();
 
 // ── Register ─────────────────────────────────────────────────────────
 document.getElementById('btn-reg').onclick = function() {
@@ -227,9 +234,10 @@ document.getElementById('btn-reg').onclick = function() {
   }
 
   var emails = [];
-  document.querySelectorAll('.pinp').forEach(function(el) {
-    if (el.value.trim()) emails.push(el.value.trim());
-  });
+  for (var i = 0; i < pcnt; i++) {
+    var em = document.getElementById('em' + i);
+    if (em && em.value.trim()) emails.push(em.value.trim());
+  }
 
   var teamData = {
     name: name,
