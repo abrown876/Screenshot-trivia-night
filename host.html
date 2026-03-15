@@ -23,20 +23,24 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .main{max-width:720px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem}
 .card{background:var(--card);border-radius:var(--r);padding:1.25rem 1.5rem;box-shadow:var(--sh)}
 .slabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.7rem;font-family:'Nunito',sans-serif}
-.status-bar{display:flex;align-items:center;justify-content:space-between;border-left:5px solid var(--purple)}
-.status-val{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:var(--text)}
+.status-bar{display:flex;align-items:center;justify-content:space-between;border-left:5px solid var(--purple);flex-wrap:wrap;gap:.75rem}
+.status-val{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
 .count-pills{display:flex;gap:.5rem;flex-wrap:wrap}
-.pill{font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;padding:.35rem .9rem;border-radius:20px}
+.pill{font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;padding:.3rem .85rem;border-radius:20px}
 .pill-wait{background:#FEF3DC;color:#8A5500}
 .pill-play{background:#EEF0FF;color:#3D3D9E}
 .pill-done{background:#EAF7F0;color:#1A6A3A}
+.round-tabs{display:flex;gap:.5rem;margin-bottom:1rem}
+.rtab{flex:1;padding:.6rem;border-radius:10px;border:2px solid var(--bd);background:var(--bg);font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;text-align:center;color:var(--muted)}
+.rtab.active{border-color:var(--purple);background:var(--purplel);color:var(--purple)}
+.rtab.done{border-color:var(--green);background:var(--greenl);color:var(--green)}
 .q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
 .q-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--text)}
 .cpill{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:'Nunito',sans-serif}
 .ch{background:#FEF3DC;color:#8A5500}.cf{background:#FAECE7;color:#8A2E0F}
 .cm{background:#EEF0FF;color:#3D3D9E}.cg{background:#E6F7EE;color:#1A6A3A}
 .cs{background:#FDE8EE;color:#8A1840}.cx{background:#F0F0F8;color:#4A4A8A}
-.q-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;line-height:1.4;color:var(--text);margin-bottom:.85rem}
+.q-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.05rem;line-height:1.4;color:var(--text);margin-bottom:.85rem}
 .answer-box{background:var(--greenl);border:1.5px solid #90D4A8;border-radius:10px;padding:.7rem 1rem;font-size:14px;color:var(--green);font-weight:700;display:none;margin-bottom:.85rem}
 .answer-box.show{display:block}
 .opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.85rem}
@@ -57,6 +61,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .btn-amber{background:var(--amber);color:#fff}
 .btn-green{background:var(--green);color:#fff}
 .btn-coral{background:var(--coral);color:#fff;grid-column:1/-1}
+.btn-teal{background:#0F6E56;color:#fff;grid-column:1/-1}
 .btn-red{background:#C0392B;color:#fff;grid-column:1/-1;margin-top:.5rem}
 .qdots{display:flex;flex-wrap:wrap;gap:.5rem}
 .qdot{width:38px;height:38px;border-radius:50%;border:2px solid var(--bd);background:var(--bg);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
@@ -75,6 +80,12 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .lb-empty{text-align:center;font-size:13px;color:var(--muted);padding:1.25rem 0}
 .rxn-item{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--bd);font-size:13px}
 .rxn-item:last-child{border-bottom:none}
+.round-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem}
+.rs-card{background:var(--bg);border-radius:10px;padding:.6rem .75rem;text-align:center;border:1.5px solid var(--bd)}
+.rs-card.active{border-color:var(--purple);background:var(--purplel)}
+.rs-card.done{border-color:var(--green);background:var(--greenl)}
+.rs-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--purple)}
+.rs-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 </style>
 </head>
 <body>
@@ -91,7 +102,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
   <div class="card status-bar">
     <div>
       <div class="slabel" style="margin-bottom:.2rem">Status</div>
-      <div class="status-val" id="status-val">Ready to start</div>
+      <div class="status-val" id="status-val">Ready to start Round 1</div>
     </div>
     <div class="count-pills">
       <div class="pill pill-wait" id="count-waiting">0 waiting</div>
@@ -100,13 +111,28 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     </div>
   </div>
 
+  <!-- Round tabs -->
+  <div class="card">
+    <div class="slabel">Rounds</div>
+    <div class="round-tabs">
+      <div class="rtab active" id="rtab-0">Round 1</div>
+      <div class="rtab" id="rtab-1">Round 2</div>
+      <div class="rtab" id="rtab-2">Round 3</div>
+    </div>
+    <div class="round-summary">
+      <div class="rs-card active" id="rs-0"><div class="rs-num" id="rs-q0">10</div><div class="rs-lbl">R1 Questions</div></div>
+      <div class="rs-card" id="rs-1"><div class="rs-num" id="rs-q1">10</div><div class="rs-lbl">R2 Questions</div></div>
+      <div class="rs-card" id="rs-2"><div class="rs-num" id="rs-q2">10</div><div class="rs-lbl">R3 Questions</div></div>
+    </div>
+  </div>
+
   <!-- Current question preview -->
   <div class="card">
     <div class="q-header">
-      <div class="q-title" id="q-title">No question selected</div>
+      <div class="q-title" id="q-title">Hit Launch to start Round 1</div>
       <span class="cpill" id="q-cat-pill"></span>
     </div>
-    <div class="q-text" id="q-text-host">Select a question below and hit Launch</div>
+    <div class="q-text" id="q-text-host">10 questions will be picked from the pool for each round.</div>
     <div class="answer-box" id="answer-box"></div>
     <div class="opts-grid" id="opts-preview"></div>
     <div class="timer-block" id="timer-block">
@@ -119,16 +145,17 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
   <div class="card">
     <div class="slabel" style="margin-bottom:.85rem">Controls</div>
     <div class="controls">
-      <button class="btn btn-purple" id="btn-launch">&#9654; Launch Q<span id="launch-label">1</span></button>
+      <button class="btn btn-purple" id="btn-launch">&#9654; Launch Round <span id="launch-round">1</span> &mdash; Q<span id="launch-label">1</span></button>
       <button class="btn btn-amber" id="btn-pause" disabled>&#9646;&#9646; Pause</button>
       <button class="btn btn-green" id="btn-reveal" disabled>&#128065; Reveal &amp; Stop</button>
-      <button class="btn btn-coral" id="btn-end" disabled>&#127937; End Game</button>
+      <button class="btn btn-coral" id="btn-end-round" disabled>&#9654;&#9654; End Round &amp; Break</button>
+      <button class="btn btn-teal" id="btn-end-game" disabled>&#127937; End Game &amp; Show Results</button>
     </div>
   </div>
 
   <!-- Q dots -->
   <div class="card">
-    <div class="slabel">Questions</div>
+    <div class="slabel" id="dots-label">Round 1 — Questions</div>
     <div class="qdots" id="qdots"></div>
   </div>
 
@@ -209,44 +236,46 @@ var QUESTIONS = [
 
 var CC = {h:'ch',f:'cf',m:'cm',g:'cg',s:'cs',x:'cx'};
 var LT = ['A','B','C','D'];
-var MD = ['1st','2nd','3rd'];
 var TSECS = 10;
+var QperRound = 10;
+var TOTAL_ROUNDS = 3;
 
-var selQ = 0, curQ = -1, timerInt = null, timeLeft = 0, qLive = false;
+// State
+var curRound = 0; // 0-indexed
+var selQ = 0;     // within current round
+var timerInt = null, timeLeft = 0, qLive = false;
 var doneQs = [];
-var qSaved = false;
-var GAME_QUESTIONS = []; // shuffled order used for this game
+var roundQuestions = [[], [], []]; // shuffled questions per round
+var roundsSaved = [false, false, false];
+var roundDone = [false, false, false];
 
 function shuffle(a) {
   for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
   return a;
 }
 
-// Build question dots
-function buildDots10() {
-  var c = document.getElementById('qdots');
-  c.innerHTML = '';
-  for(var i=0;i<10;i++){
-    (function(idx){
-      var d = document.createElement('div');
-      d.className = 'qdot' + (idx===0?' active':'');
-      d.id = 'dot-'+idx;
-      d.textContent = idx+1;
-      d.onclick = function(){ if(GAME_QUESTIONS.length>0) selectQ(idx); };
-      c.appendChild(d);
-    })(i);
-  }
+// Shuffle all 30 into 3 rounds of 10 at the start
+function initRounds() {
+  var pool = shuffle(QUESTIONS.slice());
+  roundQuestions[0] = pool.slice(0, 10);
+  roundQuestions[1] = pool.slice(10, 20);
+  roundQuestions[2] = pool.slice(20, 30);
+  // Save all rounds to Firebase upfront so players can access them
+  db.ref('game/rounds').set(roundQuestions);
 }
+initRounds();
+
 function buildDots() {
-  var count = GAME_QUESTIONS.length > 0 ? GAME_QUESTIONS.length : 10;
   var c = document.getElementById('qdots');
   c.innerHTML = '';
+  var qs = roundQuestions[curRound];
+  var count = qs.length > 0 ? qs.length : QperRound;
+  document.getElementById('dots-label').textContent = 'Round '+(curRound+1)+' — Questions';
   for(var i=0;i<count;i++){
     (function(idx){
       var d = document.createElement('div');
       d.className = 'qdot' + (idx===0?' active':'');
-      d.id = 'dot-'+idx;
-      d.textContent = idx+1;
+      d.id = 'dot-'+idx; d.textContent = idx+1;
       d.onclick = function(){ selectQ(idx); };
       c.appendChild(d);
     })(i);
@@ -254,29 +283,28 @@ function buildDots() {
 }
 buildDots();
 
-function selectQ(i) {
-  if(doneQs.indexOf(i)>=0 || qLive) return;
-  selQ = i;
-  for(var j=0;j<GAME_QUESTIONS.length;j++){
-    var d=document.getElementById('dot-'+j);
-    if(d && doneQs.indexOf(j)<0) d.className='qdot';
+function updateRoundTabs() {
+  for(var i=0;i<TOTAL_ROUNDS;i++){
+    var t = document.getElementById('rtab-'+i);
+    var rs = document.getElementById('rs-'+i);
+    if(roundDone[i]){ t.className='rtab done'; rs.className='rs-card done'; }
+    else if(i===curRound){ t.className='rtab active'; rs.className='rs-card active'; }
+    else { t.className='rtab'; rs.className='rs-card'; }
   }
-  document.getElementById('dot-'+i).className='qdot active';
-  previewQ(i);
-  document.getElementById('launch-label').textContent = i+1;
 }
 
 function previewQ(i) {
-  if(GAME_QUESTIONS.length === 0) {
-    document.getElementById('q-title').textContent = 'Ready to start';
-    document.getElementById('q-text-host').textContent = 'Hit Launch Q1 to shuffle and start the game. Questions will be picked from the 30-question pool.';
+  var qs = roundQuestions[curRound];
+  if(!qs || qs.length === 0) {
+    document.getElementById('q-title').textContent = 'Ready — hit Launch to start';
+    document.getElementById('q-text-host').textContent = 'Round '+(curRound+1)+' questions will appear here.';
     document.getElementById('q-cat-pill').textContent = '';
     document.getElementById('opts-preview').innerHTML = '';
     return;
   }
-  var arr = GAME_QUESTIONS;
-  var q = arr[i];
-  document.getElementById('q-title').textContent = 'Q'+(i+1)+' of '+arr.length;
+  var q = qs[i];
+  if(!q) return;
+  document.getElementById('q-title').textContent = 'Round '+(curRound+1)+' — Q'+(i+1)+' of '+qs.length;
   var cat = document.getElementById('q-cat-pill');
   cat.textContent = q.lb; cat.className = 'cpill '+CC[q.cat];
   document.getElementById('q-text-host').textContent = q.q;
@@ -292,34 +320,26 @@ function previewQ(i) {
 }
 previewQ(0);
 
-// Wire buttons
-document.getElementById('btn-launch').onclick = function() { launchQ(); };
-document.getElementById('btn-pause').onclick  = function() { pauseGame(); };
-document.getElementById('btn-reveal').onclick = function() { revealAnswer(); };
-document.getElementById('btn-end').onclick    = function() { endGame(); };
-document.getElementById('btn-reset').onclick  = function() { resetAll(); };
+// Buttons
+document.getElementById('btn-launch').onclick   = function(){ launchQ(); };
+document.getElementById('btn-pause').onclick    = function(){ pauseGame(); };
+document.getElementById('btn-reveal').onclick   = function(){ revealAnswer(); };
+document.getElementById('btn-end-round').onclick = function(){ endRound(); };
+document.getElementById('btn-end-game').onclick  = function(){ endGame(); };
+document.getElementById('btn-reset').onclick    = function(){ resetAll(); };
 
 function launchQ() {
   if(qLive) return;
   var idx = selQ;
-  // Save shuffled questions to Firebase on first launch
-  if(!qSaved) {
-    qSaved = true;
-    GAME_QUESTIONS = shuffle(QUESTIONS.slice()).slice(0,10);
-    buildDots();
-    previewQ(0);
-    document.getElementById('launch-label').textContent='1';
-    db.ref('game/questions').set(GAME_QUESTIONS);
-  }
+  var qs = roundQuestions[curRound];
   qLive = true;
   document.getElementById('btn-launch').disabled = true;
   document.getElementById('btn-pause').disabled = false;
   document.getElementById('btn-reveal').disabled = false;
-  document.getElementById('btn-end').disabled = false;
   document.getElementById('answer-box').className = 'answer-box';
   document.getElementById('timer-block').style.display = 'block';
-  document.getElementById('status-val').textContent = 'Q'+(idx+1)+' is live — '+TSECS+'s on the clock';
-  db.ref('host/command').set({action:'question',index:idx,timestamp:Date.now()});
+  document.getElementById('status-val').textContent = 'Round '+(curRound+1)+' Q'+(idx+1)+' live — '+TSECS+'s on the clock';
+  db.ref('host/command').set({action:'question', round:curRound, index:idx, timestamp:Date.now()});
   startTimer(idx);
 }
 
@@ -330,11 +350,8 @@ function startTimer(idx) {
   timerInt = setInterval(function(){
     timeLeft--;
     renderTimer(timeLeft);
-    document.getElementById('status-val').textContent = 'Q'+(idx+1)+' live — '+timeLeft+'s remaining';
-    if(timeLeft<=0){
-      clearInterval(timerInt); timerInt=null;
-      finishQ(idx);
-    }
+    document.getElementById('status-val').textContent = 'Round '+(curRound+1)+' Q'+(idx+1)+' — '+timeLeft+'s left';
+    if(timeLeft<=0){ clearInterval(timerInt); timerInt=null; finishQ(idx); }
   }, 1000);
 }
 
@@ -350,37 +367,45 @@ function finishQ(idx) {
   qLive = false;
   doneQs.push(idx);
   var d = document.getElementById('dot-'+idx);
-  if(d){ d.className='qdot done'; }
+  if(d) d.className = 'qdot done';
   document.getElementById('btn-pause').disabled = true;
   document.getElementById('btn-reveal').disabled = true;
-  document.getElementById('status-val').textContent = 'Q'+(idx+1)+' done — paused, ready for next';
-  var next = idx+1;
-  if(next < GAME_QUESTIONS.length){
+  var qs = roundQuestions[curRound];
+  var next = idx + 1;
+  if(next < qs.length) {
     selQ = next;
     var nd = document.getElementById('dot-'+next);
-    if(nd) nd.className='qdot active';
+    if(nd) nd.className = 'qdot active';
     document.getElementById('launch-label').textContent = next+1;
-    previewQ(next);
+    document.getElementById('launch-round').textContent = curRound+1;
     document.getElementById('btn-launch').disabled = false;
+    document.getElementById('btn-end-round').disabled = false;
+    previewQ(next);
+    document.getElementById('status-val').textContent = 'Round '+(curRound+1)+' Q'+idx+' done — launch next or end round';
   } else {
+    // All questions in round done
     document.getElementById('btn-launch').disabled = true;
-    document.getElementById('status-val').textContent = 'All questions done — end game when ready';
+    document.getElementById('btn-end-round').disabled = false;
+    if(curRound === TOTAL_ROUNDS-1) {
+      document.getElementById('btn-end-game').disabled = false;
+    }
+    document.getElementById('status-val').textContent = 'Round '+(curRound+1)+' complete — click End Round to break';
   }
 }
 
 function revealAnswer() {
   if(timerInt){ clearInterval(timerInt); timerInt=null; }
   var idx = selQ;
-  var arr = GAME_QUESTIONS.length > 0 ? GAME_QUESTIONS : QUESTIONS;
-  var q = arr[idx];
+  var q = roundQuestions[curRound][idx];
+  if(!q) return;
   var box = document.getElementById('answer-box');
   box.textContent = 'Answer: '+LT[q.a]+' — '+q.o[q.a];
   box.className = 'answer-box show';
   renderTimer(0);
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('btn-pause').disabled = true;
-  document.getElementById('status-val').textContent = 'Q'+(idx+1)+' — answer revealed';
-  db.ref('host/command').set({action:'reveal',index:idx,timestamp:Date.now()});
+  document.getElementById('status-val').textContent = 'Round '+(curRound+1)+' Q'+(idx+1)+' — answer revealed';
+  db.ref('host/command').set({action:'reveal', round:curRound, index:idx, timestamp:Date.now()});
   finishQ(idx);
 }
 
@@ -389,50 +414,74 @@ function pauseGame() {
   qLive = false;
   document.getElementById('btn-pause').disabled = true;
   document.getElementById('btn-launch').disabled = false;
-  document.getElementById('status-val').textContent = 'Paused — tables are waiting for you';
-  db.ref('host/command').set({action:'pause',timestamp:Date.now()});
+  document.getElementById('status-val').textContent = 'Paused — tables waiting';
+  db.ref('host/command').set({action:'pause', round:curRound, timestamp:Date.now()});
+}
+
+function endRound() {
+  if(timerInt){ clearInterval(timerInt); timerInt=null; }
+  qLive = false;
+  roundDone[curRound] = true;
+  var finishedRound = curRound;
+  document.getElementById('btn-end-round').disabled = true;
+  document.getElementById('btn-launch').disabled = true;
+  document.getElementById('status-val').textContent = 'Round '+(finishedRound+1)+' complete — break time!';
+  db.ref('host/command').set({action:'round_end', round:finishedRound, timestamp:Date.now()});
+  updateRoundTabs();
+  // Advance to next round if available
+  if(curRound < TOTAL_ROUNDS-1) {
+    setTimeout(function(){
+      curRound++;
+      selQ = 0;
+      doneQs = [];
+      buildDots();
+      previewQ(0);
+      updateRoundTabs();
+      document.getElementById('launch-round').textContent = curRound+1;
+      document.getElementById('launch-label').textContent = '1';
+      document.getElementById('btn-launch').disabled = false;
+      document.getElementById('status-val').textContent = 'Break — ready to start Round '+(curRound+1)+' when you are';
+      document.getElementById('timer-block').style.display = 'none';
+      document.getElementById('answer-box').className = 'answer-box';
+    }, 1500);
+  } else {
+    document.getElementById('btn-end-game').disabled = false;
+    document.getElementById('status-val').textContent = 'All rounds done — end game when ready!';
+  }
 }
 
 function endGame() {
-  if(!confirm('End the game and show results to all tables?')) return;
+  if(!confirm('End the game and show final results to all tables?')) return;
   if(timerInt){ clearInterval(timerInt); timerInt=null; }
-  document.getElementById('btn-end').disabled = true;
+  document.getElementById('btn-end-game').disabled = true;
   document.getElementById('btn-launch').disabled = true;
-  document.getElementById('btn-pause').disabled = true;
-  document.getElementById('btn-reveal').disabled = true;
-  document.getElementById('status-val').textContent = 'Game ended — results showing on tablets';
-  db.ref('host/command').set({action:'end',timestamp:Date.now()});
-  // Clear after 5s so joining players dont see stale end command
+  document.getElementById('status-val').textContent = 'Game over — final results showing on tablets';
+  db.ref('host/command').set({action:'end', timestamp:Date.now()});
   setTimeout(function(){ db.ref('host/command').remove(); }, 5000);
 }
 
 function resetAll() {
   if(!confirm('Reset everything? This clears all scores, teams, and game data.')) return;
   if(timerInt){ clearInterval(timerInt); timerInt=null; }
-  qSaved = false; selQ=0; curQ=-1; qLive=false; doneQs=[]; GAME_QUESTIONS=[];
-  db.ref('scores').remove();
-  db.ref('race').remove();
-  db.ref('reactions').remove();
-  db.ref('host/command').remove();
-  db.ref('teams').remove();
-  db.ref('game').remove();
-  buildDots();
-  previewQ(0);
+  curRound=0; selQ=0; qLive=false; doneQs=[]; roundDone=[false,false,false]; roundsSaved=[false,false,false];
+  db.ref('scores').remove(); db.ref('race').remove(); db.ref('reactions').remove();
+  db.ref('host/command').remove(); db.ref('teams').remove(); db.ref('game').remove();
+  initRounds();
+  buildDots(); previewQ(0); updateRoundTabs();
+  document.getElementById('launch-round').textContent='1';
   document.getElementById('launch-label').textContent='1';
   document.getElementById('btn-launch').disabled=false;
   document.getElementById('btn-pause').disabled=true;
   document.getElementById('btn-reveal').disabled=true;
-  document.getElementById('btn-end').disabled=true;
+  document.getElementById('btn-end-round').disabled=true;
+  document.getElementById('btn-end-game').disabled=true;
   document.getElementById('timer-block').style.display='none';
   document.getElementById('answer-box').className='answer-box';
-  document.getElementById('status-val').textContent='Reset complete — ready to start';
-  document.getElementById('count-waiting').textContent='0 waiting';
-  document.getElementById('count-playing').textContent='0 playing';
-  document.getElementById('count-finished').textContent='0 finished';
+  document.getElementById('status-val').textContent='Reset complete — ready to start Round 1';
   alert('All clear! Ready for a fresh game.');
 }
 
-// Teams listener — live waiting/playing/finished counts
+// Teams listener
 db.ref('teams').on('value', function(snap){
   var data = snap.val();
   if(!data){
@@ -442,12 +491,9 @@ db.ref('teams').on('value', function(snap){
     return;
   }
   var teams = Object.values(data);
-  var waiting  = teams.filter(function(t){return t.status==='waiting';}).length;
-  var playing  = teams.filter(function(t){return t.status==='playing';}).length;
-  var finished = teams.filter(function(t){return t.status==='finished';}).length;
-  document.getElementById('count-waiting').textContent  = waiting+' waiting';
-  document.getElementById('count-playing').textContent  = playing+' playing';
-  document.getElementById('count-finished').textContent = finished+' finished';
+  document.getElementById('count-waiting').textContent  = teams.filter(function(t){return t.status==='waiting';}).length+' waiting';
+  document.getElementById('count-playing').textContent  = teams.filter(function(t){return t.status==='playing';}).length+' playing';
+  document.getElementById('count-finished').textContent = teams.filter(function(t){return t.status==='finished';}).length+' finished';
 });
 
 // Reactions
@@ -457,21 +503,28 @@ db.ref('reactions').orderByChild('timestamp').limitToLast(6).on('value', functio
   if(!data){ el.innerHTML='<div class="lb-empty">No reactions yet</div>'; return; }
   var items = Object.values(data).sort(function(a,b){return b.timestamp-a.timestamp;});
   el.innerHTML = items.map(function(r){
-    return '<div class="rxn-item"><span style="font-size:1.2rem">'+r.emoji+'</span><span style="font-weight:500">'+r.team+'</span><span style="color:var(--muted);font-size:11px;margin-left:auto">Q'+(r.q+1)+'</span></div>';
+    return '<div class="rxn-item"><span style="font-size:1.2rem">'+r.emoji+'</span><span style="font-weight:500">'+r.team+'</span><span style="color:var(--muted);font-size:11px;margin-left:auto">R'+(r.round+1)+' Q'+(r.q+1)+'</span></div>';
   }).join('');
 });
 
-// Leaderboard
+// Leaderboard — show total across all rounds
 db.ref('scores').on('value', function(snap){
   var data = snap.val();
   var el = document.getElementById('lb-list');
   if(!data){ el.innerHTML='<div class="lb-empty">No scores yet</div>'; return; }
-  var best = {};
-  Object.values(data).forEach(function(e){ if(!best[e.team]||e.score>best[e.team].score) best[e.team]=e; });
-  var sorted = Object.values(best).sort(function(a,b){return b.score-a.score;});
+  // Aggregate by team across rounds
+  var totals = {};
+  Object.values(data).forEach(function(e){
+    if(!totals[e.team]) totals[e.team] = {team:e.team, base:0, bonus:0, rounds:{}};
+    totals[e.team].base  += (e.base  || e.score || 0);
+    totals[e.team].bonus += (e.bonus || 0);
+    totals[e.team].rounds['r'+(e.round+1)] = (e.base||e.score||0) + '+'+(e.bonus||0);
+  });
+  var sorted = Object.values(totals).sort(function(a,b){return (b.base+b.bonus)-(a.base+a.bonus);});
   el.innerHTML = sorted.slice(0,8).map(function(e,i){
-    var emails = Array.isArray(e.emails) ? e.emails.join(', ') : (e.email||'');
-    return '<div class="lb-row"><div class="lb-left"><span class="lb-medal">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1))+'</span><div><div class="lb-team">'+e.team+'</div><div class="lb-email">'+emails+'</div></div></div><span class="lb-score">'+e.score+' / '+e.total+'</span></div>';
+    var total = e.base + e.bonus;
+    var roundStr = [1,2,3].map(function(r){ return 'R'+r+':'+(e.rounds['r'+r]||'—'); }).join(' · ');
+    return '<div class="lb-row"><div class="lb-left"><span class="lb-medal">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1))+'</span><div><div class="lb-team">'+e.team+'</div><div class="lb-email">'+roundStr+'</div></div></div><span class="lb-score">'+total+' pts</span></div>';
   }).join('');
 });
 </script>
