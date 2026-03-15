@@ -50,9 +50,9 @@ body{display:flex;flex-direction:column}
 .lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;display:block;font-family:'Nunito',sans-serif}
 .inp{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;display:block;margin-bottom:.85rem}
 .inp:focus{border-color:var(--purple)}
-.player-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem}
+.player-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem}
 .pnum{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:var(--purple);min-width:20px;text-align:center}
-.pinp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color .2s}
+.pinp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color .2s;min-height:48px}
 .pinp:focus{border-color:var(--purple)}
 .cr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
 .cbtn{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);background:var(--bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-family:'Nunito',sans-serif;font-weight:800}
@@ -404,7 +404,7 @@ function renderPF(){
   const c=document.getElementById('pfields');c.innerHTML='';
   for(let i=0;i<pcnt;i++){
     const d=document.createElement('div');d.className='player-row';
-    d.innerHTML=`<span class="pnum">${i+1}</span><input class="pinp" type="email" placeholder="player${i+1}@email.com" id="em${i}" maxlength="80" autocomplete="off">`;
+    d.innerHTML=`<span class="pnum">${i+1}</span><input class="pinp" type="email" inputmode="email" placeholder="player${i+1}@email.com" id="em${i}" maxlength="80">`;
     c.appendChild(d);
   }
 }
