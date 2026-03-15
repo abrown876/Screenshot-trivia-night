@@ -5,267 +5,274 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Join — Jamaica Trivia Night</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-
-/* ── TABLET & MOBILE OPTIMISATION (FYD-868 800x1280) ───────────────────── */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-input, select, textarea { font-size: 16px !important; } /* prevent zoom on focus */
-button { touch-action: manipulation; cursor: pointer; }
-body { overflow-x: hidden; max-width: 100vw; }
-
-/* Tablet portrait (800px) — comfortable sizing */
-@media (max-width: 860px) {
-  .si { padding: 1rem !important; }
-  .main, .wrap { padding: 1rem !important; }
-  .fcard { padding: 1rem !important; }
-  .opts { gap: .45rem !important; }
-  .opt { padding: .75rem .9rem !important; font-size: 15px !important; }
-  .qcard { padding: 1rem !important; }
-  .btn { min-height: 52px; font-size: 16px !important; }
-  .wcard { padding: 1.25rem !important; }
-  .hero h1 { font-size: 1.5rem !important; }
-  .hero { padding: 1.25rem !important; }
-  .qtxt { font-size: 1.05rem !important; }
-  .tnum { font-size: 1.3rem !important; }
-  .rscore { font-size: 3rem !important; }
-}
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --purple:#5B5BD6;--purpled:#3D3D9E;--purplel:#EEEEFF;
-  --coral:#E8547A;--corall:#FDE8EE;
+  --coral:#E8547A;--corall:#FDE8EE;--corald:#B03058;
   --gold:#F5A623;--goldl:#FEF3DC;
-  --bg:#F4F4FC;--card:#fff;--text:#1A1A3E;--muted:#7A7AAA;--bd:#E0E0F0;
-  --ok:#2D7A4F;--no:#C0392B;--okbg:#EAF7F0;--nobg:#FDECEA;
+  --bg:#F4F4FC;--card:#FFF;--text:#1A1A3E;--muted:#7A7AAA;--bd:#E0E0F0;
+  --ok:#2D7A4F;--no:#C0392B;
+  --r:16px;--sh:0 2px 12px rgba(91,91,214,.08)
 }
-html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+html,body{min-height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
 body{display:flex;flex-direction:column}
+input,select,textarea{font-size:16px;-webkit-appearance:none;-webkit-user-select:text;user-select:text}
+button{touch-action:manipulation;cursor:pointer}
 
-/* SPONSOR BAR */
-.spbar{background:var(--coral);padding:6px 1.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-shrink:0}
-.splbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
-.spnm{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:#fff}
-.spdv{width:1px;height:12px;background:rgba(255,255,255,.35)}
+/* HEADER */
+.hdr{background:var(--purple);padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:8px}
+.logon{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#fff;letter-spacing:.04em}
+.logos{font-family:'Nunito',sans-serif;font-weight:700;font-size:7px;color:rgba(255,255,255,.7);letter-spacing:.12em;text-transform:uppercase}
+.hdr-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#fff;text-align:right}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.7);text-align:right}
 
-/* MAIN LAYOUT — two columns on tablet */
-.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:1rem;gap:1rem;max-width:860px;margin:0 auto;width:100%}
+/* MAIN LAYOUT */
+.wrap{flex:1;display:flex;flex-direction:column;padding:1.1rem;gap:1rem;max-width:860px;margin:0 auto;width:100%}
+
+/* TWO COLUMNS on wide screens */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+@media(max-width:600px){.cols{grid-template-columns:1fr}}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,var(--purple),var(--purpled));border-radius:16px;padding:1.1rem 1rem;text-align:center;width:100%}
-.hero-flag{font-size:2.5rem;margin-bottom:.5rem}
-.hero h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:#fff;line-height:1.15;margin-bottom:.25rem}
-.hero p{font-size:13px;color:rgba(255,255,255,.75)}
-.hero-sp{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 14px;display:inline-block;margin-top:.6rem;font-size:12px;color:rgba(255,255,255,.85);font-family:'Nunito',sans-serif;font-weight:700}
+.hero{background:linear-gradient(135deg,var(--purple),var(--purpled));border-radius:var(--r);padding:1.1rem 1.25rem;text-align:center;color:#fff}
+.hero h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;line-height:1.2;margin-bottom:.25rem}
+.hero p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.5}
 
-/* TWO COLUMN */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;width:100%}
-@media(max-width:800px){.cols{grid-template-columns:1fr}}
+/* CARD */
+.card{background:var(--card);border-radius:var(--r);padding:1.1rem;box-shadow:var(--sh)}
+.card-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text);margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
 
-/* QR COLUMN */
-.qr-card{background:var(--card);border-radius:20px;padding:1.5rem;box-shadow:0 4px 20px rgba(91,91,214,.08);text-align:center;display:flex;flex-direction:column;align-items:center;gap:.85rem}
-.qr-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
-.qr-sub{font-size:12px;color:var(--muted);line-height:1.5}
-.qr-frame{background:#fff;border:3px solid var(--purplel);border-radius:16px;padding:12px;box-shadow:0 2px 12px rgba(91,91,214,.12)}
-.qr-frame img{display:block;border-radius:8px}
-.qr-url{font-size:11px;color:var(--muted);font-family:monospace;background:var(--bg);padding:5px 10px;border-radius:8px;word-break:break-all;text-align:center}
-.qr-arrow{font-size:.9rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
+/* QR */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:.5rem 0}
+.qr-box{background:#fff;border-radius:12px;padding:12px;border:2px solid var(--bd);display:inline-block}
+.qr-url{font-size:11px;color:var(--muted);text-align:center;word-break:break-all;max-width:220px}
+.qr-hint{font-size:12px;color:var(--purple);font-weight:700;text-align:center}
 
-/* REGISTER COLUMN */
-.reg-card{background:var(--card);border-radius:20px;padding:1.5rem;box-shadow:0 4px 20px rgba(91,91,214,.08)}
-.reg-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text);margin-bottom:1rem}
-.flbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;display:block;font-family:'Nunito',sans-serif}
-.alertbox{display:none;background:var(--nobg);color:var(--no);border:1px solid #f5c0bb;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:.75rem}
-
-/* TEAMS JOINED */
-.teams-card{background:var(--card);border-radius:20px;padding:1.25rem;box-shadow:0 4px 20px rgba(91,91,214,.08);width:100%}
-.teams-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);display:inline-block;margin-right:.35rem;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.teams-grid{display:flex;flex-wrap:wrap;gap:.45rem}
-.tpill{background:var(--purplel);color:var(--purpled);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;padding:.3rem .85rem;border-radius:20px}
-.teams-empty{font-size:12px;color:var(--muted)}
-
-/* FORM ELEMENTS */
-.btn{width:100%;padding:15px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:block;margin-top:.75rem;min-height:52px}
+/* FORM */
+.flbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem;display:block;font-family:'Nunito',sans-serif}
+.inp{width:100%;padding:13px 14px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;font-size:16px;color:var(--text);outline:none;display:block;margin-bottom:.85rem;font-family:'DM Sans',sans-serif}
+.inp:focus{border-color:var(--purple)}
+.inp:last-child{margin-bottom:0}
+.cr{display:flex;align-items:center;gap:12px;margin-bottom:.85rem}
+.cbtn{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--bd);background:var(--bg);font-size:22px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cval{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--purple);min-width:24px;text-align:center}
+.clbl{font-size:13px;color:var(--muted)}
+.prow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pnum{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:var(--purple);min-width:20px;text-align:center;flex-shrink:0}
+.pinp{flex:1;padding:12px 13px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;font-size:15px;color:var(--text);outline:none;min-width:0;font-family:'DM Sans',sans-serif}
+.pinp:focus{border-color:var(--purple)}
+.btn{width:100%;padding:15px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;display:block;min-height:52px;margin-top:.75rem}
 .bpp{background:var(--purple);color:#fff}
-.bpp:hover{background:var(--purpled)}
-.success-box{display:none;background:var(--okbg);color:var(--ok);border:1px solid #90D4A8;border-radius:12px;padding:1rem;text-align:center;margin-top:.75rem}
-.success-box h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;margin-bottom:.3rem}
-.success-box p{font-size:13px}
+.alertbox{display:none;background:#FDECEA;color:var(--no);border:1px solid #f5c0bb;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:.75rem}
+.successbox{display:none;background:#EAF7F0;color:var(--ok);border:1px solid #b2dfc8;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:.75rem;font-weight:600;text-align:center}
+
+/* TEAM LIST */
+.team-list{display:flex;flex-direction:column;gap:.45rem;max-height:280px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.trow{background:var(--bg);border-radius:10px;padding:.65rem .85rem;display:flex;align-items:center;gap:.6rem;border:1.5px solid var(--bd)}
+.trow.playing{border-color:var(--purple);background:var(--purplel)}
+.trow.finished{border-color:var(--ok);background:#EAF7F0}
+.trow-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'Nunito',sans-serif;flex-shrink:0}
+.b-wait{background:var(--goldl);color:#8A5500}
+.b-play{background:var(--purplel);color:var(--purple)}
+.b-done{background:#EAF7F0;color:var(--ok)}
+.tcount{font-size:11px;color:var(--muted);margin-bottom:.5rem}
+.empty-teams{font-size:13px;color:var(--muted);text-align:center;padding:1rem}
+
+/* SPONSOR */
+.spw{background:var(--goldl);border-radius:var(--r);padding:.85rem 1.1rem;text-align:center;border:1.5px solid #F5D09A}
+.spwl{font-size:10px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:'Nunito',sans-serif;margin-bottom:.25rem}
+.spwn{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#7A5000}
+.spwt{font-size:12px;color:#9A6520;margin-top:.15rem}
+
+/* FOOTER */
+.footer{padding:.75rem 1.25rem;text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--bd);flex-shrink:0}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-<div class="spbar"><span class="splbl">Presented by</span><span class="spdv"></span><span class="spnm" id="spnm">YOUR SPONSOR</span></div>
+<div class="hdr">
+  <div class="logo">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="13" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-dasharray="4 2"/>
+      <circle cx="16" cy="16" r="13" stroke="#E8547A" stroke-width="2.5" stroke-dasharray="6 76" stroke-dashoffset="-64"/>
+      <text x="16" y="21" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="14" fill="#fff">S</text>
+    </svg>
+    <div><div class="logon">SCREENSHOT</div><div class="logos">Interactive</div></div>
+  </div>
+  <div>
+    <div class="hdr-title">&#x1F1EF;&#x1F1F2; Jamaica Trivia Night</div>
+    <div class="hdr-sub" id="hdr-sub">Scan or register below to play</div>
+  </div>
+</div>
 
 <div class="wrap">
-
   <div class="hero">
-    <div class="hero-flag">&#x1F1EF;&#x1F1F2;</div>
-    <h1>Jamaica Trivia Night</h1>
-    <p>3 rounds &middot; 30 questions &middot; Race mode bonus points</p>
-    <div class="hero-sp">Brought to you by <b id="hspnm">YOUR SPONSOR</b></div>
+    <h1>&#x1F3C6; Welcome to Trivia Night!</h1>
+    <p>Scan the QR code with your phone, or use the tablet to register your table.</p>
   </div>
 
   <div class="cols">
-
-    <!-- QR CODE -->
-    <div class="qr-card">
-      <div class="qr-title">&#x1F4F2; Scan with your phone</div>
-      <div class="qr-sub">Open on your own device — one player per phone, or share a tablet with your table</div>
-      <div class="qr-frame">
-        <div id="qr-container" style="line-height:0;border-radius:8px;overflow:hidden"></div>
+    <!-- LEFT: QR code -->
+    <div class="card">
+      <div class="card-title">&#x1F4F1; Scan with your phone</div>
+      <div class="qr-wrap">
+        <div class="qr-box" id="qr-container"></div>
+        <div class="qr-hint">Point your camera here</div>
+        <div class="qr-url" id="qr-url"></div>
       </div>
-      <div class="qr-url" id="qr-url"></div>
-      <div class="qr-arrow">&#x2934; or register on this tablet below</div>
     </div>
 
-    <!-- REGISTER ON THIS DEVICE -->
-    <div class="reg-card">
-      <div class="reg-title">&#x1F3AE; Register at this table</div>
+    <!-- RIGHT: Registration form -->
+    <div class="card">
+      <div class="card-title">&#x1F4DD; Register your table</div>
       <div class="alertbox" id="alertbox"></div>
+      <div class="successbox" id="successbox"></div>
 
       <label class="flbl">Table name</label>
-      <input id="f-tname" type="text" placeholder="e.g. Table 4 or The Legends" maxlength="30"
-        style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#fff;font-size:16px;color:#1A1A3E;outline:none;display:block;margin-bottom:.85rem;font-family:'DM Sans',sans-serif;box-sizing:border-box">
+      <input class="inp" id="f-tname" type="text" placeholder="e.g. Table 4 or The Legends" maxlength="30" autocomplete="off">
 
       <label class="flbl">Number of players (1&ndash;4)</label>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:.85rem">
-        <button id="btn-minus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8722;</button>
-        <span id="cval" style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#5B5BD6;min-width:24px;text-align:center">1</span>
-        <span id="clbl" style="font-size:13px;color:#7A7AAA">player</span>
-        <button id="btn-plus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#43;</button>
+      <div class="cr">
+        <button class="cbtn" id="btn-minus">&#8722;</button>
+        <span class="cval" id="cval">1</span>
+        <span class="clbl" id="clbl">player</span>
+        <button class="cbtn" id="btn-plus">&#43;</button>
       </div>
 
       <label class="flbl">Player emails</label>
       <div id="pfields"></div>
 
-      <button class="btn bpp" id="btn-join">Register this table &#8594;</button>
-
-      <div class="success-box" id="success-box">
-        <h3>&#x2705; You're registered!</h3>
-        <p>Head to your table and open the game on your device — the host will launch Round 1 shortly.</p>
-      </div>
+      <button class="btn bpp" id="btn-reg">Register table &#8594;</button>
     </div>
-
   </div>
 
-  <!-- TEAMS JOINED -->
-  <div class="teams-card">
-    <div class="teams-title">
-      <span><span class="live-dot"></span>Teams registered</span>
-      <span id="team-count" style="font-size:12px;color:var(--muted);font-weight:400">0 teams</span>
+  <!-- Teams registered -->
+  <div class="card">
+    <div class="card-title">&#x1F465; Teams registered <span id="team-count" style="font-size:12px;color:var(--muted);font-weight:500"></span></div>
+    <div class="team-list" id="team-list">
+      <div class="empty-teams">No teams yet — be the first! &#x1F3C6;</div>
     </div>
-    <div id="teams-grid" class="teams-grid"><span class="teams-empty">No teams yet — be the first!</span></div>
   </div>
 
+  <div class="spw">
+    <div class="spwl">Tonight&#39;s trivia is brought to you by</div>
+    <div class="spwn" id="spwn">YOUR SPONSOR</div>
+    <div class="spwt" id="spwt">Your sponsor tagline here</div>
+  </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<div class="footer">Jamaica Trivia Night &mdash; Screenshot Interactive &mdash; <span id="join-url-text"></span></div>
+
 <script>
 var SPONSOR_NAME = "YOUR SPONSOR";
 var SPONSOR_TAG  = "Your sponsor tagline here";
-var JOIN_URL = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
-var MAXP = 4;
+var JOIN_URL     = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
 
-firebase.initializeApp({
-  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
-  authDomain:"screenshot-trivia-night.firebaseapp.com",
-  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
-  projectId:"screenshot-trivia-night",
-  storageBucket:"screenshot-trivia-night.firebasestorage.app",
-  messagingSenderId:"482758352954",
-  appId:"1:482758352954:web:832d1cba008bc0b789d503"
-});
-var db = firebase.database();
-
-// Set sponsor
-document.getElementById('spnm').textContent = SPONSOR_NAME;
-document.getElementById('hspnm').textContent = SPONSOR_NAME;
-
-// QR code
+document.getElementById('spwn').textContent = SPONSOR_NAME;
+document.getElementById('spwt').textContent = SPONSOR_TAG;
 document.getElementById('qr-url').textContent = JOIN_URL;
+document.getElementById('join-url-text').textContent = JOIN_URL;
 
+// Generate QR code
+new QRCode(document.getElementById('qr-container'), {
+  text: JOIN_URL,
+  width: 200,
+  height: 200,
+  colorDark: '#1A1A3E',
+  colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.H
+});
 
-// Form
+// Firebase
+var db = null;
+try {
+  firebase.initializeApp({
+    apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+    authDomain:"screenshot-trivia-night.firebaseapp.com",
+    databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+    projectId:"screenshot-trivia-night",
+    storageBucket:"screenshot-trivia-night.firebasestorage.app",
+    messagingSenderId:"482758352954",
+    appId:"1:482758352954:web:832d1cba008bc0b789d503"
+  });
+  db = firebase.database();
+} catch(e) { console.warn(e); }
+
+// Form state
 var pcnt = 1;
 
 function renderPF() {
-  var c = document.getElementById('pfields');
-  c.innerHTML = '';
+  var c = document.getElementById('pfields'); c.innerHTML = '';
   for (var i = 0; i < pcnt; i++) {
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
-    var num = document.createElement('span');
-    num.textContent = i + 1;
-    num.style.cssText = 'font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#5B5BD6;min-width:20px;text-align:center;flex-shrink:0';
-    var inp = document.createElement('input');
-    inp.type = 'email'; inp.placeholder = 'player'+(i+1)+'@example.com';
-    inp.maxLength = 80; inp.id = 'em'+i;
-    inp.style.cssText = 'flex:1;padding:12px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#ffffff;font-size:16px;color:#1A1A3E;outline:none;font-family:DM Sans,sans-serif;min-width:0;box-sizing:border-box';
-    row.appendChild(num); row.appendChild(inp);
-    c.appendChild(row);
+    var row = document.createElement('div'); row.className = 'prow';
+    var num = document.createElement('span'); num.className = 'pnum'; num.textContent = i+1;
+    var inp = document.createElement('input'); inp.type = 'email';
+    inp.placeholder = 'player'+(i+1)+'@email.com'; inp.maxLength = 80; inp.id = 'em'+i; inp.className = 'pinp';
+    row.appendChild(num); row.appendChild(inp); c.appendChild(row);
   }
   document.getElementById('cval').textContent = pcnt;
   document.getElementById('clbl').textContent = pcnt === 1 ? 'player' : 'players';
 }
 
 document.getElementById('btn-minus').onclick = function(){ if(pcnt>1){pcnt--;renderPF();} };
-document.getElementById('btn-plus').onclick  = function(){ if(pcnt<MAXP){pcnt++;renderPF();} };
-document.getElementById('btn-join').onclick  = function(){ registerTable(); };
+document.getElementById('btn-plus').onclick  = function(){ if(pcnt<4){pcnt++;renderPF();} };
 renderPF();
 
-function showAlert(msg){ var a=document.getElementById('alertbox'); a.textContent=msg; a.style.display='block'; setTimeout(function(){a.style.display='none';},4000); }
+function showAlert(msg){ var a=document.getElementById('alertbox'); a.textContent=msg; a.style.display='block'; document.getElementById('successbox').style.display='none'; setTimeout(function(){a.style.display='none';},4000); }
+function showSuccess(msg){ var s=document.getElementById('successbox'); s.textContent=msg; s.style.display='block'; document.getElementById('alertbox').style.display='none'; setTimeout(function(){s.style.display='none';},5000); }
 
-function registerTable() {
+document.getElementById('btn-reg').onclick = function() {
   var tname = document.getElementById('f-tname').value.trim();
-  if(!tname){ showAlert('Please enter a table name!'); return; }
-  var pemails = [];
-  for(var i=0;i<pcnt;i++){
-    var el=document.getElementById('em'+i);
-    var v=el?el.value.trim().toLowerCase():'';
-    if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ showAlert('Please enter a valid email for Player '+(i+1)+'.'); return; }
-    if(pemails.indexOf(v)>=0){ showAlert('Player '+(i+1)+' email is a duplicate.'); return; }
-    pemails.push(v);
+  if (!tname) { showAlert('Please enter a table name!'); return; }
+  var emails = [];
+  for (var i = 0; i < pcnt; i++) {
+    var el = document.getElementById('em'+i); var v = el ? el.value.trim().toLowerCase() : '';
+    if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { showAlert('Please enter a valid email for Player '+(i+1)+'.'); return; }
+    if (emails.indexOf(v) >= 0) { showAlert('Player '+(i+1)+' email is a duplicate.'); return; }
+    emails.push(v);
   }
-  var k = tname.replace(/[^a-zA-Z0-9]/g,'_');
-  db.ref('teams/'+k).set({name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:Date.now()}, function(err){
-    if(err){ showAlert('Could not register — check your connection.'); return; }
-    document.getElementById('btn-join').style.display = 'none';
-    document.getElementById('success-box').style.display = 'block';
-    // Disable form
-    document.getElementById('f-tname').disabled = true;
-    document.getElementById('btn-minus').disabled = true;
-    document.getElementById('btn-plus').disabled = true;
-    var inputs = document.querySelectorAll('#pfields input');
-    for(var i=0;i<inputs.length;i++) inputs[i].disabled = true;
-  });
+  var key = tname.replace(/[^a-zA-Z0-9]/g,'_');
+  if (db) {
+    db.ref('teams/'+key).set({name:tname, players:pcnt, emails:emails, status:'waiting', joinedAt:Date.now()}, function(err){
+      if (err) { showAlert('Could not register — check your connection.'); }
+      else {
+        showSuccess('✓ '+tname+' registered! Head to index.html to play.');
+        document.getElementById('f-tname').value = '';
+        pcnt = 1; renderPF();
+      }
+    });
+  } else {
+    showAlert('No database connection.');
+  }
+};
+
+// Live team list
+function renderTeams(data) {
+  var list = document.getElementById('team-list');
+  if (!data) { list.innerHTML = '<div class="empty-teams">No teams yet — be the first! 🏆</div>'; document.getElementById('team-count').textContent=''; return; }
+  var teams = Object.values(data).sort(function(a,b){return (a.joinedAt||0)-(b.joinedAt||0);});
+  document.getElementById('team-count').textContent = '('+teams.length+')';
+  var waiting=0,playing=0,finished=0;
+  teams.forEach(function(t){if(t.status==='finished')finished++;else if(t.status==='playing')playing++;else waiting++;});
+  document.getElementById('hdr-sub').textContent = teams.length+' team'+(teams.length!==1?'s':'')+' registered · '+playing+' playing · '+finished+' finished';
+  list.innerHTML = teams.map(function(t){
+    var badge, cls;
+    if(t.status==='finished'){badge='Done ✓';cls='b-done';return '<div class="trow finished"><span class="trow-name">'+t.name+'</span><span class="trow-badge '+cls+'">'+badge+'</span><span style="font-size:11px;color:var(--muted);flex-shrink:0">'+t.players+'p</span></div>';}
+    else if(t.status==='playing'){badge='Playing';cls='b-play';}
+    else{badge='Waiting';cls='b-wait';}
+    return '<div class="trow '+(t.status==='playing'?'playing':'')+'"><span class="trow-name">'+t.name+'</span><span class="trow-badge '+cls+'">'+badge+'</span><span style="font-size:11px;color:var(--muted);flex-shrink:0">'+t.players+'p</span></div>';
+  }).join('');
 }
 
-// Live teams list
-db.ref('teams').on('value', function(snap){
-  var data = snap.val();
-  var grid = document.getElementById('teams-grid');
-  var count = document.getElementById('team-count');
-  if(!data){ grid.innerHTML='<span class="teams-empty">No teams yet — be the first!</span>'; count.textContent='0 teams'; return; }
-  var teams = Object.values(data).sort(function(a,b){return a.joinedAt-b.joinedAt;});
-  count.textContent = teams.length + ' team' + (teams.length!==1?'s':'');
-  grid.innerHTML = teams.map(function(t){
-    return '<div class="tpill">&#x1F3AE; '+t.name+'</div>';
-  }).join('');
-});
-
-  // Generate QR code using qrcodejs
-  document.getElementById('qr-url').textContent = 'https://abrown876.github.io/Screenshot-trivia-night/index.html';
-  new QRCode(document.getElementById('qr-container'), {
-    text: 'https://abrown876.github.io/Screenshot-trivia-night/index.html',
-    width: 200, height: 200,
-    colorDark: '#1A1A3E',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
-
+if (db) {
+  db.ref('teams').on('value', function(snap){ renderTeams(snap.val()); });
+}
 </script>
 </body>
 </html>
