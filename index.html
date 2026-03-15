@@ -251,11 +251,26 @@ body{display:flex;flex-direction:column}
 </div>
 
 <!-- RESULTS -->
+<div id="roundbreak" class="scr an">
+  <div class="wc">
+    <div class="wcard">
+      <div style="font-size:2.5rem;margin-bottom:.6rem">&#x2615;</div>
+      <div class="wbadge" style="background:#E8547A;display:inline-block;margin-bottom:.75rem" id="rb-round">Round 1 complete!</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:2rem;color:var(--purple);margin-bottom:.1rem" id="rb-base">0</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:.1rem" id="rb-bonus">No bonus</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.75rem" id="rb-total">0 pts this round</div>
+      <div id="rb-breakdown" style="text-align:left;margin-bottom:.75rem"></div>
+      <div style="font-size:14px;color:var(--purple);font-weight:700" id="rb-cumul">Total so far: 0 pts</div>
+    </div>
+    <div class="spw"><div class="spwl">A word from our sponsor</div><div class="spwn" id="sppn">YOUR SPONSOR</div><div class="spwt" id="sppt">Your sponsor tagline here</div></div>
+  </div>
+</div>
+
 <div id="results" class="scr an">
   <div class="si">
     <div class="rhero">
       <div class="rscore" id="rscore">0</div>
-      <div class="rdenom">out of 10 pts</div>
+      <div class="rdenom">out of 30 pts</div>
       <div class="rhl" id="rhl"></div>
       <div class="rpct" id="rpct"></div>
     </div>
@@ -286,10 +301,9 @@ body{display:flex;flex-direction:column}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-// ── SPONSOR CONFIG ──────────────────
+// ── CONFIG ───────────────────────────
 var SPONSOR_NAME = "YOUR SPONSOR";
 var SPONSOR_TAG  = "Your sponsor tagline here";
-// ────────────────────────────────────
 
 var FIREBASE_CONFIG = {
   apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
@@ -300,65 +314,43 @@ var FIREBASE_CONFIG = {
   messagingSenderId:"482758352954",
   appId:"1:482758352954:web:832d1cba008bc0b789d503"
 };
+
 var db = null;
 try {
   firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
 } catch(e) { console.warn('Firebase init failed:', e); }
 
-function dbRef(path) { return db ? db.ref(path) : null; }
-function dbSet(path, val, cb) { var r=dbRef(path); if(r) r.set(val, cb||function(){}); else if(cb) cb(new Error('no db')); }
-function dbOn(path, cb) { var r=dbRef(path); if(r) r.on('value', cb); }
-function dbOnce(path, cb) { var r=dbRef(path); if(r) r.once('value', cb); else cb({val:function(){return null;}}); }
-function dbPush(path, val) { var r=dbRef(path); if(r) r.push(val); }
+function dbRef(path){ return db ? db.ref(path) : null; }
+function dbSet(path,val,cb){ var r=dbRef(path); if(r) r.set(val,cb||function(){}); else if(cb) cb(new Error('no db')); }
+function dbOn(path,cb){ var r=dbRef(path); if(r) r.on('value',cb); }
+function dbOnce(path,cb){ var r=dbRef(path); if(r) r.once('value',cb); else cb({val:function(){return null;}}); }
+function dbPush(path,val){ var r=dbRef(path); if(r) r.push(val); }
 
 // Set sponsor names
 ['spnm','hspnm','spwn','sppn'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=SPONSOR_NAME; });
 ['spwt','sppt'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=SPONSOR_TAG; });
 
-// ── QUESTIONS ───────────────────────
-var AQ = [
-  {cat:'h',lb:'History',q:'In what year did Jamaica gain independence from Britain?',o:['1958','1960','1962','1966'],a:2},
-  {cat:'h',lb:'History',q:"Who was Jamaica's first Prime Minister after independence?",o:['Michael Manley','Norman Washington Manley','Alexander Bustamante','Hugh Shearer'],a:2},
-  {cat:'h',lb:'History',q:"What was Jamaica's original indigenous name?",o:['Xamayca','Caribia','Hispaniola','Boriken'],a:0},
-  {cat:'h',lb:'History',q:'The Morant Bay Rebellion of 1865 was led by which figure?',o:['Sam Sharpe','Marcus Garvey','Paul Bogle','Nanny of the Maroons'],a:2},
-  {cat:'h',lb:'History',q:'Marcus Garvey founded which influential movement?',o:['Rastafari','Pan-Africanism and UNIA','Black Power','Negritude'],a:1},
-  {cat:'m',lb:'Music & Culture',q:'Which Jamaican artist is known as the King of Reggae?',o:['Peter Tosh','Jimmy Cliff','Toots Hibbert','Bob Marley'],a:3},
-  {cat:'m',lb:'Music & Culture',q:'Which music genre originated in Jamaica in the late 1960s?',o:['Calypso','Soca','Reggae','Dancehall'],a:2},
-  {cat:'m',lb:'Music & Culture',q:"Bob Marley's backing band was called The...?",o:['Wailers','Skatalites','Upsetters','Gladiators'],a:0},
-  {cat:'m',lb:'Music & Culture',q:'What does Irie mean in Jamaican culture?',o:['Goodbye','Feeling good and all is well','Watch out','Hurry up'],a:1},
-  {cat:'m',lb:'Music & Culture',q:'What are the colours of the Rastafarian flag?',o:['Red white and blue','Red gold and green','Black gold and green','Red black and green'],a:1},
-  {cat:'f',lb:'Food & Cuisine',q:'What is the national dish of Jamaica?',o:['Curry goat and rice','Ackee and saltfish','Jerk chicken','Callaloo and dumplings'],a:1},
-  {cat:'f',lb:'Food & Cuisine',q:'Where did ackee originally come from?',o:['South America','India','West Africa','The Caribbean'],a:2},
-  {cat:'f',lb:'Food & Cuisine',q:'Which spice blend is most associated with Jamaican jerk cooking?',o:['Allspice and Scotch bonnet pepper','Cumin and chilli','Turmeric and ginger','Paprika and thyme'],a:0},
-  {cat:'f',lb:'Food & Cuisine',q:'What is bammy made from?',o:['Corn','Cassava','Sweet potato','Breadfruit'],a:1},
-  {cat:'f',lb:'Food & Cuisine',q:'Which Jamaican soup is traditionally eaten on Saturdays?',o:['Fish tea','Pumpkin soup','Red peas soup','Mannish water'],a:2},
-  {cat:'g',lb:'Geography',q:'What is the capital city of Jamaica?',o:['Montego Bay','Port Antonio','Ocho Rios','Kingston'],a:3},
-  {cat:'g',lb:'Geography',q:"Which mountain range contains Jamaica's highest peak?",o:['Santa Cruz Mountains','John Crow Mountains','Blue Mountains','Dry Harbour Mountains'],a:2},
-  {cat:'g',lb:'Geography',q:'Which sea lies to the south of Jamaica?',o:['Atlantic Ocean','Gulf of Mexico','Pacific Ocean','Caribbean Sea'],a:3},
-  {cat:'g',lb:'Geography',q:'Which parish is Montego Bay located in?',o:['St James','St Ann','Westmoreland','Hanover'],a:0},
-  {cat:'g',lb:'Geography',q:'How many parishes does Jamaica have?',o:['10','12','14','16'],a:2},
-  {cat:'s',lb:'Sports',q:'Which Jamaican sprinter holds world records in both 100m and 200m?',o:['Asafa Powell','Yohan Blake','Shelly-Ann Fraser-Pryce','Usain Bolt'],a:3},
-  {cat:'s',lb:'Sports',q:'Which sport made Jamaica famous at the 1988 Winter Olympics?',o:['Bobsled','Luge','Skeleton','Ski jumping'],a:0},
-  {cat:'s',lb:'Sports',q:"Usain Bolt's world record 100m time is?",o:['9.72s','9.58s','9.69s','9.84s'],a:1},
-  {cat:'s',lb:'Sports',q:'Which Jamaican athlete is the most decorated female sprinter?',o:['Merlene Ottey','Elaine Thompson-Herah','Shelly-Ann Fraser-Pryce','Veronica Campbell-Brown'],a:2},
-  {cat:'s',lb:'Sports',q:"The Reggae Boyz is Jamaica's national team in which sport?",o:['Cricket','Athletics','Football','Basketball'],a:2},
-  {cat:'x',lb:'General',q:'What is the official language of Jamaica?',o:['Patois only','Spanish','French','English'],a:3},
-  {cat:'x',lb:'General',q:'What is the currency of Jamaica?',o:['Jamaican Pound','Jamaican Dollar','Caribbean Dollar','Jamaican Franc'],a:1},
-  {cat:'x',lb:'General',q:'What is the approximate population of Jamaica?',o:['1 million','2.8 million','4.5 million','6 million'],a:1},
-  {cat:'x',lb:'General',q:"The Jamaican coat of arms features which two animals?",o:['Lion and crocodile','Crocodile and hummingbird','Eagle and snake','Parrot and turtle'],a:0},
-  {cat:'x',lb:'General',q:"What is Jamaica's national bird?",o:['Jamaican Parrot','Red-billed Streamertail hummingbird','Jamaican Oriole','Doctor Bird'],a:1}
-];
-
+// ── CONSTANTS ────────────────────────
 var CC={h:'ch',f:'cf',m:'cm',g:'cg',s:'cs',x:'cx'};
 var LT=['A','B','C','D'];
 var MD=['🥇','🥈','🥉'];
 var TSECS=10, MAXP=4, BSPTS=3;
+var TOTAL_ROUNDS=3, QperRound=10;
 
-// State
-var tname='', pemails=[], pcnt=1, score=0, bonus=0, answers=[], alive=false;
-var cq=-1, qlist=[], tint=null, tleft=0, answered=false, selIdx=-1, qst=0, rsent=false;
-var activeScreen='splash', lastCmdKey='', lastHostCmd=null, timerPaused=false, joinTime=0;
+// ── STATE ────────────────────────────
+var tname='', pemails=[], pcnt=1;
+var curRound=0;                     // current round 0-indexed
+var roundScores=[0,0,0];            // base scores per round
+var roundBonus=[0,0,0];             // bonus per round
+var roundAnswers=[[],[],[]];        // answers per round
+var roundQuestions=[[],[],[]];      // questions per round loaded from Firebase
+var score=0, bonus=0;               // totals
+var answers=[];                     // current round answers
+var qlist=[];                       // current round questions
+var cq=-1, tint=null, tleft=0, answered=false, selIdx=-1, qst=0, rsent=false;
+var alive=false, timerPaused=false;
+var activeScreen='splash', lastCmdKey='', lastHostCmd=null, joinTime=0;
 
 // ── FORM ─────────────────────────────
 function renderPF() {
@@ -371,72 +363,48 @@ function renderPF() {
     num.textContent = i + 1;
     num.style.cssText = 'font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#5B5BD6;min-width:20px;text-align:center;flex-shrink:0';
     var inp = document.createElement('input');
-    inp.type = 'email';
-    inp.placeholder = 'player' + (i+1) + '@example.com';
-    inp.maxLength = 80;
-    inp.id = 'em' + i;
+    inp.type = 'email'; inp.placeholder = 'player'+(i+1)+'@example.com';
+    inp.maxLength = 80; inp.id = 'em'+i;
     inp.style.cssText = 'flex:1;padding:13px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#ffffff;font-size:16px;color:#1A1A3E;outline:none;font-family:DM Sans,sans-serif;min-width:0;box-sizing:border-box';
-    row.appendChild(num);
-    row.appendChild(inp);
+    row.appendChild(num); row.appendChild(inp);
     c.appendChild(row);
   }
   document.getElementById('cval').textContent = pcnt;
   document.getElementById('clbl').textContent = pcnt === 1 ? 'player' : 'players';
 }
 
-document.getElementById('btn-minus').onclick = function() { if(pcnt>1){pcnt--;renderPF();} };
-document.getElementById('btn-plus').onclick  = function() { if(pcnt<MAXP){pcnt++;renderPF();} };
-document.getElementById('btn-join').onclick   = function() { joinGame(); };
-document.getElementById('btn-seelb').onclick  = function() { showTab('lb'); };
-document.getElementById('btn-restart').onclick = function() { restartGame(); };
-document.getElementById('tab-play').onclick   = function() { showTab('play'); };
-document.getElementById('tab-lb').onclick     = function() { showTab('lb'); };
-document.getElementById('r1').onclick = function() { sendR('🔥'); };
-document.getElementById('r2').onclick = function() { sendR('😱'); };
-document.getElementById('r3').onclick = function() { sendR('👏'); };
-document.getElementById('r4').onclick = function() { sendR('🎉'); };
-
+document.getElementById('btn-minus').onclick  = function(){ if(pcnt>1){pcnt--;renderPF();} };
+document.getElementById('btn-plus').onclick   = function(){ if(pcnt<MAXP){pcnt++;renderPF();} };
+document.getElementById('btn-join').onclick   = function(){ joinGame(); };
+document.getElementById('btn-seelb').onclick  = function(){ showTab('lb'); };
+document.getElementById('btn-restart').onclick= function(){ restartGame(); };
+document.getElementById('tab-play').onclick   = function(){ showTab('play'); };
+document.getElementById('tab-lb').onclick     = function(){ showTab('lb'); };
+document.getElementById('r1').onclick = function(){ sendR('🔥'); };
+document.getElementById('r2').onclick = function(){ sendR('😱'); };
+document.getElementById('r3').onclick = function(){ sendR('👏'); };
+document.getElementById('r4').onclick = function(){ sendR('🎉'); };
 renderPF();
 
 // ── HELPERS ──────────────────────────
-function showAlert(msg) {
-  var a = document.getElementById('alertbox');
-  a.textContent = msg; a.style.display = 'block';
-  setTimeout(function(){ a.style.display='none'; }, 4000);
-}
-function updSC() { document.getElementById('sc').textContent = score + ' pts'; }
-function showToast(msg) {
-  var t = document.getElementById('stoast');
-  t.textContent = msg; t.className = 'stoast on';
-  setTimeout(function(){ t.className='stoast'; }, 2200);
-}
-function showLbTab() { document.getElementById('tab-lb').style.display = 'flex'; }
-function shuffle(a) {
-  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i];a[i]=a[j];a[j]=tmp; }
-  return a;
-}
+function showAlert(msg){ var a=document.getElementById('alertbox'); a.textContent=msg; a.style.display='block'; setTimeout(function(){a.style.display='none';},4000); }
+function updSC(){ document.getElementById('sc').textContent=score+' pts'; }
+function showToast(msg){ var t=document.getElementById('stoast'); t.textContent=msg; t.className='stoast on'; setTimeout(function(){t.className='stoast';},2200); }
+function showLbTab(){ document.getElementById('tab-lb').style.display='flex'; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
 
 // ── SCREENS ──────────────────────────
-function showScr(id) {
-  var all = ['splash','waiting','paused','results','lb'];
-  for(var i=0;i<all.length;i++) {
-    var el = document.getElementById(all[i]);
-    if(el) el.classList.remove('on');
-  }
+function showScr(id){
+  ['splash','waiting','paused','results','lb','roundbreak'].forEach(function(sid){ var el=document.getElementById(sid); if(el) el.classList.remove('on'); });
   document.getElementById('qscr').classList.add('off');
-  if(id==='qscr') {
-    document.getElementById('qscr').classList.remove('off');
-  } else if(id !== 'lb') {
-    var el = document.getElementById(id);
-    if(el) el.classList.add('on');
-  }
-  if(id !== 'lb') activeScreen = id;
+  if(id==='qscr'){ document.getElementById('qscr').classList.remove('off'); }
+  else if(id!=='lb'){ var el=document.getElementById(id); if(el) el.classList.add('on'); }
+  if(id!=='lb') activeScreen=id;
 }
 
-function showTab(t) {
-  if(t === 'lb') {
-    var all = ['splash','waiting','paused','results'];
-    for(var i=0;i<all.length;i++) document.getElementById(all[i]).classList.remove('on');
+function showTab(t){
+  if(t==='lb'){
+    ['splash','waiting','paused','results','roundbreak'].forEach(function(s){ document.getElementById(s).classList.remove('on'); });
     document.getElementById('qscr').classList.add('off');
     document.getElementById('lb').classList.add('on');
     document.getElementById('tab-lb').classList.add('on');
@@ -446,22 +414,14 @@ function showTab(t) {
     document.getElementById('lb').classList.remove('on');
     document.getElementById('tab-lb').classList.remove('on');
     document.getElementById('tab-play').classList.add('on');
-    if(lastHostCmd && alive) {
-      var cmd = lastHostCmd;
-      if(cmd.action === 'question') {
-        if(qlist.length > 0 && cmd.index !== cq) {
-          cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false;
-          launchQ(cq);
-        } else {
-          document.getElementById('qscr').classList.remove('off');
-          activeScreen = 'qscr';
-          if(!answered && timerPaused) resumeTimer();
-        }
-      } else if(cmd.action === 'pause') {
-        document.getElementById(activeScreen==='qscr'?'paused':activeScreen).classList.add('on');
+    if(lastHostCmd && alive){
+      var cmd=lastHostCmd;
+      if(cmd.action==='question' && cmd.round===curRound && cmd.index!==cq){
+        cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq);
       } else {
         if(activeScreen==='qscr') document.getElementById('qscr').classList.remove('off');
         else { var el=document.getElementById(activeScreen); if(el) el.classList.add('on'); }
+        if(!answered && timerPaused) resumeTimer();
       }
     } else {
       if(activeScreen==='qscr') document.getElementById('qscr').classList.remove('off');
@@ -471,139 +431,132 @@ function showTab(t) {
 }
 
 // ── TIMER ────────────────────────────
-function pauseTimer() { if(tint){clearInterval(tint);tint=null;timerPaused=true;} }
-function resumeTimer() {
-  if(!timerPaused||answered||tleft<=0) return;
-  timerPaused=false;
-  tint=setInterval(function(){
-    tleft--; renderT(tleft);
-    if(tleft<=0){stopT(); if(!answered) timeoutQ(cq);}
-  },1000);
-}
-function stopT() { if(tint){clearInterval(tint);tint=null;} timerPaused=false; }
-function renderT(t) {
-  document.getElementById('tnum').textContent = t;
-  document.getElementById('tbarf').style.width = ((t/TSECS)*100)+'%';
-  var urg = t<=3;
-  document.getElementById('tnum').className = urg?'tnum urg':'tnum';
-  document.getElementById('tbarf').className = urg?'tbarf urg':'tbarf';
+function pauseTimer(){ if(tint){clearInterval(tint);tint=null;timerPaused=true;} }
+function resumeTimer(){ if(!timerPaused||answered||tleft<=0) return; timerPaused=false; tint=setInterval(function(){ tleft--; renderT(tleft); if(tleft<=0){stopT();if(!answered)timeoutQ(cq);}},1000); }
+function stopT(){ if(tint){clearInterval(tint);tint=null;} timerPaused=false; }
+function renderT(t){
+  document.getElementById('tnum').textContent=t;
+  document.getElementById('tbarf').style.width=((t/TSECS)*100)+'%';
+  var urg=t<=3;
+  document.getElementById('tnum').className=urg?'tnum urg':'tnum';
+  document.getElementById('tbarf').className=urg?'tbarf urg':'tbarf';
 }
 
 // ── JOIN ─────────────────────────────
-function joinGame() {
+function joinGame(){
   tname = document.getElementById('f-tname').value.trim();
   if(!tname){ showAlert('Please enter a table name!'); return; }
-  pemails = [];
+  pemails=[];
   for(var i=0;i<pcnt;i++){
-    var el = document.getElementById('em'+i);
-    var v = el ? el.value.trim().toLowerCase() : '';
+    var el=document.getElementById('em'+i); var v=el?el.value.trim().toLowerCase():'';
     if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ showAlert('Please enter a valid email for Player '+(i+1)+'.'); return; }
     if(pemails.indexOf(v)>=0){ showAlert('Player '+(i+1)+' email is a duplicate.'); return; }
     pemails.push(v);
   }
-  qlist=[]; score=0; bonus=0; answers=[]; cq=-1; alive=true; answered=false;
-  var chip=document.getElementById('tname-chip');
-  chip.textContent='Team: '+tname; chip.style.display='block';
+  // Reset all state
+  curRound=0; roundScores=[0,0,0]; roundBonus=[0,0,0]; roundAnswers=[[],[],[]]; roundQuestions=[[],[],[]];
+  score=0; bonus=0; answers=[]; qlist=[]; cq=-1; alive=true; answered=false;
+  var chip=document.getElementById('tname-chip'); chip.textContent='Team: '+tname; chip.style.display='block';
   document.getElementById('sc').style.display='block';
   document.getElementById('tabbar').classList.add('on');
   updSC();
-  // Register team
-  joinTime = Date.now();
+  joinTime=Date.now();
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:joinTime});
-  // Check current host state
-  dbOnce('host/command', function(snap){
-    var ex = snap.val();
-    // Game already in progress — load questions and handle late join
-    if(ex && (ex.action==='question'||ex.action==='reveal'||ex.action==='pause') && ex.index >= 0) {
-      dbOnce('game/questions', function(qsnap){
-        var qd = qsnap.val();
-        if(qd) {
-          qlist = qd;
-          // Mark missed questions as skipped
-          for(var i=0; i<ex.index; i++) {
-            answers[i] = {q:qlist[i]?qlist[i].q:'', r:'t'};
-          }
-          if(ex.index > 0) {
-            showLateJoinNotice(ex.index);
-          } else {
-            showWait(0); showScr('waiting');
-          }
-        } else {
-          showWait(0); showScr('waiting');
-        }
-        listenHost();
-      });
-    } else {
-      showWait(0); showScr('waiting');
+  // Load all round questions from Firebase
+  dbOnce('game/rounds',function(snap){
+    var rd=snap.val();
+    if(rd){ roundQuestions[0]=rd[0]||[]; roundQuestions[1]=rd[1]||[]; roundQuestions[2]=rd[2]||[]; }
+    dbOnce('host/command',function(snap2){
+      var ex=snap2.val();
+      if(ex && ex.timestamp && ex.timestamp > joinTime-5000 && (ex.action==='question'||ex.action==='pause'||ex.action==='reveal')) {
+        // Game already in progress — join at current round
+        curRound = ex.round || 0;
+        qlist = roundQuestions[curRound] || [];
+        answers = roundAnswers[curRound];
+        if(ex.index > 0) showLateJoinNotice(ex.round, ex.index);
+        else { showWait(0); showScr('waiting'); }
+      } else {
+        showWait(0); showScr('waiting');
+      }
       listenHost();
-    }
+    });
   });
 }
 
-function showLateJoinNotice(currentIdx) {
+function showLateJoinNotice(rnd, idx) {
   var b=document.getElementById('wbadge'),tt=document.getElementById('wtitle'),sb=document.getElementById('wsub'),sl=document.getElementById('wsline');
-  b.textContent='Joining in progress!';
-  b.style.background='#E8547A';
-  tt.textContent='Game already started!';
-  sb.textContent='No worries — '+tname+' is jumping in at Q'+(currentIdx+1)+'. Earlier questions will be marked as missed.';
-  sl.textContent='You\'ll start scoring from Q'+(currentIdx+1)+' onwards.';
+  b.textContent='Joining late!'; b.style.background='#E8547A';
+  tt.textContent='Round '+(rnd+1)+' in progress!';
+  sb.textContent=tname+' is jumping in at Q'+(idx+1)+'. Earlier questions will be marked as missed.';
+  sl.textContent='You will start scoring from Q'+(idx+1)+' onwards.';
   showScr('waiting');
 }
 
 function showWait(n) {
   var b=document.getElementById('wbadge'),tt=document.getElementById('wtitle'),sb=document.getElementById('wsub'),sl=document.getElementById('wsline');
+  b.style.background='';
   if(n===0){
     b.textContent="You're in!"; tt.textContent='Waiting for host...';
-    sb.textContent='Sit tight — '+tname+' is registered. Your host will launch the first question shortly!';
+    sb.textContent='Sit tight — '+tname+' is registered. Your host will launch Round 1 shortly!';
     sl.textContent='';
   } else {
-    b.textContent='Q'+(n+1)+' coming up...'; tt.textContent='Nice one!';
-    var cor=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))cor++;}
-    sb.textContent=tname+' — '+cor+' correct out of '+n+' so far. Next question coming soon!';
-    sl.textContent='Score: '+score+' pts'+(bonus?' (including ⚡'+bonus+' bonus)':'');
+    b.textContent='Round coming up...'; tt.textContent='Nice one!';
+    var cor=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))cor++;} 
+    sb.textContent=tname+' — '+cor+' correct in this round so far.';
+    sl.textContent='Score: '+score+' pts'+(bonus?' (incl. ⚡'+bonus+' bonus)':'');
   }
 }
 
 // ── HOST LISTENER ────────────────────
-function listenHost() {
-  dbOn('host/command', function(snap){
-    var cmd = snap.val();
+function listenHost(){
+  dbOn('host/command',function(snap){
+    var cmd=snap.val();
     if(!cmd||!alive) return;
-    lastHostCmd = cmd;
-    // Ignore stale commands from before this player joined
+    lastHostCmd=cmd;
+    // Ignore stale commands from before join
     if(cmd.timestamp && cmd.timestamp < joinTime) return;
-    // Ignore already-processed commands
-    var cmdKey = JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
-    if(cmdKey === lastCmdKey) return;
-    lastCmdKey = cmdKey;
-    // Switch to play tab on any command
+    var cmdKey=JSON.stringify({a:cmd.action,r:cmd.round,i:cmd.index,t:cmd.timestamp});
+    if(cmdKey===lastCmdKey) return;
+    lastCmdKey=cmdKey;
+    // Switch to play tab
     document.getElementById('lb').classList.remove('on');
     document.getElementById('tab-lb').classList.remove('on');
     document.getElementById('tab-play').classList.add('on');
+
     if(cmd.action==='question'){
+      var r=cmd.round||0;
+      if(r!==curRound){
+        // New round starting
+        curRound=r;
+        roundAnswers[curRound]=[];
+        answers=roundAnswers[curRound];
+        qlist=roundQuestions[curRound]||[];
+      }
       if(qlist.length===0){
-        dbOnce('game/questions',function(qsnap){
-          var qd=qsnap.val(); if(qd) qlist=qd;
+        dbOnce('game/rounds',function(qsnap){
+          var rd=qsnap.val();
+          if(rd){ roundQuestions[0]=rd[0]||[]; roundQuestions[1]=rd[1]||[]; roundQuestions[2]=rd[2]||[]; qlist=roundQuestions[curRound]||[]; }
           if(qlist.length>0){ cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq); }
         });
       } else {
-        if(cmd.index!==cq){ cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq); }
-        else if(timerPaused){ resumeTimer(); }
+        cq=cmd.index; answered=false; selIdx=-1; rsent=false; qst=Date.now(); timerPaused=false; launchQ(cq);
       }
     } else if(cmd.action==='reveal'){ stopT(); if(qlist.length>0) revealAns(cq); }
     else if(cmd.action==='pause'){ stopT(); showPaused(); }
+    else if(cmd.action==='round_end'){ stopT(); showRoundBreak(cmd.round); }
     else if(cmd.action==='end'){ stopT(); showResults(); }
   });
-  // Race bonus listener
-  dbOn('race', function(rsnap){
+
+  // Race bonus
+  dbOn('race',function(rsnap){
     var rd=rsnap.val(); if(!rd||!alive) return;
-    var qk='q'+cq; if(!rd[qk]) return;
+    var qk='r'+curRound+'q'+cq; if(!rd[qk]) return;
     var ents=[]; for(var k in rd[qk]){if(rd[qk][k].correct)ents.push(rd[qk][k]);}
     ents.sort(function(a,b){return a.time-b.time;});
     var mp=-1; for(var i=0;i<ents.length;i++){if(ents[i].team===tname){mp=i;break;}}
-    var bk='_bq'+cq;
+    var bk='_br'+curRound+'q'+cq;
     if(mp>=0&&mp<BSPTS&&!window[bk]){
-      window[bk]=true; bonus++; score++; updSC();
+      window[bk]=true; bonus++; roundBonus[curRound]++; score++; roundScores[curRound]++; updSC();
       var pos=mp===0?'1st':mp===1?'2nd':'3rd';
       showToast('⚡ Bonus! '+pos+' to answer — +1 pt!');
       if(answers[cq]) answers[cq].r='b';
@@ -611,14 +564,14 @@ function listenHost() {
   });
 }
 
-// ── LAUNCH QUESTION ──────────────────
-function launchQ(idx) {
+// ── QUESTION ─────────────────────────
+function launchQ(idx){
   document.getElementById('tab-lb').style.display='none';
   document.getElementById('tab-play').classList.add('on');
   document.getElementById('tab-lb').classList.remove('on');
   showScr('qscr'); activeScreen='qscr';
   var q=qlist[idx];
-  document.getElementById('qct').textContent='Q'+(idx+1)+' / '+qlist.length;
+  document.getElementById('qct').textContent='R'+(curRound+1)+' Q'+(idx+1)+' / '+qlist.length;
   var cat=document.getElementById('qcat'); cat.textContent=q.lb; cat.className='cpill '+CC[q.cat];
   document.getElementById('qprog').style.width=((idx/qlist.length)*100)+'%';
   document.getElementById('qtxt').textContent=q.q;
@@ -626,30 +579,21 @@ function launchQ(idx) {
   document.getElementById('rbar').style.display='none';
   var oc=document.getElementById('opts'); oc.innerHTML='';
   for(var i=0;i<q.o.length;i++){
-    (function(idx2,i2){
+    (function(i2){
       var btn=document.createElement('button');
       btn.className='opt'; btn.id='op'+i2;
       btn.innerHTML='<span class="oltr">'+LT[i2]+'</span><span>'+q.o[i2]+'</span>';
       btn.onclick=function(){selOpt(i2);};
       oc.appendChild(btn);
-    })(idx,i);
+    })(i);
   }
   stopT(); timerPaused=false; tleft=TSECS; renderT(tleft);
-  tint=setInterval(function(){
-    tleft--; renderT(tleft);
-    if(tleft<=0){stopT(); if(!answered) timeoutQ(idx);}
-  },1000);
+  tint=setInterval(function(){ tleft--; renderT(tleft); if(tleft<=0){stopT();if(!answered)timeoutQ(idx);}},1000);
 }
 
-function lockOpts() {
-  var opts=document.querySelectorAll('.opt');
-  for(var i=0;i<opts.length;i++){
-    opts[i].className=opts[i].className+' lk';
-    opts[i].onclick=null;
-  }
-}
+function lockOpts(){ var opts=document.querySelectorAll('.opt'); for(var i=0;i<opts.length;i++){opts[i].className=opts[i].className+' lk';opts[i].onclick=null;} }
 
-function timeoutQ(idx) {
+function timeoutQ(idx){
   if(answered) return; answered=true;
   if(!answers[idx]) answers[idx]={q:qlist[idx].q,r:'t'};
   lockOpts();
@@ -658,7 +602,7 @@ function timeoutQ(idx) {
   document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
 }
 
-function revealAns(idx) {
+function revealAns(idx){
   var q=qlist[idx]; lockOpts();
   var ce=document.getElementById('op'+q.a); if(ce) ce.classList.add('correct');
   if(!answered){
@@ -675,14 +619,14 @@ function revealAns(idx) {
   document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
 }
 
-function selOpt(i) {
+function selOpt(i){
   if(answered) return; stopT(); answered=true; selIdx=i;
   var rt=Date.now()-qst, q=qlist[cq], cor=i===q.a;
   var btn=document.getElementById('op'+i); if(btn) btn.classList.add('pend');
   lockOpts();
   if(cor){
-    score++; answers[cq]={q:q.q,r:'c'}; updSC(); showToast('+1 pt! ✓');
-    dbSet('race/q'+cq+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});
+    score++; roundScores[curRound]++; answers[cq]={q:q.q,r:'c'}; updSC(); showToast('+1 pt! ✓');
+    dbSet('race/r'+curRound+'q'+cq+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});
   } else { answers[cq]={q:q.q,r:'w'}; }
   revealAns(cq);
 }
@@ -694,22 +638,19 @@ function showFB(type,icon,text){
   fb.className='fb '+type+' on';
 }
 
-function sendR(emoji) {
+function sendR(emoji){
   if(rsent) return; rsent=true;
   var btns=document.querySelectorAll('.rbtn');
-  for(var i=0;i<btns.length;i++){
-    var re=btns[i].querySelector('.re');
-    if(re&&re.textContent===emoji) btns[i].classList.add('sent');
-  }
-  dbPush('reactions',{emoji:emoji,team:tname,q:cq,timestamp:Date.now()});
+  for(var i=0;i<btns.length;i++){ var re=btns[i].querySelector('.re'); if(re&&re.textContent===emoji) btns[i].classList.add('sent'); }
+  dbPush('reactions',{emoji:emoji,team:tname,round:curRound,q:cq,timestamp:Date.now()});
 }
 
-function showPaused() {
+function showPaused(){
   var done=0; for(var i=0;i<answers.length;i++){if(answers[i])done++;}
   document.getElementById('pausenum').textContent=done;
-  document.getElementById('pscore').textContent=score;
+  document.getElementById('pscore').textContent=roundScores[curRound];
   var cor=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))cor++;}
-  document.getElementById('pdetail').textContent=cor+' correct out of '+done+(bonus?' · ⚡ '+bonus+' bonus pt'+(bonus!==1?'s':''):'');
+  document.getElementById('pdetail').textContent=cor+' correct in Round '+(curRound+1)+(roundBonus[curRound]?' · ⚡'+roundBonus[curRound]+' bonus':'');
   showScr('paused'); activeScreen='paused';
   document.getElementById('tab-play').classList.add('on');
   document.getElementById('tab-lb').classList.remove('on');
@@ -717,84 +658,118 @@ function showPaused() {
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','playing');
 }
 
-function saveScore() {
-  var n=document.getElementById('snotice');
-  var k=tname.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();
-  dbSet('scores/'+k,{team:tname,emails:pemails,players:pcnt,score:score,bonus:bonus,total:qlist.length,timestamp:Date.now()},function(err){
-    if(!err){
-      n.textContent='✓ Score saved to the leaderboard!'; n.style.background='#EAF7F0'; n.style.color='#2D7A4F';
-      dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','finished');
-    } else {
-      n.textContent="Couldn't save your score — check your connection."; n.style.background='#FDECEA'; n.style.color='#C0392B';
-    }
-  });
-}
-
-function showResults() {
-  var base=0; for(var i=0;i<answers.length;i++){if(answers[i]&&(answers[i].r==='c'||answers[i].r==='b'))base++;}
-  var pct=Math.round((base/qlist.length)*100);
-  var hl=pct===100?'Nuh badda — perfect! 🏆':pct>=80?'Big up yourself! 🎉':pct>=60?'Respect! 👍':pct>=40?'Keep at it! 😅':'Room to grow — try again!';
-  document.getElementById('rscore').textContent=score;
-  document.getElementById('rhl').textContent=hl;
-  document.getElementById('rpct').textContent=pct+'% correct · '+tname+(bonus?' · ⚡'+bonus+' bonus pts':'')+(answers.filter(function(a){return a&&a.r==='t'&&a.q===''}).length>0?' · joined late':'');
-  var rl='';
-  for(var i=0;i<qlist.length;i++){
-    var ar=answers[i], r=ar?ar.r:'t', cl=r==='c'||r==='b'?'dc':r==='w'?'dw':'dt';
-    var qtxt=qlist[i].q; if(qtxt.length>50) qtxt=qtxt.substring(0,50)+'…';
-    rl+='<div class="rrow"><span class="rqt">Q'+(i+1)+'. '+qtxt+'</span><span class="rdot '+cl+'"></span></div>';
+// ── ROUND BREAK ──────────────────────
+function showRoundBreak(rnd){
+  var rb = document.getElementById('roundbreak');
+  if(!rb) { showPaused(); return; }
+  // Save round score to Firebase
+  var rBase  = roundScores[rnd] || 0;
+  var rBonus = roundBonus[rnd]  || 0;
+  var k = tname.replace(/[^a-zA-Z0-9]/g,'_')+'_r'+rnd;
+  dbSet('scores/'+k,{team:tname,emails:pemails,players:pcnt,base:rBase,bonus:rBonus,round:rnd,total:QperRound,timestamp:Date.now()});
+  // Update UI
+  document.getElementById('rb-round').textContent   = 'Round '+(rnd+1)+' complete!';
+  document.getElementById('rb-base').textContent    = rBase;
+  document.getElementById('rb-bonus').textContent   = rBonus ? '+'+rBonus+' bonus' : 'No bonus';
+  document.getElementById('rb-total').textContent   = (rBase+rBonus)+' pts this round';
+  document.getElementById('rb-cumul').textContent   = 'Total so far: '+score+' pts';
+  // Build per-round breakdown
+  var breakdown='';
+  for(var r=0;r<=rnd;r++){
+    var b=roundScores[r]||0, bn=roundBonus[r]||0;
+    breakdown+='<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--bd);font-size:13px"><span>Round '+(r+1)+'</span><span style="font-weight:700">'+b+' / '+QperRound+(bn?' + ⚡'+bn:'')+'</span></div>';
   }
-  document.getElementById('rlist').innerHTML=rl;
-  showScr('results'); activeScreen='results';
+  document.getElementById('rb-breakdown').innerHTML=breakdown;
+  showScr('roundbreak'); activeScreen='roundbreak';
   document.getElementById('tab-play').classList.add('on');
   document.getElementById('tab-lb').classList.remove('on');
-  document.getElementById('qprog').style.width='100%';
-  showLbTab(); saveScore(); alive=false;
+  showLbTab();
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','waiting');
 }
 
-function restartGame() {
+// ── RESULTS ──────────────────────────
+function showResults(){
+  // Save final round if not saved
+  var rnd=curRound;
+  var rBase=roundScores[rnd]||0, rBonus=roundBonus[rnd]||0;
+  var k=tname.replace(/[^a-zA-Z0-9]/g,'_')+'_r'+rnd+'_final';
+  dbSet('scores/'+k,{team:tname,emails:pemails,players:pcnt,base:rBase,bonus:rBonus,round:rnd,total:QperRound,timestamp:Date.now()});
+
+  var totalBase=roundScores[0]+roundScores[1]+roundScores[2];
+  var totalBonus=roundBonus[0]+roundBonus[1]+roundBonus[2];
+  var total=totalBase+totalBonus;
+  var pct=Math.round((totalBase/(TOTAL_ROUNDS*QperRound))*100);
+  var hl=pct===100?'Nuh badda — perfect! 🏆':pct>=80?'Big up yourself! 🎉':pct>=60?'Respect! 👍':pct>=40?'Keep at it! 😅':'Room to grow!';
+  document.getElementById('rscore').textContent=total;
+  document.getElementById('rhl').textContent=hl;
+  document.getElementById('rpct').textContent=pct+'% correct · '+tname;
+  // Round breakdown in results
+  var rbd='';
+  for(var r=0;r<TOTAL_ROUNDS;r++){
+    var rb=roundScores[r]||0, rbn=roundBonus[r]||0;
+    rbd+='<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--bd);font-size:13px"><span style="font-weight:600">Round '+(r+1)+'</span><span>'+rb+' / '+QperRound+(rbn?' <span style=\'color:#5B5BD6;font-weight:700\'>+⚡'+rbn+' bonus</span>':'')+'</span></div>';
+  }
+  rbd+='<div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:14px;font-weight:800"><span>Total</span><span>'+totalBase+' pts'+(totalBonus?' + ⚡'+totalBonus+' bonus':'')+'</span></div>';
+  document.getElementById('rlist').innerHTML=rbd;
+  document.getElementById('snotice').textContent='Score saved!';
+  document.getElementById('snotice').style.background='#EAF7F0';
+  document.getElementById('snotice').style.color='#2D7A4F';
+  showScr('results'); activeScreen='results';
+  showLbTab(); alive=false;
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','finished');
+}
+
+function restartGame(){
   document.getElementById('f-tname').value='';
   document.getElementById('tname-chip').style.display='none';
   pcnt=1; renderPF();
   document.getElementById('sc').style.display='none';
   document.getElementById('tabbar').classList.remove('on');
   document.getElementById('tab-lb').style.display='none';
-  stopT(); alive=false; answered=false; selIdx=-1; bonus=0; score=0; answers=[];
+  stopT(); alive=false; answered=false; selIdx=-1;
+  score=0; bonus=0; answers=[]; qlist=[]; cq=-1; curRound=0;
+  roundScores=[0,0,0]; roundBonus=[0,0,0]; roundAnswers=[[],[],[]]; roundQuestions=[[],[],[]];
   activeScreen='splash'; showScr('splash');
 }
 
 // ── LEADERBOARD ──────────────────────
 var teamsC=null, scoresC=null;
-function renderLB() {
+function renderLB(){
   var list=document.getElementById('lblist');
   var teams=teamsC?Object.values(teamsC):[];
   var scores=scoresC?Object.values(scoresC):[];
-  var best={};
-  for(var i=0;i<scores.length;i++){var e=scores[i];if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;}
-  var finished=Object.values(best).sort(function(a,b){return b.score-a.score;});
+  // Aggregate by team
+  var totals={};
+  scores.forEach(function(e){
+    if(!totals[e.team]) totals[e.team]={team:e.team,base:0,bonus:0,rounds:{}};
+    totals[e.team].base+=(e.base||e.score||0);
+    totals[e.team].bonus+=(e.bonus||0);
+    totals[e.team].rounds['r'+(e.round+1)]=(e.base||e.score||0);
+  });
+  var finished=Object.values(totals).sort(function(a,b){return (b.base+b.bonus)-(a.base+a.bonus);});
   var finNames={};
-  for(var i=0;i<finished.length;i++) finNames[finished[i].team]=true;
+  finished.forEach(function(t){finNames[t.team]=true;});
   var waiting=teams.filter(function(t){return !finNames[t.name];}).sort(function(a,b){return a.joinedAt-b.joinedAt;});
-  if(finished.length===0&&waiting.length===0){list.innerHTML='<div class="lbempty">No teams yet — be the first! 🏆</div>';return;}
+  if(finished.length===0&&waiting.length===0){list.innerHTML='<div class="lbempty">No teams yet! 🏆</div>';return;}
   var html='';
   if(finished.length>0){
     if(waiting.length>0) html+='<div class="lbsec">Finished</div>';
-    for(var i=0;i<Math.min(finished.length,10);i++){
-      var e=finished[i];
-      var pct=Math.round(((e.score-(e.bonus||0))/e.total)*100);
-      html+='<div class="lbrow '+(i===0?'top':'')+'"><div class="lbrank">'+(i+1)+'</div><div class="lbmed">'+(MD[i]||'')+'</div><div class="lbi"><div class="lbteam">'+e.team+'</div><div class="lbmeta">'+e.players+' player'+(e.players!==1?'s':'')+' · '+pct+'%'+(e.bonus?' · ⚡'+e.bonus+' bonus':'')+'</div></div><div class="lbpts">'+e.score+'<span style="font-size:.6rem;opacity:.6"> pts</span></div></div>';
-    }
+    finished.slice(0,10).forEach(function(e,i){
+      var total=e.base+e.bonus;
+      var rounds=[1,2,3].map(function(r){return 'R'+r+':'+(e.rounds['r'+r]!==undefined?e.rounds['r'+r]:'—');}).join(' ');
+      html+='<div class="lbrow '+(i===0?'top':'')+'"><div class="lbrank">'+(i+1)+'</div><div class="lbmed">'+(MD[i]||'')+'</div><div class="lbi"><div class="lbteam">'+e.team+'</div><div class="lbmeta">'+rounds+(e.bonus?' · ⚡'+e.bonus+' bonus':'')+'</div></div><div class="lbpts">'+total+'<span style="font-size:.6rem;opacity:.6"> pts</span></div></div>';
+    });
   }
   if(waiting.length>0){
-    html+='<div class="lbsec">'+(finished.length>0?'Waiting to play':'Teams registered')+'</div>';
-    for(var i=0;i<waiting.length;i++){
-      var t=waiting[i];
+    html+='<div class="lbsec">'+(finished.length>0?'Still playing':'Teams registered')+'</div>';
+    waiting.forEach(function(t){
       html+='<div class="lbrow wrow"><div class="lbrank">—</div><div class="lbmed">⏳</div><div class="lbi"><div class="lbteam">'+t.name+'</div><div class="lbmeta">'+t.players+' player'+(t.players!==1?'s':'')+' · waiting</div></div><div class="lbpts" style="font-size:.8rem;color:var(--muted);font-weight:500">Ready</div></div>';
-    }
+    });
   }
   list.innerHTML=html;
 }
-dbOn('teams', function(snap){teamsC=snap.val();renderLB();});
-dbOn('scores', function(snap){scoresC=snap.val();renderLB();});
+dbOn('teams',function(snap){teamsC=snap.val();renderLB();});
+dbOn('scores',function(snap){scoresC=snap.val();renderLB();});
 </script>
 </body>
 </html>
