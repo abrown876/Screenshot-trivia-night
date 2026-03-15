@@ -88,7 +88,11 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 
   <div class="card status-bar">
     <div><div class="slabel" style="margin-bottom:.2rem">Game status</div><div class="status-val" id="status-val">Ready to start</div></div>
-    <div class="tables-pill" id="tables-count">0 tables</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="team-counts">
+      <div class="tables-pill" id="count-waiting" style="background:#FEF3DC;color:#8A5500">0 waiting</div>
+      <div class="tables-pill" id="count-playing" style="background:#EEF0FF;color:#3D3D9E">0 playing</div>
+      <div class="tables-pill" id="count-finished" style="background:#EAF7F0;color:#1A6A3A">0 finished</div>
+    </div>
   </div>
 
   <div class="card">
@@ -145,9 +149,9 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, query, orderByChild, limitToLast, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
 
 const FB={apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",authDomain:"screenshot-trivia-night.firebaseapp.com",databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",projectId:"screenshot-trivia-night",storageBucket:"screenshot-trivia-night.firebasestorage.app",messagingSenderId:"482758352954",appId:"1:482758352954:web:832d1cba008bc0b789d503"};
 const app=initializeApp(FB);const db=getDatabase(app);
@@ -198,14 +202,14 @@ function previewQ(i){
 }
 previewQ(0);
 
-window.launchQ=async function(){
+window.launchQ=function(){
   if(qLive) return;
   const idx=selQ;qLive=true;
-  // On first question launch, write shuffled question order to Firebase for all players
-  if(idx===0&&!window._qSaved){
+  // Save question order to Firebase on first launch (always, not just Q1)
+  if(!window._qSaved){
     window._qSaved=true;
     const shuffled=shuffle([...QUESTIONS]);
-    try{ await set(ref(db,'game/questions'),shuffled); }catch(e){}
+    ref('game/questions').set(shuffled);
   }
   document.getElementById('btn-launch').disabled=true;
   document.getElementById('btn-pause').disabled=false;
@@ -214,7 +218,7 @@ window.launchQ=async function(){
   document.getElementById('answer-box').classList.remove('show');
   document.getElementById('timer-block').style.display='block';
   document.getElementById('status-val').textContent='Q'+(idx+1)+' is live — '+TIMER_SECS+'s on the clock';
-  await set(ref(db,'host/command'),{action:'question',index:idx,timestamp:Date.now()});
+  db.ref('host/command').set({action:'question',index:idx,timestamp:Date.now()});
   startTimer(idx);
 };
 
@@ -256,7 +260,7 @@ function finishQ(idx){
   }
 }
 
-window.revealAnswer=async function(){
+window.revealAnswer=function(){
   if(timerInt){clearInterval(timerInt);timerInt=null;}
   const idx=selQ;const q=QUESTIONS[idx];
   const box=document.getElementById('answer-box');
@@ -266,36 +270,36 @@ window.revealAnswer=async function(){
   document.getElementById('status-val').textContent='Answer revealed for Q'+(idx+1);
   document.getElementById('btn-reveal').disabled=true;
   document.getElementById('btn-pause').disabled=true;
-  await set(ref(db,'host/command'),{action:'reveal',index:idx,timestamp:Date.now()});
+  db.ref('host/command').set({action:'reveal',index:idx,timestamp:Date.now()});
   finishQ(idx);
 };
 
-window.pauseGame=async function(){
+window.pauseGame=function(){
   if(timerInt){clearInterval(timerInt);timerInt=null;}
   qLive=false;
   document.getElementById('btn-pause').disabled=true;
   document.getElementById('btn-launch').disabled=false;
   document.getElementById('status-val').textContent='Paused — tables are waiting for you';
-  await set(ref(db,'host/command'),{action:'pause',timestamp:Date.now()});
+  db.ref('host/command').set({action:'pause',timestamp:Date.now()});
 };
 
-window.endGame=async function(){
+window.endGame=function(){
   if(!confirm('Ready to end the game? All tables will see their final results.')) return;
   if(timerInt){clearInterval(timerInt);timerInt=null;}
   ['btn-end','btn-launch','btn-pause','btn-reveal'].forEach(id=>document.getElementById(id).disabled=true);
   document.getElementById('status-val').textContent='Game over — results showing on all tablets';
-  await set(ref(db,'host/command'),{action:'end',timestamp:Date.now()});
+  db.ref('host/command').set({action:'end',timestamp:Date.now()});
 };
 
-window.resetLeaderboard=async function(){
+window.resetLeaderboard=function(){
   if(!confirm('This will permanently delete all scores, bonus data and reactions. Are you sure?')) return;
   try{
-    await remove(ref(db,'scores'));
-    await remove(ref(db,'race'));
-    await remove(ref(db,'reactions'));
-    await remove(ref(db,'host/command'));
-    await remove(ref(db,'teams'));
-    await remove(ref(db,'game'));
+    ref('scores').remove();
+    ref('race').remove();
+    ref('reactions').remove();
+    ref('host/command').remove();
+    ref('teams').remove();
+    ref('game').remove();
     window._qSaved=false;
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">Leaderboard cleared — ready for a new game!</div>';
     document.getElementById('status-val').textContent='Reset complete — ready to start';
@@ -305,7 +309,7 @@ window.resetLeaderboard=async function(){
   }
 };
 
-onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(6)),snapshot=>{
+db.ref('reactions').orderByChild('timestamp').limitToLast(6).on('value',function(snapshot){
   const data=snapshot.val();
   const el=document.getElementById('rxn-list');
   if(!data){el.innerHTML='<div class="lb-empty">No reactions yet</div>';return;}
@@ -318,16 +322,33 @@ onValue(query(ref(db,'reactions'),orderByChild('timestamp'),limitToLast(6)),snap
     </div>`).join('');
 });
 
-onValue(ref(db,'scores'),snapshot=>{
+// Teams listener — shows waiting/playing/finished counts
+db.ref('teams').on('value', function(snap){
+  var data = snap.val();
+  if(!data){ 
+    document.getElementById('count-waiting').textContent='0 waiting';
+    document.getElementById('count-playing').textContent='0 playing';
+    return;
+  }
+  var teams = Object.values(data);
+  var waiting = teams.filter(function(t){return t.status==='waiting';}).length;
+  var playing = teams.filter(function(t){return t.status==='playing';}).length;
+  var finished = teams.filter(function(t){return t.status==='finished';}).length;
+  document.getElementById('count-waiting').textContent=waiting+' waiting';
+  document.getElementById('count-playing').textContent=playing+' playing';
+  document.getElementById('count-finished').textContent=finished+' finished';
+});
+
+db.ref('scores').on('value',function(snapshot){
   const data=snapshot.val();
   if(!data){
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
-    document.getElementById('tables-count').textContent='0 tables';return;
+    document.getElementById('count-finished').textContent='0 finished';return;
   }
   const best={};
   Object.values(data).forEach(e=>{if(!best[e.team]||e.score>best[e.team].score)best[e.team]=e;});
   const sorted=Object.values(best).sort((a,b)=>b.score-a.score);
-  document.getElementById('tables-count').textContent=sorted.length+' table'+(sorted.length!==1?'s':'');
+  document.getElementById('count-finished').textContent=sorted.length+' finished';
   document.getElementById('lb-list').innerHTML=sorted.slice(0,8).map((e,i)=>`
     <div class="lb-row">
       <div class="lb-left">
