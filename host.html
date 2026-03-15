@@ -389,7 +389,7 @@ function endRound(){
   clearInterval(timer);
   // Mark round as done
   roundDone[curRound-1] = true;
-  db.ref('host/command').set({action:'roundbreak',round:curRound,timestamp:Date.now()});
+  db.ref('host/command').set({action:'round_end',round:curRound,timestamp:Date.now()});
   // Mark round tab as done
   document.getElementById('rtab'+curRound).className='rtab done';
   document.getElementById('btn-break').disabled = true;
@@ -416,7 +416,7 @@ function endRound(){
 
 function endGame(){
   if(!db) return;
-  db.ref('host/command').set({action:'results',round:3,timestamp:Date.now()});
+  db.ref('host/command').set({action:'end',round:3,timestamp:Date.now()});
   document.getElementById('status-val').textContent = 'Game over — results shown';
 }
 
