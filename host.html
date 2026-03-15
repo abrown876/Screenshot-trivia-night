@@ -538,7 +538,22 @@ if(db){
 // Init
 setChip('waiting');
 selRound(1);
-document.getElementById('btn-launch').disabled=true; // enabled when a team joins
+// Check if teams already exist in Firebase (e.g. page refresh mid-game)
+if(db){
+  db.ref('teams').once('value', function(snap){
+    var data = snap.val() || {};
+    var total = Object.keys(data).length;
+    if(total > 0){
+      document.getElementById('btn-launch').disabled = false;
+      setChip('ready', total+' team'+(total!==1?'s':'')+' ready');
+      document.getElementById('status-val').textContent = total+' team'+(total!==1?'s':'')+' ready — launch when ready';
+    } else {
+      document.getElementById('btn-launch').disabled = true;
+    }
+  });
+} else {
+  document.getElementById('btn-launch').disabled = true;
+}
 </script>
 </body>
 </html>
