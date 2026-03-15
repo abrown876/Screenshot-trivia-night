@@ -255,13 +255,14 @@ try {
 function selRound(r){
   // Prevent jumping to a round that hasn't been unlocked
   // Round 1 always available; Round 2 only after Round 1 done; Round 3 only after Round 2 done
-  if(r === 2 && !roundDone[0]){ alert('Complete Round 1 first.'); return; }
-  if(r === 3 && !roundDone[1]){ alert('Complete Round 2 first.'); return; }
+  if(r === 2 && !(window.roundDone||[false,false,false])[0]){ alert('Complete Round 1 first.'); return; }
+  if(r === 3 && !(window.roundDone||[false,false,false])[1]){ alert('Complete Round 2 first.'); return; }
   curRound = r;
   selQ = 0;
   [1,2,3].forEach(function(n){
     var t = document.getElementById('rtab'+n);
-    t.className = 'rtab' + (roundDone[n-1]?' done' : n===r?' active':'');
+    var rd = window.roundDone||[false,false,false];
+    t.className = 'rtab' + (rd[n-1]?' done' : n===r?' active':'');
   });
   renderDots();
   renderQuestion();
@@ -307,9 +308,6 @@ function renderQuestion(){
   grid.innerHTML = q.o.map(function(opt,i){
     return '<div class="opt-prev'+(i===q.a?' correct-opt':'')+'"><div class="opt-ltr">'+String.fromCharCode(65+i)+'</div>'+opt+'</div>';
   }).join('');
-  document.getElementById('btn-launch').disabled = false;
-  document.getElementById('btn-reveal').disabled = true;
-  document.getElementById('btn-pause').disabled = true;
 }
 
 function launchQ(){
@@ -405,7 +403,7 @@ function revealQ(){
     document.getElementById('btn-launch').disabled = false;
     document.getElementById('btn-break').disabled = true;
     document.getElementById('status-val').textContent = 'Revealed — launch Q'+(selQ+1)+' when ready';
-    setChip('revealed','Q'+(selQ)+' revealed');
+    setChip('revealed','Q'+selQ+' revealed');
   }
 }
 
@@ -413,7 +411,8 @@ function endRound(){
   if(!db) return;
   clearInterval(timer);
   // Mark round as done
-  roundDone[curRound-1] = true;
+  if(!window.roundDone) window.roundDone=[false,false,false];
+  window.roundDone[curRound-1] = true;
   db.ref('host/command').set({action:'round_end',round:curRound,timestamp:Date.now()});
   // Mark round tab as done
   document.getElementById('rtab'+curRound).className='rtab done';
@@ -534,9 +533,7 @@ if(db){
 // Init
 setChip('waiting');
 selRound(1);
-renderDots();
-renderQuestion();
-document.getElementById('btn-launch').disabled=true; // enabled when team joins
+document.getElementById('btn-launch').disabled=true; // enabled when a team joins
 </script>
 </body>
 </html>
