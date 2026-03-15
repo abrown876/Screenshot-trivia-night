@@ -287,6 +287,7 @@ function launchQ(){
   var qs = getRoundQuestions();
   var q = qs[selQ];
   if(!q || !db) return;
+  if(teamCount === 0){ alert('No teams registered yet. Wait for at least 1 team to join.'); return; }
   var ts = Date.now();
   db.ref('game/current').set({round:curRound,index:selQ,question:q,timestamp:ts});
   db.ref('host/command').set({action:'question',round:curRound,index:selQ,timestamp:ts});
@@ -433,9 +434,22 @@ if(db){
       else if(t.status==='playing') play++;
       else if(t.status==='finished') done++;
     });
+    teamCount = wait + play + done;
     document.getElementById('cnt-wait').textContent = wait;
     document.getElementById('cnt-play').textContent = play;
     document.getElementById('cnt-done').textContent = done;
+    // Gate launch button on team presence
+    var launchBtn = document.getElementById('btn-launch');
+    if(launchBtn){
+      if(teamCount === 0){
+        launchBtn.disabled = true;
+        document.getElementById('status-val').textContent = 'Waiting for teams to join...';
+      } else if(launchBtn.disabled && document.getElementById('timer-block').style.display === 'none'){
+        // Teams joined and no question running — enable launch
+        launchBtn.disabled = false;
+        document.getElementById('status-val').textContent = teamCount+' team'+(teamCount!==1?'s':'')+' ready — launch when ready';
+      }
+    }
   });
 
   // ── Reactions listener ───────────────────────────────────────────
@@ -454,6 +468,7 @@ if(db){
 selRound(1);
 renderDots();
 renderQuestion();
+document.getElementById('btn-launch').disabled=true; // enabled when team joins
 </script>
 </body>
 </html>
