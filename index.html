@@ -252,17 +252,37 @@ body{display:flex;flex-direction:column}
 
 <!-- RESULTS -->
 <div id="roundbreak" class="scr an">
-  <div class="wc">
-    <div class="wcard">
-      <div style="font-size:2.5rem;margin-bottom:.6rem">&#x2615;</div>
-      <div class="wbadge" style="background:#E8547A;display:inline-block;margin-bottom:.75rem" id="rb-round">Round 1 complete!</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:2rem;color:var(--purple);margin-bottom:.1rem" id="rb-base">0</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:.1rem" id="rb-bonus">No bonus</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.75rem" id="rb-total">0 pts this round</div>
-      <div id="rb-breakdown" style="text-align:left;margin-bottom:.75rem"></div>
-      <div style="font-size:14px;color:var(--purple);font-weight:700" id="rb-cumul">Total so far: 0 pts</div>
+  <div class="si">
+    <!-- Score summary card -->
+    <div class="wcard" style="margin-bottom:1rem;text-align:center">
+      <div style="font-size:2rem;margin-bottom:.4rem">&#x2615;</div>
+      <div class="wbadge" style="background:#E8547A;display:inline-block;margin-bottom:.6rem" id="rb-round">Round 1 complete!</div>
+      <div style="display:flex;justify-content:center;gap:1.5rem;margin-bottom:.5rem">
+        <div style="text-align:center">
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--purple);line-height:1" id="rb-base">0</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700">Base pts</div>
+        </div>
+        <div style="width:1px;background:var(--bd)"></div>
+        <div style="text-align:center">
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:#E8547A;line-height:1" id="rb-bonus-num">0</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700">&#x26A1; Bonus</div>
+        </div>
+        <div style="width:1px;background:var(--bd)"></div>
+        <div style="text-align:center">
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--text);line-height:1" id="rb-total-num">0</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700">This round</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--purple);font-weight:700" id="rb-cumul">Total so far: 0 pts</div>
     </div>
-    <div class="spw"><div class="spwl">A word from our sponsor</div><div class="spwn" id="sppn">YOUR SPONSOR</div><div class="spwt" id="sppt">Your sponsor tagline here</div></div>
+
+    <!-- Answers reveal -->
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text);margin-bottom:.6rem">&#x1F4CB; Round answers</div>
+    <div id="rb-answers"></div>
+
+    <!-- Sponsor -->
+    <div class="spw" style="margin-top:.75rem"><div class="spwl">A word from our sponsor</div><div class="spwn" id="sppn">YOUR SPONSOR</div><div class="spwt" id="sppt">Your sponsor tagline here</div></div>
+    <div style="height:1rem"></div>
   </div>
 </div>
 
@@ -683,16 +703,44 @@ function showRoundBreak(rnd){
   // Update UI
   document.getElementById('rb-round').textContent   = 'Round '+(rnd+1)+' complete!';
   document.getElementById('rb-base').textContent    = rBase;
-  document.getElementById('rb-bonus').textContent   = rBonus ? '+'+rBonus+' bonus' : 'No bonus';
-  document.getElementById('rb-total').textContent   = (rBase+rBonus)+' pts this round';
+  document.getElementById('rb-bonus-num').textContent = rBonus || 0;
+  document.getElementById('rb-total-num').textContent = rBase + rBonus;
   document.getElementById('rb-cumul').textContent   = 'Total so far: '+score+' pts';
-  // Build per-round breakdown
-  var breakdown='';
-  for(var r=0;r<=rnd;r++){
-    var b=roundScores[r]||0, bn=roundBonus[r]||0;
-    breakdown+='<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--bd);font-size:13px"><span>Round '+(r+1)+'</span><span style="font-weight:700">'+b+' / '+QperRound+(bn?' + ⚡'+bn:'')+'</span></div>';
+
+  // Build answers reveal for this round
+  var qs = roundQuestions[rnd] || [];
+  var ans = roundAnswers[rnd] || [];
+  var LT2 = ['A','B','C','D'];
+  var ahtml = '';
+  for(var qi=0; qi<qs.length; qi++){
+    var q = qs[qi];
+    if(!q) continue;
+    var ar = ans[qi];
+    var playerResult = ar ? ar.r : 't'; // c=correct b=bonus w=wrong t=timeout
+    var gotIt = playerResult==='c' || playerResult==='b';
+    var icon = gotIt ? '&#x2705;' : (playerResult==='w' ? '&#x274C;' : '&#x23F0;');
+    var cardColor = gotIt ? 'background:#EAF7F0;border-color:#90D4A8' : (playerResult==='w' ? 'background:#FDECEA;border-color:#F5C0BB' : 'background:#FEF3DC;border-color:#F5D09A');
+    var bonusBadge = playerResult==='b' ? '<span style="background:#EEEEFF;color:#3D3D9E;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:6px;font-family:Nunito,sans-serif">⚡ Bonus</span>' : '';
+    ahtml += '<div style="'+cardColor+';border:1.5px solid;border-radius:12px;padding:.7rem .9rem;margin-bottom:.5rem">';
+    ahtml += '<div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.35rem">';
+    ahtml += '<span style="font-size:1rem;flex-shrink:0">'+icon+'</span>';
+    ahtml += '<span style="font-size:12px;font-weight:700;color:#1A1A3E;line-height:1.4;flex:1">Q'+(qi+1)+'. '+q.q+'</span>';
+    ahtml += '</div>';
+    // Show all options, highlight correct
+    ahtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.25rem">';
+    for(var oi=0; oi<q.o.length; oi++){
+      var isCorrect = oi===q.a;
+      var optStyle = isCorrect
+        ? 'background:#1A8A4A;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700'
+        : 'color:#7A7AAA;font-size:11px;padding:3px 8px';
+      ahtml += '<div style="'+optStyle+'">'+LT2[oi]+'. '+q.o[oi]+'</div>';
+    }
+    ahtml += '</div>';
+    if(bonusBadge) ahtml += '<div style="margin-top:.25rem">'+bonusBadge+'</div>';
+    ahtml += '</div>';
   }
-  document.getElementById('rb-breakdown').innerHTML=breakdown;
+  document.getElementById('rb-answers').innerHTML = ahtml;
+
   showScr('roundbreak'); activeScreen='roundbreak';
   document.getElementById('tab-play').classList.add('on');
   document.getElementById('tab-lb').classList.remove('on');
