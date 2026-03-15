@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join — Jamaica Trivia Night</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#5B5BD6;--purpled:#3D3D9E;--purplel:#EEEEFF;
+  --coral:#E8547A;--corall:#FDE8EE;
+  --gold:#F5A623;--goldl:#FEF3DC;
+  --bg:#F4F4FC;--card:#fff;--text:#1A1A3E;--muted:#7A7AAA;--bd:#E0E0F0;
+  --ok:#2D7A4F;--no:#C0392B;--okbg:#EAF7F0;--nobg:#FDECEA;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+body{display:flex;flex-direction:column}
+
+/* SPONSOR BAR */
+.spbar{background:var(--coral);padding:6px 1.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-shrink:0}
+.splbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
+.spnm{font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;color:#fff}
+.spdv{width:1px;height:12px;background:rgba(255,255,255,.35)}
+
+/* MAIN LAYOUT — two columns on tablet */
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem;max-width:900px;margin:0 auto;width:100%}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--purple),var(--purpled));border-radius:20px;padding:1.75rem;text-align:center;width:100%}
+.hero-flag{font-size:2.5rem;margin-bottom:.5rem}
+.hero h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.8rem;color:#fff;line-height:1.15;margin-bottom:.35rem}
+.hero p{font-size:13px;color:rgba(255,255,255,.75)}
+.hero-sp{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 14px;display:inline-block;margin-top:.6rem;font-size:12px;color:rgba(255,255,255,.85);font-family:'Nunito',sans-serif;font-weight:700}
+
+/* TWO COLUMN */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;width:100%}
+@media(max-width:580px){.cols{grid-template-columns:1fr}}
+
+/* QR COLUMN */
+.qr-card{background:var(--card);border-radius:20px;padding:1.5rem;box-shadow:0 4px 20px rgba(91,91,214,.08);text-align:center;display:flex;flex-direction:column;align-items:center;gap:.85rem}
+.qr-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
+.qr-sub{font-size:12px;color:var(--muted);line-height:1.5}
+.qr-frame{background:#fff;border:3px solid var(--purplel);border-radius:16px;padding:12px;box-shadow:0 2px 12px rgba(91,91,214,.12)}
+.qr-frame img{display:block;border-radius:8px}
+.qr-url{font-size:11px;color:var(--muted);font-family:monospace;background:var(--bg);padding:5px 10px;border-radius:8px;word-break:break-all;text-align:center}
+.qr-arrow{font-size:.9rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
+
+/* REGISTER COLUMN */
+.reg-card{background:var(--card);border-radius:20px;padding:1.5rem;box-shadow:0 4px 20px rgba(91,91,214,.08)}
+.reg-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text);margin-bottom:1rem}
+.flbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;display:block;font-family:'Nunito',sans-serif}
+.alertbox{display:none;background:var(--nobg);color:var(--no);border:1px solid #f5c0bb;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:.75rem}
+
+/* TEAMS JOINED */
+.teams-card{background:var(--card);border-radius:20px;padding:1.25rem;box-shadow:0 4px 20px rgba(91,91,214,.08);width:100%}
+.teams-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);display:inline-block;margin-right:.35rem;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.teams-grid{display:flex;flex-wrap:wrap;gap:.45rem}
+.tpill{background:var(--purplel);color:var(--purpled);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;padding:.3rem .85rem;border-radius:20px}
+.teams-empty{font-size:12px;color:var(--muted)}
+
+/* FORM ELEMENTS */
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;display:block;margin-top:.75rem}
+.bpp{background:var(--purple);color:#fff}
+.bpp:hover{background:var(--purpled)}
+.success-box{display:none;background:var(--okbg);color:var(--ok);border:1px solid #90D4A8;border-radius:12px;padding:1rem;text-align:center;margin-top:.75rem}
+.success-box h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;margin-bottom:.3rem}
+.success-box p{font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="spbar"><span class="splbl">Presented by</span><span class="spdv"></span><span class="spnm" id="spnm">YOUR SPONSOR</span></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-flag">&#x1F1EF;&#x1F1F2;</div>
+    <h1>Jamaica Trivia Night</h1>
+    <p>3 rounds &middot; 30 questions &middot; Race mode bonus points</p>
+    <div class="hero-sp">Brought to you by <b id="hspnm">YOUR SPONSOR</b></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- QR CODE -->
+    <div class="qr-card">
+      <div class="qr-title">&#x1F4F2; Scan with your phone</div>
+      <div class="qr-sub">Open on your own device — one player per phone, or share a tablet with your table</div>
+      <div class="qr-frame">
+        <img id="qr-img" width="180" height="180" alt="QR Code">
+      </div>
+      <div class="qr-url" id="qr-url"></div>
+      <div class="qr-arrow">&#x2934; or register on this tablet below</div>
+    </div>
+
+    <!-- REGISTER ON THIS DEVICE -->
+    <div class="reg-card">
+      <div class="reg-title">&#x1F3AE; Register at this table</div>
+      <div class="alertbox" id="alertbox"></div>
+
+      <label class="flbl">Table name</label>
+      <input id="f-tname" type="text" placeholder="e.g. Table 4 or The Legends" maxlength="30"
+        style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#fff;font-size:16px;color:#1A1A3E;outline:none;display:block;margin-bottom:.85rem;font-family:'DM Sans',sans-serif;box-sizing:border-box">
+
+      <label class="flbl">Number of players (1&ndash;4)</label>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:.85rem">
+        <button id="btn-minus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8722;</button>
+        <span id="cval" style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#5B5BD6;min-width:24px;text-align:center">1</span>
+        <span id="clbl" style="font-size:13px;color:#7A7AAA">player</span>
+        <button id="btn-plus" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #E0E0F0;background:#F4F4FC;font-size:22px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#43;</button>
+      </div>
+
+      <label class="flbl">Player emails</label>
+      <div id="pfields"></div>
+
+      <button class="btn bpp" id="btn-join">Register this table &#8594;</button>
+
+      <div class="success-box" id="success-box">
+        <h3>&#x2705; You're registered!</h3>
+        <p>Head to your table and open the game on your device — the host will launch Round 1 shortly.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TEAMS JOINED -->
+  <div class="teams-card">
+    <div class="teams-title">
+      <span><span class="live-dot"></span>Teams registered</span>
+      <span id="team-count" style="font-size:12px;color:var(--muted);font-weight:400">0 teams</span>
+    </div>
+    <div id="teams-grid" class="teams-grid"><span class="teams-empty">No teams yet — be the first!</span></div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+var SPONSOR_NAME = "YOUR SPONSOR";
+var SPONSOR_TAG  = "Your sponsor tagline here";
+var JOIN_URL = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
+var MAXP = 4;
+
+firebase.initializeApp({
+  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+  authDomain:"screenshot-trivia-night.firebaseapp.com",
+  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+  projectId:"screenshot-trivia-night",
+  storageBucket:"screenshot-trivia-night.firebasestorage.app",
+  messagingSenderId:"482758352954",
+  appId:"1:482758352954:web:832d1cba008bc0b789d503"
+});
+var db = firebase.database();
+
+// Set sponsor
+document.getElementById('spnm').textContent = SPONSOR_NAME;
+document.getElementById('hspnm').textContent = SPONSOR_NAME;
+
+// QR code
+document.getElementById('qr-url').textContent = JOIN_URL;
+document.getElementById('qr-img').src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAEXElEQVR4nO3dwY3bSBBAUY+xWTiYjd3BOA7uYX2lAQJd7qb+e2dBouSPPtTQxa/rur7Bp/u++wLgbxA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBL+WfVGP378u+qtRv369fPR659+r+n3P+1zpz39Xnec6CQInQShkyB0EoROgtBJEDoJy+bod1bNQZ96Oie+e/2u66997vRc34lOgtBJEDoJQidB6CQInQShkzA+R7+z6z7sp++z677t036f067nKSc6CUInQegkCJ0EoZMgdBKETsK2Ofqn+tT9Km/nRCdB6CQInQShkyB0EoROgtBJMEf/bXoP+vT78GdOdBKEToLQSRA6CUInQegkCJ2EbXP00+bHT/e6rNqnftpe9junXc9TTnQShE6C0EkQOglCJ0HoJAidhPE5+lv2ljydZ08/x3T69Xfe8u/1lBOdBKGTIHQShE6C0EkQOglCJ+Hruq7d1/BRdu2Hect97bs40UkQOglCJ0HoJAidBKGTIHQSls3RT7vf+rS9K6vm69Nz+l2/8zQnOglCJ0HoJAidBKGTIHQShE7C+P3o03PW0+bcT99/196V0/a4T7+/E50EoZMgdBKEToLQSRA6CUInYXw/+vScddXrVzntOnfN6U/bs+5EJ0HoJAidBKGTIHQShE6C0En42OeM7tpD4jmg/zttD4wTnQShkyB0EoROgtBJEDoJQidhfD/62522t2TXHPot+93vONFJEDoJQidB6CQInQShkyB0El6z12Xa3Xx3+u8Du+brb/l/Aqs40UkQOglCJ0HoJAidBKGTIHQSxp8zusv08zh3Pe/zzmn3i5/2+zjRSRA6CUInQegkCJ0EoZMgdBK27XWZ3gt+2n3wp825d7EfHQYJnQShkyB0EoROgtBJEDoJ43tdVnk6V37LvHnXXvNdf8fY9Ts70UkQOglCJ0HoJAidBKGTIHQSPnavy7Tp+6pX7TufnpffOe1+eic6CUInQegkCJ0EoZMgdBKETsKy+9F3PbfyqdP2gk/ft71rj8ppnOgkCJ0EoZMgdBKEToLQSRA6CeN7XXbNa3fd9zz93M2nnn6v065/FSc6CUInQegkCJ0EoZMgdBKETsK2/ejT+0NW2bVf5en1rLLq+z7lOaOwgNBJEDoJQidB6CQInQShk/Ca54xOe8v8e9U8e9frd/39wYlOgtBJEDoJQidB6CQInQShk2CO/tuq53G+ZS/K9Pc9jROdBKGTIHQShE6C0EkQOglCJ2HbHP0t89fp+fGu+f2u55jumsc70UkQOglCJ0HoJAidBKGTIHQSxufop92H/dRp922ftg/+LZ/rRCdB6CQInQShkyB0EoROgtBJ+Lqua/c1wDgnOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE7Cf/oCdYspI+06AAAAAElFTkSuQmCC';
+
+// Form
+var pcnt = 1;
+
+function renderPF() {
+  var c = document.getElementById('pfields');
+  c.innerHTML = '';
+  for (var i = 0; i < pcnt; i++) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
+    var num = document.createElement('span');
+    num.textContent = i + 1;
+    num.style.cssText = 'font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#5B5BD6;min-width:20px;text-align:center;flex-shrink:0';
+    var inp = document.createElement('input');
+    inp.type = 'email'; inp.placeholder = 'player'+(i+1)+'@example.com';
+    inp.maxLength = 80; inp.id = 'em'+i;
+    inp.style.cssText = 'flex:1;padding:12px 14px;border-radius:10px;border:1.5px solid #E0E0F0;background:#ffffff;font-size:16px;color:#1A1A3E;outline:none;font-family:DM Sans,sans-serif;min-width:0;box-sizing:border-box';
+    row.appendChild(num); row.appendChild(inp);
+    c.appendChild(row);
+  }
+  document.getElementById('cval').textContent = pcnt;
+  document.getElementById('clbl').textContent = pcnt === 1 ? 'player' : 'players';
+}
+
+document.getElementById('btn-minus').onclick = function(){ if(pcnt>1){pcnt--;renderPF();} };
+document.getElementById('btn-plus').onclick  = function(){ if(pcnt<MAXP){pcnt++;renderPF();} };
+document.getElementById('btn-join').onclick  = function(){ registerTable(); };
+renderPF();
+
+function showAlert(msg){ var a=document.getElementById('alertbox'); a.textContent=msg; a.style.display='block'; setTimeout(function(){a.style.display='none';},4000); }
+
+function registerTable() {
+  var tname = document.getElementById('f-tname').value.trim();
+  if(!tname){ showAlert('Please enter a table name!'); return; }
+  var pemails = [];
+  for(var i=0;i<pcnt;i++){
+    var el=document.getElementById('em'+i);
+    var v=el?el.value.trim().toLowerCase():'';
+    if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ showAlert('Please enter a valid email for Player '+(i+1)+'.'); return; }
+    if(pemails.indexOf(v)>=0){ showAlert('Player '+(i+1)+' email is a duplicate.'); return; }
+    pemails.push(v);
+  }
+  var k = tname.replace(/[^a-zA-Z0-9]/g,'_');
+  db.ref('teams/'+k).set({name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:Date.now()}, function(err){
+    if(err){ showAlert('Could not register — check your connection.'); return; }
+    document.getElementById('btn-join').style.display = 'none';
+    document.getElementById('success-box').style.display = 'block';
+    // Disable form
+    document.getElementById('f-tname').disabled = true;
+    document.getElementById('btn-minus').disabled = true;
+    document.getElementById('btn-plus').disabled = true;
+    var inputs = document.querySelectorAll('#pfields input');
+    for(var i=0;i<inputs.length;i++) inputs[i].disabled = true;
+  });
+}
+
+// Live teams list
+db.ref('teams').on('value', function(snap){
+  var data = snap.val();
+  var grid = document.getElementById('teams-grid');
+  var count = document.getElementById('team-count');
+  if(!data){ grid.innerHTML='<span class="teams-empty">No teams yet — be the first!</span>'; count.textContent='0 teams'; return; }
+  var teams = Object.values(data).sort(function(a,b){return a.joinedAt-b.joinedAt;});
+  count.textContent = teams.length + ' team' + (teams.length!==1?'s':'');
+  grid.innerHTML = teams.map(function(t){
+    return '<div class="tpill">&#x1F3AE; '+t.name+'</div>';
+  }).join('');
+});
+</script>
+</body>
+</html>
