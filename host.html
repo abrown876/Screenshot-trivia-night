@@ -354,18 +354,26 @@ function launchQ(){
     if(timerVal <= 3){ big.className='timer-big urg'; fill.className='timer-fill urg'; }
     if(timerVal <= 0){
       clearInterval(timer);
-      // Timer expired — show current Q still, enable reveal or next launch
-      document.getElementById('btn-reveal').disabled = false; // host can still reveal answer
+      // Timer expired
+      var _qs = getRoundQuestions();
+      var _isLast = selQ >= _qs.length - 1;
+      document.getElementById('btn-reveal').disabled = false; // can still reveal answer
       document.getElementById('btn-pause').disabled = true;
-      document.getElementById('btn-break').disabled = true;
-      document.getElementById('status-val').textContent = 'Time up! Reveal answer or launch next Q';
-      setChip('paused', 'Time up');
+      document.getElementById('btn-break').disabled = false; // always available
+      document.getElementById('btn-launch').disabled = _isLast;
+      if(_isLast){
+        document.getElementById('status-val').textContent = 'Time up — reveal answer then End Round';
+        setChip('paused', 'Last Q — time up');
+      } else {
+        document.getElementById('status-val').textContent = 'Time up — reveal or launch next Q';
+        setChip('paused', 'Time up');
+      }
     }
   }, 1000);
   document.getElementById('btn-launch').disabled = true;
   document.getElementById('btn-pause').disabled = false;
   document.getElementById('btn-reveal').disabled = false;  // only active while timer runs
-  document.getElementById('btn-break').disabled = true;
+  document.getElementById('btn-break').disabled = false; // always available once launched
   document.getElementById('status-val').textContent = 'Round '+curRound+' — Q'+(selQ+1)+' live';
   setChip('live','R'+curRound+' Q'+(selQ+1)+' Live');
 }
@@ -374,6 +382,7 @@ function pauseQ(){
   if(!db) return;
   db.ref('host/command').set({action:'pause',round:curRound,index:selQ,timestamp:Date.now()});
   clearInterval(timer);
+  document.getElementById('btn-break').disabled = false;
   document.getElementById('status-val').textContent = 'Paused';
   setChip('paused');
 }
@@ -419,7 +428,7 @@ function revealQ(){
     document.getElementById('btn-launch').disabled = false;
     document.getElementById('btn-pause').disabled = true;
     document.getElementById('btn-reveal').disabled = true;
-    document.getElementById('btn-break').disabled = true;
+    document.getElementById('btn-break').disabled = false; // can end round at any time
     document.getElementById('status-val').textContent = '👉 Preview: Q'+selQ+' of '+getRoundQuestions().length+' — click Launch when ready';
     setChip('ready', 'Q'+selQ+' preview');
   }
