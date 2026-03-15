@@ -238,9 +238,10 @@ function buildDots10() {
   }
 }
 function buildDots() {
+  var count = GAME_QUESTIONS.length > 0 ? GAME_QUESTIONS.length : 10;
   var c = document.getElementById('qdots');
   c.innerHTML = '';
-  for(var i=0;i<GAME_QUESTIONS.length;i++){
+  for(var i=0;i<count;i++){
     (function(idx){
       var d = document.createElement('div');
       d.className = 'qdot' + (idx===0?' active':'');
@@ -266,7 +267,14 @@ function selectQ(i) {
 }
 
 function previewQ(i) {
-  var arr = GAME_QUESTIONS.length > 0 ? GAME_QUESTIONS : QUESTIONS;
+  if(GAME_QUESTIONS.length === 0) {
+    document.getElementById('q-title').textContent = 'Ready to start';
+    document.getElementById('q-text-host').textContent = 'Hit Launch Q1 to shuffle and start the game. Questions will be picked from the 30-question pool.';
+    document.getElementById('q-cat-pill').textContent = '';
+    document.getElementById('opts-preview').innerHTML = '';
+    return;
+  }
+  var arr = GAME_QUESTIONS;
   var q = arr[i];
   document.getElementById('q-title').textContent = 'Q'+(i+1)+' of '+arr.length;
   var cat = document.getElementById('q-cat-pill');
@@ -347,8 +355,7 @@ function finishQ(idx) {
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('status-val').textContent = 'Q'+(idx+1)+' done — paused, ready for next';
   var next = idx+1;
-  var arr = GAME_QUESTIONS.length > 0 ? GAME_QUESTIONS : QUESTIONS;
-  if(next < arr.length){
+  if(next < GAME_QUESTIONS.length){
     selQ = next;
     var nd = document.getElementById('dot-'+next);
     if(nd) nd.className='qdot active';
