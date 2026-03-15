@@ -244,6 +244,9 @@ var selQ = 0;
 var timer = null;
 var timerVal = 0;
 var db = null;
+var teamCount = 0;
+var roundDone = [false,false,false];
+var roundStarted = [false,false,false];
 
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
@@ -316,7 +319,8 @@ function launchQ(){
   if(!q || !db) return;
   if(teamCount === 0){ alert('No teams registered yet. Wait for at least 1 team to join.'); return; }
   var ts = Date.now();
-  roundStarted[curRound-1] = true;
+  if(!window.roundStarted) window.roundStarted=[false,false,false];
+  window.roundStarted[curRound-1] = true;
   // Update all waiting teams to 'playing'
   db.ref('teams').once('value', function(snap){
     var teams = snap.val() || {};
