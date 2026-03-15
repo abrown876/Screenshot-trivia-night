@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Screenshot Quiz Night \u2014 Screenshot Interactive</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Screenshot Quiz Night</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -290,8 +290,11 @@ button{touch-action:manipulation;cursor:pointer}
 <div class="stoast" id="stoast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
+
 
 function renderSponsors(){
   var hh=SPONSOR_HEIGHT;
@@ -404,16 +407,7 @@ function joinGame(){
   updSC();
   joinTime=Date.now();
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:joinTime});
-  // Listen persistently for rounds pushed by host
-  dbOn('game/rounds',function(snap){
-    var rd=snap.val();
-    if(!rd) return;
-    roundQuestions[0]=rd[0]||[];
-    roundQuestions[1]=rd[1]||[];
-    roundQuestions[2]=rd[2]||[];
-    // Refresh current qlist if round is active
-    if(alive) qlist=roundQuestions[curRound]||[];
-  });
+  
   // Show waiting screen and start listening for host commands
   showWait(0);
   showScr('waiting');
@@ -438,9 +432,14 @@ function listenHost(){
     if(cmd.action==='question'){
       var r=(cmd.round||1)-1;
       if(r!==curRound){curRound=r;roundAnswers[curRound]=[];answers=roundAnswers[curRound];}
-      qlist=roundQuestions[curRound]||[];
-      cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
-      launchQ(cq);
+      // Read the exact question host just pushed to game/current
+      dbOnce('game/current',function(cs){
+        var cur=cs.val();
+        if(!cur||!cur.question){return;}
+        qlist=[cur.question];
+        cq=0;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
+        launchQ(0);
+      });
     } else if(cmd.action==='reveal'){stopT();if(qlist.length>0)revealAns(cq);}
     else if(cmd.action==='pause'){stopT();showPaused();}
     else if(cmd.action==='round_end'){stopT();showRoundBreak((cmd.round||1)-1);}
@@ -582,7 +581,7 @@ dbOn('live_scores',function(snap){liveC=snap.val();renderLB();});
   }, 100);
 })();
 
+
 </script>
 </body>
 </html>
-</div>
