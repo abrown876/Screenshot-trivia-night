@@ -39,8 +39,8 @@ button{touch-action:manipulation;cursor:pointer}
 .card-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text);margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
 
 /* QR */
-.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:.5rem 0}
-.qr-box{background:#1A1A3E;border-radius:12px;padding:12px;border:2px solid #5B5BD6;display:inline-block}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:.5rem 0;text-align:center}
+.qr-box{background:#1A1A3E;border-radius:12px;padding:12px;border:2px solid #5B5BD6;display:flex;align-items:center;justify-content:center;width:224px;height:224px}
 .qr-url{font-size:11px;color:var(--muted);text-align:center;word-break:break-all;max-width:220px}
 .qr-hint{font-size:12px;color:var(--purple);font-weight:700;text-align:center}
 
@@ -104,7 +104,7 @@ button{touch-action:manipulation;cursor:pointer}
       <div class="card-title">&#x1F4F1; Scan with your phone</div>
       <div class="qr-wrap">
         <div class="qr-box">
-          <div id="qr-container" style="line-height:0;border-radius:8px;overflow:hidden"></div>
+          <div id="qr-container" style="width:200px;height:200px;border-radius:8px;overflow:hidden"></div>
         </div>
         <div class="qr-hint">Point your camera here</div>
         <div class="qr-url" id="qr-url"></div>
@@ -157,14 +157,22 @@ var playerCount = 1;
 var teamsCache = {};
 
 // ── QR Code ──────────────────────────────────────────────────────────
-document.getElementById('qr-url').textContent = JOIN_URL;
-new QRCode(document.getElementById('qr-container'), {
-  text: JOIN_URL,
-  width: 180, height: 180,
-  colorDark: '#ffffff',
-  colorLight: '#1A1A3E',
-  correctLevel: QRCode.CorrectLevel.H
-});
+function initQR() {
+  var qrEl = document.getElementById('qr-container');
+  if (!qrEl || qrEl.childNodes.length > 0) return;
+  if (typeof QRCode === 'undefined') { setTimeout(initQR, 100); return; }
+  var urlEl = document.getElementById('qr-url');
+  if (urlEl) urlEl.textContent = JOIN_URL;
+  new QRCode(qrEl, {
+    text: JOIN_URL,
+    width: 200, height: 200,
+    colorDark: '#ffffff',
+    colorLight: '#1A1A3E',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+document.addEventListener('DOMContentLoaded', initQR);
+window.addEventListener('load', initQR);
 
 // ── Firebase ─────────────────────────────────────────────────────────
 try {
