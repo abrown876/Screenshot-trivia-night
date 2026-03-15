@@ -529,13 +529,44 @@ function joinGame() {
   updSC();
   // Register team
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:Date.now()});
-  // Snapshot current command to ignore
+  // Check current host state — handle late joiners
   dbOnce('host/command', function(snap){
     var ex = snap.val();
     lastCmdKey = ex ? JSON.stringify({a:ex.action,i:ex.index,t:ex.timestamp}) : '';
-    showWait(0); showScr('waiting');
-    listenHost();
+    // Game already in progress?
+    if(ex && (ex.action==='question'||ex.action==='reveal'||ex.action==='pause') && ex.index > 0) {
+      // Late joiner — load questions then jump to current position
+      dbOnce('game/questions', function(qsnap){
+        var qd = qsnap.val();
+        if(qd) {
+          qlist = qd;
+          // Mark all previous questions as skipped
+          for(var i=0; i<ex.index; i++) {
+            answers[i] = {q:qlist[i]?qlist[i].q:'', r:'t'};
+          }
+          showLateJoinNotice(ex.index);
+        } else {
+          // No questions saved yet, just wait
+          showWait(0); showScr('waiting');
+        }
+        listenHost();
+      });
+    } else {
+      // Normal join — game not started or on Q1
+      showWait(0); showScr('waiting');
+      listenHost();
+    }
   });
+}
+
+function showLateJoinNotice(currentIdx) {
+  var b=document.getElementById('wbadge'),tt=document.getElementById('wtitle'),sb=document.getElementById('wsub'),sl=document.getElementById('wsline');
+  b.textContent='Joining in progress!';
+  b.style.background='#E8547A';
+  tt.textContent='Game already started!';
+  sb.textContent='No worries — '+tname+' is jumping in at Q'+(currentIdx+1)+'. Earlier questions will be marked as missed.';
+  sl.textContent='You\'ll start scoring from Q'+(currentIdx+1)+' onwards.';
+  showScr('waiting');
 }
 
 function showWait(n) {
@@ -721,7 +752,7 @@ function showResults() {
   var hl=pct===100?'Nuh badda — perfect! 🏆':pct>=80?'Big up yourself! 🎉':pct>=60?'Respect! 👍':pct>=40?'Keep at it! 😅':'Room to grow — try again!';
   document.getElementById('rscore').textContent=score;
   document.getElementById('rhl').textContent=hl;
-  document.getElementById('rpct').textContent=pct+'% correct · '+tname+(bonus?' · ⚡'+bonus+' bonus pts':'');
+  document.getElementById('rpct').textContent=pct+'% correct · '+tname+(bonus?' · ⚡'+bonus+' bonus pts':'')+(answers.filter(function(a){return a&&a.r==='t'&&a.q===''}).length>0?' · joined late':'');
   var rl='';
   for(var i=0;i<qlist.length;i++){
     var ar=answers[i], r=ar?ar.r:'t', cl=r==='c'||r==='b'?'dc':r==='w'?'dw':'dt';
