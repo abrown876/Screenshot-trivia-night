@@ -242,9 +242,15 @@ document.getElementById('btn-reg').onclick = function() {
     db.ref('teams/'+key).set({name:tname, players:pcnt, emails:emails, status:'waiting', joinedAt:Date.now()}, function(err){
       if (err) { showAlert('Could not register — check your connection.'); }
       else {
-        showSuccess('✓ '+tname+' registered! Head to index.html to play.');
-        document.getElementById('f-tname').value = '';
-        pcnt = 1; renderPF();
+        // Store registration details so index.html can pre-fill and skip join form
+        try {
+          sessionStorage.setItem('trivia_tname', tname);
+          sessionStorage.setItem('trivia_pcnt', pcnt);
+          sessionStorage.setItem('trivia_emails', JSON.stringify(emails));
+          sessionStorage.setItem('trivia_registered', '1');
+        } catch(se) {}
+        showSuccess('✓ '+tname+' registered! Taking you to the game...');
+        setTimeout(function(){ window.location.href = 'index.html'; }, 1000);
       }
     });
   } else {
