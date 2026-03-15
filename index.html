@@ -639,7 +639,7 @@ function timeoutQ(idx) {
   if(!answers[idx]) answers[idx]={q:qlist[idx].q,r:'t'};
   lockOpts();
   var ce=document.getElementById('op'+qlist[idx].a); if(ce) ce.classList.add('correct');
-  showFB('timeout','⏰','Time's up! The correct answer was '+qlist[idx].o[qlist[idx].a]+'.');
+  showFB('timeout','⏰','Time\'s up! The correct answer was '+qlist[idx].o[qlist[idx].a]+'.');
   document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
 }
 
@@ -648,14 +648,14 @@ function revealAns(idx) {
   var ce=document.getElementById('op'+q.a); if(ce) ce.classList.add('correct');
   if(!answered){
     answered=true; if(!answers[idx]) answers[idx]={q:q.q,r:'t'};
-    showFB('timeout','⏰','Time's up! The correct answer was '+q.o[q.a]+'.');
+    showFB('timeout','⏰','Time\'s up! The correct answer was '+q.o[q.a]+'.');
   } else {
     var ar=answers[idx];
     if(ar&&(ar.r==='c'||ar.r==='b')) showFB('correct','🎉','Correct! Great answer!');
     else if(ar&&ar.r==='w'){
       var we=document.getElementById('op'+selIdx); if(we) we.classList.add('wrong');
       showFB('wrong','😬','Not quite — the answer was '+q.o[q.a]+'.');
-    } else showFB('timeout','⏰','Time's up! The answer was '+q.o[q.a]+'.');
+    } else showFB('timeout','⏰','Time\'s up! The answer was '+q.o[q.a]+'.');
   }
   document.getElementById('rbar').style.display='flex'; renderT(0); showLbTab();
 }
