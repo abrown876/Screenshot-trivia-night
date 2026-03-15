@@ -402,6 +402,8 @@ function endGame() {
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('status-val').textContent = 'Game ended — results showing on tablets';
   db.ref('host/command').set({action:'end',timestamp:Date.now()});
+  // Clear after 5s so joining players dont see stale end command
+  setTimeout(function(){ db.ref('host/command').remove(); }, 5000);
 }
 
 function resetAll() {
