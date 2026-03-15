@@ -410,7 +410,7 @@ function joinGame(){
     dbOnce('host/command',function(snap2){
       var ex=snap2.val();
       if(ex&&ex.timestamp&&ex.timestamp>(joinTime-5000)&&(ex.action==='question'||ex.action==='pause'||ex.action==='reveal')){
-        curRound=ex.round||0;qlist=roundQuestions[curRound]||[];answers=roundAnswers[curRound];
+        curRound=(ex.round||1)-1;qlist=roundQuestions[curRound]||[];answers=roundAnswers[curRound];
         if(ex.index>0){document.getElementById('wbadge').textContent='Joining late!';document.getElementById('wbadge').style.background='#E8547A';document.getElementById('wtitle').textContent='Round '+(curRound+1)+' in progress!';document.getElementById('wsub').textContent=tname+' jumping in at Q'+(ex.index+1)+'.';}
         else{showWait(0);}
       } else {showWait(0);}
@@ -436,13 +436,13 @@ function listenHost(){
     lastCmdKey=cmdKey;
     document.getElementById('lb').classList.remove('on');document.getElementById('tab-lb').classList.remove('on');document.getElementById('tab-play').classList.add('on');
     if(cmd.action==='question'){
-      var r=cmd.round||0;
+      var r=(cmd.round||1)-1;
       if(r!==curRound){curRound=r;roundAnswers[curRound]=[];answers=roundAnswers[curRound];qlist=roundQuestions[curRound]||[];}
       if(qlist.length===0){dbOnce('game/rounds',function(qsnap){var rd=qsnap.val();if(rd){roundQuestions[0]=rd[0]||[];roundQuestions[1]=rd[1]||[];roundQuestions[2]=rd[2]||[];qlist=roundQuestions[curRound]||[];}if(qlist.length>0){cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;launchQ(cq);}});}
       else{cq=cmd.index;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;launchQ(cq);}
     } else if(cmd.action==='reveal'){stopT();if(qlist.length>0)revealAns(cq);}
     else if(cmd.action==='pause'){stopT();showPaused();}
-    else if(cmd.action==='round_end'){stopT();showRoundBreak(cmd.round);}
+    else if(cmd.action==='round_end'){stopT();showRoundBreak((cmd.round||1)-1);}
     else if(cmd.action==='end'){stopT();showResults();}
     else if(cmd.action==='reset'){restartGame();}
   });
