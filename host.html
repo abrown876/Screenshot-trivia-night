@@ -300,13 +300,18 @@ function renderQuestion(){
   var qs = getRoundQuestions();
   var q = qs[selQ];
   if(!q) return;
+  // Update question counter and category
   document.getElementById('q-title').textContent = 'Q'+(selQ+1)+' / '+qs.length;
   var catEl = document.getElementById('q-cat');
   catEl.textContent = q.lb;
   catEl.className = 'cpill ' + (CC[q.cat]||'cx');
+  // Show question text
   document.getElementById('q-text').textContent = q.q;
-  document.getElementById('answer-box').className = 'answer-box';
-  document.getElementById('answer-box').textContent = '';
+  // Clear answer box — always hidden until revealed
+  var ab = document.getElementById('answer-box');
+  ab.className = 'answer-box';
+  ab.innerHTML = '';
+  // Show options — correct one highlighted for host only
   var grid = document.getElementById('opts-grid');
   grid.innerHTML = q.o.map(function(opt,i){
     return '<div class="opt-prev'+(i===q.a?' correct-opt':'')+'"><div class="opt-ltr">'+String.fromCharCode(65+i)+'</div>'+opt+'</div>';
@@ -402,12 +407,17 @@ function revealQ(){
   } else {
     // More questions remain — advance and enable next launch
     selQ++;
+    // Hide timer for next question preview
+    document.getElementById('timer-block').style.display = 'none';
+    document.getElementById('timer-big').textContent = '10';
+    document.getElementById('timer-fill').style.width = '100%';
+    document.getElementById('timer-big').className = 'timer-big';
     renderDots();
     renderQuestion();
     document.getElementById('btn-launch').disabled = false;
     document.getElementById('btn-break').disabled = true;
-    document.getElementById('status-val').textContent = 'Revealed — launch Q'+(selQ+1)+' when ready';
-    setChip('revealed','Q'+selQ+' revealed');
+    document.getElementById('status-val').textContent = 'Next up: Q'+(selQ+1)+' — launch when ready';
+    setChip('ready','Q'+(selQ+1)+' ready to launch');
   }
 }
 
