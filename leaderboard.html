@@ -82,9 +82,43 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .footer{padding:.6rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .footer-url{font-size:12px;color:var(--muted)}
 .footer-count{font-size:12px;color:var(--muted)}
+
+/* QR SCREEN */
+.qr-screen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity .6s ease}
+.qr-screen.hide{opacity:0;pointer-events:none}
+.qr-flag{font-size:4rem;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.qr-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:3rem;color:var(--text);text-align:center;line-height:1.15}
+.qr-sub{font-size:1.1rem;color:var(--muted);text-align:center}
+.qr-box{background:#fff;border-radius:20px;padding:18px;box-shadow:0 0 60px rgba(123,123,255,.35)}
+.qr-scan{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--purple);display:flex;align-items:center;gap:.5rem}
+.qr-url{font-size:.9rem;color:var(--muted);font-family:monospace}
+.qr-teams{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;max-width:600px}
+.qr-team-pill{background:rgba(123,123,255,.12);border:1px solid rgba(123,123,255,.3);color:var(--purple);font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;padding:.35rem .9rem;border-radius:20px;animation:pillIn .4s ease}
+@keyframes pillIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.qr-sp{background:rgba(232,84,122,.1);border:1px solid rgba(232,84,122,.25);border-radius:12px;padding:.6rem 1.5rem;text-align:center}
+.qr-sp-lbl{font-size:11px;color:var(--coral);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
+.qr-sp-nm{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
 </style>
 </head>
 <body>
+
+
+<div class="qr-screen" id="qr-screen">
+  <div class="qr-flag">&#x1F1EF;&#x1F1F2;</div>
+  <div class="qr-title">Jamaica Trivia Night</div>
+  <div class="qr-sub">Scan to join from your phone — or register on the tablet at your table</div>
+  <div class="qr-box">
+    <canvas id="qr-canvas" width="220" height="220"></canvas>
+  </div>
+  <div class="qr-scan">&#128247; Scan to join</div>
+  <div class="qr-url">https://abrown876.github.io/Screenshot-trivia-night/index.html</div>
+  <div class="qr-sp">
+    <div class="qr-sp-lbl">Tonight brought to you by</div>
+    <div class="qr-sp-nm sp-name">YOUR SPONSOR</div>
+  </div>
+  <div id="qr-teams" class="qr-teams"></div>
+</div>
 
 <div class="sponsor-ticker">
   <span class="st-label">Presented by</span>
@@ -127,7 +161,55 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <span class="footer-count" id="footer-count"></span>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+// ── QR SCREEN ────────────────────────
+var JOIN_URL = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
+var gameStarted = false;
+
+function drawQR() {
+  var canvas = document.getElementById('qr-canvas');
+  if(!canvas) return;
+  var img = document.createElement('img');
+  img.width = 220; img.height = 220;
+  img.style.cssText = 'display:block;border-radius:8px';
+  img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAEXElEQVR4nO3dwY3bSBBAUY+xWTiYjd3BOA7uYX2lAQJd7qb+e2dBouSPPtTQxa/rur7Bp/u++wLgbxA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBL+WfVGP378u+qtRv369fPR659+r+n3P+1zpz39Xnec6CQInQShkyB0EoROgtBJEDoJy+bod1bNQZ96Oie+e/2u66997vRc34lOgtBJEDoJQidB6CQInQShkzA+R7+z6z7sp++z677t036f067nKSc6CUInQegkCJ0EoZMgdBKETsK2Ofqn+tT9Km/nRCdB6CQInQShkyB0EoROgtBJMEf/bXoP+vT78GdOdBKEToLQSRA6CUInQegkCJ2EbXP00+bHT/e6rNqnftpe9junXc9TTnQShE6C0EkQOglCJ0HoJAidhPE5+lv2ljydZ08/x3T69Xfe8u/1lBOdBKGTIHQShE6C0EkQOglCJ+Hruq7d1/BRdu2Hect97bs40UkQOglCJ0HoJAidBKGTIHQSls3RT7vf+rS9K6vm69Nz+l2/8zQnOglCJ0HoJAidBKGTIHQShE7C+P3o03PW0+bcT99/196V0/a4T7+/E50EoZMgdBKEToLQSRA6CUInYXw/+vScddXrVzntOnfN6U/bs+5EJ0HoJAidBKGTIHQShE6C0En42OeM7tpD4jmg/zttD4wTnQShkyB0EoROgtBJEDoJQidhfD/62522t2TXHPot+93vONFJEDoJQidB6CQInQShkyB0El6z12Xa3Xx3+u8Du+brb/l/Aqs40UkQOglCJ0HoJAidBKGTIHQSxp8zusv08zh3Pe/zzmn3i5/2+zjRSRA6CUInQegkCJ0EoZMgdBK27XWZ3gt+2n3wp825d7EfHQYJnQShkyB0EoROgtBJEDoJ43tdVnk6V37LvHnXXvNdf8fY9Ts70UkQOglCJ0HoJAidBKGTIHQSPnavy7Tp+6pX7TufnpffOe1+eic6CUInQegkCJ0EoZMgdBKETsKy+9F3PbfyqdP2gk/ft71rj8ppnOgkCJ0EoZMgdBKEToLQSRA6CeN7XXbNa3fd9zz93M2nnn6v065/FSc6CUInQegkCJ0EoZMgdBKETsK2/ejT+0NW2bVf5en1rLLq+z7lOaOwgNBJEDoJQidB6CQInQShk/Ca54xOe8v8e9U8e9frd/39wYlOgtBJEDoJQidB6CQInQShk2CO/tuq53G+ZS/K9Pc9jROdBKGTIHQShE6C0EkQOglCJ2HbHP0t89fp+fGu+f2u55jumsc70UkQOglCJ0HoJAidBKGTIHQSxufop92H/dRp922ftg/+LZ/rRCdB6CQInQShkyB0EoROgtBJ+Lqua/c1wDgnOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE7Cf/oCdYspI+06AAAAAElFTkSuQmCC';
+  canvas.parentNode.replaceChild(img, canvas);
+  img.id = 'qr-img';
+}
+drawQR();
+
+function updateQRTeams() {
+  var el = document.getElementById('qr-teams');
+  if(!el) return;
+  var teams = Object.values(teamsC);
+  if(!teams.length) { el.innerHTML = '<div style="color:var(--muted);font-size:.85rem">Waiting for tables to join...</div>'; return; }
+  el.innerHTML = teams.map(function(t) {
+    return '<div class="qr-team-pill">&#x1F3AE; ' + t.name + '</div>';
+  }).join('');
+}
+
+// Listen for host command to switch from QR to leaderboard
+db.ref('host/command').on('value', function(snap) {
+  var cmd = snap.val();
+  if(cmd && (cmd.action === 'question' || cmd.action === 'reveal') && !gameStarted) {
+    gameStarted = true;
+    var qrScr = document.getElementById('qr-screen');
+    if(qrScr) {
+      qrScr.classList.add('hide');
+      setTimeout(function() { qrScr.style.display = 'none'; }, 700);
+    }
+  }
+  // If game reset (command removed), show QR again
+  if(!cmd && gameStarted) {
+    gameStarted = false;
+    var qrScr = document.getElementById('qr-screen');
+    if(qrScr) {
+      qrScr.style.display = 'flex';
+      setTimeout(function() { qrScr.classList.remove('hide'); }, 50);
+    }
+  }
+});
+</script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 firebase.initializeApp({
@@ -210,7 +292,7 @@ function renderBoard(){
   if(tc) tc.textContent=total+' team'+(total!==1?'s':'');
 }
 
-db.ref('teams').on('value',function(snap){teamsC=snap.val()||{};renderBoard();});
+db.ref('teams').on('value',function(snap){teamsC=snap.val()||{};renderBoard();updateQRTeams();});
 db.ref('scores').on('value',function(snap){scoresC=snap.val()||{};renderBoard();});
 db.ref('live_scores').on('value',function(snap){liveC=snap.val()||{};renderBoard();});
 
