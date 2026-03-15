@@ -513,7 +513,8 @@ if(db){
       if(teamCount === 0){
         launchBtn.disabled = true;
         document.getElementById('status-val').textContent = 'Waiting for teams to join...';
-      } else if(launchBtn.disabled && document.getElementById('timer-block').style.display === 'none'){
+        if(typeof setChip==='function') setChip('waiting');
+      } else if(launchBtn.disabled && document.getElementById('timer-block').style.display !== 'block'){
         // Teams joined and no question running — enable launch
         launchBtn.disabled = false;
         document.getElementById('status-val').textContent = teamCount+' team'+(teamCount!==1?'s':'')+' ready — launch when ready';
