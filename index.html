@@ -378,7 +378,7 @@ var TSECS=10, MAXP=4, BSPTS=3;
 // State
 var tname='', pemails=[], pcnt=1, score=0, bonus=0, answers=[], alive=false;
 var cq=-1, qlist=[], tint=null, tleft=0, answered=false, selIdx=-1, qst=0, rsent=false;
-var activeScreen='splash', lastCmdKey='', lastHostCmd=null, timerPaused=false;
+var activeScreen='splash', lastCmdKey='', lastHostCmd=null, timerPaused=false, joinTime=0;
 
 // ── FORM ─────────────────────────────
 function renderPF() {
@@ -528,31 +528,32 @@ function joinGame() {
   document.getElementById('tabbar').classList.add('on');
   updSC();
   // Register team
-  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:Date.now()});
-  // Check current host state — handle late joiners
+  joinTime = Date.now();
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:pemails,status:'waiting',joinedAt:joinTime});
+  // Check current host state
   dbOnce('host/command', function(snap){
     var ex = snap.val();
-    lastCmdKey = ex ? JSON.stringify({a:ex.action,i:ex.index,t:ex.timestamp}) : '';
-    // Game already in progress?
-    if(ex && (ex.action==='question'||ex.action==='reveal'||ex.action==='pause') && ex.index > 0) {
-      // Late joiner — load questions then jump to current position
+    // Game already in progress — load questions and handle late join
+    if(ex && (ex.action==='question'||ex.action==='reveal'||ex.action==='pause') && ex.index >= 0) {
       dbOnce('game/questions', function(qsnap){
         var qd = qsnap.val();
         if(qd) {
           qlist = qd;
-          // Mark all previous questions as skipped
+          // Mark missed questions as skipped
           for(var i=0; i<ex.index; i++) {
             answers[i] = {q:qlist[i]?qlist[i].q:'', r:'t'};
           }
-          showLateJoinNotice(ex.index);
+          if(ex.index > 0) {
+            showLateJoinNotice(ex.index);
+          } else {
+            showWait(0); showScr('waiting');
+          }
         } else {
-          // No questions saved yet, just wait
           showWait(0); showScr('waiting');
         }
         listenHost();
       });
     } else {
-      // Normal join — game not started or on Q1
       showWait(0); showScr('waiting');
       listenHost();
     }
@@ -589,8 +590,9 @@ function listenHost() {
     var cmd = snap.val();
     if(!cmd||!alive) return;
     lastHostCmd = cmd;
+    // Only skip if we've already processed this exact command
     var cmdKey = JSON.stringify({a:cmd.action,i:cmd.index,t:cmd.timestamp});
-    if(cmdKey === lastCmdKey) return;
+    if(cmdKey === lastCmdKey && cq >= 0) return;
     lastCmdKey = cmdKey;
     // Switch to play tab on any command
     document.getElementById('lb').classList.remove('on');
