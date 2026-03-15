@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Live Leaderboard — Screenshot Interactive</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
+/* ── TABLET & MOBILE OPTIMISATION (FYD-868 800x1280) ───────────────────── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+input, select, textarea { font-size: 16px !important; } /* prevent zoom on focus */
+button { touch-action: manipulation; cursor: pointer; }
+body { overflow-x: hidden; max-width: 100vw; }
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --purple:#7B7BFF;--purple-dim:#5B5BD6;--purple-glow:rgba(123,123,255,0.18);
@@ -100,6 +107,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .qr-sp-lbl{font-size:11px;color:var(--coral);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-family:'Nunito',sans-serif}
 .qr-sp-nm{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -109,7 +117,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="qr-title">Jamaica Trivia Night</div>
   <div class="qr-sub">Scan to join from your phone — or register on the tablet at your table</div>
   <div class="qr-box">
-    <canvas id="qr-canvas" width="220" height="220"></canvas>
+    <div id="qr-container" style="line-height:0;border-radius:8px;overflow:hidden"></div>
   </div>
   <div class="qr-scan">&#128247; Scan to join</div>
   <div class="qr-url">https://abrown876.github.io/Screenshot-trivia-night/index.html</div>
@@ -166,17 +174,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 var JOIN_URL = "https://abrown876.github.io/Screenshot-trivia-night/index.html";
 var gameStarted = false;
 
-function drawQR() {
-  var canvas = document.getElementById('qr-canvas');
-  if(!canvas) return;
-  var img = document.createElement('img');
-  img.width = 220; img.height = 220;
-  img.style.cssText = 'display:block;border-radius:8px';
-  img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPgAAAD4CAIAAABOs7xcAAAEXElEQVR4nO3dwY3bSBBAUY+xWTiYjd3BOA7uYX2lAQJd7qb+e2dBouSPPtTQxa/rur7Bp/u++wLgbxA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBKEToLQSRA6CUInQegkCJ0EoZMgdBL+WfVGP378u+qtRv369fPR659+r+n3P+1zpz39Xnec6CQInQShkyB0EoROgtBJEDoJy+bod1bNQZ96Oie+e/2u66997vRc34lOgtBJEDoJQidB6CQInQShkzA+R7+z6z7sp++z677t036f067nKSc6CUInQegkCJ0EoZMgdBKETsK2Ofqn+tT9Km/nRCdB6CQInQShkyB0EoROgtBJMEf/bXoP+vT78GdOdBKEToLQSRA6CUInQegkCJ2EbXP00+bHT/e6rNqnftpe9junXc9TTnQShE6C0EkQOglCJ0HoJAidhPE5+lv2ljydZ08/x3T69Xfe8u/1lBOdBKGTIHQShE6C0EkQOglCJ+Hruq7d1/BRdu2Hect97bs40UkQOglCJ0HoJAidBKGTIHQSls3RT7vf+rS9K6vm69Nz+l2/8zQnOglCJ0HoJAidBKGTIHQShE7C+P3o03PW0+bcT99/196V0/a4T7+/E50EoZMgdBKEToLQSRA6CUInYXw/+vScddXrVzntOnfN6U/bs+5EJ0HoJAidBKGTIHQShE6C0En42OeM7tpD4jmg/zttD4wTnQShkyB0EoROgtBJEDoJQidhfD/62522t2TXHPot+93vONFJEDoJQidB6CQInQShkyB0El6z12Xa3Xx3+u8Du+brb/l/Aqs40UkQOglCJ0HoJAidBKGTIHQSxp8zusv08zh3Pe/zzmn3i5/2+zjRSRA6CUInQegkCJ0EoZMgdBK27XWZ3gt+2n3wp825d7EfHQYJnQShkyB0EoROgtBJEDoJ43tdVnk6V37LvHnXXvNdf8fY9Ts70UkQOglCJ0HoJAidBKGTIHQSPnavy7Tp+6pX7TufnpffOe1+eic6CUInQegkCJ0EoZMgdBKETsKy+9F3PbfyqdP2gk/ft71rj8ppnOgkCJ0EoZMgdBKEToLQSRA6CeN7XXbNa3fd9zz93M2nnn6v065/FSc6CUInQegkCJ0EoZMgdBKETsK2/ejT+0NW2bVf5en1rLLq+z7lOaOwgNBJEDoJQidB6CQInQShk/Ca54xOe8v8e9U8e9frd/39wYlOgtBJEDoJQidB6CQInQShk2CO/tuq53G+ZS/K9Pc9jROdBKGTIHQShE6C0EkQOglCJ2HbHP0t89fp+fGu+f2u55jumsc70UkQOglCJ0HoJAidBKGTIHQSxufop92H/dRp922ftg/+LZ/rRCdB6CQInQShkyB0EoROgtBJ+Lqua/c1wDgnOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE6C0EkQOglCJ0HoJAidBKGTIHQShE7Cf/oCdYspI+06AAAAAElFTkSuQmCC';
-  canvas.parentNode.replaceChild(img, canvas);
-  img.id = 'qr-img';
-}
-drawQR();
+
 
 function updateQRTeams() {
   var el = document.getElementById('qr-teams');
@@ -315,6 +313,16 @@ function showReaction(r){
   ticker.appendChild(item);
   setTimeout(function(){if(item.parentNode)item.parentNode.removeChild(item);},4000);
 }
+
+  // Generate QR code using qrcodejs
+  new QRCode(document.getElementById('qr-container'), {
+    text: 'https://abrown876.github.io/Screenshot-trivia-night/index.html',
+    width: 240, height: 240,
+    colorDark: '#1A1A3E',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
 </script>
 </body>
 </html>
