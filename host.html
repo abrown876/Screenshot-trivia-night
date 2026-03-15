@@ -217,6 +217,26 @@ var QUESTIONS=[
 {cat:'x',lb:'General',q:`Which city is NOT in Jamaica?`,o:['Montego Bay','Ocho Rios','Nassau','Mandeville'],a:2}
 ];
 
+
+function setChip(state, label){
+  var dot  = document.getElementById('chip-dot');
+  var lbl  = document.getElementById('chip-text');
+  var chip = document.getElementById('game-chip');
+  if(!lbl) return;
+  var cfg = {
+    waiting:  {text:'Waiting for teams', color:'#8888BB', pulse:false, bg:'rgba(255,255,255,.1)',  border:'rgba(255,255,255,.25)'},
+    ready:    {text:'Ready to launch',   color:'#F5A623', pulse:false, bg:'rgba(245,166,35,.2)',   border:'rgba(245,166,35,.5)'},
+    live:     {text:'Live',              color:'#E8547A', pulse:true,  bg:'rgba(232,84,122,.2)',   border:'rgba(232,84,122,.5)'},
+    paused:   {text:'Paused',            color:'#F5A623', pulse:false, bg:'rgba(245,166,35,.2)',   border:'rgba(245,166,35,.5)'},
+    revealed: {text:'Revealed',          color:'#5B5BD6', pulse:false, bg:'rgba(91,91,214,.2)',    border:'rgba(91,91,214,.5)'},
+    break:    {text:'Round break',       color:'#F5A623', pulse:false, bg:'rgba(245,166,35,.2)',   border:'rgba(245,166,35,.5)'},
+    ended:    {text:'Game over',         color:'#1A8A4A', pulse:false, bg:'rgba(26,138,74,.2)',    border:'rgba(26,138,74,.5)'}
+  };
+  var s = cfg[state] || cfg.waiting;
+  if(lbl) lbl.textContent = label || s.text;
+  if(dot){ dot.style.background=s.color; dot.style.animation=s.pulse?'pulse 1.2s infinite':'none'; }
+  if(chip){ chip.style.background=s.bg; chip.style.borderColor=s.border; }
+}
 var CC = {h:'ch',f:'cf',m:'cm',s:'cs',x:'cx'};
 var MEDALS = ['&#x1F947;','&#x1F948;','&#x1F949;'];
 var curRound = 1;
@@ -333,6 +353,7 @@ function launchQ(){
       document.getElementById('btn-pause').disabled = true;
       document.getElementById('btn-break').disabled = false;
       document.getElementById('status-val').textContent = 'Time up — launch next question';
+      setChip('ready','Time up — next Q');
     }
   }, 1000);
   document.getElementById('btn-launch').disabled = true;
@@ -340,6 +361,7 @@ function launchQ(){
   document.getElementById('btn-reveal').disabled = false;  // only active while timer runs
   document.getElementById('btn-break').disabled = true;
   document.getElementById('status-val').textContent = 'Round '+curRound+' — Q'+(selQ+1)+' live';
+  setChip('live','R'+curRound+' Q'+(selQ+1)+' Live');
 }
 
 function pauseQ(){
@@ -347,6 +369,7 @@ function pauseQ(){
   db.ref('host/command').set({action:'pause',round:curRound,index:selQ,timestamp:Date.now()});
   clearInterval(timer);
   document.getElementById('status-val').textContent = 'Paused';
+  setChip('paused');
 }
 
 function revealQ(){
@@ -373,6 +396,7 @@ function revealQ(){
     document.getElementById('btn-launch').disabled = true;
     document.getElementById('btn-break').disabled = false;
     document.getElementById('status-val').textContent = 'Round '+curRound+' complete — click End Round';
+    setChip('revealed','Round '+curRound+' done');
   } else {
     // More questions remain — advance and enable next launch
     selQ++;
@@ -381,6 +405,7 @@ function revealQ(){
     document.getElementById('btn-launch').disabled = false;
     document.getElementById('btn-break').disabled = true;
     document.getElementById('status-val').textContent = 'Revealed — launch Q'+(selQ+1)+' when ready';
+    setChip('revealed','Q'+(selQ)+' revealed');
   }
 }
 
@@ -398,6 +423,7 @@ function endRound(){
   if(curRound < 3){
     var next = curRound+1;
     document.getElementById('status-val').textContent = 'Round '+curRound+' done — break time. Start Round '+next+' when ready.';
+    setChip('break','Round '+curRound+' break');
     // Unlock next round tab
     document.getElementById('rtab'+next).disabled = false;
     selRound(next);
@@ -410,6 +436,7 @@ function endRound(){
       });
     });
     document.getElementById('status-val').textContent = 'All rounds complete!';
+    setChip('ended');
     document.getElementById('btn-endgame').style.display='block';
   }
 }
@@ -418,6 +445,7 @@ function endGame(){
   if(!db) return;
   db.ref('host/command').set({action:'end',round:3,timestamp:Date.now()});
   document.getElementById('status-val').textContent = 'Game over — results shown';
+  setChip('ended');
 }
 
 function resetGame(){
@@ -486,6 +514,7 @@ if(db){
         // Teams joined and no question running — enable launch
         launchBtn.disabled = false;
         document.getElementById('status-val').textContent = teamCount+' team'+(teamCount!==1?'s':'')+' ready — launch when ready';
+      setChip('ready',teamCount+' team'+(teamCount!==1?'s':'')+' ready');
       }
     }
   });
@@ -503,6 +532,7 @@ if(db){
 }
 
 // Init
+setChip('waiting');
 selRound(1);
 renderDots();
 renderQuestion();
