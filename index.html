@@ -42,6 +42,8 @@ button{touch-action:manipulation;cursor:pointer;border:none;background:none;font
 .an{animation:fadeUp .3s ease}
 /* SPONSOR BANNER */
 .sponsor-bar{background:linear-gradient(90deg,#E85D24 0%,#D14520 100%);padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;border-radius:var(--r);margin-bottom:.8rem}
+.sponsor-bar.sponsor-compact{padding:6px 12px;margin-bottom:.5rem;border-radius:10px}
+.sponsor-compact .sponsor-label{font-size:9px}
 .sponsor-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.08em;text-transform:uppercase}
 .sponsor-name{font-weight:900;font-size:13px;color:#fff;letter-spacing:.02em}
 .sponsor-tagline{font-size:10px;color:rgba(255,255,255,.85)}
@@ -257,6 +259,14 @@ button{touch-action:manipulation;cursor:pointer;border:none;background:none;font
 <!-- QUESTION -->
 <div id="qscr" class="off an">
   <div class="qsi">
+    <!-- SPONSOR BANNER - During Questions -->
+    <div class="sponsor-bar sponsor-compact">
+      <span class="sponsor-label">Brought to you by</span>
+      <svg viewBox="0 0 200 50" style="height:24px;width:auto;">
+        <text x="100" y="28" text-anchor="middle" font-family="Impact, Haettenschweiler, Arial Narrow Bold, sans-serif" font-size="28" fill="white" font-weight="bold" letter-spacing="2">CHILITOS</text>
+        <text x="100" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.85)" letter-spacing="3">— JAMEXICAN FOOD —</text>
+      </svg>
+    </div>
     <div class="q-meta">
       <span class="q-counter" id="qct">R1 Q1/10</span>
       <span class="q-cat" id="qcat"></span>
