@@ -165,7 +165,7 @@ button{touch-action:manipulation;cursor:pointer}
   <div class="si">
     <div class="hero"><div class="hero-inner"><div style="display:flex;justify-content:center;margin-bottom:.6rem"><a href="https://screenshotinteractive.com" target="_blank" style="display:block"></a></div><div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:.7rem;color:rgba(255,255,255,.65);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem">GET READY TO PLAY</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem .75rem;text-align:left;max-width:300px;margin:0 auto"><div style="color:rgba(255,255,255,.95);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:1.2rem">&#x1F3C6;</span>3 Rounds</div><div style="color:rgba(255,255,255,.95);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:1.2rem">&#x1F9E0;</span>30 Questions</div><div style="color:rgba(255,255,255,.95);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:1.2rem">&#x26A1;</span>Fast Answer Bonus</div><div style="color:rgba(255,255,255,.95);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:1.2rem">&#x1F381;</span>Prizes to be Won</div></div></div></div></div>
     <div class="pills"><span class="pill ph">&#x1F3DB;&#xFE0F; History</span><span class="pill pf">&#x1F354; Food</span><span class="pill pm">&#x1F3B5; Music</span><span class="pill ps">&#x26BD; Sports</span><span class="pill px">&#x1F4A1; General</span></div>
-    <div class="sponsor-footer" style="border-radius:var(--r);border:1.5px solid #F5D09A;margin-bottom:1rem"><span class="sf-label">Tonight's trivia brought to you by</span></div><div class="alertbox" id="alertbox"></div>
+    <div class="sponsor-footer" style="border-radius:var(--r);border:1.5px solid #F5D09A;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:.4rem"><span class="sf-label">Tonight's trivia brought to you by</span></div><div class="alertbox" id="alertbox"></div>
     <div class="fcard">
       <label class="flbl">Team name</label>
       <input id="f-tname" type="text" placeholder="e.g. The Legends or Table 4" maxlength="30" style="width:100%;padding:15px 16px;border-radius:12px;border:2px solid #E0E0F0;background:#fff;font-size:18px;color:#1A1A3E;outline:none;display:block;margin-bottom:1rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;font-weight:500;transition:border-color .15s">
@@ -233,7 +233,7 @@ button{touch-action:manipulation;cursor:pointer}
       <div class="sprv"><div class="sprvn" id="pscore">0</div><div class="sprvl">pts this round</div></div>
       <div style="font-size:13px;color:var(--muted)" id="pdetail"></div>
     </div>
-    <div class="spw" style="background:var(--goldl);border-radius:var(--r);padding:.85rem 1.1rem;text-align:center;border:1.5px solid #F5D09A;display:flex;flex-direction:column;align-items:center;gap:.4rem"><div class="spwl">Tonight's trivia brought to you by</div></div><div class="spwn" id="sppn">Chilitos — Jamexican Food</div><div class="spwt" id="sppt">Your sponsor tagline here</div></div>
+    <div class="spw" style="background:var(--goldl);border-radius:var(--r);padding:.85rem 1.1rem;text-align:center;border:1.5px solid #F5D09A;display:flex;flex-direction:column;align-items:center;gap:.4rem"><div class="spwl">Tonight's trivia brought to you by</div></div>
   </div>
 </div>
 
@@ -253,7 +253,7 @@ button{touch-action:manipulation;cursor:pointer}
       <div style="font-size:13px;color:var(--purple);font-weight:700" id="rb-cumul">Total: 0 pts</div>
     </div>
     <div><div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:.6rem">&#x1F4CB; Round answers</div><div id="rb-answers"></div></div>
-    <div class="spw" style="background:var(--goldl);border-radius:var(--r);padding:.85rem 1.1rem;text-align:center;border:1.5px solid #F5D09A;display:flex;flex-direction:column;align-items:center;gap:.4rem"><div class="spwl">Tonight's trivia brought to you by</div></div><div class="spwn" id="rbspn">Chilitos — Jamexican Food</div><div class="spwt" id="rbspt">Your sponsor tagline here</div></div>
+    <div class="spw" style="background:var(--goldl);border-radius:var(--r);padding:.85rem 1.1rem;text-align:center;border:1.5px solid #F5D09A;display:flex;flex-direction:column;align-items:center;gap:.4rem"><div class="spwl">Tonight's trivia brought to you by</div></div>
   </div>
 </div>
 
@@ -436,9 +436,16 @@ function listenHost(){
       dbOnce('game/current',function(cs){
         var cur=cs.val();
         if(!cur||!cur.question){return;}
+        var qIdx=cur.index||0;
+        var rnd=(cur.round||1)-1;
+        // Store question in roundQuestions for review later
+        if(!roundQuestions[rnd]) roundQuestions[rnd]=[];
+        roundQuestions[rnd][qIdx]=cur.question;
+        // Build qlist with full round context for progress display
         qlist=[cur.question];
-        cq=0; // always 0 since qlist has 1 item
-        answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
+        qlist._hostIndex=qIdx;   // actual question index in round
+        qlist._hostRound=rnd;
+        cq=0;answered=false;selIdx=-1;rsent=false;qst=Date.now();timerPaused=false;
         launchQ(0);
       });
     } else if(cmd.action==='reveal'){stopT();if(qlist.length>0)revealAns(cq);}
@@ -462,9 +469,11 @@ function launchQ(idx){
   document.getElementById('tab-lb').style.display='none';
   showScr('qscr');activeScreen='qscr';
   var q=qlist[idx];
-  document.getElementById('qct').textContent='R'+(curRound+1)+' Q'+(idx+1)+'/'+qlist.length;
+  var _hi = (qlist._hostIndex!==undefined ? qlist._hostIndex : idx);
+  var _rl = QpR; // always show out of QpR
+  document.getElementById('qct').textContent='R'+(curRound+1)+' Q'+(_hi+1)+'/'+_rl;
   var cat=document.getElementById('qcat');cat.textContent=q.lb;cat.className='cpill '+CC[q.cat];
-  document.getElementById('qprog').style.width=((idx/qlist.length)*100)+'%';
+  document.getElementById('qprog').style.width=((_hi/_rl)*100)+'%';
   document.getElementById('qtxt').textContent=q.q;
   document.getElementById('fb').className='fb';
   document.getElementById('rbar').style.display='none';
@@ -476,7 +485,26 @@ function launchQ(idx){
 function lockOpts(){var opts=document.querySelectorAll('.opt');for(var i=0;i<opts.length;i++){opts[i].className=opts[i].className+' lk';opts[i].onclick=null;}}
 function timeoutQ(idx){if(answered)return;answered=true;if(!answers[idx])answers[idx]={q:qlist[idx].q,r:'t'};lockOpts();var ce=document.getElementById('op'+qlist[idx].a);if(ce)ce.classList.add('correct');showFB('timeout','\u23f0',"Time's up! Answer: "+qlist[idx].o[qlist[idx].a]);document.getElementById('rbar').style.display='flex';renderT(0);showLbTab();}
 function revealAns(idx){var q=qlist[idx];lockOpts();var ce=document.getElementById('op'+q.a);if(ce)ce.classList.add('correct');if(!answered){answered=true;if(!answers[idx])answers[idx]={q:q.q,r:'t'};showFB('timeout','\u23f0',"Time's up! Answer: "+q.o[q.a]);}else{var ar=answers[idx];if(ar&&(ar.r==='c'||ar.r==='b'))showFB('correct','\ud83c\udf89','Correct!');else if(ar&&ar.r==='w'){var we=document.getElementById('op'+selIdx);if(we)we.classList.add('wrong');showFB('wrong','\ud83d\ude2c','Not quite \u2014 answer: '+q.o[q.a]);}else showFB('timeout','\u23f0',"Time's up! Answer: "+q.o[q.a]);}document.getElementById('rbar').style.display='flex';renderT(0);showLbTab();}
-function selOpt(i){if(answered)return;stopT();answered=true;selIdx=i;var rt=Date.now()-qst,q=qlist[cq],cor=i===q.a;var btn=document.getElementById('op'+i);if(btn)btn.classList.add('pend');lockOpts();if(cor){score++;roundScores[curRound]++;answers[cq]={q:q.q,r:'c'};updSC();showToast('+1 pt! \u2713');dbSet('race/r'+curRound+'q'+cq+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});pushLive();}else{answers[cq]={q:q.q,r:'w'};}revealAns(cq);}
+function selOpt(i){
+  if(answered)return;stopT();answered=true;selIdx=i;
+  var rt=Date.now()-qst,q=qlist[cq],cor=i===q.a;
+  var btn=document.getElementById('op'+i);if(btn)btn.classList.add('pend');
+  lockOpts();
+  var _hi=qlist._hostIndex!==undefined?qlist._hostIndex:cq;
+  if(!roundAnswers[curRound])roundAnswers[curRound]=[];
+  if(cor){
+    score++;roundScores[curRound]++;
+    answers[cq]={q:q.q,r:'c'};
+    roundAnswers[curRound][_hi]={q:q.q,r:'c'};
+    updSC();showToast('+1 pt! ✓');
+    dbSet('race/r'+curRound+'q'+_hi+'/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{team:tname,correct:true,time:rt,timestamp:Date.now()});
+    pushLive();
+  }else{
+    answers[cq]={q:q.q,r:'w'};
+    roundAnswers[curRound][_hi]={q:q.q,r:'w'};
+  }
+  revealAns(cq);
+}
 function showFB(type,icon,text){var fb=document.getElementById('fb');document.getElementById('fbic').textContent=icon;document.getElementById('fbtxt').textContent=text;fb.className='fb '+type+' on';}
 function sendR(emoji){if(rsent)return;rsent=true;var btns=document.querySelectorAll('.rbtn');for(var i=0;i<btns.length;i++){var re=btns[i].querySelector('.re');if(re&&re.textContent===emoji)btns[i].classList.add('sent');}dbPush('reactions',{emoji:emoji,team:tname,round:curRound,q:cq,timestamp:Date.now()});}
 function pushLive(){
@@ -502,15 +530,20 @@ function showRoundBreak(rnd){
   document.getElementById('rb-total-num').textContent=rBase+rBonus;
   document.getElementById('rb-cumul').textContent='Total so far: '+score+' pts';
   var qs=roundQuestions[rnd]||[],ans=roundAnswers[rnd]||[],ahtml='';
-  for(var qi=0;qi<qs.length;qi++){var q=qs[qi];if(!q)continue;var ar=ans[qi],pr=ar?ar.r:'t',gotIt=pr==='c'||pr==='b';var icon=gotIt?'\u2705':(pr==='w'?'\u274c':'\u23f0');var cardCol=gotIt?'background:#EAF7F0;border-color:#90D4A8':(pr==='w'?'background:#FDECEA;border-color:#F5C0BB':'background:#FEF3DC;border-color:#F5D09A');ahtml+='<div style="'+cardCol+';border:1.5px solid;border-radius:12px;padding:.7rem .9rem;margin-bottom:.5rem"><div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.3rem"><span>'+icon+'</span><span style="font-size:12px;font-weight:700;color:#1A1A3E;flex:1">Q'+(qi+1)+'. '+q.q+'</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem">';for(var oi=0;oi<q.o.length;oi++){var isC=oi===q.a;ahtml+='<div style="'+(isC?'background:#1A8A4A;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700':'color:#7A7AAA;font-size:11px;padding:3px 8px')+'">'+LT[oi]+'. '+q.o[oi]+'</div>';}ahtml+='</div></div>';}
+  // Loop over QpR questions — show placeholder for any not received
+  for(var qi=0;qi<QpR;qi++){var q=qs[qi];if(!q)continue;var ar=ans[qi],pr=ar?ar.r:'t',gotIt=pr==='c'||pr==='b';var icon=gotIt?'\u2705':(pr==='w'?'\u274c':'\u23f0');var cardCol=gotIt?'background:#EAF7F0;border-color:#90D4A8':(pr==='w'?'background:#FDECEA;border-color:#F5C0BB':'background:#FEF3DC;border-color:#F5D09A');ahtml+='<div style="'+cardCol+';border:1.5px solid;border-radius:12px;padding:.7rem .9rem;margin-bottom:.5rem"><div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.3rem"><span>'+icon+'</span><span style="font-size:12px;font-weight:700;color:#1A1A3E;flex:1">Q'+(qi+1)+'. '+q.q+'</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem">';for(var oi=0;oi<q.o.length;oi++){var isC=oi===q.a;ahtml+='<div style="'+(isC?'background:#1A8A4A;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700':'color:#7A7AAA;font-size:11px;padding:3px 8px')+'">'+LT[oi]+'. '+q.o[oi]+'</div>';}ahtml+='</div></div>';}
   document.getElementById('rb-answers').innerHTML=ahtml;
   showScr('roundbreak');activeScreen='roundbreak';document.getElementById('tab-play').classList.add('on');document.getElementById('tab-lb').classList.remove('on');showLbTab();
   dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'/status','waiting');
 }
 
 function showResults(){
-  var rnd=curRound,rBase=roundScores[rnd]||0,rBonus=roundBonus[rnd]||0;
-  dbSet('scores/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'_r'+rnd+'_f',{team:tname,emails:pemails,players:pcnt,base:rBase,bonus:rBonus,round:rnd,total:QpR,timestamp:Date.now()});
+  // Save final scores for all rounds
+  for(var _ri=0;_ri<TOTAL_ROUNDS;_ri++){
+    var _rb=roundScores[_ri]||0,_rbn=roundBonus[_ri]||0;
+    if(_rb>0||_rbn>0) dbSet('scores/'+tname.replace(/[^a-zA-Z0-9]/g,'_')+'_r'+_ri+'_f',{team:tname,players:pcnt,base:_rb,bonus:_rbn,round:_ri,timestamp:Date.now()});
+  }
+  var rnd=TOTAL_ROUNDS-1,rBase=roundScores[rnd]||0,rBonus=roundBonus[rnd]||0;
   var totalBase=roundScores[0]+roundScores[1]+roundScores[2],totalBonus=roundBonus[0]+roundBonus[1]+roundBonus[2],total=totalBase+totalBonus;
   var pct=Math.round((totalBase/(TOTAL_ROUNDS*QpR))*100);
   var hl=pct===100?'Nuh badda \u2014 perfect! \ud83c\udfc6':pct>=80?'Big up yourself! \ud83c\udf89':pct>=60?'Respect! \ud83d\udc4d':pct>=40?'Keep at it! \ud83d\ude05':'Room to grow!';
