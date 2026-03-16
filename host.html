@@ -304,10 +304,12 @@ function renderQuestion(){
   catEl.className = 'cpill ' + (CC[q.cat]||'cx');
   // Show question text
   document.getElementById('q-text').textContent = q.q;
-  // Clear answer box — always hidden until revealed
+  // Only clear answer box if it's not currently showing an answer
   var ab = document.getElementById('answer-box');
-  ab.className = 'answer-box';
-  ab.innerHTML = '';
+  if(!ab.classList.contains('show')){
+    ab.className = 'answer-box';
+    ab.innerHTML = '';
+  }
   // Show options — correct one highlighted for host only
   var grid = document.getElementById('opts-grid');
   grid.innerHTML = q.o.map(function(opt,i){
@@ -367,10 +369,13 @@ function launchQ(){
       }
     }
   }, 1000);
+  // Clear previous answer box when launching new question
+  var _ab = document.getElementById('answer-box');
+  _ab.className = 'answer-box'; _ab.innerHTML = '';
   document.getElementById('btn-launch').disabled = true;
   document.getElementById('btn-pause').disabled = false;
-  document.getElementById('btn-reveal').disabled = false;  // only active while timer runs
-  document.getElementById('btn-break').disabled = false; // always available once launched
+  document.getElementById('btn-reveal').disabled = false;
+  document.getElementById('btn-break').disabled = false;
   document.getElementById('status-val').textContent = 'Round '+curRound+' — Q'+(selQ+1)+' live';
   setChip('live','R'+curRound+' Q'+(selQ+1)+' Live');
 }
