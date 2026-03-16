@@ -84,6 +84,12 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .live-row{display:flex;align-items:center;gap:.4rem;font-size:12px;font-weight:800;color:var(--coral)}
 .ldot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:chipPulse 1.2s infinite}
 .rxn-item{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;font-size:13px;border-bottom:1px solid var(--border2)}
+/* SPONSOR FOOTER */
+.sponsor-footer{background:linear-gradient(90deg,#E85D24 0%,#D14520 100%);padding:12px 24px;display:flex;align-items:center;justify-content:center;gap:14px;flex-shrink:0;margin-top:auto}
+.sponsor-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.1em;text-transform:uppercase}
+.sponsor-name{font-weight:900;font-size:15px;color:#fff;letter-spacing:.02em}
+.sponsor-tagline{font-size:12px;color:rgba(255,255,255,.85)}
+.sponsor-divider{width:1px;height:16px;background:rgba(255,255,255,.3)}
 </style>
 </head>
 <body>
@@ -323,5 +329,13 @@ if(db){
 
 setChip('waiting');selRound(1);
 </script>
+<!-- SPONSOR FOOTER -->
+<div class="sponsor-footer">
+  <span class="sponsor-label">Tonight brought to you by</span>
+  <svg viewBox="0 0 200 50" style="height:36px;width:auto;">
+    <text x="100" y="28" text-anchor="middle" font-family="Impact, Haettenschweiler, Arial Narrow Bold, sans-serif" font-size="28" fill="white" font-weight="bold" letter-spacing="2">CHILITOS</text>
+    <text x="100" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.85)" letter-spacing="3">— JAMEXICAN FOOD —</text>
+  </svg>
+</div>
 </body>
 </html>
