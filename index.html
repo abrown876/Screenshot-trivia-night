@@ -231,6 +231,9 @@ button{touch-action:manipulation;cursor:pointer;border:none;background:none;font
       <label class="flbl">Team Name</label>
       <input id="f-tname" class="finput" type="text" placeholder="e.g. The Legends or Table 4" maxlength="30">
       <div style="height:.8rem"></div>
+      <label class="flbl">Email Address</label>
+      <input id="f-email" class="finput" type="email" placeholder="your@email.com" maxlength="100">
+      <div style="height:.8rem"></div>
       <label class="flbl">Number of Players (1–4)</label>
       <div class="pcnt-wrap">
         <button class="pcnt-btn" id="btn-minus">−</button>
@@ -500,8 +503,11 @@ renderPF();
 // ── JOIN GAME ──
 function joinGame(){
   tname=document.getElementById('f-tname').value.trim();
+  var email=document.getElementById('f-email').value.trim();
   if(!tname){showAlert('Please enter a team name!');return;}
-  pemails=[];
+  if(!email){showAlert('Please enter your email address!');return;}
+  if(!isValidEmail(email)){showAlert('Please enter a valid email address!');return;}
+  pemails=[email];
   curRound=0;roundScores=[0,0,0];roundBonus=[0,0,0];roundAnswers=[[],[],[]];roundQuestions=[[],[],[]];
   score=0;bonus=0;answers=[];qlist=[];cq=-1;alive=true;answered=false;streak=0;
   for(var _bk in window){if(_bk.indexOf('_br')===0)delete window[_bk];}
@@ -511,11 +517,13 @@ function joinGame(){
   document.getElementById('tabbar').classList.add('on');
   updSC();
   joinTime=Date.now();
-  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:[],status:'waiting',joinedAt:joinTime});
+  dbSet('teams/'+tname.replace(/[^a-zA-Z0-9]/g,'_'),{name:tname,players:pcnt,emails:[email],status:'waiting',joinedAt:joinTime});
   showWait(0);
   showScr('waiting');
   listenHost();
 }
+
+function isValidEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
 
 function showWait(n){
   var b=document.getElementById('wbadge');b.style.background='';
