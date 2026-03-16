@@ -90,34 +90,36 @@ button{touch-action:manipulation;cursor:pointer;border:none;background:none;font
 .pulse-ring{width:60px;height:60px;border-radius:50%;border:3px solid var(--purple);margin:1rem auto;animation:pulseRing 1.8s ease-in-out infinite;opacity:.5}
 @keyframes pulseRing{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:.2}}
 /* QUESTION SCREEN */
-#qscr{display:flex;flex-direction:column}
+#qscr{display:flex;flex-direction:column;height:100%}
 #qscr.off{display:none}
-.qsi{padding:.8rem 1rem;display:flex;flex-direction:column;flex:1}
-.q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.qsi{padding:1rem;display:flex;flex-direction:column;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem}
+.q-left{display:flex;align-items:center;gap:.6rem}
 .q-counter{font-size:12px;color:var(--text-dim);font-weight:600;font-family:var(--font-mono)}
-.q-cat{font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px}
-.q-prog{height:4px;background:var(--surface3);border-radius:3px;margin-bottom:.6rem;overflow:hidden}
+.q-cat{font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px}
+.q-prog{height:5px;background:var(--surface3);border-radius:3px;margin-bottom:1rem;overflow:hidden}
 .q-prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:3px;transition:width .4s}
-/* TIMER RING */
-.timer-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:.6rem;position:relative}
-.timer-ring{width:80px;height:80px;position:relative}
-.timer-ring svg{transform:rotate(-90deg)}
-.timer-ring circle{fill:none;stroke-width:5}
+/* TIMER - Compact inline in header */
+.timer-inline{display:flex;align-items:center;gap:.5rem;background:var(--surface);border:2px solid var(--border);border-radius:30px;padding:5px 14px 5px 8px}
+.timer-inline.urg{border-color:var(--coral);background:rgba(255,75,92,.1)}
+.timer-ring{width:36px;height:36px;position:relative;flex-shrink:0}
+.timer-ring svg{transform:rotate(-90deg);width:36px;height:36px}
+.timer-ring circle{fill:none;stroke-width:3.5}
 .timer-ring .ring-bg{stroke:var(--surface3)}
 .timer-ring .ring-fg{stroke:var(--purple);stroke-linecap:round;transition:stroke-dashoffset .25s linear,stroke .3s}
 .timer-ring .ring-fg.urg{stroke:var(--coral)}
-.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:900;font-size:1.6rem;color:var(--text)}
-.timer-num.urg{color:var(--coral);animation:numPulse .5s ease-in-out infinite}
-@keyframes numPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-.race-chip{font-size:10px;font-weight:800;background:rgba(255,183,64,.12);color:var(--gold);padding:2px 8px;border-radius:20px;margin-left:.75rem}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:900;font-size:.9rem;color:var(--text)}
+.timer-num.urg{color:var(--coral)}
+.timer-label{font-size:11px;font-weight:700;color:var(--text-dim)}
+.timer-label .gold{color:var(--gold)}
 /* QUESTION CARD */
-.qcard{background:var(--surface);border-radius:var(--r);padding:1rem 1.1rem;border-left:4px solid var(--purple);margin-bottom:.7rem;border:1px solid var(--border);border-left:4px solid var(--purple)}
-.qtxt{font-weight:800;font-size:1.05rem;line-height:1.4;color:var(--text)}
+.qcard{background:var(--surface);border-radius:var(--r);padding:1.25rem;border:1px solid var(--border);border-left:4px solid var(--purple);margin-bottom:1rem}
+.qtxt{font-weight:700;font-size:1.15rem;line-height:1.5;color:var(--text)}
 /* OPTIONS */
-.opts{display:flex;flex-direction:column;gap:.45rem;margin-bottom:.6rem}
-.opt{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:.8rem 1rem;font-size:15px;text-align:left;color:var(--text);display:flex;align-items:center;gap:.7rem;width:100%;min-height:56px;font-weight:500;transition:all .12s;font-family:var(--font-display)}
+.opts{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem}
+.opt{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:1rem 1.1rem;font-size:16px;text-align:left;color:var(--text);display:flex;align-items:center;gap:.85rem;width:100%;min-height:60px;font-weight:500;transition:all .12s;font-family:var(--font-display)}
 .opt:active{transform:scale(.98)}
-.oltr{width:28px;height:28px;border-radius:50%;background:var(--surface3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text-dim);flex-shrink:0;font-family:var(--font-mono)}
+.oltr{width:32px;height:32px;border-radius:50%;background:var(--surface3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--text-dim);flex-shrink:0;font-family:var(--font-mono)}
 .opt.correct{background:var(--green-bg)!important;border-color:var(--green)!important}
 .opt.correct .oltr{background:var(--green)!important;border-color:var(--green)!important;color:#000!important}
 .opt.wrong{background:var(--red-bg)!important;border-color:var(--red)!important}
@@ -273,30 +275,44 @@ button{touch-action:manipulation;cursor:pointer;border:none;background:none;font
     <!-- SPONSOR BANNER - During Questions -->
     <div class="sponsor-bar sponsor-compact">
       <span class="sponsor-label">Brought to you by</span>
-      <svg viewBox="0 0 200 50" style="height:24px;width:auto;">
+      <svg viewBox="0 0 200 50" style="height:22px;width:auto;">
         <text x="100" y="28" text-anchor="middle" font-family="Impact, Haettenschweiler, Arial Narrow Bold, sans-serif" font-size="28" fill="white" font-weight="bold" letter-spacing="2">CHILITOS</text>
         <text x="100" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.85)" letter-spacing="3">— JAMEXICAN FOOD —</text>
       </svg>
     </div>
-    <div class="q-meta">
-      <span class="q-counter" id="qct">R1 Q1/10</span>
-      <span class="q-cat" id="qcat"></span>
-      <span class="streak-badge" id="streak">🔥 x0</span>
-    </div>
-    <div class="q-prog"><div class="q-prog-fill" id="qprog"></div></div>
-    <div class="timer-wrap">
-      <div class="timer-ring">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle class="ring-bg" cx="40" cy="40" r="35"/>
-          <circle class="ring-fg" id="ring-fg" cx="40" cy="40" r="35" stroke-dasharray="220" stroke-dashoffset="0"/>
-        </svg>
-        <div class="timer-num" id="tnum">10</div>
+    
+    <!-- HEADER ROW: Counter, Category, Timer -->
+    <div class="q-header">
+      <div class="q-left">
+        <span class="q-counter" id="qct">R1 Q1/10</span>
+        <span class="q-cat" id="qcat"></span>
+        <span class="streak-badge" id="streak">🔥 x0</span>
       </div>
-      <span class="race-chip">⚡ Race</span>
+      <div class="timer-inline" id="timer-wrap">
+        <div class="timer-ring">
+          <svg width="36" height="36" viewBox="0 0 36 36">
+            <circle class="ring-bg" cx="18" cy="18" r="15"/>
+            <circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15" stroke-dasharray="94" stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-num" id="tnum">10</div>
+        </div>
+        <div class="timer-label">⚡ <span class="gold">Race</span></div>
+      </div>
     </div>
+    
+    <!-- PROGRESS BAR -->
+    <div class="q-prog"><div class="q-prog-fill" id="qprog"></div></div>
+    
+    <!-- QUESTION -->
     <div class="qcard"><div class="qtxt" id="qtxt"></div></div>
+    
+    <!-- OPTIONS -->
     <div class="opts" id="opts"></div>
+    
+    <!-- FEEDBACK -->
     <div class="fb" id="fb"><span class="fbic" id="fbic"></span><span id="fbtxt"></span></div>
+    
+    <!-- REACTIONS -->
     <div class="rbar" id="rbar" style="display:none">
       <button class="rbtn" id="r1"><span class="re">🔥</span>Fire</button>
       <button class="rbtn" id="r2"><span class="re">😱</span>Shocked</button>
@@ -412,7 +428,7 @@ var CC={h:'cat-h',f:'cat-f',m:'cat-m',g:'cat-x',s:'cat-s',x:'cat-x'};
 var LT=['A','B','C','D'];
 var MD=['🥇','🥈','🥉'];
 var TSECS=10,MAXP=4,BSPTS=3,QpR=10,TOTAL_ROUNDS=3;
-var RING_CIRC=220; // circumference of timer ring
+var RING_CIRC=94; // circumference of timer ring (2*PI*15)
 
 // ── STATE ──
 var tname='',pemails=[],pcnt=1;
@@ -484,6 +500,8 @@ function renderT(t){
   var u=t<=3;
   fg.className=u?'ring-fg urg':'ring-fg';
   document.getElementById('tnum').className=u?'timer-num urg':'timer-num';
+  var tw=document.getElementById('timer-wrap');
+  if(tw)tw.className=u?'timer-inline urg':'timer-inline';
 }
 
 // ── EVENT HANDLERS ──
