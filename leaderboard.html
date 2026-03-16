@@ -57,6 +57,12 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .rxn-emoji{font-size:1.2rem}
 .rxn-team{font-weight:700;font-size:12px}
 .empty-msg{color:var(--text-dim);font-size:13px;text-align:center;padding:2rem 1rem}
+/* SPONSOR FOOTER */
+.sponsor-footer{background:linear-gradient(90deg,#E85D24 0%,#D14520 100%);padding:12px 24px;display:flex;align-items:center;justify-content:center;gap:14px;flex-shrink:0;border-top:1px solid var(--border)}
+.sponsor-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.1em;text-transform:uppercase}
+.sponsor-name{font-weight:900;font-size:15px;color:#fff;letter-spacing:.02em}
+.sponsor-tagline{font-size:12px;color:rgba(255,255,255,.85)}
+.sponsor-divider{width:1px;height:16px;background:rgba(255,255,255,.3)}
 </style>
 </head>
 <body>
@@ -79,6 +85,14 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
       <div style="font-size:12px;color:var(--text-dim);margin-top:.2rem">Max score: 30 pts + bonuses</div>
     </div>
   </div>
+</div>
+<!-- SPONSOR FOOTER -->
+<div class="sponsor-footer">
+  <span class="sponsor-label">Tonight brought to you by</span>
+  <svg viewBox="0 0 200 50" style="height:36px;width:auto;">
+    <text x="100" y="28" text-anchor="middle" font-family="Impact, Haettenschweiler, Arial Narrow Bold, sans-serif" font-size="28" fill="white" font-weight="bold" letter-spacing="2">CHILITOS</text>
+    <text x="100" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.85)" letter-spacing="3">— JAMEXICAN FOOD —</text>
+  </svg>
 </div>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
