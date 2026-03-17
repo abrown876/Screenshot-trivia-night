@@ -115,6 +115,14 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 /* Sponsor footer */
 .sponsor-footer{background:linear-gradient(90deg,#E85D24,#D14520);padding:8px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0}
 .sponsor-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase}
+
+/* gradient host panel title */
+.hdr-label{
+  background:linear-gradient(135deg,#fff 0%,#C4BEFF 50%,#FF5C8A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;color:transparent;display:inline-block;
+  font-weight:900;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;
+}
 </style>
 </head>
 <body>
@@ -141,7 +149,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
       <div class="status-val" id="status-val">Waiting for teams to join...</div>
       <div class="count-pills">
         <div class="pill pill-wait">⏳ <span id="cnt-wait">0</span></div>
-        <div class="pill pill-play">🎮 <span id="cnt-play">0</span></div>
+        <div class="pill pill-play"><span id="cnt-play">0</span></div>
         <div class="pill pill-done">✅ <span id="cnt-done">0</span></div>
       </div>
     </div>
