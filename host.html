@@ -37,6 +37,7 @@ body{display:flex;flex-direction:column}
 .status-dot{width:7px;height:7px;border-radius:50%}
 .status-dot.lobby{background:var(--gold)}
 .status-dot.live{background:var(--green);animation:pulse 1.5s infinite}
+.status-dot.ended{background:var(--text-muted)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* SCREENS */
@@ -108,7 +109,7 @@ body{display:flex;flex-direction:column}
 .q-opt.correct{background:var(--green-bg);color:var(--green)}
 .q-opt-letter{font-weight:900;font-size:.6rem;opacity:.6}
 
-/* PROGRESS CARD - BY ROUND */
+/* PROGRESS CARD */
 .progress-card{max-height:220px}
 .progress-rounds{display:flex;flex-direction:column;gap:.75rem}
 .progress-round{background:var(--surface2);border-radius:8px;padding:.5rem .6rem}
@@ -160,6 +161,7 @@ body{display:flex;flex-direction:column}
 .btn:active:not(:disabled){transform:scale(.97)}
 .btn-green{background:var(--green);color:#000}
 .btn-red{background:var(--red);color:#fff}
+.btn-coral{background:var(--coral);color:#fff}
 .btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text-dim)}
 .btn-ghost:hover{border-color:var(--text-dim)}
 
@@ -167,6 +169,28 @@ body{display:flex;flex-direction:column}
 .stat-pill{display:flex;align-items:center;gap:.4rem;background:var(--surface2);padding:.4rem .75rem;border-radius:8px}
 .stat-pill-num{font-family:var(--font-mono);font-weight:900;font-size:1rem;color:var(--purple)}
 .stat-pill-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GAME OVER SCREEN
+═══════════════════════════════════════════════════════════════════════════ */
+.gameover-screen{flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
+.gameover-icon{font-size:4rem;margin-bottom:.5rem}
+.gameover-title{font-weight:900;font-size:2rem;margin-bottom:.25rem;background:linear-gradient(135deg,var(--gold),#E8930A);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gameover-sub{color:var(--text-dim);font-size:.9rem;margin-bottom:1.5rem}
+.gameover-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:1.25rem;width:100%;max-width:400px;margin-bottom:1.5rem}
+.gameover-card-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.final-lb{display:flex;flex-direction:column;gap:.5rem}
+.final-lb-row{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;background:var(--surface2);border-radius:8px}
+.final-lb-row.winner{background:linear-gradient(90deg,rgba(255,183,64,.15),var(--surface2));border:2px solid var(--gold)}
+.final-lb-rank{width:28px;font-family:var(--font-mono);font-weight:900;font-size:1rem;text-align:center}
+.final-lb-medal{font-size:1.5rem}
+.final-lb-name{flex:1;font-weight:800;font-size:1rem}
+.final-lb-score{font-family:var(--font-mono);font-weight:900;font-size:1.1rem;color:var(--purple)}
+.gameover-stats{display:flex;gap:1rem;margin-bottom:1.5rem}
+.gameover-stat{background:var(--surface);border-radius:var(--r);padding:.75rem 1.25rem;border:1px solid var(--border)}
+.gameover-stat-num{font-family:var(--font-mono);font-weight:900;font-size:1.5rem;color:var(--purple)}
+.gameover-stat-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase}
+.gameover-btn{padding:1rem 2.5rem;font-size:1.1rem}
 
 /* TOAST */
 .toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);padding:8px 18px;border-radius:8px;font-weight:700;font-size:11px;color:var(--text);opacity:0;transition:all .25s;z-index:100}
@@ -272,7 +296,7 @@ body{display:flex;flex-direction:column}
       <div class="card lb-card">
         <div class="card-hdr">
           <span class="card-title">🏆 Leaderboard</span>
-          <span class="card-badge"><span id="lb-max">20</span> max</span>
+          <span class="card-badge"><span id="lb-max">30</span> max</span>
         </div>
         <div class="card-body" id="lb-body">
           <div class="empty-msg">Scores appear as teams play</div>
@@ -313,10 +337,35 @@ body{display:flex;flex-direction:column}
         <button class="btn btn-ghost" id="btn-reset" style="display:none">🔄 Reset</button>
       </div>
       <div class="bottom-right">
-        <button class="btn btn-ghost" id="btn-end">✕ End</button>
+        <button class="btn btn-ghost" id="btn-end">✕ End Game</button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div class="screen gameover-screen" id="scr-gameover">
+  <div class="gameover-icon">🏆</div>
+  <h1 class="gameover-title">Game Over!</h1>
+  <p class="gameover-sub">Thanks for playing Screenshot Quiz Night</p>
+  
+  <div class="gameover-stats">
+    <div class="gameover-stat">
+      <div class="gameover-stat-num" id="go-teams">0</div>
+      <div class="gameover-stat-lbl">Teams</div>
+    </div>
+    <div class="gameover-stat">
+      <div class="gameover-stat-num" id="go-players">0</div>
+      <div class="gameover-stat-lbl">Players</div>
+    </div>
+  </div>
+  
+  <div class="gameover-card">
+    <div class="gameover-card-title">🏆 Final Leaderboard</div>
+    <div class="final-lb" id="final-lb"></div>
+  </div>
+  
+  <button class="btn btn-coral gameover-btn" id="btn-new-game">🚀 Create New Game</button>
 </div>
 
 <!-- SPONSOR -->
@@ -333,7 +382,7 @@ body{display:flex;flex-direction:column}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// QUESTIONS (1pt each, +5 bonus for perfect round = max 10 per round, 30 total)
+// QUESTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 const QUESTIONS = [
   {cat:'m',lb:'Music',q:'Which Jamaican artist is known as "The Gong"?',o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],a:1},
@@ -355,7 +404,7 @@ const QUESTIONS = [
 const Q_PER_ROUND = 5;
 const TOTAL_ROUNDS = 3;
 const PERFECT_BONUS = 5;
-const MAX_SCORE = (Q_PER_ROUND + PERFECT_BONUS) * TOTAL_ROUNDS; // 30
+const MAX_SCORE = (Q_PER_ROUND + PERFECT_BONUS) * TOTAL_ROUNDS;
 const LETTERS = ['A','B','C','D'];
 const CAT_CLASS = {m:'cat-m',f:'cat-f',x:'cat-x'};
 
@@ -392,6 +441,7 @@ let scoresData = {};
 let answersData = {};
 let joinUrl = '';
 let activityLog = [];
+let finalScores = []; // Store for game over screen
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ELEMENTS
@@ -402,6 +452,7 @@ const toast = $('toast');
 function showScreen(n) {
   $('scr-setup').classList.toggle('on', n==='setup');
   $('scr-dashboard').classList.toggle('on', n==='dashboard');
+  $('scr-gameover').classList.toggle('on', n==='gameover');
 }
 function setStatus(s, t) {
   $('status-dot').className = 'status-dot ' + s;
@@ -416,19 +467,25 @@ function showToast(m, t) {
 function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ROOM
+// ROOM CODE GENERATION (randomized)
 // ═══════════════════════════════════════════════════════════════════════════
 function genCode() {
-  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let r = '';
-  for (let i = 0; i < 4; i++) r += c[Math.floor(Math.random() * c.length)];
-  return r;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // Excludes I and O
+  let code = '';
+  for (let i = 0; i < 4; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
 }
 
 function createRoom() {
   const code = genCode();
   dbGet('games/' + code, existing => {
-    if (existing) { createRoom(); return; }
+    if (existing && existing.status !== 'ended') { 
+      // Code already in use, generate new one
+      createRoom(); 
+      return; 
+    }
     dbSet('games/' + code, { code, createdAt: Date.now(), status: 'lobby' }, err => {
       if (err) { showToast('Error', 'error'); return; }
       dbSet('currentRoom', code);
@@ -529,7 +586,7 @@ function renderTeams() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PROGRESS BY ROUND (fixed: now shows current question correctly)
+// PROGRESS
 // ═══════════════════════════════════════════════════════════════════════════
 function onAnswers(data) {
   answersData = data || {};
@@ -559,7 +616,6 @@ function renderProgress() {
       const currentQ = t.currentQuestion || 0;
       const finished = t.status === 'finished';
       
-      // Calculate round score
       let roundCorrect = 0;
       
       html += `<div class="pt-row"><span class="pt-name">${esc(t.name)}</span><div class="pt-dots">`;
@@ -567,14 +623,11 @@ function renderProgress() {
       for (let q = 0; q < Q_PER_ROUND; q++) {
         const key = r + '-' + q;
         const ans = answers[key];
-        const globalQ = (r - 1) * Q_PER_ROUND + q;
-        const teamGlobalQ = (currentRound - 1) * Q_PER_ROUND + currentQ;
         
         let cls = '';
         let txt = '';
         
         if (ans) {
-          // Has answered this question
           if (ans.correct) {
             cls = 'correct';
             txt = '✓';
@@ -584,7 +637,6 @@ function renderProgress() {
             txt = '✗';
           }
         } else if (!finished && r === currentRound && q === currentQ) {
-          // Currently on this question
           cls = 'current';
           txt = '●';
         }
@@ -592,7 +644,6 @@ function renderProgress() {
         html += `<span class="pt-dot ${cls}">${txt}</span>`;
       }
       
-      // Round score: correct answers + bonus if perfect
       const bonus = roundCorrect === Q_PER_ROUND ? PERFECT_BONUS : 0;
       const roundScore = roundCorrect + bonus;
       const hasStartedRound = Object.keys(answers).some(k => k.startsWith(r + '-'));
@@ -606,7 +657,6 @@ function renderProgress() {
   html += '</div>';
   $('progress-body').innerHTML = html;
   
-  // Update finished count
   const finished = teams.filter(([k, t]) => t.status === 'finished').length;
   $('stat-finished').textContent = finished;
   $('stat-finished-wrap').style.display = gameStatus === 'live' ? 'flex' : 'none';
@@ -634,6 +684,8 @@ function renderLeaderboard() {
   }
   
   entries.sort((a, b) => b.score - a.score);
+  finalScores = entries; // Store for game over
+  
   const medals = ['🥇', '🥈', '🥉'];
   
   let html = '<div class="lb-list">';
@@ -736,19 +788,71 @@ function resetGame() {
 }
 
 function endSession() {
-  if (!confirm('End session?')) return;
+  if (!confirm('End this game and show final results?')) return;
   
+  // Store final data before clearing
+  const teamCount = Object.keys(teamsData).length;
+  let playerCount = 0;
+  Object.values(teamsData).forEach(t => playerCount += t.players || 1);
+  
+  // Update Firebase
   dbSet('games/' + roomCode + '/status', 'ended');
+  dbSet('games/' + roomCode + '/endedAt', Date.now());
+  
+  // Stop listeners
   ['teams', 'live_scores', 'scores', 'reactions'].forEach(p => dbOff('games/' + roomCode + '/' + p));
   dbRemove('currentRoom');
   
+  // Clear local storage
   localStorage.removeItem('host_room');
-  roomCode = null;
-  $('room-chip').style.display = 'none';
   
+  // Show game over screen
+  showGameOver(teamCount, playerCount);
+}
+
+function showGameOver(teamCount, playerCount) {
+  $('go-teams').textContent = teamCount;
+  $('go-players').textContent = playerCount;
+  
+  // Render final leaderboard
+  const medals = ['🥇', '🥈', '🥉'];
+  let html = '';
+  
+  finalScores.slice(0, 5).forEach((e, i) => {
+    const isWinner = i === 0;
+    const rankDisplay = i < 3 ? `<span class="final-lb-medal">${medals[i]}</span>` : `<span class="final-lb-rank">${i + 1}</span>`;
+    html += `<div class="final-lb-row${isWinner ? ' winner' : ''}">
+      ${rankDisplay}
+      <span class="final-lb-name">${esc(e.name)}</span>
+      <span class="final-lb-score">${e.score}/${MAX_SCORE}</span>
+    </div>`;
+  });
+  
+  if (!html) {
+    html = '<div class="empty-msg">No scores recorded</div>';
+  }
+  
+  $('final-lb').innerHTML = html;
+  
+  // Reset state
+  roomCode = null;
+  teamsData = {};
+  scoresData = {};
+  answersData = {};
+  finalScores = [];
+  activityLog = [];
+  
+  $('room-chip').style.display = 'none';
   setStatus('ended', 'Ended');
+  showScreen('gameover');
+}
+
+function createNewGame() {
   showScreen('setup');
-  showToast('Session ended');
+  // Small delay then create new room automatically
+  setTimeout(() => {
+    createRoom();
+  }, 100);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -758,6 +862,7 @@ $('btn-create').onclick = createRoom;
 $('btn-start').onclick = startGame;
 $('btn-reset').onclick = resetGame;
 $('btn-end').onclick = endSession;
+$('btn-new-game').onclick = createNewGame;
 
 $('btn-copy').onclick = function() {
   navigator.clipboard.writeText(joinUrl).then(() => {
