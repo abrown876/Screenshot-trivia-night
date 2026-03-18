@@ -44,18 +44,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
 .anim{animation:fadeUp .3s ease}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ERROR SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* ERROR SCREEN */
 .error-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
 .error-icon{font-size:3.5rem;margin-bottom:1rem}
 .error-title{font-size:1.4rem;font-weight:900;color:var(--coral);margin-bottom:.4rem}
 .error-msg{color:var(--text-dim);font-size:13px;line-height:1.5;margin-bottom:1.25rem;max-width:260px}
 .error-link{color:var(--purple);font-weight:700;text-decoration:none;font-size:13px}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   WAITING SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* WAITING SCREEN */
 .wait-card{background:var(--surface);border-radius:var(--r);padding:1.75rem 1.25rem;text-align:center;border:1px solid var(--border)}
 .wait-badge{background:var(--green);color:#000;font-weight:900;font-size:.8rem;padding:.35rem 1rem;border-radius:16px;display:inline-block;margin-bottom:.75rem}
 .wait-title{font-weight:900;font-size:1.35rem;margin-bottom:.3rem}
@@ -63,17 +59,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .wait-team{font-family:var(--font-mono);font-weight:700;color:var(--purple);margin-top:.6rem;font-size:.95rem}
 .pulse-ring{width:60px;height:60px;border-radius:50%;border:3px solid var(--purple);margin:1.25rem auto 0;animation:pulse 2s ease-in-out infinite;opacity:.5}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   GET READY SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* GET READY SCREEN */
 .ready-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .ready-round{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
 .ready-title{font-size:1.75rem;font-weight:900;margin-bottom:1.25rem}
 .ready-count{font-family:var(--font-mono);font-size:5rem;font-weight:900;color:var(--purple);text-shadow:0 0 50px var(--purple-glow);animation:countPop 1s ease infinite}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   QUESTION SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* QUESTION SCREEN */
 .q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
 .q-meta{display:flex;align-items:center;gap:.5rem}
 .q-counter{font-size:11px;color:var(--text-dim);font-weight:700;font-family:var(--font-mono)}
@@ -82,7 +74,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .cat-f{background:rgba(255,92,138,.12);color:var(--coral)}
 .cat-x{background:rgba(136,136,187,.12);color:var(--text-dim)}
 
-/* Timer */
 .timer-wrap{display:flex;align-items:center;gap:.35rem;background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:.3rem .6rem;transition:all .2s}
 .timer-wrap.warn{border-color:var(--gold);background:rgba(255,183,64,.08)}
 .timer-wrap.danger{border-color:var(--red);background:rgba(255,75,92,.08);animation:pulse .4s ease infinite}
@@ -91,14 +82,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .timer-num.warn{color:var(--gold)}
 .timer-num.danger{color:var(--red)}
 
-/* Progress bar */
 .q-progress{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:1rem}
 .q-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:2px;transition:width .15s linear}
 
-/* Question text */
 .q-text{font-size:1.1rem;font-weight:700;line-height:1.4;margin-bottom:1.25rem}
 
-/* Options */
 .opts{display:flex;flex-direction:column;gap:.6rem}
 .opt{width:100%;text-align:left;padding:1rem 1.1rem;border-radius:12px;border:2px solid var(--border);background:var(--surface);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.65rem;cursor:pointer;font-family:var(--font-display);transition:all .1s}
 .opt:active{transform:scale(.98);background:var(--surface2)}
@@ -110,26 +98,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .opt.correct .opt-letter{background:var(--green);color:#000}
 .opt.wrong .opt-letter{background:var(--red);color:#fff}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   FEEDBACK SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* FEEDBACK SCREEN */
 .fb-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .fb-icon{font-size:4rem;margin-bottom:.75rem}
 .fb-title{font-size:1.5rem;font-weight:900;margin-bottom:.3rem}
 .fb-sub{font-size:13px;color:var(--text-dim)}
 .fb-points{font-family:var(--font-mono);font-size:2.25rem;font-weight:900;color:var(--green);margin-top:.75rem}
 .fb-points.zero{color:var(--red)}
-.fb-bonus{font-size:12px;color:var(--gold);margin-top:.2rem}
 
-/* Reactions */
 .react-row{display:flex;justify-content:center;gap:.6rem;margin-top:1.25rem}
 .react-btn{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--surface);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .1s}
 .react-btn:active{transform:scale(.9)}
 .react-btn.sent{border-color:var(--purple);background:rgba(124,110,246,.15)}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ROUND BREAK SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* ROUND BREAK SCREEN */
 .break-card{background:var(--surface);border-radius:var(--r);padding:1.25rem;border:1px solid var(--border);text-align:center;margin-bottom:1rem}
 .break-badge{background:var(--gold);color:#000;font-weight:900;font-size:.75rem;padding:.3rem .85rem;border-radius:14px;display:inline-block;margin-bottom:.6rem}
 .break-title{font-size:1.15rem;font-weight:900;margin-bottom:.85rem}
@@ -138,7 +120,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .break-stat{background:var(--surface2);border-radius:10px;padding:.6rem}
 .break-stat-num{font-family:var(--font-mono);font-weight:900;font-size:1.35rem;color:var(--purple)}
 .break-stat-num.green{color:var(--green)}
+.break-stat-num.gold{color:var(--gold)}
 .break-stat-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;margin-top:.15rem}
+
+.break-perfect{background:linear-gradient(135deg,rgba(255,183,64,.15),rgba(255,183,64,.05));border:1px solid rgba(255,183,64,.3);border-radius:10px;padding:.75rem;margin-bottom:1rem;text-align:center}
+.break-perfect-icon{font-size:1.5rem}
+.break-perfect-text{font-size:13px;font-weight:700;color:var(--gold)}
 
 .break-answers{text-align:left}
 .break-answers-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
@@ -152,22 +139,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 .break-btn{width:100%;margin-top:1rem}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   RESULTS SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
+/* RESULTS SCREEN */
 .results-card{background:var(--surface);border-radius:var(--r);padding:1.5rem 1.25rem;border:1px solid var(--border);text-align:center;margin-bottom:1rem}
 .results-trophy{font-size:3.5rem;margin-bottom:.4rem}
 .results-score{font-family:var(--font-mono);font-weight:900;font-size:3.5rem;color:var(--gold);text-shadow:0 0 30px rgba(255,183,64,.25)}
+.results-max{font-size:1rem;color:var(--text-dim);font-weight:600}
 .results-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
 .results-rank{font-size:1rem;font-weight:700}
 .results-rank strong{color:var(--purple)}
 
 .results-breakdown{background:var(--surface);border-radius:var(--r);padding:1rem;border:1px solid var(--border)}
 .results-breakdown-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem;text-align:left}
-.results-round{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)}
+.results-round{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)}
 .results-round:last-child{border-bottom:none}
 .results-round-name{font-weight:600;color:var(--text-dim);font-size:13px}
+.results-round-detail{font-size:11px;color:var(--text-muted)}
 .results-round-score{font-family:var(--font-mono);font-weight:800;color:var(--purple);font-size:13px}
+.results-round-perfect{color:var(--gold)}
 
 /* BTN */
 .btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:none;cursor:pointer;font-family:var(--font-display);transition:all .1s}
@@ -193,21 +181,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <span class="hdr-score" id="hdr-score">0</span>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     ERROR SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- ERROR SCREEN -->
 <div class="screen" id="scr-error">
   <div class="error-content">
     <div class="error-icon">🎮</div>
     <h2 class="error-title">No Game Found</h2>
     <p class="error-msg">You need to join through the registration page to play.</p>
-    <a href="join-v2.html" class="error-link">← Go to Join Page</a>
+    <a href="join.html" class="error-link">← Go to Join Page</a>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     WAITING SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- WAITING SCREEN -->
 <div class="screen" id="scr-wait">
   <div class="screen-inner anim">
     <div class="wait-card">
@@ -220,9 +204,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     GET READY SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- GET READY SCREEN -->
 <div class="screen" id="scr-ready">
   <div class="ready-content anim">
     <div class="ready-round" id="ready-round">Round 1</div>
@@ -231,9 +213,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     QUESTION SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- QUESTION SCREEN -->
 <div class="screen" id="scr-question">
   <div class="screen-inner">
     <div class="q-header">
@@ -252,16 +232,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     FEEDBACK SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- FEEDBACK SCREEN -->
 <div class="screen" id="scr-feedback">
   <div class="fb-content anim">
     <div class="fb-icon" id="fb-icon">✅</div>
     <h2 class="fb-title" id="fb-title">Correct!</h2>
     <p class="fb-sub" id="fb-sub">Great job!</p>
-    <div class="fb-points" id="fb-points">+40</div>
-    <div class="fb-bonus" id="fb-bonus">⚡ +10 speed bonus</div>
+    <div class="fb-points" id="fb-points">+1</div>
     <div class="react-row">
       <button class="react-btn" data-e="🔥">🔥</button>
       <button class="react-btn" data-e="😱">😱</button>
@@ -271,9 +248,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     ROUND BREAK SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- ROUND BREAK SCREEN -->
 <div class="screen" id="scr-break">
   <div class="screen-inner anim">
     <div class="break-card">
@@ -285,13 +260,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="break-stat-lbl">Correct</div>
         </div>
         <div class="break-stat">
-          <div class="break-stat-num" id="break-bonus">0</div>
-          <div class="break-stat-lbl">⚡ Bonus</div>
+          <div class="break-stat-num gold" id="break-bonus">0</div>
+          <div class="break-stat-lbl">Bonus</div>
         </div>
         <div class="break-stat">
           <div class="break-stat-num green" id="break-total">0</div>
           <div class="break-stat-lbl">Round Pts</div>
         </div>
+      </div>
+      <div class="break-perfect" id="break-perfect" style="display:none">
+        <span class="break-perfect-icon">🌟</span>
+        <span class="break-perfect-text">Perfect Round! +5 Bonus Points!</span>
       </div>
       <div class="break-answers" id="break-answers"></div>
     </div>
@@ -299,14 +278,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     RESULTS SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
+<!-- RESULTS SCREEN -->
 <div class="screen" id="scr-results">
   <div class="screen-inner anim">
     <div class="results-card">
       <div class="results-trophy">🏆</div>
       <div class="results-score" id="res-score">0</div>
+      <div class="results-max">out of 30</div>
       <div class="results-label">Total Points</div>
       <div class="results-rank" id="res-rank">Calculating rank...</div>
     </div>
@@ -314,7 +292,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="results-breakdown-title">Round Breakdown</div>
       <div id="res-rounds"></div>
     </div>
-    <button class="btn btn-ghost" style="margin-top:1rem" id="btn-again">Play Again</button>
+    <button class="btn btn-purple" style="margin-top:1rem" id="btn-again">Play Again</button>
   </div>
 </div>
 
@@ -324,19 +302,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <strong>Screenshot Interactive</strong>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// CONFIG
+// CONFIG - SIMPLIFIED SCORING
+// 1 point per correct answer
+// +5 bonus for perfect round (all 5 correct)
+// Max per round: 10 (5 + 5 bonus)
+// Max total: 30 (3 rounds × 10)
 // ═══════════════════════════════════════════════════════════════════════════
 const TIMER_SECS = 15;
 const Q_PER_ROUND = 5;
 const TOTAL_ROUNDS = 3;
-const BASE_PTS = 30;
+const PTS_PER_CORRECT = 1;
+const PERFECT_BONUS = 5;
+const MAX_PER_ROUND = Q_PER_ROUND + PERFECT_BONUS;
+const MAX_TOTAL = MAX_PER_ROUND * TOTAL_ROUNDS;
 const FEEDBACK_MS = 1800;
 const COUNTDOWN = 3;
 const LETTERS = ['A','B','C','D'];
@@ -396,9 +378,9 @@ let teamName = '';
 let round = 1;
 let qIndex = 0;
 let totalScore = 0;
-let roundScores = [0,0,0];
-let roundBonus = [0,0,0];
-let roundAnswers = [[],[],[]];
+let roundCorrect = [0, 0, 0];
+let roundBonus = [0, 0, 0];
+let roundAnswers = [[], [], []];
 
 let timer = null;
 let timerVal = TIMER_SECS;
@@ -424,14 +406,12 @@ function updateScore() {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 function init() {
-  // Get session from storage
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem('trivia_team')); } catch(e){}
   if (!session) {
     try { session = JSON.parse(localStorage.getItem('trivia_session')); } catch(e){}
   }
   
-  // URL params
   const params = new URLSearchParams(window.location.search);
   const urlRoom = params.get('room');
   
@@ -452,12 +432,10 @@ function init() {
     return;
   }
   
-  // Update header
   $('hdr-room').textContent = roomCode;
   $('hdr-team').textContent = teamName;
   $('wait-team').textContent = teamName;
   
-  // Check game status
   dbGet('games/' + roomCode, game => {
     if (!game) {
       showScreen('error');
@@ -491,6 +469,8 @@ function startRound(r) {
   round = r;
   qIndex = 0;
   roundAnswers[r-1] = [];
+  roundCorrect[r-1] = 0;
+  roundBonus[r-1] = 0;
   saveProgress();
   showGetReady();
 }
@@ -533,7 +513,6 @@ function loadQuestion() {
   timerVal = TIMER_SECS;
   startTime = Date.now();
   
-  // Update UI
   $('q-counter').textContent = 'Q' + (qIndex + 1) + '/' + Q_PER_ROUND;
   $('q-cat').textContent = q.lb;
   $('q-cat').className = 'q-cat ' + (CAT_CLASS[q.cat] || 'cat-x');
@@ -543,7 +522,6 @@ function loadQuestion() {
   $('timer-num').className = 'timer-num';
   $('timer-wrap').className = 'timer-wrap';
   
-  // Render options
   let html = '';
   q.o.forEach((opt, i) => {
     html += `<button class="opt" data-i="${i}">
@@ -553,7 +531,6 @@ function loadQuestion() {
   });
   $('opts').innerHTML = html;
   
-  // Click handlers
   $('opts').querySelectorAll('.opt').forEach(btn => {
     btn.onclick = () => !answered && onAnswer(parseInt(btn.dataset.i));
   });
@@ -572,7 +549,6 @@ function runTimer() {
     $('timer-num').textContent = timerVal;
     $('q-progress').style.width = ((timerVal / TIMER_SECS) * 100) + '%';
     
-    // Visual warnings
     if (timerVal <= 5) {
       $('timer-num').className = 'timer-num danger';
       $('timer-wrap').className = 'timer-wrap danger';
@@ -599,37 +575,30 @@ function onAnswer(selected) {
   const qi = getQIndex();
   const q = QUESTIONS[qi];
   const correct = selected === q.a;
-  const timeSpent = (Date.now() - startTime) / 1000;
-  const bonus = correct ? speedBonus(timeSpent) : 0;
-  const pts = correct ? BASE_PTS + bonus : 0;
+  const pts = correct ? PTS_PER_CORRECT : 0;
   
-  // Update scores
+  if (correct) {
+    roundCorrect[round-1]++;
+  }
+  
   totalScore += pts;
-  roundScores[round-1] += correct ? BASE_PTS : 0;
-  roundBonus[round-1] += bonus;
   
-  // Save answer
   roundAnswers[round-1].push({
     q: qIndex,
     correct,
-    time: timeSpent,
-    pts,
-    bonus
+    pts
   });
   
-  // Visual feedback on options
   $('opts').querySelectorAll('.opt').forEach((btn, i) => {
     btn.classList.add('locked');
     if (i === q.a) btn.classList.add('correct');
     else if (i === selected && !correct) btn.classList.add('wrong');
   });
   
-  // Firebase
-  saveAnswer(correct, timeSpent, pts, bonus);
+  saveAnswer(correct, pts);
   updateScore();
   
-  // Show feedback
-  setTimeout(() => showFeedback(correct, pts, bonus, false), 400);
+  setTimeout(() => showFeedback(correct, pts, false), 400);
 }
 
 function onTimeout() {
@@ -639,12 +608,9 @@ function onTimeout() {
   roundAnswers[round-1].push({
     q: qIndex,
     correct: false,
-    time: TIMER_SECS,
-    pts: 0,
-    bonus: 0
+    pts: 0
   });
   
-  // Show correct
   const qi = getQIndex();
   const q = QUESTIONS[qi];
   $('opts').querySelectorAll('.opt').forEach((btn, i) => {
@@ -652,30 +618,17 @@ function onTimeout() {
     if (i === q.a) btn.classList.add('correct');
   });
   
-  saveAnswer(false, TIMER_SECS, 0, 0);
+  saveAnswer(false, 0);
   
-  setTimeout(() => showFeedback(false, 0, 0, true), 400);
+  setTimeout(() => showFeedback(false, 0, true), 400);
 }
 
-function speedBonus(t) {
-  if (t <= 3) return 10;
-  if (t <= 6) return 7;
-  if (t <= 10) return 4;
-  if (t <= 14) return 1;
-  return 0;
-}
-
-function saveAnswer(correct, time, pts, bonus) {
+function saveAnswer(correct, pts) {
   const key = round + '-' + qIndex;
   
-  // Room-scoped
-  dbSet(`games/${roomCode}/scores/${emailKey}/answers/${key}`, {
-    correct, time: Math.round(time * 10) / 10, pts, bonus
-  });
+  dbSet(`games/${roomCode}/scores/${emailKey}/answers/${key}`, { correct, pts });
   dbSet(`games/${roomCode}/scores/${emailKey}/total`, totalScore);
   dbSet(`games/${roomCode}/live_scores/${emailKey}`, totalScore);
-  
-  // Legacy
   dbSet(`live_scores/${emailKey}`, totalScore);
   
   saveProgress();
@@ -689,7 +642,7 @@ function saveProgress() {
 // ═══════════════════════════════════════════════════════════════════════════
 // FEEDBACK
 // ═══════════════════════════════════════════════════════════════════════════
-function showFeedback(correct, pts, bonus, timeout) {
+function showFeedback(correct, pts, timeout) {
   const encourageGood = ['Nailed it!','Great job!','You\'re on fire!','Brilliant!','Keep going!'];
   const encourageBad = ['Next one!','Stay focused!','You got this!','Keep going!'];
   
@@ -697,25 +650,20 @@ function showFeedback(correct, pts, bonus, timeout) {
     $('fb-icon').textContent = '✅';
     $('fb-title').textContent = 'Correct!';
     $('fb-sub').textContent = encourageGood[Math.floor(Math.random()*encourageGood.length)];
-    $('fb-points').textContent = '+' + pts;
+    $('fb-points').textContent = '+1';
     $('fb-points').className = 'fb-points';
-    $('fb-bonus').textContent = bonus > 0 ? '⚡ +' + bonus + ' speed bonus' : '';
-    $('fb-bonus').style.display = bonus > 0 ? 'block' : 'none';
   } else {
     $('fb-icon').textContent = timeout ? '⏰' : '❌';
     $('fb-title').textContent = timeout ? 'Time\'s Up!' : 'Wrong';
     $('fb-sub').textContent = encourageBad[Math.floor(Math.random()*encourageBad.length)];
     $('fb-points').textContent = '+0';
     $('fb-points').className = 'fb-points zero';
-    $('fb-bonus').style.display = 'none';
   }
   
-  // Reset reactions
   document.querySelectorAll('.react-btn').forEach(b => b.classList.remove('sent'));
   
   showScreen('feedback');
   
-  // Auto-advance
   setTimeout(advance, FEEDBACK_MS);
 }
 
@@ -732,17 +680,29 @@ function advance() {
 // ROUND BREAK
 // ═══════════════════════════════════════════════════════════════════════════
 function showRoundBreak() {
-  const answers = roundAnswers[round-1];
-  const correctCount = answers.filter(a => a.correct).length;
-  const bonusTotal = roundBonus[round-1];
-  const roundTotal = roundScores[round-1] + bonusTotal;
+  const correct = roundCorrect[round-1];
+  const isPerfect = correct === Q_PER_ROUND;
+  const bonus = isPerfect ? PERFECT_BONUS : 0;
+  roundBonus[round-1] = bonus;
+  
+  if (isPerfect) {
+    totalScore += bonus;
+    updateScore();
+    dbSet(`games/${roomCode}/scores/${emailKey}/total`, totalScore);
+    dbSet(`games/${roomCode}/live_scores/${emailKey}`, totalScore);
+    dbSet(`live_scores/${emailKey}`, totalScore);
+  }
+  
+  const roundTotal = correct + bonus;
   
   $('break-badge').textContent = 'Round ' + round + ' Complete';
-  $('break-correct').textContent = correctCount;
-  $('break-bonus').textContent = bonusTotal;
+  $('break-correct').textContent = correct;
+  $('break-bonus').textContent = bonus;
   $('break-total').textContent = roundTotal;
   
-  // Answers list
+  $('break-perfect').style.display = isPerfect ? 'block' : 'none';
+  
+  const answers = roundAnswers[round-1];
   let html = '<div class="break-answers-title">Your Answers</div>';
   answers.forEach((a, i) => {
     const qi = (round-1) * Q_PER_ROUND + i;
@@ -753,19 +713,17 @@ function showRoundBreak() {
     html += `<div class="break-answer">
       <span class="break-answer-icon">${icon}</span>
       <span class="break-answer-q">${qText}</span>
-      <span class="break-answer-pts ${cls}">${a.correct ? '+'+a.pts : '0'}</span>
+      <span class="break-answer-pts ${cls}">${a.correct ? '+1' : '0'}</span>
     </div>`;
   });
   $('break-answers').innerHTML = html;
   
-  // Save round
   dbSet(`games/${roomCode}/scores/${emailKey}/rounds/${round}`, {
-    base: roundScores[round-1],
-    bonus: bonusTotal,
+    correct,
+    bonus,
     total: roundTotal
   });
   
-  // Button text
   if (round >= TOTAL_ROUNDS) {
     $('btn-next').textContent = 'See Final Results →';
   } else {
@@ -787,24 +745,27 @@ function continueNext() {
 // RESULTS
 // ═══════════════════════════════════════════════════════════════════════════
 function showResults() {
-  // Mark finished
   dbSet(`games/${roomCode}/teams/${emailKey}/status`, 'finished');
   dbSet(`games/${roomCode}/teams/${emailKey}/completedAt`, Date.now());
   
   $('res-score').textContent = totalScore;
   
-  // Breakdown
   let html = '';
   for (let r = 1; r <= TOTAL_ROUNDS; r++) {
-    const rTotal = roundScores[r-1] + roundBonus[r-1];
+    const correct = roundCorrect[r-1];
+    const bonus = roundBonus[r-1];
+    const rTotal = correct + bonus;
+    const isPerfect = bonus > 0;
     html += `<div class="results-round">
-      <span class="results-round-name">Round ${r}</span>
-      <span class="results-round-score">${rTotal} pts</span>
+      <div>
+        <span class="results-round-name">Round ${r}</span>
+        <span class="results-round-detail">${correct}/5 correct${isPerfect ? ' 🌟' : ''}</span>
+      </div>
+      <span class="results-round-score ${isPerfect ? 'results-round-perfect' : ''}">${rTotal}</span>
     </div>`;
   }
   $('res-rounds').innerHTML = html;
   
-  // Get rank
   dbGet(`games/${roomCode}/live_scores`, scores => {
     if (!scores) {
       $('res-rank').innerHTML = 'Quiz complete!';
@@ -851,7 +812,7 @@ $('btn-next').onclick = continueNext;
 $('btn-again').onclick = () => {
   sessionStorage.removeItem('trivia_team');
   localStorage.removeItem('trivia_session');
-  window.location.href = 'join-v2.html';
+  window.location.href = 'join.html';
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
