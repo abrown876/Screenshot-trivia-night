@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-<title>Screenshot Quiz Night</title>
+<title>Join Quiz — Screenshot Quiz Night</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0B0B1A;--surface:#141428;--surface2:#1C1C36;--surface3:#252542;
-  --purple:#7C6EF6;--purple-dim:#5B50C8;--purple-glow:rgba(124,110,246,.25);
+  --purple:#7C6EF6;--purple-glow:rgba(124,110,246,.25);
   --coral:#FF5C8A;--coral-glow:rgba(255,92,138,.2);
   --gold:#FFB740;
   --green:#3DDC84;--green-bg:rgba(61,220,132,.15);
@@ -20,303 +20,198 @@
   --font-display:'Outfit',sans-serif;
   --font-mono:'Space Mono',monospace;
 }
-html,body{height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text);overflow:hidden}
+html,body{min-height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text)}
 body{display:flex;flex-direction:column}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(124,110,246,.08) 0%,transparent 60%);pointer-events:none}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(124,110,246,.1) 0%,transparent 60%);pointer-events:none}
 
 /* HEADER */
-.hdr{background:var(--surface);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
-.hdr-left{display:flex;align-items:center;gap:.5rem}
-.hdr-logo{width:26px;height:26px}
-.hdr-room{font-weight:800;font-size:10px;color:var(--gold);background:rgba(255,183,64,.15);padding:3px 9px;border-radius:14px;font-family:var(--font-mono);letter-spacing:.06em}
-.hdr-team{font-weight:800;font-size:11px;color:var(--purple);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hdr-score{background:var(--purple);color:#fff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:14px;font-family:var(--font-mono)}
+.hdr{padding:1rem;text-align:center;flex-shrink:0}
+.hdr-logo{width:48px;height:48px;margin:0 auto .5rem}
+.hdr-title{font-weight:900;font-size:1.25rem;background:linear-gradient(135deg,#fff,var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-sub{font-size:12px;color:var(--text-dim);margin-top:.25rem}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;padding:0 1rem 1rem;max-width:400px;margin:0 auto;width:100%}
 
 /* SCREENS */
-.screen{display:none;flex:1;flex-direction:column;overflow:hidden}
+.screen{display:none;flex:1;flex-direction:column}
 .screen.on{display:flex}
-.screen-inner{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;max-width:480px;margin:0 auto;width:100%}
 
 /* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
-@keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
 .anim{animation:fadeUp .3s ease}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ERROR SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
-.error-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
-.error-icon{font-size:3.5rem;margin-bottom:1rem}
-.error-title{font-size:1.4rem;font-weight:900;color:var(--coral);margin-bottom:.4rem}
-.error-msg{color:var(--text-dim);font-size:13px;line-height:1.5;margin-bottom:1.25rem;max-width:260px}
-.error-link{color:var(--purple);font-weight:700;text-decoration:none;font-size:13px}
+/* CARD */
+.card{background:var(--surface);border-radius:var(--r);padding:1.5rem 1.25rem;border:1px solid var(--border)}
+.card-title{font-weight:900;font-size:1.1rem;margin-bottom:.25rem;text-align:center}
+.card-sub{font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:1.25rem}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   WAITING SCREEN
+   SCREEN 1: ROOM CODE
 ═══════════════════════════════════════════════════════════════════════════ */
-.wait-card{background:var(--surface);border-radius:var(--r);padding:1.75rem 1.25rem;text-align:center;border:1px solid var(--border)}
+.code-inputs{display:flex;justify-content:center;gap:.5rem;margin-bottom:1.25rem}
+.code-input{width:56px;height:64px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;font-family:var(--font-mono);font-size:1.75rem;font-weight:900;color:var(--purple);text-align:center;text-transform:uppercase;outline:none;transition:all .15s}
+.code-input:focus{border-color:var(--purple);background:rgba(124,110,246,.08)}
+.code-input.error{border-color:var(--red);animation:shake .4s ease}
+.code-input.valid{border-color:var(--green)}
+
+.room-status{text-align:center;font-size:12px;min-height:20px;margin-bottom:1rem}
+.room-status.checking{color:var(--text-dim)}
+.room-status.valid{color:var(--green)}
+.room-status.invalid{color:var(--red)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 2: EMAIL + TEAM
+═══════════════════════════════════════════════════════════════════════════ */
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
+.form-input{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:.85rem 1rem;font-size:15px;font-weight:600;color:var(--text);outline:none;font-family:var(--font-display);transition:all .15s}
+.form-input:focus{border-color:var(--purple);background:rgba(124,110,246,.05)}
+.form-input.error{border-color:var(--red)}
+.form-hint{font-size:10px;color:var(--text-muted);margin-top:.3rem}
+.form-error{font-size:11px;color:var(--red);margin-top:.3rem;display:none}
+.form-error.show{display:block}
+
+/* Player count */
+.player-btns{display:flex;gap:.5rem}
+.player-btn{flex:1;padding:.75rem;border-radius:10px;border:2px solid var(--border);background:var(--surface2);font-size:1rem;font-weight:800;color:var(--text-dim);cursor:pointer;font-family:var(--font-display);transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.player-btn span{font-size:10px;font-weight:600}
+.player-btn.active{border-color:var(--purple);background:rgba(124,110,246,.1);color:var(--purple)}
+.player-btn:active{transform:scale(.97)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 3: WAITING
+═══════════════════════════════════════════════════════════════════════════ */
+.wait-card{text-align:center}
 .wait-badge{background:var(--green);color:#000;font-weight:900;font-size:.8rem;padding:.35rem 1rem;border-radius:16px;display:inline-block;margin-bottom:.75rem}
 .wait-title{font-weight:900;font-size:1.35rem;margin-bottom:.3rem}
 .wait-sub{font-size:13px;color:var(--text-dim);line-height:1.5}
-.wait-team{font-family:var(--font-mono);font-weight:700;color:var(--purple);margin-top:.6rem;font-size:.95rem}
-.pulse-ring{width:60px;height:60px;border-radius:50%;border:3px solid var(--purple);margin:1.25rem auto 0;animation:pulse 2s ease-in-out infinite;opacity:.5}
+.wait-team{font-family:var(--font-mono);font-weight:700;color:var(--purple);margin-top:.6rem;font-size:1rem}
+.wait-room{font-size:12px;color:var(--text-dim);margin-top:.25rem}
+.pulse-ring{width:50px;height:50px;border-radius:50%;border:3px solid var(--purple);margin:1rem auto 0;animation:pulse 2s ease-in-out infinite;opacity:.5}
+
+/* Rejoin card */
+.rejoin-card{background:var(--surface2);border-radius:10px;padding:1rem;margin-top:1rem;text-align:center}
+.rejoin-text{font-size:12px;color:var(--text-dim);margin-bottom:.5rem}
+.rejoin-team{font-weight:800;color:var(--purple);font-size:14px}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   GET READY SCREEN
+   BUTTONS
 ═══════════════════════════════════════════════════════════════════════════ */
-.ready-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.ready-round{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
-.ready-title{font-size:1.75rem;font-weight:900;margin-bottom:1.25rem}
-.ready-count{font-family:var(--font-mono);font-size:5rem;font-weight:900;color:var(--purple);text-shadow:0 0 50px var(--purple-glow);animation:countPop 1s ease infinite}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   QUESTION SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
-.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
-.q-meta{display:flex;align-items:center;gap:.5rem}
-.q-counter{font-size:11px;color:var(--text-dim);font-weight:700;font-family:var(--font-mono)}
-.q-cat{font-size:9px;font-weight:800;padding:3px 10px;border-radius:12px}
-.cat-m{background:rgba(124,110,246,.12);color:var(--purple)}
-.cat-f{background:rgba(255,92,138,.12);color:var(--coral)}
-.cat-x{background:rgba(136,136,187,.12);color:var(--text-dim)}
-
-/* Timer */
-.timer-wrap{display:flex;align-items:center;gap:.35rem;background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:.3rem .6rem;transition:all .2s}
-.timer-wrap.warn{border-color:var(--gold);background:rgba(255,183,64,.08)}
-.timer-wrap.danger{border-color:var(--red);background:rgba(255,75,92,.08);animation:pulse .4s ease infinite}
-.timer-icon{font-size:12px}
-.timer-num{font-family:var(--font-mono);font-size:1.1rem;font-weight:900;min-width:24px;text-align:center}
-.timer-num.warn{color:var(--gold)}
-.timer-num.danger{color:var(--red)}
-
-/* Progress bar */
-.q-progress{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:1rem}
-.q-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:2px;transition:width .15s linear}
-
-/* Question text */
-.q-text{font-size:1.1rem;font-weight:700;line-height:1.4;margin-bottom:1.25rem}
-
-/* Options */
-.opts{display:flex;flex-direction:column;gap:.6rem}
-.opt{width:100%;text-align:left;padding:1rem 1.1rem;border-radius:12px;border:2px solid var(--border);background:var(--surface);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.65rem;cursor:pointer;font-family:var(--font-display);transition:all .1s}
-.opt:active{transform:scale(.98);background:var(--surface2)}
-.opt.locked{pointer-events:none;opacity:.6}
-.opt.selected{border-color:var(--purple);background:rgba(124,110,246,.1)}
-.opt.correct{border-color:var(--green);background:var(--green-bg)}
-.opt.wrong{border-color:var(--red);background:var(--red-bg);animation:shake .4s ease}
-.opt-letter{width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:var(--purple);flex-shrink:0;transition:all .15s}
-.opt.correct .opt-letter{background:var(--green);color:#000}
-.opt.wrong .opt-letter{background:var(--red);color:#fff}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FEEDBACK SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
-.fb-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.fb-icon{font-size:4rem;margin-bottom:.75rem}
-.fb-title{font-size:1.5rem;font-weight:900;margin-bottom:.3rem}
-.fb-sub{font-size:13px;color:var(--text-dim)}
-.fb-points{font-family:var(--font-mono);font-size:2.25rem;font-weight:900;color:var(--green);margin-top:.75rem}
-.fb-points.zero{color:var(--red)}
-.fb-bonus{font-size:12px;color:var(--gold);margin-top:.2rem}
-
-/* Reactions */
-.react-row{display:flex;justify-content:center;gap:.6rem;margin-top:1.25rem}
-.react-btn{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--surface);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .1s}
-.react-btn:active{transform:scale(.9)}
-.react-btn.sent{border-color:var(--purple);background:rgba(124,110,246,.15)}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ROUND BREAK SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
-.break-card{background:var(--surface);border-radius:var(--r);padding:1.25rem;border:1px solid var(--border);text-align:center;margin-bottom:1rem}
-.break-badge{background:var(--gold);color:#000;font-weight:900;font-size:.75rem;padding:.3rem .85rem;border-radius:14px;display:inline-block;margin-bottom:.6rem}
-.break-title{font-size:1.15rem;font-weight:900;margin-bottom:.85rem}
-
-.break-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
-.break-stat{background:var(--surface2);border-radius:10px;padding:.6rem}
-.break-stat-num{font-family:var(--font-mono);font-weight:900;font-size:1.35rem;color:var(--purple)}
-.break-stat-num.green{color:var(--green)}
-.break-stat-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;margin-top:.15rem}
-
-.break-answers{text-align:left}
-.break-answers-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
-.break-answer{display:flex;align-items:center;gap:.4rem;padding:.4rem 0;border-bottom:1px solid var(--border)}
-.break-answer:last-child{border-bottom:none}
-.break-answer-icon{font-size:.9rem}
-.break-answer-q{flex:1;font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.break-answer-pts{font-family:var(--font-mono);font-weight:700;font-size:11px}
-.break-answer-pts.green{color:var(--green)}
-.break-answer-pts.red{color:var(--red)}
-
-.break-btn{width:100%;margin-top:1rem}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   RESULTS SCREEN
-═══════════════════════════════════════════════════════════════════════════ */
-.results-card{background:var(--surface);border-radius:var(--r);padding:1.5rem 1.25rem;border:1px solid var(--border);text-align:center;margin-bottom:1rem}
-.results-trophy{font-size:3.5rem;margin-bottom:.4rem}
-.results-score{font-family:var(--font-mono);font-weight:900;font-size:3.5rem;color:var(--gold);text-shadow:0 0 30px rgba(255,183,64,.25)}
-.results-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
-.results-rank{font-size:1rem;font-weight:700}
-.results-rank strong{color:var(--purple)}
-
-.results-breakdown{background:var(--surface);border-radius:var(--r);padding:1rem;border:1px solid var(--border)}
-.results-breakdown-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem;text-align:left}
-.results-round{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)}
-.results-round:last-child{border-bottom:none}
-.results-round-name{font-weight:600;color:var(--text-dim);font-size:13px}
-.results-round-score{font-family:var(--font-mono);font-weight:800;color:var(--purple);font-size:13px}
-
-/* BTN */
-.btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:none;cursor:pointer;font-family:var(--font-display);transition:all .1s}
-.btn:active{transform:scale(.97)}
-.btn-purple{background:var(--purple);color:#fff}
-.btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:none;cursor:pointer;font-family:var(--font-display);transition:all .12s;margin-top:.5rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn-purple{background:var(--purple);color:#fff;box-shadow:0 4px 20px var(--purple-glow)}
+.btn-coral{background:var(--coral);color:#fff;box-shadow:0 4px 20px var(--coral-glow)}
+.btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text-dim)}
 
 /* FOOTER */
-.footer{background:linear-gradient(90deg,#E85D24,#D14520);padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0}
+.footer{background:linear-gradient(90deg,#E85D24,#D14520);padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;margin-top:auto}
 .footer span{font-size:9px;color:rgba(255,255,255,.75)}
-.footer strong{font-size:10px;color:#fff;font-weight:800}
+.footer strong{font-size:11px;color:#fff;font-weight:800}
+
+/* TOAST */
+.toast{position:fixed;bottom:4rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-weight:700;font-size:12px;color:var(--text);opacity:0;transition:all .25s;z-index:100}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.error{background:var(--red);color:#fff;border-color:var(--red)}
+.toast.success{background:var(--green);color:#000;border-color:var(--green)}
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="hdr">
-  <div class="hdr-left">
-    <svg class="hdr-logo" viewBox="0 0 26 26" fill="none"><rect width="26" height="26" rx="6" fill="#7C6EF6"/><path d="M7 10h12M7 13h9M7 16h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-    <span class="hdr-room" id="hdr-room">----</span>
-  </div>
-  <span class="hdr-team" id="hdr-team">---</span>
-  <span class="hdr-score" id="hdr-score">0</span>
+  <svg class="hdr-logo" viewBox="0 0 48 48" fill="none">
+    <rect width="48" height="48" rx="12" fill="#7C6EF6"/>
+    <path d="M14 18h20M14 24h15M14 30h17" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  <h1 class="hdr-title">Screenshot Quiz Night</h1>
+  <p class="hdr-sub">Join the game and test your knowledge!</p>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     ERROR SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-error">
-  <div class="error-content">
-    <div class="error-icon">🎮</div>
-    <h2 class="error-title">No Game Found</h2>
-    <p class="error-msg">You need to join through the registration page to play.</p>
-    <a href="join-v2.html" class="error-link">← Go to Join Page</a>
-  </div>
-</div>
+<!-- MAIN -->
+<main class="main">
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     WAITING SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-wait">
-  <div class="screen-inner anim">
-    <div class="wait-card">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SCREEN 1: ROOM CODE
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen on" id="scr-code">
+    <div class="card anim">
+      <h2 class="card-title">Enter Room Code</h2>
+      <p class="card-sub">Ask your host for the 4-letter code</p>
+      
+      <div class="code-inputs">
+        <input type="text" maxlength="1" class="code-input" id="c0" autocomplete="off" autocapitalize="characters">
+        <input type="text" maxlength="1" class="code-input" id="c1" autocomplete="off" autocapitalize="characters">
+        <input type="text" maxlength="1" class="code-input" id="c2" autocomplete="off" autocapitalize="characters">
+        <input type="text" maxlength="1" class="code-input" id="c3" autocomplete="off" autocapitalize="characters">
+      </div>
+      
+      <div class="room-status" id="room-status"></div>
+      
+      <button class="btn btn-purple" id="btn-code" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SCREEN 2: EMAIL + TEAM
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="scr-register">
+    <div class="card anim">
+      <h2 class="card-title">Register Your Team</h2>
+      <p class="card-sub">Room: <strong id="reg-room">----</strong></p>
+      
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="inp-email" placeholder="you@email.com" autocomplete="email">
+        <p class="form-hint">One email per team — used to rejoin if needed</p>
+        <p class="form-error" id="err-email">This email is already registered</p>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Team Name</label>
+        <input type="text" class="form-input" id="inp-team" placeholder="e.g. Quiz Masters" maxlength="24" autocomplete="off">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Players at Table</label>
+        <div class="player-btns">
+          <button class="player-btn" data-p="1">1<span>Solo</span></button>
+          <button class="player-btn active" data-p="2">2<span>Duo</span></button>
+          <button class="player-btn" data-p="3">3<span>Trio</span></button>
+          <button class="player-btn" data-p="4">4<span>Squad</span></button>
+        </div>
+      </div>
+      
+      <button class="btn btn-coral" id="btn-register" disabled>Join Game →</button>
+      <button class="btn btn-ghost" id="btn-back">← Back</button>
+      
+      <!-- Rejoin option (shown when email exists) -->
+      <div class="rejoin-card" id="rejoin-card" style="display:none">
+        <p class="rejoin-text">Already registered as:</p>
+        <p class="rejoin-team" id="rejoin-team">Team Name</p>
+        <button class="btn btn-purple" id="btn-rejoin" style="margin-top:.75rem">Rejoin My Team →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SCREEN 3: WAITING
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="scr-wait">
+    <div class="card wait-card anim">
       <div class="wait-badge">✓ You're In!</div>
-      <h2 class="wait-title">Game Starts Soon</h2>
+      <h2 class="wait-title">Ready to Play</h2>
       <p class="wait-sub">Waiting for the host to start the game...</p>
       <div class="wait-team" id="wait-team">Team Name</div>
+      <div class="wait-room" id="wait-room">Room: ----</div>
       <div class="pulse-ring"></div>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     GET READY SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-ready">
-  <div class="ready-content anim">
-    <div class="ready-round" id="ready-round">Round 1</div>
-    <h2 class="ready-title">Get Ready!</h2>
-    <div class="ready-count" id="ready-count">3</div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     QUESTION SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-question">
-  <div class="screen-inner">
-    <div class="q-header">
-      <div class="q-meta">
-        <span class="q-counter" id="q-counter">Q1/5</span>
-        <span class="q-cat cat-x" id="q-cat">General</span>
-      </div>
-      <div class="timer-wrap" id="timer-wrap">
-        <span class="timer-icon">⏱</span>
-        <span class="timer-num" id="timer-num">15</span>
-      </div>
-    </div>
-    <div class="q-progress"><div class="q-progress-fill" id="q-progress"></div></div>
-    <p class="q-text" id="q-text">Question text here...</p>
-    <div class="opts" id="opts"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     FEEDBACK SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-feedback">
-  <div class="fb-content anim">
-    <div class="fb-icon" id="fb-icon">✅</div>
-    <h2 class="fb-title" id="fb-title">Correct!</h2>
-    <p class="fb-sub" id="fb-sub">Great job!</p>
-    <div class="fb-points" id="fb-points">+40</div>
-    <div class="fb-bonus" id="fb-bonus">⚡ +10 speed bonus</div>
-    <div class="react-row">
-      <button class="react-btn" data-e="🔥">🔥</button>
-      <button class="react-btn" data-e="😱">😱</button>
-      <button class="react-btn" data-e="👏">👏</button>
-      <button class="react-btn" data-e="🎉">🎉</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     ROUND BREAK SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-break">
-  <div class="screen-inner anim">
-    <div class="break-card">
-      <div class="break-badge" id="break-badge">Round 1 Complete</div>
-      <h2 class="break-title">Nice Work!</h2>
-      <div class="break-stats">
-        <div class="break-stat">
-          <div class="break-stat-num" id="break-correct">0</div>
-          <div class="break-stat-lbl">Correct</div>
-        </div>
-        <div class="break-stat">
-          <div class="break-stat-num" id="break-bonus">0</div>
-          <div class="break-stat-lbl">⚡ Bonus</div>
-        </div>
-        <div class="break-stat">
-          <div class="break-stat-num green" id="break-total">0</div>
-          <div class="break-stat-lbl">Round Pts</div>
-        </div>
-      </div>
-      <div class="break-answers" id="break-answers"></div>
-    </div>
-    <button class="btn btn-purple break-btn" id="btn-next">Continue →</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     RESULTS SCREEN
-═══════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="scr-results">
-  <div class="screen-inner anim">
-    <div class="results-card">
-      <div class="results-trophy">🏆</div>
-      <div class="results-score" id="res-score">0</div>
-      <div class="results-label">Total Points</div>
-      <div class="results-rank" id="res-rank">Calculating rank...</div>
-    </div>
-    <div class="results-breakdown">
-      <div class="results-breakdown-title">Round Breakdown</div>
-      <div id="res-rounds"></div>
-    </div>
-    <button class="btn btn-ghost" style="margin-top:1rem" id="btn-again">Play Again</button>
-  </div>
-</div>
+</main>
 
 <!-- FOOTER -->
 <div class="footer">
@@ -324,45 +219,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <strong>Screenshot Interactive</strong>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SCRIPTS
 ═══════════════════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════════════════════════
-const TIMER_SECS = 15;
-const Q_PER_ROUND = 5;
-const TOTAL_ROUNDS = 3;
-const BASE_PTS = 30;
-const FEEDBACK_MS = 1800;
-const COUNTDOWN = 3;
-const LETTERS = ['A','B','C','D'];
-const CAT_CLASS = {m:'cat-m',f:'cat-f',x:'cat-x'};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// QUESTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-const QUESTIONS = [
-  {cat:'m',lb:'Music',q:'Which Jamaican artist is known as "The Gong"?',o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],a:1},
-  {cat:'m',lb:'Music',q:'Sean Paul\'s "Temperature" peaked at #1 in how many countries?',o:['3','5','8','12'],a:2},
-  {cat:'x',lb:'Culture',q:'What is Jamaica\'s most famous carnival street party?',o:['Sumfest','Bacchanal','Rebel Salute','Sting'],a:1},
-  {cat:'m',lb:'Music',q:'Which artist featured on Beyonce\'s "Black Is King"?',o:['Koffee','Spice','Govana','Chronixx'],a:0},
-  {cat:'x',lb:'Culture',q:'What Kingston event is the biggest dancehall concert?',o:['Sumfest','Fully Loaded','Sting','Reggae Month'],a:2},
-  {cat:'m',lb:'Music',q:'Koffee\'s 2024 Grammy-winning album?',o:['Gifted','Rapture','West Indies','Sink or Swim'],a:0},
-  {cat:'x',lb:'Culture',q:'Who is the "Queen of the Dancehall"?',o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],a:2},
-  {cat:'f',lb:'Food',q:'What is Jamaica\'s national dish?',o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],a:2},
-  {cat:'m',lb:'Music',q:'Vybz Kartel created which dance move?',o:['Whining','Daggering','Gully Creepa','Bruk Out'],a:2},
-  {cat:'x',lb:'Culture',q:'Which film starred Paul Campbell as a cult classic?',o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],a:2},
-  {cat:'m',lb:'Music',q:'Which Shaggy hit became a best-selling single?',o:['Angel','Boombastic','It Wasn\'t Me','Oh Carolina'],a:2},
-  {cat:'x',lb:'Culture',q:'What shoe brand is iconic in dancehall culture?',o:['Timberland','Clarks Originals','Nike','Adidas'],a:1},
-  {cat:'m',lb:'Music',q:'Who holds the most Reggae Grammy wins?',o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],a:3},
-  {cat:'x',lb:'Culture',q:'"Dutty Wine" refers to what?',o:['Bad wine','A dance move','A cocktail','A street party'],a:1},
-  {cat:'f',lb:'Food',q:'Which drink is a Jamaican Christmas staple?',o:['Irish Moss','Roots Tonic','Sorrel Punch','Sky Juice'],a:2}
-];
-
 // ═══════════════════════════════════════════════════════════════════════════
 // FIREBASE
 // ═══════════════════════════════════════════════════════════════════════════
@@ -380,483 +244,304 @@ try {
   db = firebase.database();
 } catch(e) { console.error(e); }
 
-const dbSet = (p,v) => db && db.ref(p).set(v);
+const dbSet = (p,v,cb) => db && db.ref(p).set(v, cb || (()=>{}));
 const dbGet = (p,cb) => db ? db.ref(p).once('value',s=>cb(s.val())) : cb(null);
 const dbOn = (p,cb) => db && db.ref(p).on('value',s=>cb(s.val()));
 const dbOff = p => db && db.ref(p).off();
-const dbPush = (p,v) => db && db.ref(p).push(v);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════
 let roomCode = '';
-let emailKey = '';
-let teamName = '';
-
-let round = 1;
-let qIndex = 0;
-let totalScore = 0;
-let roundScores = [0,0,0];
-let roundBonus = [0,0,0];
-let roundAnswers = [[],[],[]];
-
-let timer = null;
-let timerVal = TIMER_SECS;
-let answered = false;
-let startTime = 0;
+let roomValid = false;
+let playerCount = 2;
+let existingTeam = null;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ELEMENTS
 // ═══════════════════════════════════════════════════════════════════════════
 const $ = id => document.getElementById(id);
+const codeInputs = [0,1,2,3].map(i => $('c'+i));
+const toast = $('toast');
 
 function showScreen(name) {
-  ['error','wait','ready','question','feedback','break','results'].forEach(s => {
+  ['code','register','wait'].forEach(s => {
     $('scr-'+s).classList.toggle('on', s===name);
   });
 }
 
-function updateScore() {
-  $('hdr-score').textContent = totalScore;
+function showToast(msg, type) {
+  toast.textContent = msg;
+  toast.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EMAIL HASH (simple hash for Firebase key)
+// ═══════════════════════════════════════════════════════════════════════════
+function hashEmail(email) {
+  const e = email.toLowerCase().trim();
+  let h = 0;
+  for (let i = 0; i < e.length; i++) {
+    h = ((h << 5) - h) + e.charCodeAt(i);
+    h = h & h;
+  }
+  return 'e' + Math.abs(h).toString(36);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 1: ROOM CODE
+// ═══════════════════════════════════════════════════════════════════════════
+function setupCodeInputs() {
+  codeInputs.forEach((inp, i) => {
+    inp.addEventListener('input', e => {
+      const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+      e.target.value = val;
+      
+      if (val && i < 3) {
+        codeInputs[i + 1].focus();
+      }
+      
+      checkRoomCode();
+    });
+    
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value && i > 0) {
+        codeInputs[i - 1].focus();
+      }
+    });
+    
+    inp.addEventListener('paste', e => {
+      e.preventDefault();
+      const paste = (e.clipboardData.getData('text') || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
+      paste.split('').forEach((ch, idx) => {
+        if (codeInputs[idx]) codeInputs[idx].value = ch;
+      });
+      if (paste.length === 4) codeInputs[3].focus();
+      checkRoomCode();
+    });
+  });
+}
+
+function getCode() {
+  return codeInputs.map(i => i.value).join('').toUpperCase();
+}
+
+function checkRoomCode() {
+  const code = getCode();
+  const status = $('room-status');
+  
+  if (code.length < 4) {
+    status.textContent = '';
+    status.className = 'room-status';
+    $('btn-code').disabled = true;
+    codeInputs.forEach(i => i.classList.remove('valid', 'error'));
+    roomValid = false;
+    return;
+  }
+  
+  status.textContent = 'Checking...';
+  status.className = 'room-status checking';
+  
+  dbGet('games/' + code, game => {
+    if (game && game.status !== 'ended') {
+      status.textContent = '✓ Room found!';
+      status.className = 'room-status valid';
+      codeInputs.forEach(i => { i.classList.remove('error'); i.classList.add('valid'); });
+      roomCode = code;
+      roomValid = true;
+      $('btn-code').disabled = false;
+    } else {
+      status.textContent = '✗ Room not found';
+      status.className = 'room-status invalid';
+      codeInputs.forEach(i => { i.classList.remove('valid'); i.classList.add('error'); });
+      roomValid = false;
+      $('btn-code').disabled = true;
+    }
+  });
+}
+
+$('btn-code').onclick = () => {
+  if (roomValid) {
+    $('reg-room').textContent = roomCode;
+    showScreen('register');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 2: REGISTRATION
+// ═══════════════════════════════════════════════════════════════════════════
+function validateRegForm() {
+  const email = $('inp-email').value.trim();
+  const team = $('inp-team').value.trim();
+  const valid = email.includes('@') && email.includes('.') && team.length >= 2;
+  $('btn-register').disabled = !valid;
+}
+
+$('inp-email').addEventListener('input', () => {
+  $('err-email').classList.remove('show');
+  $('inp-email').classList.remove('error');
+  $('rejoin-card').style.display = 'none';
+  existingTeam = null;
+  validateRegForm();
+});
+
+$('inp-email').addEventListener('blur', () => {
+  const email = $('inp-email').value.trim();
+  if (!email || !email.includes('@')) return;
+  
+  // Check if email already registered
+  const ek = hashEmail(email);
+  dbGet(`games/${roomCode}/teams/${ek}`, team => {
+    if (team) {
+      existingTeam = { ...team, emailKey: ek };
+      $('rejoin-team').textContent = team.name;
+      $('rejoin-card').style.display = 'block';
+      $('err-email').classList.add('show');
+      $('inp-email').classList.add('error');
+      $('btn-register').disabled = true;
+    }
+  });
+});
+
+$('inp-team').addEventListener('input', validateRegForm);
+
+// Player count buttons
+document.querySelectorAll('.player-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    playerCount = parseInt(btn.dataset.p);
+  };
+});
+
+$('btn-back').onclick = () => showScreen('code');
+
+$('btn-register').onclick = registerTeam;
+$('btn-rejoin').onclick = rejoinTeam;
+
+function registerTeam() {
+  const email = $('inp-email').value.trim();
+  const team = $('inp-team').value.trim();
+  const ek = hashEmail(email);
+  
+  const teamData = {
+    name: team,
+    email: email,
+    players: playerCount,
+    status: 'waiting',
+    joinedAt: Date.now(),
+    currentRound: 1,
+    currentQuestion: 0
+  };
+  
+  // Write to room-scoped path
+  dbSet(`games/${roomCode}/teams/${ek}`, teamData, err => {
+    if (err) {
+      showToast('Error registering', 'error');
+      return;
+    }
+    
+    // Legacy path
+    dbSet(`teams/${ek}`, teamData);
+    
+    // Save session
+    const session = {
+      roomCode,
+      emailKey: ek,
+      team: team,
+      email: email,
+      players: playerCount
+    };
+    sessionStorage.setItem('trivia_team', JSON.stringify(session));
+    localStorage.setItem('trivia_session', JSON.stringify(session));
+    
+    goToWaiting(team);
+  });
+}
+
+function rejoinTeam() {
+  if (!existingTeam) return;
+  
+  const session = {
+    roomCode,
+    emailKey: existingTeam.emailKey,
+    team: existingTeam.name,
+    email: existingTeam.email,
+    players: existingTeam.players
+  };
+  sessionStorage.setItem('trivia_team', JSON.stringify(session));
+  localStorage.setItem('trivia_session', JSON.stringify(session));
+  
+  goToWaiting(existingTeam.name);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 3: WAITING
+// ═══════════════════════════════════════════════════════════════════════════
+function goToWaiting(teamName) {
+  $('wait-team').textContent = teamName;
+  $('wait-room').textContent = 'Room: ' + roomCode;
+  showScreen('wait');
+  
+  // Listen for game start
+  dbOn(`games/${roomCode}/status`, status => {
+    if (status === 'playing') {
+      dbOff(`games/${roomCode}/status`);
+      // Redirect to player app
+      window.location.href = 'index-v3.html?room=' + roomCode;
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 function init() {
-  // Get session from storage
-  let session = null;
-  try { session = JSON.parse(sessionStorage.getItem('trivia_team')); } catch(e){}
-  if (!session) {
-    try { session = JSON.parse(localStorage.getItem('trivia_session')); } catch(e){}
-  }
+  setupCodeInputs();
   
-  // URL params
+  // Check URL param for room code
   const params = new URLSearchParams(window.location.search);
   const urlRoom = params.get('room');
   
-  if (!session && !urlRoom) {
-    showScreen('error');
-    return;
+  if (urlRoom && urlRoom.length === 4) {
+    // Pre-fill room code
+    urlRoom.toUpperCase().split('').forEach((ch, i) => {
+      if (codeInputs[i]) codeInputs[i].value = ch;
+    });
+    checkRoomCode();
   }
   
-  if (session) {
-    roomCode = session.roomCode || session.room || '';
-    emailKey = session.emailKey || session.ek || '';
-    teamName = session.team || session.tname || 'Team';
-  }
-  if (urlRoom) roomCode = urlRoom;
+  // Check for existing session
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem('trivia_session')); } catch(e){}
   
-  if (!roomCode) {
-    showScreen('error');
-    return;
-  }
-  
-  // Update header
-  $('hdr-room').textContent = roomCode;
-  $('hdr-team').textContent = teamName;
-  $('wait-team').textContent = teamName;
-  
-  // Check game status
-  dbGet('games/' + roomCode, game => {
-    if (!game) {
-      showScreen('error');
-      return;
-    }
-    
-    if (game.status === 'playing') {
-      startRound(1);
-    } else if (game.status === 'ended') {
-      showScreen('error');
-    } else {
-      showScreen('wait');
-      listenForStart();
-    }
-  });
-}
-
-function listenForStart() {
-  dbOn('games/' + roomCode + '/status', status => {
-    if (status === 'playing') {
-      dbOff('games/' + roomCode + '/status');
-      startRound(1);
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ROUND FLOW
-// ═══════════════════════════════════════════════════════════════════════════
-function startRound(r) {
-  round = r;
-  qIndex = 0;
-  roundAnswers[r-1] = [];
-  saveProgress();
-  showGetReady();
-}
-
-function showGetReady() {
-  $('ready-round').textContent = 'Round ' + round;
-  showScreen('ready');
-  
-  let count = COUNTDOWN;
-  $('ready-count').textContent = count;
-  
-  const countdownTimer = setInterval(() => {
-    count--;
-    if (count > 0) {
-      $('ready-count').textContent = count;
-    } else {
-      clearInterval(countdownTimer);
-      loadQuestion();
-    }
-  }, 1000);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// QUESTION
-// ═══════════════════════════════════════════════════════════════════════════
-function getQIndex() {
-  return (round - 1) * Q_PER_ROUND + qIndex;
-}
-
-function loadQuestion() {
-  const qi = getQIndex();
-  const q = QUESTIONS[qi];
-  
-  if (!q) {
-    showRoundBreak();
-    return;
+  if (session && session.roomCode) {
+    // Verify room still exists and not ended
+    dbGet('games/' + session.roomCode, game => {
+      if (game && game.status !== 'ended') {
+        // Check if team still registered
+        dbGet(`games/${session.roomCode}/teams/${session.emailKey}`, team => {
+          if (team) {
+            roomCode = session.roomCode;
+            
+            if (game.status === 'playing') {
+              // Game already started, go to player app
+              window.location.href = 'index-v3.html?room=' + roomCode;
+            } else {
+              // Still in lobby, go to waiting
+              goToWaiting(session.team);
+            }
+          }
+        });
+      }
+    });
   }
   
-  answered = false;
-  timerVal = TIMER_SECS;
-  startTime = Date.now();
-  
-  // Update UI
-  $('q-counter').textContent = 'Q' + (qIndex + 1) + '/' + Q_PER_ROUND;
-  $('q-cat').textContent = q.lb;
-  $('q-cat').className = 'q-cat ' + (CAT_CLASS[q.cat] || 'cat-x');
-  $('q-text').textContent = q.q;
-  $('q-progress').style.width = '100%';
-  $('timer-num').textContent = timerVal;
-  $('timer-num').className = 'timer-num';
-  $('timer-wrap').className = 'timer-wrap';
-  
-  // Render options
-  let html = '';
-  q.o.forEach((opt, i) => {
-    html += `<button class="opt" data-i="${i}">
-      <span class="opt-letter">${LETTERS[i]}</span>
-      <span>${opt}</span>
-    </button>`;
-  });
-  $('opts').innerHTML = html;
-  
-  // Click handlers
-  $('opts').querySelectorAll('.opt').forEach(btn => {
-    btn.onclick = () => !answered && onAnswer(parseInt(btn.dataset.i));
-  });
-  
-  showScreen('question');
-  runTimer();
+  // Focus first input
+  setTimeout(() => codeInputs[0].focus(), 100);
 }
 
-function runTimer() {
-  clearInterval(timer);
-  
-  timer = setInterval(() => {
-    const elapsed = (Date.now() - startTime) / 1000;
-    timerVal = Math.max(0, TIMER_SECS - Math.floor(elapsed));
-    
-    $('timer-num').textContent = timerVal;
-    $('q-progress').style.width = ((timerVal / TIMER_SECS) * 100) + '%';
-    
-    // Visual warnings
-    if (timerVal <= 5) {
-      $('timer-num').className = 'timer-num danger';
-      $('timer-wrap').className = 'timer-wrap danger';
-    } else if (timerVal <= 8) {
-      $('timer-num').className = 'timer-num warn';
-      $('timer-wrap').className = 'timer-wrap warn';
-    }
-    
-    if (timerVal <= 0) {
-      clearInterval(timer);
-      onTimeout();
-    }
-  }, 100);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ANSWER
-// ═══════════════════════════════════════════════════════════════════════════
-function onAnswer(selected) {
-  if (answered) return;
-  answered = true;
-  clearInterval(timer);
-  
-  const qi = getQIndex();
-  const q = QUESTIONS[qi];
-  const correct = selected === q.a;
-  const timeSpent = (Date.now() - startTime) / 1000;
-  const bonus = correct ? speedBonus(timeSpent) : 0;
-  const pts = correct ? BASE_PTS + bonus : 0;
-  
-  // Update scores
-  totalScore += pts;
-  roundScores[round-1] += correct ? BASE_PTS : 0;
-  roundBonus[round-1] += bonus;
-  
-  // Save answer
-  roundAnswers[round-1].push({
-    q: qIndex,
-    correct,
-    time: timeSpent,
-    pts,
-    bonus
-  });
-  
-  // Visual feedback on options
-  $('opts').querySelectorAll('.opt').forEach((btn, i) => {
-    btn.classList.add('locked');
-    if (i === q.a) btn.classList.add('correct');
-    else if (i === selected && !correct) btn.classList.add('wrong');
-  });
-  
-  // Firebase
-  saveAnswer(correct, timeSpent, pts, bonus);
-  updateScore();
-  
-  // Show feedback
-  setTimeout(() => showFeedback(correct, pts, bonus, false), 400);
-}
-
-function onTimeout() {
-  if (answered) return;
-  answered = true;
-  
-  roundAnswers[round-1].push({
-    q: qIndex,
-    correct: false,
-    time: TIMER_SECS,
-    pts: 0,
-    bonus: 0
-  });
-  
-  // Show correct
-  const qi = getQIndex();
-  const q = QUESTIONS[qi];
-  $('opts').querySelectorAll('.opt').forEach((btn, i) => {
-    btn.classList.add('locked');
-    if (i === q.a) btn.classList.add('correct');
-  });
-  
-  saveAnswer(false, TIMER_SECS, 0, 0);
-  
-  setTimeout(() => showFeedback(false, 0, 0, true), 400);
-}
-
-function speedBonus(t) {
-  if (t <= 3) return 10;
-  if (t <= 6) return 7;
-  if (t <= 10) return 4;
-  if (t <= 14) return 1;
-  return 0;
-}
-
-function saveAnswer(correct, time, pts, bonus) {
-  const key = round + '-' + qIndex;
-  
-  // Room-scoped
-  dbSet(`games/${roomCode}/scores/${emailKey}/answers/${key}`, {
-    correct, time: Math.round(time * 10) / 10, pts, bonus
-  });
-  dbSet(`games/${roomCode}/scores/${emailKey}/total`, totalScore);
-  dbSet(`games/${roomCode}/live_scores/${emailKey}`, totalScore);
-  
-  // Legacy
-  dbSet(`live_scores/${emailKey}`, totalScore);
-  
-  saveProgress();
-}
-
-function saveProgress() {
-  dbSet(`games/${roomCode}/teams/${emailKey}/currentRound`, round);
-  dbSet(`games/${roomCode}/teams/${emailKey}/currentQuestion`, qIndex);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FEEDBACK
-// ═══════════════════════════════════════════════════════════════════════════
-function showFeedback(correct, pts, bonus, timeout) {
-  const encourageGood = ['Nailed it!','Great job!','You\'re on fire!','Brilliant!','Keep going!'];
-  const encourageBad = ['Next one!','Stay focused!','You got this!','Keep going!'];
-  
-  if (correct) {
-    $('fb-icon').textContent = '✅';
-    $('fb-title').textContent = 'Correct!';
-    $('fb-sub').textContent = encourageGood[Math.floor(Math.random()*encourageGood.length)];
-    $('fb-points').textContent = '+' + pts;
-    $('fb-points').className = 'fb-points';
-    $('fb-bonus').textContent = bonus > 0 ? '⚡ +' + bonus + ' speed bonus' : '';
-    $('fb-bonus').style.display = bonus > 0 ? 'block' : 'none';
-  } else {
-    $('fb-icon').textContent = timeout ? '⏰' : '❌';
-    $('fb-title').textContent = timeout ? 'Time\'s Up!' : 'Wrong';
-    $('fb-sub').textContent = encourageBad[Math.floor(Math.random()*encourageBad.length)];
-    $('fb-points').textContent = '+0';
-    $('fb-points').className = 'fb-points zero';
-    $('fb-bonus').style.display = 'none';
-  }
-  
-  // Reset reactions
-  document.querySelectorAll('.react-btn').forEach(b => b.classList.remove('sent'));
-  
-  showScreen('feedback');
-  
-  // Auto-advance
-  setTimeout(advance, FEEDBACK_MS);
-}
-
-function advance() {
-  qIndex++;
-  if (qIndex >= Q_PER_ROUND) {
-    showRoundBreak();
-  } else {
-    loadQuestion();
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ROUND BREAK
-// ═══════════════════════════════════════════════════════════════════════════
-function showRoundBreak() {
-  const answers = roundAnswers[round-1];
-  const correctCount = answers.filter(a => a.correct).length;
-  const bonusTotal = roundBonus[round-1];
-  const roundTotal = roundScores[round-1] + bonusTotal;
-  
-  $('break-badge').textContent = 'Round ' + round + ' Complete';
-  $('break-correct').textContent = correctCount;
-  $('break-bonus').textContent = bonusTotal;
-  $('break-total').textContent = roundTotal;
-  
-  // Answers list
-  let html = '<div class="break-answers-title">Your Answers</div>';
-  answers.forEach((a, i) => {
-    const qi = (round-1) * Q_PER_ROUND + i;
-    const q = QUESTIONS[qi];
-    const icon = a.correct ? '✅' : '❌';
-    const cls = a.correct ? 'green' : 'red';
-    const qText = q.q.length > 35 ? q.q.slice(0,35)+'...' : q.q;
-    html += `<div class="break-answer">
-      <span class="break-answer-icon">${icon}</span>
-      <span class="break-answer-q">${qText}</span>
-      <span class="break-answer-pts ${cls}">${a.correct ? '+'+a.pts : '0'}</span>
-    </div>`;
-  });
-  $('break-answers').innerHTML = html;
-  
-  // Save round
-  dbSet(`games/${roomCode}/scores/${emailKey}/rounds/${round}`, {
-    base: roundScores[round-1],
-    bonus: bonusTotal,
-    total: roundTotal
-  });
-  
-  // Button text
-  if (round >= TOTAL_ROUNDS) {
-    $('btn-next').textContent = 'See Final Results →';
-  } else {
-    $('btn-next').textContent = 'Continue to Round ' + (round + 1) + ' →';
-  }
-  
-  showScreen('break');
-}
-
-function continueNext() {
-  if (round >= TOTAL_ROUNDS) {
-    showResults();
-  } else {
-    startRound(round + 1);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// RESULTS
-// ═══════════════════════════════════════════════════════════════════════════
-function showResults() {
-  // Mark finished
-  dbSet(`games/${roomCode}/teams/${emailKey}/status`, 'finished');
-  dbSet(`games/${roomCode}/teams/${emailKey}/completedAt`, Date.now());
-  
-  $('res-score').textContent = totalScore;
-  
-  // Breakdown
-  let html = '';
-  for (let r = 1; r <= TOTAL_ROUNDS; r++) {
-    const rTotal = roundScores[r-1] + roundBonus[r-1];
-    html += `<div class="results-round">
-      <span class="results-round-name">Round ${r}</span>
-      <span class="results-round-score">${rTotal} pts</span>
-    </div>`;
-  }
-  $('res-rounds').innerHTML = html;
-  
-  // Get rank
-  dbGet(`games/${roomCode}/live_scores`, scores => {
-    if (!scores) {
-      $('res-rank').innerHTML = 'Quiz complete!';
-      return;
-    }
-    
-    const entries = Object.entries(scores)
-      .map(([k,s]) => ({key:k, score:s}))
-      .sort((a,b) => b.score - a.score);
-    
-    let rank = entries.findIndex(e => e.key === emailKey) + 1;
-    if (rank === 0) rank = entries.length;
-    
-    const suffix = rank===1?'st':rank===2?'nd':rank===3?'rd':'th';
-    $('res-rank').innerHTML = `You finished <strong>#${rank}</strong> out of ${entries.length} teams!`;
-  });
-  
-  showScreen('results');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// REACTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-function sendReaction(emoji) {
-  dbPush(`games/${roomCode}/reactions`, {
-    emoji,
-    team: teamName,
-    timestamp: Date.now()
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// EVENTS
-// ═══════════════════════════════════════════════════════════════════════════
-document.querySelectorAll('.react-btn').forEach(btn => {
-  btn.onclick = function() {
-    this.classList.add('sent');
-    sendReaction(this.dataset.e);
-  };
-});
-
-$('btn-next').onclick = continueNext;
-
-$('btn-again').onclick = () => {
-  sessionStorage.removeItem('trivia_team');
-  localStorage.removeItem('trivia_session');
-  window.location.href = 'join-v2.html';
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════════════════════════════
 init();
 </script>
 </body>
