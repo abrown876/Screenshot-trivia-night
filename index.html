@@ -1,60 +1,8 @@
-You are my senior product designer and frontend engineer.
-
-Focus ONLY on improving index.html (player tablet experience) for Screenshot Quiz Night.
-
-Context:
-This is a live trivia game played in a restaurant. Teams use tablets at their table. The host controls the game. Players must quickly register, answer questions, and see results in real time.
-
-Use the provided technical documentation as the source of truth. Do not change Firebase structure, game flow, or scoring logic unless absolutely necessary.
-
-Your tasks:
-
-1. Audit the current player experience across all screens:
-- splash
-- registration
-- waiting
-- question
-- paused
-- round break
-- results
-- leaderboard tab
-
-2. Identify the biggest UX issues for:
-- speed (onboarding + answering)
-- clarity (noisy restaurant, quick glances)
-- engagement (should feel like a game show, not a form)
-
-3. Redesign the experience with these goals:
-- registration completed in under 10 seconds
-- larger, clearer answer buttons
-- stronger visual hierarchy
-- more exciting and dynamic feel
-- better use of space and typography
-- clearer feedback on correct/wrong answers
-- improved countdown urgency
-
-Important constraint:
-- player email collection is mandatory
-- do not remove it or make it optional
-- you may restructure how emails are collected for speed (e.g. show after player count selection)
-
-4. Implement improvements directly in index.html:
-- update layout and structure
-- improve CSS for readability and touch targets
-- refine microcopy (make it more energetic and game-like)
-- enhance visual states (waiting, answering, reveal, results)
-
-5. Do NOT:
-- introduce frameworks
-- add build steps
-- break Firebase reads/writes
-- change host command handling
-
-6. Deliver:
-- summary of UX issues found
-- list of improvements made
-- updated code
-- test checklist (what to verify in real gameplay)
-
-Focus on making the player experience feel like:
-HQ Trivia / Kahoot / Jackbox — fast, fun, competitive.
+ fill emails after fields render
+    setTimeout(function() {
+      var emails = team.emails || [];
+      for (var i = 0; i < pcnt; i++) {
+        var el = document.getElementById('em' + i);
+        if (el) el.value = emails[i] || ('player' + (i+1) + '@guest.com');
+      }
+      // Step 5: call joinGame
