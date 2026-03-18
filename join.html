@@ -489,7 +489,7 @@ function goToWaiting(teamName) {
     if (status === 'playing') {
       dbOff(`games/${roomCode}/status`);
       // Redirect to player app
-      window.location.href = 'index-v3.html?room=' + roomCode;
+      window.location.href = 'index.html?room=' + roomCode;
     }
   });
 }
@@ -527,7 +527,7 @@ function init() {
             
             if (game.status === 'playing') {
               // Game already started, go to player app
-              window.location.href = 'index-v3.html?room=' + roomCode;
+              window.location.href = 'index.html?room=' + roomCode;
             } else {
               // Still in lobby, go to waiting
               goToWaiting(session.team);
