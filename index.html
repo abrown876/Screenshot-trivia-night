@@ -554,7 +554,16 @@ function init() {
     dbGet('games/' + roomCode, game => {
       if (!game) { showScreen('error'); return; }
       if (game.status === 'playing') {
-        startRound(1);
+        // Only resume if the player was already mid-game (has a saved round).
+        // A fresh page-load with a stale 'playing' room should wait, not auto-start.
+        const savedRound = game.teams && game.teams[emailKey] && game.teams[emailKey].currentRound;
+        if (savedRound) {
+          startRound(savedRound);
+        } else {
+          // Player joined late or game is already running — show wait screen
+          showScreen('wait');
+          listenForPlayerCount();
+        }
       } else if (game.status === 'ended') {
         showScreen('error');
       } else {
@@ -676,7 +685,9 @@ function doRegister() {
     $('wait-team').textContent = teamName;
     
     if (game.status === 'playing') {
-      startRound(1);
+      // Game already in progress — player joined late, just show wait screen
+      showScreen('wait');
+      listenForPlayerCount();
     } else {
       showScreen('wait');
       listenForStart();
@@ -686,7 +697,12 @@ function doRegister() {
 }
 
 function listenForStart() {
+  // Firebase fires the callback immediately with the current value on attach.
+  // We only want to react to a *change* (host pressing Start), so skip the
+  // first call.
+  let skipFirst = true;
   dbOn('games/' + roomCode + '/status', status => {
+    if (skipFirst) { skipFirst = false; return; }
     if (status === 'playing') {
       dbOff('games/' + roomCode + '/status');
       startRound(1);
