@@ -123,12 +123,19 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
     </div>
   </div>
   <div class="card" style="padding:.9rem 1.5rem">
-    <div class="slabel" style="margin-bottom:.4rem">Game Room Code</div>
-    <div class="room-row">
-      <input class="room-input" id="room-input" type="text" placeholder="e.g. ABCD" maxlength="6" style="text-transform:uppercase">
-      <button class="btn btn-purple" id="btn-connect" onclick="connectRoom()" style="flex-shrink:0;padding:.55rem 1.2rem">Connect</button>
+    <div class="slabel" style="margin-bottom:.4rem">Game Room</div>
+    <div id="room-setup" style="display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-purple" onclick="createRoom()" style="flex:1">🎲 New Game</button>
     </div>
-    <div id="connect-status" style="font-size:12px;color:var(--text-muted);margin-top:.3rem">Enter room code from player share link</div>
+    <div id="room-active" style="display:none">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem">
+        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:900;color:var(--purple);letter-spacing:.15em" id="room-code-display">----</div>
+        <button class="btn btn-teal" onclick="copyLink()" style="padding:.4rem .9rem;font-size:12px">📋 Copy Link</button>
+        <button class="btn btn-coral" onclick="resetRoom()" style="padding:.4rem .9rem;font-size:12px">✕ Reset</button>
+      </div>
+      <div id="room-link" style="font-size:11px;color:var(--text-muted);word-break:break-all;background:var(--surface2);border-radius:8px;padding:.4rem .6rem"></div>
+      <div id="connect-status" style="font-size:12px;color:var(--green);margin-top:.4rem">✅ Room active — share the link with players</div>
+    </div>
   </div>
   <div class="card">
     <div class="round-tabs">
@@ -202,31 +209,70 @@ var QUESTIONS=[
 {cat:'f',lb:'Food',q:`Which red flower drink is a Jamaican Christmas staple?`,o:['Irish Moss','Roots Tonic','Sorrel Punch','Sky Juice'],a:2}
 ];
 
-function connectRoom(){
-  var inp=document.getElementById('room-input'),code=inp.value.trim().toUpperCase();
-  if(!code){alert('Enter a room code.');return;}
+function generateCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ';
+  var code='';
+  for(var i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function createRoom(){
   if(!db){alert('Firebase not connected.');return;}
-  roomCode=code;
-  document.getElementById('connect-status').textContent='Connecting to room: '+roomCode+'…';
-  document.getElementById('connect-status').style.color='var(--gold)';
-  // Verify room exists
-  db.ref('games/'+roomCode).once('value',function(snap){
-    if(!snap.exists()){
-      document.getElementById('connect-status').textContent='⚠ Room "'+roomCode+'" not found — it will be created on first launch.';
-      document.getElementById('connect-status').style.color='var(--amber)';
-    } else {
-      document.getElementById('connect-status').textContent='✅ Connected to room: '+roomCode;
-      document.getElementById('connect-status').style.color='var(--green)';
-    }
-    document.getElementById('btn-connect').disabled=true;
-    inp.disabled=true;
+  // Generate unique code not already in Firebase
+  var code=generateCode();
+  db.ref('games/'+code).once('value',function(snap){
+    if(snap.exists()){code=generateCode();} // try once more if collision
+    roomCode=code;
+    // Write the room to Firebase
+    db.ref('games/'+roomCode+'/createdAt').set(Date.now());
+    // Show the active room UI
+    document.getElementById('room-setup').style.display='none';
+    document.getElementById('room-active').style.display='block';
+    document.getElementById('room-code-display').textContent=roomCode;
+    var link='https://quiz.screenshotinteractive.com/?room='+roomCode;
+    document.getElementById('room-link').textContent=link;
     attachListeners();
-    // enable launch if teams present
-    db.ref('games/'+roomCode+'/teams').once('value',function(snap2){
-      var data=snap2.val()||{},total=Object.keys(data).length;
-      if(total>0){document.getElementById('btn-launch').disabled=false;setChip('ready',total+' team'+(total!==1?'s':'')+' ready');}
-    });
+    document.getElementById('btn-launch').disabled=false;
+    setChip('ready','Room '+roomCode+' created');
+    document.getElementById('status-val').textContent='Room '+roomCode+' ready — share link with players';
   });
+}
+
+function copyLink(){
+  var link='https://quiz.screenshotinteractive.com/?room='+roomCode;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn=event.target;
+    btn.textContent='✅ Copied!';
+    setTimeout(function(){btn.textContent='📋 Copy Link';},2000);
+  }).catch(function(){
+    prompt('Copy this link:',link);
+  });
+}
+
+function resetRoom(){
+  if(!confirm('Reset entire room? All teams and scores will be cleared.'))return;
+  if(!db||!roomCode)return;
+  db.ref('games/'+roomCode).remove();
+  roomCode=null;
+  roundDone=[false,false,false];
+  clearInterval(timer);
+  document.getElementById('room-setup').style.display='flex';
+  document.getElementById('room-active').style.display='none';
+  document.getElementById('room-code-display').textContent='----';
+  document.getElementById('cnt-wait').textContent='0';
+  document.getElementById('cnt-play').textContent='0';
+  document.getElementById('cnt-done').textContent='0';
+  document.getElementById('btn-launch').disabled=true;
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-break').disabled=true;
+  document.getElementById('btn-endgame').style.display='none';
+  document.getElementById('timer-block').classList.remove('show');
+  document.getElementById('answer-box').className='answer-box';
+  document.getElementById('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';
+  [1,2,3].forEach(function(n){document.getElementById('rtab'+n).className='rtab'+(n===1?' active':'');});
+  selRound(1);setChip('waiting');
+  document.getElementById('status-val').textContent='Create a new room to start';
 }
 
 function attachListeners(){
@@ -402,24 +448,21 @@ function endGame(){if(!db)return;db.ref('games/'+roomCode+'/host/command').set({
 
 function resetGame(){
   if(!confirm('Reset scores? Teams stay registered.'))return;if(!db)return;
-  db.ref('games/'+roomCode+'/scores').remove();db.ref('games/'+roomCode+'/live_scores').remove();db.ref('games/'+roomCode+'/reactions').remove();db.ref('games/'+roomCode+'/race').remove();db.ref('games/'+roomCode+'/game/current').remove();db.ref('games/'+roomCode+'/status').remove();db.ref('games/'+roomCode+'/host/command').set({action:'reset',timestamp:Date.now()});
+  db.ref('games/'+roomCode+'/scores').remove();db.ref('games/'+roomCode+'/live_scores').remove();db.ref('games/'+roomCode+'/reactions').remove();db.ref('games/'+roomCode+'/race').remove();db.ref('games/'+roomCode+'/game/current').remove();db.ref('games/'+roomCode+'/status').remove();db.ref('games/'+roomCode+'/host/command').remove();
   roundDone=[false,false,false];roundStarted=[false,false,false];clearInterval(timer);
   document.getElementById('btn-pause').disabled=true;document.getElementById('btn-reveal').disabled=true;document.getElementById('btn-break').disabled=true;document.getElementById('btn-endgame').style.display='none';document.getElementById('timer-block').classList.remove('show');document.getElementById('answer-box').className='answer-box';
   [1,2,3].forEach(function(n){document.getElementById('rtab'+n).className='rtab'+(n===1?' active':'');});
   selRound(1);setChip('ready');document.getElementById('status-val').textContent='Scores reset — teams still registered';
 }
-function resetAll(){
-  if(!confirm('Wipe everything?'))return;if(!db)return;
-  db.ref('games/'+roomCode+'/scores').remove();db.ref('games/'+roomCode+'/live_scores').remove();db.ref('games/'+roomCode+'/teams').remove();db.ref('games/'+roomCode+'/reactions').remove();db.ref('games/'+roomCode+'/race').remove();db.ref('games/'+roomCode+'/game').remove();db.ref('games/'+roomCode+'/host/command').set({action:'reset',timestamp:Date.now()});
-  roundDone=[false,false,false];roundStarted=[false,false,false];teamCount=0;clearInterval(timer);
-  document.getElementById('cnt-wait').textContent='0';document.getElementById('cnt-play').textContent='0';document.getElementById('cnt-done').textContent='0';
-  document.getElementById('btn-launch').disabled=true;document.getElementById('btn-pause').disabled=true;document.getElementById('btn-reveal').disabled=true;document.getElementById('btn-break').disabled=true;document.getElementById('btn-endgame').style.display='none';document.getElementById('timer-block').classList.remove('show');document.getElementById('answer-box').className='answer-box';
-  [1,2,3].forEach(function(n){document.getElementById('rtab'+n).className='rtab'+(n===1?' active':'');});
-  selRound(1);setChip('waiting');document.getElementById('status-val').textContent='Reset complete — waiting for teams';
-}
+function resetAll(){resetRoom();}
 
 
 setChip('waiting');selRound(1);
+document.getElementById('btn-launch').disabled=true;
+document.getElementById('btn-pause').disabled=true;
+document.getElementById('btn-reveal').disabled=true;
+document.getElementById('btn-break').disabled=true;
+document.getElementById('status-val').textContent='Create a new room to start';
 </script>
 <!-- SPONSOR FOOTER -->
 <div class="sponsor-footer">
