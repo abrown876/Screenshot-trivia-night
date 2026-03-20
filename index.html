@@ -766,24 +766,26 @@ function doRegister() {
 }
 
 function listenForStart() {
-  // Wait for the host to press Launch on Q1 of Round 1.
-  // We use a two-layer stale guard:
-  //   1. attachedAt  — ignore anything timestamped before we registered
-  //   2. MAX_STALE   — even if the clock is slightly off, reject commands
-  //                    older than 10 seconds from now
-  const attachedAt = Date.now();
-  const MAX_STALE = 10000; // ms
+  // Step 1: snapshot whatever command is in the DB RIGHT NOW.
+  // Step 2: attach a live listener — only fire on values DIFFERENT from the snapshot.
+  // This completely eliminates any timestamp race condition.
+  const path = 'games/' + roomCode + '/host/command';
 
-  dbOn('games/' + roomCode + '/host/command', cmd => {
-    if (!cmd) return;
-    const cmdTs = cmd.timestamp || 0;
-    const age   = Date.now() - cmdTs;
-    // Stale: was already in DB when we attached, or older than 10s
-    if (cmdTs < attachedAt || age > MAX_STALE) return;
-    if (cmd.action === 'question') {
-      dbOff('games/' + roomCode + '/host/command');
-      startRound(cmd.round || 1);
-    }
+  dbGet(path, existingCmd => {
+    // Serialise the existing command so we can compare later
+    const existingStr = JSON.stringify(existingCmd);
+
+    db.ref(path).on('value', snap => {
+      const cmd = snap.val();
+      // Ignore if it's null or identical to what was already there
+      if (!cmd) return;
+      if (JSON.stringify(cmd) === existingStr) return;
+      // New command — only care about 'question' action
+      if (cmd.action === 'question') {
+        db.ref(path).off('value');
+        startRound(cmd.round || 1);
+      }
+    });
   });
 }
 
