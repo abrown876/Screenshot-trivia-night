@@ -355,6 +355,7 @@ function launchQ(){
   window.roundStarted[curRound-1]=true;
   db.ref('games/'+roomCode+'/teams').once('value',function(snap){var teams=snap.val()||{};Object.keys(teams).forEach(function(k){if(teams[k].status==='waiting')db.ref('games/'+roomCode+'/teams/'+k+'/status').set('playing');});});
   db.ref('games/'+roomCode+'/game/current').set({round:curRound,index:selQ,question:q,timestamp:ts});
+  db.ref('games/'+roomCode+'/status').set('playing');
   db.ref('games/'+roomCode+'/host/command').set({action:'question',round:curRound,index:selQ,timestamp:ts});
   clearInterval(timer);timerVal=10;
   var block=document.getElementById('timer-block'),big=document.getElementById('timer-big'),fill=document.getElementById('timer-fill');
@@ -401,7 +402,7 @@ function endGame(){if(!db)return;db.ref('games/'+roomCode+'/host/command').set({
 
 function resetGame(){
   if(!confirm('Reset scores? Teams stay registered.'))return;if(!db)return;
-  db.ref('games/'+roomCode+'/scores').remove();db.ref('games/'+roomCode+'/live_scores').remove();db.ref('games/'+roomCode+'/reactions').remove();db.ref('games/'+roomCode+'/race').remove();db.ref('games/'+roomCode+'/game/current').remove();db.ref('games/'+roomCode+'/host/command').set({action:'reset',timestamp:Date.now()});
+  db.ref('games/'+roomCode+'/scores').remove();db.ref('games/'+roomCode+'/live_scores').remove();db.ref('games/'+roomCode+'/reactions').remove();db.ref('games/'+roomCode+'/race').remove();db.ref('games/'+roomCode+'/game/current').remove();db.ref('games/'+roomCode+'/status').remove();db.ref('games/'+roomCode+'/host/command').set({action:'reset',timestamp:Date.now()});
   roundDone=[false,false,false];roundStarted=[false,false,false];clearInterval(timer);
   document.getElementById('btn-pause').disabled=true;document.getElementById('btn-reveal').disabled=true;document.getElementById('btn-break').disabled=true;document.getElementById('btn-endgame').style.display='none';document.getElementById('timer-block').classList.remove('show');document.getElementById('answer-box').className='answer-box';
   [1,2,3].forEach(function(n){document.getElementById('rtab'+n).className='rtab'+(n===1?' active':'');});
