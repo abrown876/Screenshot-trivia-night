@@ -814,7 +814,7 @@ const dbPush = (p,v) => db && db.ref(p).push(v);
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let roomCode='SQNX', emailKey='', teamName='', playerCount=2;
+let roomCode='SQNX', emailKey='', teamName='', playerCount=2, joinTime=0;
 let existingTeam=null, roomValid=false;
 
 // Game state
@@ -976,10 +976,8 @@ $('btn-register').onclick = () => {
 
   dbSet(`games/${roomCode}/teams/${ek}`, teamData, err => {
     if (err) { showToast('Error registering','error'); return; }
-    dbSet(`teams/${ek}`, teamData);
-    // Also seed live_scores at 0
-    dbSet(`games/${roomCode}/live_scores/${ek}`, 0);
-    dbSet(`live_scores/${ek}`, 0);
+    // Seed live_scores as proper object for host panel + leaderboard
+    dbSet(`games/${roomCode}/live_scores/${ek}`, {team:team,players:playerCount,r0:0,r1:0,r2:0,score:0,updatedAt:Date.now()});
     saveSession();
     goToWaiting(team);
   });
@@ -1005,6 +1003,7 @@ function saveSession() {
 // SCREEN 3: WAITING
 // ═══════════════════════════════════════════════════════════════
 function goToWaiting(name) {
+  joinTime = Date.now(); // record when player joined — used to filter stale commands
   $('wait-team').textContent = name;
   $('wait-room') && ($('wait-room').textContent = 'Waiting for host...');
   $('hdr-team').textContent = name;
@@ -1057,14 +1056,15 @@ function listenForHost() {
       if(onBreak || onFeedback) showResults();
 
     } else if(action==='reset'){
-      // Game was reset — clear session and go back to waiting
-      try{sessionStorage.clear(); localStorage.removeItem('trivia_session'); localStorage.removeItem('trivia_team');}catch(e){}
-      // Turn off listener — going back to entrance
-      dbOff('games/'+roomCode+'/host/command');
-      showScreen('entrance');
-      // Rebuild entrance team list
-      try{ var eb=document.querySelector('#scr-entrance .entrance-body');
-        if(eb) { var orig=eb.dataset.orig; if(orig) eb.innerHTML=orig; } }catch(e){}
+      // Only act on reset if it happened AFTER this player joined
+      // (prevents stale reset from kicking out a freshly registered player)
+      var resetTime = cmd.timestamp||0;
+      if(resetTime > joinTime){
+        try{sessionStorage.clear(); localStorage.removeItem('trivia_session'); localStorage.removeItem('trivia_team');}catch(e){}
+        dbOff('games/'+roomCode+'/host/command');
+        showScreen('entrance');
+      }
+      // If reset is older than join — ignore it, stay on waiting screen
     }
   });
 }
