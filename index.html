@@ -573,6 +573,7 @@ function init() {
   function clearSessionAndRegister(prefilledRoom) {
     try { sessionStorage.removeItem('trivia_team'); } catch(e){}
     try { localStorage.removeItem('trivia_session'); } catch(e){}
+    _startListenerAttached = false;
     showRegister(prefilledRoom);
   }
 
@@ -630,15 +631,14 @@ function init() {
           // Host launched a question recently — resume
           startRound(savedRound);
         } else {
-          // Status is stale playing — just wait for host
-          showScreen('wait');
+          // Status is stale — go back to register and wait for host
+          showRegister(urlRoom);
           listenForStart();
-          listenForPlayerCount();
         }
       } else {
-        showScreen('wait');
+        // Don't show wait screen — go back to register, listenForStart is active
+        showRegister(urlRoom);
         listenForStart();
-        listenForPlayerCount();
       }
     });
     return;
@@ -662,6 +662,9 @@ function showRegister(prefilledRoom) {
   }
   
   showScreen('register');
+  
+  // Start listening for host launch immediately — even before the player submits
+  listenForStart();
   
   // Auto-uppercase room code input
   $('reg-room').addEventListener('input', function() {
@@ -753,19 +756,20 @@ function doRegister() {
     $('hdr-team').textContent = teamName;
     $('wait-team').textContent = teamName;
     
-    if (game.status === 'playing') {
-      // Game already in progress — player joined late, just show wait screen
-      showScreen('wait');
-      listenForPlayerCount();
-    } else {
-      showScreen('wait');
+    // Stay on register screen — listenForStart() is already active.
+    // The moment the host fires, startRound() will be called directly.
+    // If the game is already mid-session, also start listening.
+    if (game.status !== 'playing') {
       listenForStart();
-      listenForPlayerCount();
     }
   });
 }
 
+let _startListenerAttached = false;
+
 function listenForStart() {
+  if (_startListenerAttached) return;
+  _startListenerAttached = true;
   // Step 1: snapshot whatever command is in the DB RIGHT NOW.
   // Step 2: attach a live listener — only fire on values DIFFERENT from the snapshot.
   // This completely eliminates any timestamp race condition.
