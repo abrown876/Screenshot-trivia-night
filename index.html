@@ -1370,303 +1370,59 @@ function renderLeaderboard(){
 // Override init to default to entrance not code screen
 var _origInit = init;
 init = function(){
-  // Only go straight to entrance; existing session logic still handled by _origInit
   var hasSession = false;
-  try{
-    hasSession = !!(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session'));
-  }catch(e){}
-  if(!hasSession){
-    // Check for ?team=KEY share link — skip straight to waiting
-    var params=new URLSearchParams(window.location.search);
-    var teamKey=params.get('team');
-    var teamNameParam=params.get('name');
-    if(teamKey){
-      // Verify team exists in Firebase then go straight to waiting
-      if(db){
-        db.ref('games/'+ROOM+'/teams/'+teamKey).once('value',function(snap){
-          var team=snap.val();
-          if(team){
-            emailKey=teamKey;
-            teamName=team.name||decodeURIComponent(teamNameParam||'');
-            playerCount=team.players||2;
-            try{
-              var sess={roomCode:ROOM,emailKey:teamKey,team:teamName,players:playerCount};
-              sessionStorage.setItem('trivia_team',JSON.stringify(sess));
-              localStorage.setItem('trivia_session',JSON.stringify(sess));
-            }catch(e){}
-            // Mark team as connected
-            db.ref('games/'+ROOM+'/teams/'+teamKey+'/status').set('waiting');
-            // Hide entrance, go to waiting
-            document.getElementById('scr-entrance').classList.remove('on');
-            goToWaiting(teamName);
-          } else {
-            // Team key not found — show entrance
-            document.getElementById('scr-entrance').classList.add('on');
-            document.getElementById('scr-code').classList.remove('on');
-          }
-        });
-      }
-      return;
-    }
-    // No session, no team key — show entrance
-    document.getElementById('scr-entrance').classList.add('on');
-    document.getElementById('scr-code').classList.remove('on');
-    setupCodeInputs();
+  try{ hasSession=!!(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session')); }catch(e){}
+
+  // Existing session — rejoin
+  if(hasSession){
+    document.getElementById('scr-entrance').classList.remove('on');
+    _origInit();
     return;
   }
-  document.getElementById('scr-entrance').classList.remove('on');
-  _origInit();
-};
 
+  // ?team=KEY share link — go straight to waiting lobby
+  var params=new URLSearchParams(window.location.search);
+  var teamKey=params.get('team');
+  var teamNameParam=params.get('name');
 
-// =================================================================
-// PRACTICE QUIZ (embedded)
-// =================================================================
-var POOL=[
-{q:`Who is known as the "King of Dancehall"?`,o:['Buju Banton','Vybz Kartel','Beenie Man','Bounty Killer'],a:2},
-{q:`Which Jamaican won the 100m at the 2008 and 2012 Olympics?`,o:['Asafa Powell','Yohan Blake','Usain Bolt','Michael Frater'],a:2},
-{q:`What is Jamaica's national dish?`,o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],a:2},
-{q:`Bob Marley was born in which Jamaican parish?`,o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1},
-{q:`Which Jamaican artist is known as "The Gong"?`,o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],a:1},
-{q:`What annual Kingston concert is the biggest dancehall show in the world?`,o:['Sumfest','Rebel Salute','Sting','Bacchanal'],a:2},
-{q:`Koffee won the Grammy for Best Reggae Album in 2024 with which project?`,o:['Gifted','Rapture','West Indies','Sink or Swim'],a:0},
-{q:`What is Jamaica's national fruit?`,o:['Mango','Breadfruit','Ackee','Soursop'],a:2},
-{q:`Which Jamaican sprinter holds the 100m world record?`,o:['Asafa Powell','Yohan Blake','Michael Frater','Usain Bolt'],a:3},
-{q:`What is the name of Jamaica's most famous carnival street party?`,o:['Sumfest','Bacchanal','Rebel Salute','Sting'],a:1},
-{q:`Which female dancehall artist is known as the "Queen of the Dancehall"?`,o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],a:2},
-{q:`What shoe brand is iconic in dancehall culture and called "Clarks" by fans?`,o:['Timberland','Clarks Originals','Nike','Adidas'],a:1},
-{q:`Which traditional Jamaican Christmas drink is made from a red flower?`,o:['Irish Moss','Roots Tonic','Sorrel','Sky Juice'],a:2},
-{q:`Usain Bolt's 9.58s world record was set in which city?`,o:['Beijing','London','Berlin','Tokyo'],a:2},
-{q:`Which Jamaican film starred Paul Campbell and became a cult classic?`,o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],a:2},
-{q:`What Jamaican phrase means everything is alright?`,o:['Weh yuh seh','Irie','Likkle more','Wagwan'],a:1},
-{q:`Which Bob Marley song begins "Rise up this morning, smiled with the rising sun"?`,o:['No Woman No Cry','Three Little Birds','Redemption Song','One Love'],a:1},
-{q:`Jamaica gained independence from Britain in which year?`,o:['1958','1960','1962','1964'],a:2},
-{q:`Which Jamaican music genre came before reggae in the 1960s?`,o:['Calypso','Mento','Rocksteady','Ska'],a:3},
-{q:`Vybz Kartel created which popular dance move in the early 2010s?`,o:['Whining','Daggering','Gully Creepa','Bruk Out'],a:2},
-{q:`Which Jamaican artist featured on Beyonce's "Black Is King" visual album?`,o:['Koffee','Spice','Govana','Chronixx'],a:0},
-{q:`What is the capital city of Jamaica?`,o:['Montego Bay','Ocho Rios','Kingston','Mandeville'],a:2},
-{q:`Which Jamaican singer won The Voice USA in 2012?`,o:['Koffee','Tessanne Chin','Jada Kingdom','Shenseea'],a:1},
-{q:`The Jamaican phrase "Dutty Wine" refers to what?`,o:['Bad wine','A popular dance move','A cocktail','A street party'],a:1},
-{q:`Which Shaggy hit featuring RikRok is one of the best-selling singles of all time?`,o:['Angel','Boombastic',`It Wasn't Me`,'Oh Carolina'],a:2},
-{q:`What is Jamaica's national bird?`,o:['Parrot','Pelican','Doctor Bird','Frigatebird'],a:2},
-{q:`Which Jamaican artiste holds the record for most Reggae Grammy wins?`,o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],a:3},
-{q:`What is the main ingredient in Jamaican festival bread?`,o:['Wheat flour only','Cornmeal and flour','Rice flour','Breadfruit'],a:1},
-{q:`Which neighbourhood is most associated with the birth of reggae music?`,o:['New Kingston','Trench Town','Barbican','Tivoli Gardens'],a:1},
-{q:`Shelly-Ann Fraser-Pryce is a multiple Olympic champion in which event?`,o:['200m','Long Jump','100m','400m'],a:2},
-{q:`What is mannish water in Jamaican cuisine?`,o:['A rum cocktail','Fish broth','Goat head soup','Pepper pot'],a:2},
-{q:`Which Jamaican music festival is held in Montego Bay every July?`,o:['Rebel Salute','Sumfest','Sting','Bacchanal'],a:1},
-{q:`"One Love" is most associated with which Jamaican artist?`,o:['Peter Tosh','Bunny Wailer','Bob Marley','Jimmy Cliff'],a:2},
-{q:`What is the name of the famous Jamaican rum brand with a bat logo?`,o:['Appleton','Wray and Nephew','Bacardi','Captain Morgan'],a:2},
-{q:`Which parish in Jamaica is known as the breadbasket?`,o:['St. Elizabeth','Westmoreland','Clarendon','Manchester'],a:0},
-{q:`Jamaica's motto "Out of Many One People" reflects what?`,o:['Its geography','Its mixed heritage','Its independence','Its exports'],a:1},
-{q:`Which Jamaican track athlete competed in six Olympic Games?`,o:['Usain Bolt','Shelly-Ann Fraser-Pryce','Merlene Ottey','Asafa Powell'],a:2},
-{q:`What is Blue Mountain in Jamaica famous for?`,o:['Hiking trails','Coffee','Waterfalls','Rum'],a:1},
-{q:`What is jerk seasoning primarily flavoured with?`,o:['Cumin and coriander','Allspice and scotch bonnet','Turmeric and ginger','Bay leaf and thyme'],a:1},
-{q:`Jimmy Cliff starred in which 1972 Jamaican film?`,o:['Shottas','The Harder They Come','Dancehall Queen','Rockers'],a:1},
-{q:`What is sky juice in Jamaica?`,o:['Coconut water','Shaved ice with syrup','Soursop drink','Sorrel punch'],a:1},
-{q:`Chronixx is associated with which music genre?`,o:['Dancehall','Reggae revival','Soca','R&B'],a:1},
-{q:`Which Jamaican city is known as the tourist capital?`,o:['Kingston','Ocho Rios','Negril','Montego Bay'],a:3},
-{q:`What does wagwan mean in Jamaican patois?`,o:['Goodbye','What is going on','Come here','Move quickly'],a:1},
-{q:`Which Jamaican national hero led the 1865 Morant Bay Rebellion?`,o:['Marcus Garvey','Alexander Bustamante','Paul Bogle','Norman Manley'],a:2},
-{q:`Damian Marley is the son of Bob Marley and which Miss World winner?`,o:['Rita Marley','Cindy Breakspeare','Janet Hunt','Joan Andrea Hutchinson'],a:1},
-{q:`What is Jamaica's national flower?`,o:['Hibiscus','Lignum Vitae','Bougainvillea','Bird of Paradise'],a:1},
-{q:`Which Jamaican sprinter won 100m gold at the 2020 Tokyo Olympics?`,o:['Shelly-Ann Fraser-Pryce','Shericka Jackson','Elaine Thompson-Herah','Briana Williams'],a:2},
-{q:`"Redemption Song" by Bob Marley was released on which album?`,o:['Exodus','Uprising','Rastaman Vibration','Survival'],a:1},
-{q:`What is the traditional Jamaican Christmas cake soaked in?`,o:['Rum','Beer','Wine','Brandy'],a:0},
-{q:`What does likkle more mean in Jamaican patois?`,o:['A little bit more','See you later','Hurry up','Thank you'],a:1},
-{q:`Which Jamaican musician is credited with pioneering the reggae genre?`,o:['Jimmy Cliff','Desmond Dekker','Toots Hibbert','Byron Lee'],a:2},
-{q:`"Boombastic" was a number one hit for which Jamaican artist?`,o:['Sean Paul','Ini Kamoze','Shaggy','Shabba Ranks'],a:2},
-{q:`Which of these is a traditional Jamaican breakfast?`,o:['Saltfish and callaloo','Jerk pork','Rice and peas','Oxtail'],a:0},
-{q:`What is a duppy in Jamaican folklore?`,o:['A ghost or spirit','A local dance','A type of food','A musical instrument'],a:0},
-{q:`Shenseea is known for which type of music?`,o:['Reggae','Soca','Dancehall','Afrobeats'],a:2},
-{q:`What is the name of the famous Jamaican all-inclusive resort chain?`,o:['Sandals','Beaches','Couples','Hedonism'],a:0},
-{q:`Which patois word describes a young child?`,o:['Bredren','Duppy','Pickney','Yardie'],a:2},
-{q:`Which Jamaican patois word means friend or mate?`,o:['Bredren','Pickney','Duppy','Ital'],a:0},
-{q:`The Jamaican bobsled team story was turned into which 1993 movie?`,o:['Cool Runnings','Island Heat','Run Yard','Tropical Thunder'],a:0},
-{q:`What is ital food in Rastafari culture?`,o:['Spicy food','Natural food without salt or meat','Street food','Seafood'],a:1},
-{q:`Which Jamaican artist released "Here Comes the Hotstepper"?`,o:['Shabba Ranks','Super Cat','Ini Kamoze','Chaka Demus'],a:2},
-{q:`What colour are the stripes on the Jamaican flag?`,o:['Blue and red','Gold and black','Green and gold','Black and white'],a:1},
-{q:`Alkaline is a major artist in which genre?`,o:['Reggae','Soca','Dancehall','Jazz'],a:2},
-{q:`What does "one love" represent in Jamaican culture?`,o:['Romantic love','Unity and peace','National pride','Reggae music'],a:1},
-{q:`"Informer" was a massive hit for which Canadian-Jamaican artist?`,o:['Snow','Maestro Fresh Wes','Chaka Demus','Carlene Davis'],a:0},
-{q:`Which Jamaican city is known as the second city?`,o:['Portmore','Spanish Town','Montego Bay','May Pen'],a:2},
-{q:`What flavour is the classic Jamaican drink Ting?`,o:['Orange','Lime','Grapefruit','Pineapple'],a:2},
-{q:`In which decade did Jamaican sound system culture emerge?`,o:['1930s','1940s','1950s','1960s'],a:2},
-{q:`Protoje is associated with which genre of music?`,o:['Soca','Dancehall','Reggae revival','Hip hop'],a:2},
-{q:`Which Jamaican landmark is a UNESCO World Heritage Site?`,o:[`Dunn's River Falls`,'Blue and John Crow Mountains','Port Royal','Rio Grande'],a:1},
-{q:`What does bredren mean in Jamaican patois?`,o:['Brother or close friend','Enemy','Neighbourhood','Celebration'],a:0},
-{q:`Which Jamaican rum is nicknamed Whites or Overproof?`,o:['Appleton Estate','Myers','Wray and Nephew Overproof','Sangster'],a:2},
-{q:`Buju Banton's real name is?`,o:['Mark Myrie','Robert Livingston','Winston Foster','Trevor Smith'],a:0},
-{q:`Which Jamaican food festival is held annually in Boston Bay Portland?`,o:['Jerk Festival','Breadfruit Festival','Curry Festival','Seafood Festival'],a:0},
-{q:`What does Rastafari mean?`,o:['Lion of Judah','Head creator','Prince Tafari','God of Africa'],a:2},
-{q:`Grace Jones was born in which Jamaican parish?`,o:['Kingston','Spanish Town','St. Catherine','Westmoreland'],a:2},
-{q:`What is run dung in Jamaican cuisine?`,o:['A type of stew','Fish cooked in coconut milk','A fried dumpling','Braised oxtail'],a:1},
-{q:`Which Jamaican city hosts the annual Jazz and Blues Festival?`,o:['Kingston','Negril','Ocho Rios','Montego Bay'],a:3},
-{q:`What is the currency of Jamaica?`,o:['Jamaican Dollar','Jamaican Pound','Caribbean Dollar','West Indian Dollar'],a:0},
-{q:`Which Jamaican dancehall artist released the album "Pon Di Gaza"?`,o:['Bounty Killer','Mavado','Vybz Kartel','Beenie Man'],a:2},
-{q:`Ky-Mani Marley is known primarily as a?`,o:['Politician','Reggae artist and actor','Chef','Sprinter'],a:1},
-{q:`What is lasco in Jamaica?`,o:['A dance','A powdered food drink','A type of rum','A street food'],a:1},
-{q:`What dance became globally popular in Jamaican dancehall around 2012?`,o:['Dutty Wine','Gully Creepa','Daggering','Bruk Out'],a:1},
-{q:`Which reggae legend recorded much of "The Harder They Come" soundtrack?`,o:['Burning Spear','Toots Hibbert','Jimmy Cliff','Dennis Brown'],a:2},
-{q:`What is a traditional Jamaican Easter treat?`,o:['Bun and cheese','Jerk bun','Easter cake','Sweet potato pudding'],a:0},
-{q:`Sean Paul collaborated with Dua Lipa on which 2021 hit?`,o:['Temperature','No Lie','Cheap Thrills','Calling On Me'],a:3},
-{q:`Which Jamaican waterfall is one of the most photographed in the Caribbean?`,o:['YS Falls','Mayfield Falls','Blue Hole',`Dunn's River Falls`],a:3},
-{q:`What Jamaican term refers to someone from Jamaica?`,o:['Rasta','Yardie','Duppy','Bredren'],a:1},
-{q:`Koffee's breakthrough hit Toast won which major award?`,o:['BET Award','Grammy Award','MOBO Award','Billboard Award'],a:0},
-{q:`What is the name of the Jamaican patois term for a community street dance?`,o:['Session','Bashment','Rave','Juggling'],a:1},
-{q:`Which Jamaican city is closest to the Blue Mountains?`,o:['Montego Bay','Kingston','Ocho Rios','Mandeville'],a:1},
-{q:`Irie vibes is most associated with which Jamaican concept?`,o:['Feeling good and at peace','Going to a party','Being angry','Running fast'],a:0},
-{q:`Which Jamaican singer is known as the Gyptian?`,o:['Windel Edwards','Norman Grandison','Everton Williams','Desmond Brown'],a:1},
-{q:`What does bashment mean in Jamaican slang?`,o:['A fight','A big party','A bad person','A dance style'],a:1},
-{q:`Which Jamaican parish is home to the famous Boston Jerk Centre?`,o:['St. Elizabeth','St. Ann','Portland','Manchester'],a:2},
-{q:`Which Jamaican artist released the hit "Bruk It Down"?`,o:['Mr Vegas','Beenie Man','Sean Paul','Elephant Man'],a:3},
-{q:`What is the name of the famous Jamaican sprint relay team?`,o:['The Bolts','The Bullets','The Cheetahs','Racers Track Club'],a:3},
-{q:`Which Jamaican-born sprinter represented Canada at the Olympics?`,o:['Ben Johnson','Donovan Bailey','Andre De Grasse','Bruny Surin'],a:0},
-{q:`Which parish is the birthplace of Bob Marley?`,o:["St. Ann","St. Elizabeth","Westmoreland","Portland"],a:0}
-];
+  if(teamKey){
+    // Show "joining" state while Firebase verifies
+    document.getElementById('scr-entrance').classList.add('on');
+    var entryBody=document.querySelector('#scr-entrance .entrance-body');
+    if(entryBody)entryBody.innerHTML='<div style="text-align:center;padding:2.5rem 1rem;color:var(--text-dim)"><div style="font-size:2.5rem;margin-bottom:.75rem">⏳</div><div style="font-weight:700;font-size:1rem;color:var(--text)">Joining game...</div><div style="font-size:13px;margin-top:.35rem">Setting up your session</div></div>';
 
-
-var pqQuiz=[],pqQi=0,pqScore=0,pqResults=[],pqTint=null,pqTleft=0,pqAnswered=false;
-var PQ_TOTAL=5,PQ_TSECS=10,PQ_LT=['A','B','C','D'];
-
-function pqShuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
-function pqEl(id){return document.getElementById(id);}
-
-function pqShowScr(name){
-  ['pq-intro','pq-qscr','pq-results'].forEach(function(s){
-    var el=document.getElementById(s);
-    if(el)el.className='pq-scr pq-an'+(s===name?' pq-on':'');
-  });
-}
-
-function pqToast(msg){
-  var t=pqEl('pq-stoast');if(!t)return;
-  t.textContent=msg;t.className='pq-stoast pq-on';
-  setTimeout(function(){t.className='pq-stoast';},3000);
-}
-
-function pqRenderT(t){
-  var el=pqEl('pq-tnum');if(!el)return;
-  el.textContent=t;
-  el.className=t<=3?'pq-timer-num pq-danger':t<=6?'pq-timer-num pq-warn':'pq-timer-num';
-  var tw=pqEl('pq-twrap');
-  if(tw)tw.className=t<=3?'pq-timer-wrap pq-danger':t<=6?'pq-timer-wrap pq-warn':'pq-timer-wrap';
-  var fill=pqEl('pq-qprog');
-  if(fill)fill.style.width=((t/PQ_TSECS)*100)+'%';
-}
-
-function pqStopTimer(){if(pqTint){clearInterval(pqTint);pqTint=null;}}
-
-function pqLockOpts(){
-  document.querySelectorAll('#scr-practice .pq-opt').forEach(function(o){
-    o.classList.add('pq-lk');o.onclick=null;
-  });
-}
-
-function pqLoadQ(){
-  pqAnswered=false;
-  var q=pqQuiz[pqQi];
-  var sc=pqEl('pq-sc');if(sc){sc.style.display='block';sc.textContent=pqScore+' / '+PQ_TOTAL;}
-  if(pqEl('pq-qct'))pqEl('pq-qct').textContent='Q'+(pqQi+1)+' / '+PQ_TOTAL;
-  if(pqEl('pq-qcat'))pqEl('pq-qcat').textContent=q.cat;
-  if(pqEl('pq-qtxt'))pqEl('pq-qtxt').textContent=q.q;
-  if(pqEl('pq-fb'))pqEl('pq-fb').className='pq-fb';
-  if(pqEl('pq-btn-next'))pqEl('pq-btn-next').style.display='none';
-  var prog=pqEl('pq-qprog');if(prog)prog.style.width='100%';
-  var oc=pqEl('pq-opts');if(!oc)return;
-  oc.innerHTML='';
-  q.o.forEach(function(opt,i){
-    var btn=document.createElement('button');
-    btn.className='pq-opt';btn.id='pq-op'+i;
-    btn.innerHTML='<span class="pq-oltr">'+PQ_LT[i]+'</span><span>'+opt+'</span>';
-    btn.onclick=function(){pqSelOpt(i);};
-    oc.appendChild(btn);
-  });
-  pqStopTimer();pqTleft=PQ_TSECS;pqRenderT(pqTleft);
-  pqTint=setInterval(function(){
-    pqTleft--;pqRenderT(pqTleft);
-    if(pqTleft<=0){pqStopTimer();if(!pqAnswered)pqTimeoutQ();}
-  },1000);
-}
-
-function pqSelOpt(i){
-  if(pqAnswered)return;
-  pqStopTimer();pqAnswered=true;
-  var q=pqQuiz[pqQi];var cor=i===q.a;
-  var btn=pqEl('pq-op'+i);
-  if(btn){if(cor)btn.classList.add('pq-correct');else btn.classList.add('pq-pend');}
-  pqLockOpts();
-  if(cor){
-    pqScore++;
-    pqToast('Nailed it! +1');
-    pqResults.push({q:q.q,cat:q.cat,r:'correct',ans:q.o[q.a]});
-    pqShowFB('correct','Correct! +1 point');
-  } else {
-    if(btn){btn.classList.remove('pq-pend');btn.classList.add('pq-wrong');}
-    var ce=pqEl('pq-op'+q.a);if(ce){ce.classList.remove('pq-pend');ce.classList.add('pq-correct');}
-    pqResults.push({q:q.q,cat:q.cat,r:'wrong',ans:q.o[q.a]});
-    pqShowFB('wrong','So close - answer: '+q.o[q.a]);
+    function doJoin(){
+      if(!db){ setTimeout(doJoin,300); return; }
+      db.ref('games/'+ROOM+'/teams/'+teamKey).once('value',function(snap){
+        var team=snap.val();
+        if(team){
+          emailKey=teamKey;
+          teamName=team.name||decodeURIComponent(teamNameParam||'Team');
+          playerCount=team.players||2;
+          roomCode=ROOM;
+          try{
+            var sess={roomCode:ROOM,emailKey:teamKey,team:teamName,players:playerCount};
+            sessionStorage.setItem('trivia_team',JSON.stringify(sess));
+            localStorage.setItem('trivia_session',JSON.stringify(sess));
+          }catch(e){}
+          db.ref('games/'+ROOM+'/teams/'+teamKey+'/status').set('waiting');
+          document.getElementById('scr-entrance').classList.remove('on');
+          goToWaiting(teamName);
+        } else {
+          // Key not found — restore entrance normally
+          if(entryBody)entryBody.innerHTML='';
+          document.getElementById('scr-entrance').classList.add('on');
+        }
+      });
+    }
+    doJoin();
+    return;
   }
-  var sc=pqEl('pq-sc');if(sc)sc.textContent=pqScore+' / '+PQ_TOTAL;
-  pqShowNext();
-}
 
-function pqTimeoutQ(){
-  if(pqAnswered)return;pqAnswered=true;
-  var q=pqQuiz[pqQi];
-  var ce=pqEl('pq-op'+q.a);if(ce)ce.classList.add('pq-correct');
-  pqLockOpts();
-  pqResults.push({q:q.q,cat:q.cat,r:'timeout',ans:q.o[q.a]});
-  pqShowFB('timeout',"Time's up! Answer: "+q.o[q.a]);
-  pqShowNext();
-}
-
-function pqShowFB(type,text){
-  var icons={correct:'✅',wrong:'😬',timeout:'⏰'};
-  var fb=pqEl('pq-fb');if(!fb)return;
-  if(pqEl('pq-fbic'))pqEl('pq-fbic').textContent=icons[type]||'';
-  if(pqEl('pq-fbtxt'))pqEl('pq-fbtxt').textContent=text;
-  fb.className='pq-fb pq-'+type+' pq-on';
-}
-
-function pqShowNext(){
-  pqRenderT(0);
-  var btn=pqEl('pq-btn-next');if(!btn)return;
-  btn.textContent=pqQi<PQ_TOTAL-1?'Next Question ->':'See Results ->';
-  btn.style.display='block';
-}
-
-function pqStartQuiz(){
-  pqQuiz=pqShuffle(POOL).slice(0,PQ_TOTAL);
-  pqQi=0;pqScore=0;pqResults=[];
-  pqShowScr('pq-qscr');
-  pqLoadQ();
-}
-
-function pqShowResults(){
-  pqStopTimer();
-  var hl=pqScore===PQ_TOTAL?'Perfect! Trophy':pqScore>=4?'Amazing!':pqScore>=3?'Solid!':pqScore>=2?'Not bad!':'Keep practising!';
-  if(pqEl('pq-rscore'))pqEl('pq-rscore').textContent=pqScore;
-  if(pqEl('pq-rhl'))pqEl('pq-rhl').textContent=hl;
-  if(pqEl('pq-rsub'))pqEl('pq-rsub').textContent=pqScore===PQ_TOTAL?'You know your Jamaica pop culture!':'Join the full game tonight for real prizes!';
-  var html=pqResults.map(function(r,i){
-    var icon=r.r==='correct'?'✅':r.r==='wrong'?'❌':'⏰';
-    return '<div class="pq-review-item">'
-      +'<div class="pq-review-icon">'+icon+'</div>'
-      +'<div style="flex:1">'
-        +'<div class="pq-review-q">Q'+(i+1)+'. '+r.q+'</div>'
-        +'<div class="pq-review-a pq-'+r.r+'">Answer: '+r.ans+'</div>'
-      +'</div></div>';
-  }).join('');
-  if(pqEl('pq-review'))pqEl('pq-review').innerHTML=html;
-  pqShowScr('pq-results');
-}
-
-document.addEventListener('DOMContentLoaded',function(){
-  var bs=pqEl('pq-btn-start');if(bs)bs.onclick=pqStartQuiz;
-  var bn=pqEl('pq-btn-next');if(bn)bn.onclick=function(){pqQi++;if(pqQi<PQ_TOTAL)pqLoadQ();else pqShowResults();};
-  var ba=pqEl('pq-btn-again');if(ba)ba.onclick=pqStartQuiz;
-});
-</script>
+  // Default — show entrance
+  document.getElementById('scr-entrance').classList.add('on');
+  document.getElementById('scr-code').classList.remove('on');
+  setupCodeInputs();
+};</script>
 </body>
 </html>
