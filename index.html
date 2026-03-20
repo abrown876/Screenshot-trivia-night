@@ -620,12 +620,15 @@ function init() {
       $('hdr-team').textContent = teamName;
       $('wait-team').textContent = teamName;
 
-      // Always return to register screen — never auto-resume.
-      // listenForStart() will fire when the host actually launches.
+      // Restore valid sessions to the waiting screen.
       if (game.status === 'ended') {
         clearSessionAndRegister(urlRoom);
       } else {
-        showRegister(urlRoom);
+        $('wait-team').textContent = teamName;
+        $('wait-player-count').textContent = game.teams ? Object.keys(game.teams).length : 1;
+        $('wait-player-plural').textContent = (game.teams && Object.keys(game.teams).length === 1) ? '' : 's';
+        showScreen('wait');
+        listenForPlayerCount();
         listenForStart();
       }
     });
@@ -651,11 +654,15 @@ function showRegister(prefilledRoom) {
   
   showScreen('register');
   
-  // Auto-uppercase room code input
-  $('reg-room').addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-    this.classList.toggle('has-value', this.value.length > 0);
-  });
+  // Auto-uppercase room code input (attach once)
+  const roomField = $('reg-room');
+  if (roomField && !roomField.dataset.bound) {
+    roomField.addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+      this.classList.toggle('has-value', this.value.length > 0);
+    });
+    roomField.dataset.bound = '1';
+  }
   
   // Focus name field if room is pre-filled
   setTimeout(() => {
@@ -735,13 +742,18 @@ function doRegister() {
     $('hdr-score').style.display = '';
     $('hdr-team').textContent = teamName;
     $('wait-team').textContent = teamName;
-    
+    $('wait-player-count').textContent = (game.teams ? Object.keys(game.teams).length : 0) + 1;
+    $('wait-player-plural').textContent = ((game.teams ? Object.keys(game.teams).length : 0) + 1) === 1 ? '' : 's';
+
+    showScreen('wait');
+    listenForPlayerCount();
     // Now that roomCode is set, start listening for the host to launch
     listenForStart();
   });
 }
 
 let _startListenerAttached = false;
+let _teamListenerAttached = false;
 
 function listenForStart() {
   if (_startListenerAttached) return;
@@ -762,6 +774,7 @@ function listenForStart() {
       if (cmd.timestamp <= existingTs) return;
       if (cmd.action === 'question') {
         db.ref(path).off('value');
+        _startListenerAttached = false;
         startRound(cmd.round || 1);
       }
     });
@@ -769,6 +782,8 @@ function listenForStart() {
 }
 
 function listenForPlayerCount() {
+  if (_teamListenerAttached || !roomCode) return;
+  _teamListenerAttached = true;
   dbOn('games/' + roomCode + '/teams', teams => {
     const count = teams ? Object.keys(teams).length : 1;
     const el = $('wait-player-count');
@@ -1275,18 +1290,29 @@ $('btn-lb-back').onclick = () => showScreen('results');
 $('btn-again').onclick = () => {
   try { sessionStorage.removeItem('trivia_team'); } catch(e){}
   try { localStorage.removeItem('trivia_session'); } catch(e){}
+  if (db && roomCode) {
+    db.ref('games/' + roomCode + '/host/command').off('value');
+    db.ref('games/' + roomCode + '/teams').off('value');
+  }
+  _startListenerAttached = false;
+  _teamListenerAttached = false;
+  clearInterval(timer);
   // Reset state
   roomCode = ''; emailKey = ''; teamName = '';
   round = 1; qIndex = 0; totalScore = 0;
   roundCorrect = [0,0,0]; roundBonus = [0,0,0]; roundAnswers = [[],[],[]];
-  $('hdr-team').textContent = '---';
+  $('hdr-team').textContent = '';
   $('hdr-score').textContent = '0';
   $('hdr-room').textContent = '----';
+  $('hdr-room').style.display = 'none';
+  $('hdr-score').style.display = 'none';
   $('reg-email').value = '';
   $('reg-name').value = '';
   $('reg-error').classList.remove('show');
+  $('wait-player-count').textContent = '1';
+  $('wait-player-plural').textContent = '';
   updateScore();
-  showScreen('register');
+  showRegister('');
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
