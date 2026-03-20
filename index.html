@@ -618,18 +618,23 @@ function init() {
       $('hdr-team').textContent = teamName;
       $('wait-team').textContent = teamName;
 
-      if (game.status === 'playing') {
-        // Only resume mid-game if the player has a saved round position
-        const savedRound = teamEntry.currentRound;
-        if (savedRound) {
-          startRound(savedRound);
-        } else {
-          showScreen('wait');
-          listenForPlayerCount();
-        }
-      } else if (game.status === 'ended') {
+      if (game.status === 'ended') {
         // Game is over — clear session and show registration
         clearSessionAndRegister(urlRoom);
+      } else if (game.status === 'playing') {
+        // Only resume if there was a recent host command (game is actively running)
+        const cmd = game.host && game.host.command;
+        const cmdAge = cmd && cmd.timestamp ? Date.now() - cmd.timestamp : Infinity;
+        const savedRound = teamEntry.currentRound;
+        if (savedRound && cmd && cmd.action === 'question' && cmdAge < 60000) {
+          // Host launched a question recently — resume
+          startRound(savedRound);
+        } else {
+          // Status is stale playing — just wait for host
+          showScreen('wait');
+          listenForStart();
+          listenForPlayerCount();
+        }
       } else {
         showScreen('wait');
         listenForStart();
