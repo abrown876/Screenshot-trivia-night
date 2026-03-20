@@ -585,7 +585,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <div class="break-answers" id="break-answers"></div>
     </div>
-    <button class="btn btn-purple" id="btn-next" style="margin-top:1rem">Continue →</button>
+    <div style="margin-top:.85rem">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">&#x1F3C6; Current Standings</div>
+      <div id="break-lb-rows"></div>
+    </div>
+    <button class="btn btn-purple" id="btn-next" style="margin-top:1rem">Continue &#8594;</button>
   </div>
 </div>
 
@@ -1098,21 +1102,21 @@ function showFeedback(correct,pts,timeout) {
   const good=['Nailed it!','Great job!','You are on fire!','Brilliant!'];
   const bad=['Next one!','Stay focused!',"You got this!"];
   if(correct) {
-    $('fb-icon').textContent='✅';
+    $('fb-icon').textContent='\u2705';
     $('fb-title').textContent='Correct!';
     $('fb-sub').textContent=good[Math.floor(Math.random()*good.length)];
     $('fb-points').textContent='+1';
     $('fb-points').className='fb-points';
   } else {
-    $('fb-icon').textContent=timeout?'⏰':'❌';
-    $('fb-title').textContent=timeout?'Times Up!':'Wrong';
+    $('fb-icon').textContent=timeout?'\u23F0':'\u274C';
+    $('fb-title').textContent=timeout?'Time\'s Up!':'Wrong';
     $('fb-sub').textContent=bad[Math.floor(Math.random()*bad.length)];
     $('fb-points').textContent='+0';
     $('fb-points').className='fb-points zero';
   }
   document.querySelectorAll('.react-btn').forEach(b=>b.classList.remove('sent'));
+  $('fb-next-btn').style.display='block';
   showScreen('feedback');
-  setTimeout(advance, FEEDBACK_MS);
 }
 
 function advance() {
@@ -1154,6 +1158,7 @@ function showRoundBreak() {
   $('break-answers').innerHTML=html;
   dbSet(`games/${roomCode}/scores/${emailKey}/rounds/${round}`,{correct,bonus,total:roundTotal});
   $('btn-next').textContent = round>=TOTAL_ROUNDS ? 'See Final Results →' : 'Continue to Round '+(round+1)+' →';
+  loadBreakLeaderboard();
   showScreen('break');
 }
 
@@ -1165,6 +1170,30 @@ $('btn-next').onclick = () => {
 // ═══════════════════════════════════════════════════════════════
 // GAME: RESULTS
 // ═══════════════════════════════════════════════════════════════
+function loadBreakLeaderboard(){
+  if(!db)return;
+  db.ref('games/'+roomCode+'/live_scores').once('value',function(snap){
+    var data=snap.val()||{};
+    var rows=Object.values(data).filter(function(e){return e&&e.team;});
+    rows.sort(function(a,b){return b.score-a.score;});
+    var el=document.getElementById('break-lb-rows');
+    if(!el)return;
+    if(!rows.length){el.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:13px;padding:.5rem">No scores yet</div>';return;}
+    var medals=['1st','2nd','3rd'];
+    el.innerHTML=rows.map(function(t,i){
+      var mine=t.team===teamName;
+      var hi=mine?'background:rgba(124,110,246,.12);border-color:var(--purple);':'';
+      var you=mine?'<span style="font-size:10px;color:var(--purple);font-weight:700;margin-left:4px">YOU</span>':'';
+      var med=i<3?'<span style="font-size:10px;font-weight:800;color:var(--gold);min-width:22px">'+medals[i]+'</span>':'<span style="font-size:10px;color:var(--text-dim);min-width:22px">'+(i+1)+'</span>';
+      return '<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;border-radius:8px;border:1px solid var(--border);margin-bottom:.25rem;'+hi+'">'
+        +med
+        +'<span style="flex:1;font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.team+you+'</span>'
+        +'<span style="font-family:var(--font-mono);font-weight:900;font-size:.95rem;color:var(--purple)">'+t.score+'</span>'
+        +'</div>';
+    }).join('');
+  });
+}
+
 function showResults() {
   dbSet(`games/${roomCode}/teams/${emailKey}/status`,'finished');
   dbSet(`games/${roomCode}/teams/${emailKey}/completedAt`,Date.now());
