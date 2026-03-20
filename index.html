@@ -1458,12 +1458,21 @@ init();
 // Update showScreen to also include entrance + lb
 var _origShowScreen = showScreen;
 showScreen = function(name) {
+  // Toggle entrance/lb/practice screens
   ['entrance','lb','practice'].forEach(function(s){
     var el=document.getElementById('scr-'+s);
     if(el) el.classList.toggle('on', s===name);
   });
-  if(name!=='entrance'&&name!=='lb') _origShowScreen(name);
-  // header visibility
+  // For entrance/lb/practice: explicitly turn OFF all base screens
+  if(name==='entrance'||name==='lb'||name==='practice'){
+    ['code','register','wait','error','ready','question','feedback','break','results'].forEach(function(s){
+      var el=document.getElementById('scr-'+s);
+      if(el) el.classList.remove('on');
+    });
+  } else {
+    _origShowScreen(name);
+  }
+  // Header visibility
   var inGame=['question','feedback','break','results','ready'].includes(name);
   var inJoin=['code','register','wait'].includes(name);
   document.getElementById('hdr-room').style.display = (inGame||inJoin)&&roomCode ? 'block':'none';
