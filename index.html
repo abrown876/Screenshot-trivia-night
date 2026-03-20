@@ -574,6 +574,7 @@ function init() {
     try { sessionStorage.removeItem('trivia_team'); } catch(e){}
     try { localStorage.removeItem('trivia_session'); } catch(e){}
     _startListenerAttached = false;
+    if (db && roomCode) db.ref('games/' + roomCode + '/host/command').off('value');
     showRegister(prefilledRoom);
   }
 
@@ -649,9 +650,6 @@ function showRegister(prefilledRoom) {
   }
   
   showScreen('register');
-  
-  // Start listening for host launch immediately — even before the player submits
-  listenForStart();
   
   // Auto-uppercase room code input
   $('reg-room').addEventListener('input', function() {
@@ -738,12 +736,8 @@ function doRegister() {
     $('hdr-team').textContent = teamName;
     $('wait-team').textContent = teamName;
     
-    // Stay on register screen — listenForStart() is already active.
-    // The moment the host fires, startRound() will be called directly.
-    // If the game is already mid-session, also start listening.
-    if (game.status !== 'playing') {
-      listenForStart();
-    }
+    // Now that roomCode is set, start listening for the host to launch
+    listenForStart();
   });
 }
 
