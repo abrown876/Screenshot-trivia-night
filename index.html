@@ -701,6 +701,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
+const ROOM='SQNX';
 const TIMER_SECS = 15;
 const Q_PER_ROUND = 5;
 const TOTAL_ROUNDS = 3;
@@ -758,7 +759,7 @@ const dbPush = (p,v) => db && db.ref(p).push(v);
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let roomCode='', emailKey='', teamName='', playerCount=2;
+let roomCode='SQNX', emailKey='', teamName='', playerCount=2;
 let existingTeam=null, roomValid=false;
 
 // Game state
@@ -950,15 +951,29 @@ function saveSession() {
 // ═══════════════════════════════════════════════════════════════
 function goToWaiting(name) {
   $('wait-team').textContent = name;
-  $('wait-room').textContent = 'Room: ' + roomCode;
+  $('wait-room') && ($('wait-room').textContent = 'Waiting for host to start...');
   $('hdr-team').textContent = name;
-  $('hdr-room').textContent = roomCode;
-  $('hdr-room').style.display='block';
+  $('hdr-room').style.display='none';
   showScreen('wait');
-  dbOn(`games/${roomCode}/status`, status => {
-    if (status === 'playing') {
-      dbOff(`games/${roomCode}/status`);
-      startRound(1);
+  // Listen for host launching first question
+  dbOn('games/'+roomCode+'/host/command', function(cmd){
+    if(!cmd) return;
+    if(cmd.action==='question'||cmd.action==='playing'){
+      dbOff('games/'+roomCode+'/host/command');
+      // Load the question from game/current
+      dbGet('games/'+roomCode+'/game/current', function(cur){
+        if(cur){
+          round=cur.round||1;
+          qIndex=cur.index||0;
+          showGetReady();
+        } else {
+          startRound(1);
+        }
+      });
+    }
+    if(cmd.action==='reset'){
+      // Game was reset while waiting — stay on waiting screen
+      $('wait-team').textContent = name;
     }
   });
 }
@@ -1356,19 +1371,42 @@ init = function(){
     hasSession = !!(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session'));
   }catch(e){}
   if(!hasSession){
-    // Show entrance screen; don't run _origInit's focus on code inputs
+    // Check for ?team=KEY share link — skip straight to waiting
+    var params=new URLSearchParams(window.location.search);
+    var teamKey=params.get('team');
+    var teamNameParam=params.get('name');
+    if(teamKey){
+      // Verify team exists in Firebase then go straight to waiting
+      if(db){
+        db.ref('games/'+ROOM+'/teams/'+teamKey).once('value',function(snap){
+          var team=snap.val();
+          if(team){
+            emailKey=teamKey;
+            teamName=team.name||decodeURIComponent(teamNameParam||'');
+            playerCount=team.players||2;
+            try{
+              var sess={roomCode:ROOM,emailKey:teamKey,team:teamName,players:playerCount};
+              sessionStorage.setItem('trivia_team',JSON.stringify(sess));
+              localStorage.setItem('trivia_session',JSON.stringify(sess));
+            }catch(e){}
+            // Mark team as connected
+            db.ref('games/'+ROOM+'/teams/'+teamKey+'/status').set('waiting');
+            // Hide entrance, go to waiting
+            document.getElementById('scr-entrance').classList.remove('on');
+            goToWaiting(teamName);
+          } else {
+            // Team key not found — show entrance
+            document.getElementById('scr-entrance').classList.add('on');
+            document.getElementById('scr-code').classList.remove('on');
+          }
+        });
+      }
+      return;
+    }
+    // No session, no team key — show entrance
     document.getElementById('scr-entrance').classList.add('on');
     document.getElementById('scr-code').classList.remove('on');
     setupCodeInputs();
-    // Check URL params
-    var params=new URLSearchParams(window.location.search);
-    var urlRoom=params.get('room');
-    if(urlRoom&&urlRoom.length===4){
-      // Skip entrance, go straight to code screen with pre-filled room
-      document.getElementById('scr-entrance').classList.remove('on');
-      document.getElementById('scr-code').classList.add('on');
-      _origInit();
-    }
     return;
   }
   document.getElementById('scr-entrance').classList.remove('on');
