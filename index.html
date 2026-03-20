@@ -28,7 +28,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ── HEADER ── */
 .hdr{background:var(--surface);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;position:relative}
 .hdr-left{display:flex;align-items:center;gap:.5rem}
-.hdr-room{font-weight:800;font-size:11px;color:var(--gold);background:rgba(255,183,64,.15);padding:3px 9px;border-radius:14px;font-family:var(--font-mono);letter-spacing:.06em}
+
 .hdr-team{font-weight:800;font-size:11px;color:var(--purple);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:absolute;left:50%;transform:translateX(-50%)}
 .hdr-score{background:var(--purple);color:#fff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:14px;font-family:var(--font-mono)}
 
@@ -410,9 +410,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <!-- HEADER -->
 <header class="hdr">
-  <div class="hdr-left">
-    <span class="hdr-room" id="hdr-room" style="display:none">SQNX</span>
-  </div>
   <span class="hdr-team" id="hdr-team"></span>
   <span class="hdr-score" id="hdr-score" style="display:none">0</span>
 </header>
@@ -582,7 +579,6 @@ function showScreen(name) {
   SCREENS.forEach(s=>{ const el=$('scr-'+s); if(el) el.classList.toggle('on',s===name); });
   document.querySelector('header.hdr').style.display = name==='register'?'none':'flex';
   const inGame=['question','feedback','break','results','ready','wait'].includes(name);
-  $('hdr-room').style.display  = inGame?'block':'none';
   $('hdr-score').style.display = ['question','feedback','break','results'].includes(name)?'block':'none';
   $('hdr-score').textContent   = totalScore;
 }
@@ -604,7 +600,7 @@ function doStart() {
   round=1;qIndex=0;totalScore=0;answered=false;
   roundCorrect=[0,0,0];roundPts=[0,0,0];roundBonus=[0,0,0];roundAnswers=[[],[],[]];
   clearInterval(tmr);
-  $('hdr-team').textContent=playerName; $('hdr-room').textContent=ROOM;
+  $('hdr-team').textContent=playerName;
   const teamData={name:playerName,email,emailKey,players:1,status:'waiting',room:ROOM,joinedAt:Date.now()};
   dbSet('teams/'+emailKey, teamData);
   dbSet('live_scores/'+emailKey, {team:playerName,score:0,r0:0,r1:0,r2:0,players:1});
