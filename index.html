@@ -757,12 +757,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
 const ROOM='SQNX';
-const TIMER_SECS = 15;
+const TIMER_SECS = 10;
 const Q_PER_ROUND = 5;
 const TOTAL_ROUNDS = 3;
 const PTS_CORRECT = 1;
 const PERFECT_BONUS = 5;
-const FEEDBACK_MS = 1800;
+const FEEDBACK_MS = 4000;
 const COUNTDOWN = 3;
 const LETTERS = ['A','B','C','D'];
 const CAT_CLASS = {m:'cat-m',f:'cat-f',x:'cat-x'};
@@ -1384,20 +1384,34 @@ function init() {
     teamName=session.team||'';
     playerCount=session.players||2;
 
-    dbGet('games/'+roomCode, game => {
-      if (game && game.status!=='ended') {
-        dbGet(`games/${roomCode}/teams/${emailKey}`, team => {
-          if (team) {
-            $('hdr-team').textContent=teamName;
-            $('hdr-room').textContent=roomCode;
-            if (game.status==='playing') {
-              startRound(team.currentRound||1);
-            } else {
-              goToWaiting(teamName);
-            }
-          }
-        });
+    // Check actual host/command to determine real game state
+    dbGet('games/'+roomCode+'/host/command', cmd => {
+      if (!cmd || cmd.action==='reset' || cmd.action==='end') {
+        // Game was reset or ended — clear stale session, show entrance
+        try{sessionStorage.clear();localStorage.removeItem('trivia_session');localStorage.removeItem('trivia_team');}catch(e){}
+        showScreen('entrance');
+        return;
       }
+      dbGet(`games/${roomCode}/teams/${emailKey}`, team => {
+        if (!team) {
+          // Team no longer exists — clear session
+          try{sessionStorage.clear();localStorage.removeItem('trivia_session');localStorage.removeItem('trivia_team');}catch(e){}
+          showScreen('entrance');
+          return;
+        }
+        $('hdr-team').textContent=teamName;
+        $('hdr-room').textContent=roomCode;
+        if (cmd.action==='question' || cmd.action==='playing') {
+          // Game is actively mid-question — restore to waiting and let listenForHost pick up
+          goToWaiting(teamName);
+        } else if (cmd.action==='start') {
+          // Game started but not yet on a question — go to waiting
+          goToWaiting(teamName);
+        } else {
+          // Any other state — waiting lobby
+          goToWaiting(teamName);
+        }
+      });
     });
     return;
   }
@@ -1510,14 +1524,30 @@ init = function(){
   var hasSession = false;
   try{ hasSession=!!(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session')); }catch(e){}
 
-  // Existing session — rejoin
+  // Existing session — validate against Firebase before restoring
   if(hasSession){
-    document.getElementById('scr-entrance').classList.remove('on');
-    _origInit();
-    // Ensure host listener is re-established after rejoin
-    setTimeout(function(){
-      if(roomCode && emailKey) listenForHost();
-    }, 1500);
+    var sess=null;
+    try{sess=JSON.parse(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session'));}catch(e){}
+    var checkRoom=sess&&sess.roomCode?sess.roomCode:ROOM;
+    if(db&&checkRoom){
+      db.ref('games/'+checkRoom+'/host/command').once('value',function(snap){
+        var cmd=snap.val();
+        // If no command, or game was reset/ended — clear session and show entrance
+        if(!cmd||cmd.action==='reset'||cmd.action==='end'){
+          try{sessionStorage.clear();localStorage.removeItem('trivia_session');localStorage.removeItem('trivia_team');}catch(e){}
+          document.getElementById('scr-entrance').classList.add('on');
+          document.getElementById('scr-code').classList.remove('on');
+        } else {
+          // Valid active game — restore via _origInit (which calls goToWaiting → listenForHost)
+          document.getElementById('scr-entrance').classList.remove('on');
+          _origInit();
+        }
+      });
+    } else {
+      // No DB yet or no session room — just run _origInit
+      document.getElementById('scr-entrance').classList.remove('on');
+      _origInit();
+    }
     return;
   }
 
