@@ -757,16 +757,15 @@ function listenForStart() {
   // This completely eliminates any timestamp race condition.
   const path = 'games/' + roomCode + '/host/command';
 
+  // Snapshot the current timestamp — ignore any command already in the DB
   dbGet(path, existingCmd => {
-    // Serialise the existing command so we can compare later
-    const existingStr = JSON.stringify(existingCmd);
+    const existingTs = existingCmd && existingCmd.timestamp ? existingCmd.timestamp : 0;
 
     db.ref(path).on('value', snap => {
       const cmd = snap.val();
-      // Ignore if it's null or identical to what was already there
-      if (!cmd) return;
-      if (JSON.stringify(cmd) === existingStr) return;
-      // New command — only care about 'question' action
+      if (!cmd || !cmd.timestamp) return;
+      // Only react to commands with a NEWER timestamp than what was there before
+      if (cmd.timestamp <= existingTs) return;
       if (cmd.action === 'question') {
         db.ref(path).off('value');
         startRound(cmd.round || 1);
