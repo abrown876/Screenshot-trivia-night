@@ -158,6 +158,30 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .results-round-detail{font-size:11px;color:var(--text-muted)}
 .results-round-score{font-family:var(--font-mono);font-weight:800;color:var(--purple);font-size:13px}
 .results-round-perfect{color:var(--gold)}
+.lb-title{font-size:1.4rem;font-weight:900;text-align:center;margin-bottom:1.25rem}
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:.5rem;margin-bottom:1.25rem}
+.lb-pod{display:flex;flex-direction:column;align-items:center;flex:1;max-width:100px}
+.lb-pod-medal{font-size:1.6rem;margin-bottom:.2rem}
+.lb-pod-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;margin-bottom:.3rem;flex-shrink:0}
+.lb-pod-1 .lb-pod-avatar{background:linear-gradient(135deg,#ffd700,#ffb400);color:#000;width:52px;height:52px;font-size:1.1rem}
+.lb-pod-2 .lb-pod-avatar{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);color:#000}
+.lb-pod-3 .lb-pod-avatar{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.lb-pod-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-pod-score{font-family:var(--font-mono);font-size:13px;font-weight:900;color:var(--gold);margin-top:.15rem}
+.lb-pod-bar{width:100%;border-radius:6px 6px 0 0;margin-top:.4rem}
+.lb-pod-1 .lb-pod-bar{background:linear-gradient(180deg,rgba(255,183,64,.35),rgba(255,183,64,.08));height:60px}
+.lb-pod-2 .lb-pod-bar{background:linear-gradient(180deg,rgba(192,192,192,.25),rgba(192,192,192,.05));height:44px}
+.lb-pod-3 .lb-pod-bar{background:linear-gradient(180deg,rgba(205,127,50,.2),rgba(205,127,50,.04));height:32px}
+.lb-list{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:1rem}
+.lb-row{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-row.lb-me{background:rgba(124,110,246,.08);border-left:3px solid var(--purple)}
+.lb-pos{font-family:var(--font-mono);font-size:11px;font-weight:900;color:var(--text-muted);width:22px;text-align:center;flex-shrink:0}
+.lb-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:var(--purple);flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-name-you{font-size:10px;font-weight:600;color:var(--purple);margin-left:.35rem;vertical-align:middle}
+.lb-score{font-family:var(--font-mono);font-size:14px;font-weight:900;color:var(--gold);flex-shrink:0}
 
 /* BTN */
 .btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:none;cursor:pointer;font-family:var(--font-display);transition:all .1s}
@@ -409,7 +433,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="results-breakdown-title">Round Breakdown</div>
       <div id="res-rounds"></div>
     </div>
-    <button class="btn btn-purple" style="margin-top:1rem" id="btn-again">Play Again</button>
+    <button class="btn btn-purple" id="btn-leaderboard" style="margin-top:1rem;background:transparent;border:2px solid var(--purple);color:var(--purple)">🏆 View Leaderboard</button>
+    <button class="btn btn-purple" style="margin-top:.5rem" id="btn-again">Play Again</button>
+  </div>
+</div>
+
+<div class="screen" id="scr-leaderboard">
+  <div class="screen-inner anim">
+    <div class="lb-title">🏆 Final Leaderboard</div>
+    <div class="lb-podium" id="lb-podium"></div>
+    <div class="lb-list" id="lb-list"></div>
+    <button class="btn btn-purple" id="btn-lb-back" style="margin-top:.5rem;background:transparent;border:2px solid var(--border);color:var(--text)">← Back to Results</button>
   </div>
 </div>
 
@@ -510,7 +544,7 @@ let startTime = 0;
 const $ = id => document.getElementById(id);
 
 function showScreen(name) {
-  ['register','error','wait','ready','question','feedback','break','results'].forEach(s => {
+  ['register','error','wait','ready','question','feedback','break','results','leaderboard'].forEach(s => {
     $('scr-'+s).classList.toggle('on', s===name);
   });
   // Register screen has its own inline sponsor bar; hide the persistent one there
@@ -1075,6 +1109,97 @@ function showResults() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════════════════════════════════
+function showLeaderboard() {
+  const podiumEl = $('lb-podium');
+  const listEl   = $('lb-list');
+  podiumEl.innerHTML = '<div style="opacity:.4;font-size:13px;text-align:center;width:100%;padding:1rem">Loading…</div>';
+  listEl.innerHTML   = '';
+
+  // Fetch scores and team names in parallel via Promise
+  const scoresPromise = new Promise(res => dbGet('games/' + roomCode + '/live_scores', res));
+  const teamsPromise  = new Promise(res => dbGet('games/' + roomCode + '/teams', res));
+
+  Promise.all([scoresPromise, teamsPromise]).then(([scores, teams]) => {
+    // Build name map from team key -> display name
+    const nameMap = {};
+    if (teams) {
+      Object.entries(teams).forEach(([k, t]) => {
+        nameMap[k] = (t && t.name) ? t.name : k.split('_')[0];
+      });
+    }
+
+    // If no live_scores, fall back to scores/*/total
+    function renderWithEntries(entries) {
+      entries.sort((a, b) => b.score - a.score);
+
+      // ── Podium ────────────────────────────────────────────────────────
+      // Visual order: 2nd-place left, 1st-place centre, 3rd-place right
+      const podOrder  = [entries[1], entries[0], entries[2]];
+      const podClass  = ['lb-pod-2','lb-pod-1','lb-pod-3'];
+      const podMedals = ['🥈','🥇','🥉'];
+
+      podiumEl.innerHTML = podOrder.map((e, i) => {
+        if (!e) return '<div class="lb-pod"></div>';
+        const initials = e.name.substring(0, 2).toUpperCase();
+        const isMe = e.key === emailKey;
+        return '<div class="lb-pod ' + podClass[i] + '">' +
+          '<div class="lb-pod-medal">' + podMedals[i] + '</div>' +
+          '<div class="lb-pod-avatar"' + (isMe ? ' style="outline:2px solid var(--purple);outline-offset:2px"' : '') + '>' + initials + '</div>' +
+          '<div class="lb-pod-name">' + e.name + (isMe ? ' (you)' : '') + '</div>' +
+          '<div class="lb-pod-score">' + e.score + '</div>' +
+          '<div class="lb-pod-bar"></div>' +
+        '</div>';
+      }).join('');
+
+      // ── Full list ─────────────────────────────────────────────────────
+      if (!entries.length) {
+        listEl.innerHTML = '<div style="padding:1rem;text-align:center;opacity:.5;font-size:13px">No scores recorded</div>';
+        return;
+      }
+      listEl.innerHTML = entries.map((e, i) => {
+        const isMe = e.key === emailKey;
+        const pos  = i + 1;
+        const posLabel = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos;
+        const initials  = e.name.substring(0, 2).toUpperCase();
+        return '<div class="lb-row' + (isMe ? ' lb-me' : '') + '">' +
+          '<div class="lb-pos">' + posLabel + '</div>' +
+          '<div class="lb-avatar">' + initials + '</div>' +
+          '<div class="lb-info"><div class="lb-name">' + e.name +
+            (isMe ? '<span class="lb-name-you">YOU</span>' : '') +
+          '</div></div>' +
+          '<div class="lb-score">' + e.score + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    if (scores && Object.keys(scores).length > 0) {
+      const entries = Object.entries(scores).map(([k, s]) => ({
+        key: k, score: Number(s), name: nameMap[k] || k.split('_')[0]
+      }));
+      renderWithEntries(entries);
+    } else if (teams) {
+      // Fallback: pull totals from scores node
+      const keys = Object.keys(teams);
+      let pending = keys.length;
+      const entries = [];
+      if (!pending) { renderWithEntries([]); return; }
+      keys.forEach(k => {
+        dbGet('games/' + roomCode + '/scores/' + k + '/total', total => {
+          entries.push({ key: k, score: Number(total) || 0, name: nameMap[k] || k.split('_')[0] });
+          if (--pending === 0) renderWithEntries(entries);
+        });
+      });
+    } else {
+      renderWithEntries([]);
+    }
+  });
+
+  showScreen('leaderboard');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // REACTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 function sendReaction(emoji) {
@@ -1149,6 +1274,9 @@ document.querySelectorAll('.react-btn').forEach(btn => {
 });
 
 $('btn-next').onclick = continueNext;
+
+$('btn-leaderboard').onclick = () => showLeaderboard();
+$('btn-lb-back').onclick = () => showScreen('results');
 
 $('btn-again').onclick = () => {
   try { sessionStorage.removeItem('trivia_team'); } catch(e){}
