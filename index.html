@@ -619,24 +619,11 @@ function init() {
       $('hdr-team').textContent = teamName;
       $('wait-team').textContent = teamName;
 
+      // Always return to register screen — never auto-resume.
+      // listenForStart() will fire when the host actually launches.
       if (game.status === 'ended') {
-        // Game is over — clear session and show registration
         clearSessionAndRegister(urlRoom);
-      } else if (game.status === 'playing') {
-        // Only resume if there was a recent host command (game is actively running)
-        const cmd = game.host && game.host.command;
-        const cmdAge = cmd && cmd.timestamp ? Date.now() - cmd.timestamp : Infinity;
-        const savedRound = teamEntry.currentRound;
-        if (savedRound && cmd && cmd.action === 'question' && cmdAge < 60000) {
-          // Host launched a question recently — resume
-          startRound(savedRound);
-        } else {
-          // Status is stale — go back to register and wait for host
-          showRegister(urlRoom);
-          listenForStart();
-        }
       } else {
-        // Don't show wait screen — go back to register, listenForStart is active
         showRegister(urlRoom);
         listenForStart();
       }
@@ -711,16 +698,11 @@ function doRegister() {
   
   // Check room exists in Firebase
   dbGet('games/' + roomVal, game => {
-    if (!game) {
-      errorEl.textContent = 'Room "' + roomVal + '" not found. Check the code and try again.';
-      errorEl.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'JOIN THE QUIZ →';
-      return;
-    }
+    // Room doesn't exist yet — create it automatically on first registration
+    if (!game) game = {};
     
     if (game.status === 'ended') {
-      errorEl.textContent = 'This game has ended. Ask the host for a new room code.';
+      errorEl.textContent = 'This game has ended. Ask the host to reset the room.';
       errorEl.classList.add('show');
       btn.disabled = false;
       btn.textContent = 'JOIN THE QUIZ →';
