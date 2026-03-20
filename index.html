@@ -463,14 +463,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // Max per round: 10 (5 + 5 bonus)
 // Max total: 30 (3 rounds × 10)
 // ═══════════════════════════════════════════════════════════════════════════
-const TIMER_SECS = 15;
+const TIMER_SECS = 10;
 const Q_PER_ROUND = 5;
 const TOTAL_ROUNDS = 3;
 const PTS_PER_CORRECT = 1;
 const PERFECT_BONUS = 5;
 const MAX_PER_ROUND = Q_PER_ROUND + PERFECT_BONUS;
 const MAX_TOTAL = MAX_PER_ROUND * TOTAL_ROUNDS;
-const FEEDBACK_MS = 1800;
+const FEEDBACK_MS = 4000;
 const COUNTDOWN = 3;
 const LETTERS = ['A','B','C','D'];
 const CAT_CLASS = {m:'cat-m',f:'cat-f',x:'cat-x'};
@@ -761,17 +761,23 @@ function doRegister() {
 }
 
 function listenForStart() {
-  // Listen on host/command instead of status.
-  // Record the time we attach so we can ignore any command already in the DB
-  // (stale from a previous session).
+  // Wait for the host to press Launch on Q1 of Round 1.
+  // We use a two-layer stale guard:
+  //   1. attachedAt  — ignore anything timestamped before we registered
+  //   2. MAX_STALE   — even if the clock is slightly off, reject commands
+  //                    older than 10 seconds from now
   const attachedAt = Date.now();
+  const MAX_STALE = 10000; // ms
+
   dbOn('games/' + roomCode + '/host/command', cmd => {
     if (!cmd) return;
-    // Ignore commands that existed before we attached
-    if (cmd.timestamp && cmd.timestamp < attachedAt) return;
-    if (cmd.action === 'question' && cmd.round === 1 && cmd.index === 0) {
+    const cmdTs = cmd.timestamp || 0;
+    const age   = Date.now() - cmdTs;
+    // Stale: was already in DB when we attached, or older than 10s
+    if (cmdTs < attachedAt || age > MAX_STALE) return;
+    if (cmd.action === 'question') {
       dbOff('games/' + roomCode + '/host/command');
-      startRound(1);
+      startRound(cmd.round || 1);
     }
   });
 }
