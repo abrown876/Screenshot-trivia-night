@@ -17,7 +17,7 @@
   --border:rgba(124,110,246,.15);--border2:rgba(124,110,246,.08);
   --r:16px;--font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
 }
-html,body{overflow-x:hidden;height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
+html,body{height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
 body{display:flex;flex-direction:column}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(124,110,246,.1) 0%,transparent 60%);pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,110,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,110,246,.03) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
@@ -25,7 +25,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 /* HEADER */
 .hdr{background:var(--purple-dim);padding:.55rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10;position:relative}
 .hdr-score{background:rgba(255,255,255,.15);color:#fff;font-family:var(--font-mono);font-weight:900;font-size:14px;padding:5px 14px;border-radius:20px}
-.demo-chip{background:var(--coral);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase}
+.demo-chip{background:var(--coral);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase}
 
 /* SCREENS */
 .scr{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;z-index:1}
@@ -36,7 +36,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 /* SPONSOR */
 .sponsor-bar{background:linear-gradient(90deg,#E85D24,#D14520);padding:8px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
-.sponsor-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.08em;text-transform:uppercase}
+.sponsor-label{font-size:9px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.08em;text-transform:uppercase}
 
 /* INTRO SCREEN */
 .intro-hero{background:linear-gradient(145deg,rgba(124,110,246,.18),rgba(255,92,138,.1));border:1px solid var(--border);border-radius:var(--r);padding:2rem 1.5rem;text-align:center;margin-bottom:1.25rem}
@@ -53,7 +53,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 /* QUESTION SCREEN */
 .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
 .q-counter{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim)}
-.q-cat-pill{font-size:13px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(124,110,246,.15);color:var(--purple)}
+.q-cat-pill{font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(124,110,246,.15);color:var(--purple)}
 .timer-wrap{display:flex;align-items:center;gap:.5rem;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:7px 14px;transition:border-color .3s,background .3s}
 .timer-wrap.warn{border-color:var(--gold);background:rgba(255,183,64,.1)}
 .timer-wrap.danger{border-color:var(--red);background:rgba(255,75,92,.1)}
@@ -61,7 +61,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .timer-num.warn{color:var(--gold)}
 .timer-num.danger{color:var(--red);animation:tpulse .5s ease-in-out infinite}
 @keyframes tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-.timer-lbl{font-size:13px;color:var(--text-dim);font-weight:700}
+.timer-lbl{font-size:11px;color:var(--text-dim);font-weight:700}
 .prog{height:8px;background:var(--surface2);border-radius:4px;margin-bottom:1.1rem;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:4px;transition:width .9s linear}
 .qcard{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--purple);border-radius:var(--r);padding:1.4rem 1.25rem;margin-bottom:1.1rem}
@@ -101,7 +101,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .review-item:last-child{border-bottom:none}
 .review-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
 .review-q{font-size:12px;color:var(--text-dim);flex:1;line-height:1.5}
-.review-a{font-size:13px;font-weight:700;margin-top:.2rem}
+.review-a{font-size:11px;font-weight:700;margin-top:.2rem}
 .review-a.correct{color:var(--green)}
 .review-a.wrong{color:var(--red)}
 .review-a.timeout{color:var(--gold)}
@@ -113,15 +113,6 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 /* Toast */
 .stoast{background:var(--purple);color:#fff;font-weight:900;font-size:15px;padding:9px 20px;border-radius:24px;position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);z-index:200;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;box-shadow:0 4px 24px rgba(124,110,246,.4);white-space:nowrap}
 .stoast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-button,a{touch-action:manipulation}
-
-@media(max-width:480px){
-  .intro-hero{padding:1.5rem 1rem}
-  .intro-hero h1{font-size:1.5rem}
-  .fact-grid{grid-template-columns:1fr 1fr;gap:.5rem}
-  .qtxt{font-size:1.1rem!important}
-  .result-score{font-size:3.2rem!important}
-}
 </style>
 </head>
 <body>
@@ -205,108 +196,109 @@ button,a{touch-action:manipulation}
 <div class="stoast" id="stoast"></div>
 
 <script>
-var POOL=[
-{q:`Which Jamaican artist is known as "The Gong"?`,o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],a:1,cat:'Music'},
-{q:`What is Jamaica's national dish?`,o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],a:2,cat:'Food'},
-{q:`Which annual Kingston event is considered the biggest dancehall concert in the world?`,o:['Sumfest','Fully Loaded','Sting','Rebel Salute'],a:2,cat:'Culture'},
-{q:`Which Shaggy hit featuring RikRok became one of the best-selling singles of all time?`,o:[`Angel`,`Boombastic`,`It Wasn't Me`,`Oh Carolina`],a:2,cat:'Music'},
-{q:`What shoe brand is iconic in dancehall culture and called "Clarks" by fans?`,o:['Timberland','Clarks Originals','Nike','Adidas'],a:1,cat:'Culture'},
-{q:`The Jamaican phrase "Dutty Wine" refers to what?`,o:['Bad wine','A popular dance move','A cocktail','A street party'],a:1,cat:'Culture'},
-{q:`Which red flower drink is a Jamaican Christmas staple?`,o:['Irish Moss','Roots Tonic','Sorrel Punch','Sky Juice'],a:2,cat:'Food'},
-{q:`Koffee won the Grammy for Best Reggae Album in 2024 with which project?`,o:['Gifted','Rapture','West Indies','Sink or Swim'],a:0,cat:'Music'},
-{q:`Which female dancehall artist is known as the "Queen of the Dancehall"?`,o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],a:2,cat:'Music'},
-{q:`Vybz Kartel created which popular dance move in the early 2010s?`,o:['Whining','Daggering','Gully Creepa','Bruk Out'],a:2,cat:'Music'},
-{q:`Which Kingston street life film starred Paul Campbell and became a cult classic?`,o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],a:2,cat:'Culture'},
-{q:`Which Jamaican artiste holds the record for most Reggae Grammy wins?`,o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],a:3,cat:'Music'},
-{q:`What is Jamaica's most famous carnival street party called?`,o:['Sumfest','Bacchanal','Rebel Salute','Sting'],a:1,cat:'Culture'},
-{q:`Which Jamaican artist featured on Beyonce's "Black Is King" visual album?`,o:['Koffee','Spice','Govana','Chronixx'],a:0,cat:'Music'},
-{q:`Sean Paul's smash hit "Temperature" peaked at #1 in how many countries?`,o:['3','5','8','12'],a:2,cat:'Music'},
-{q:`What is the name of Jamaica's national bird?`,o:['Pelican','Doctor Bird','Parrot','Frigate Bird'],a:1,cat:'General'},
-{q:`What is Jamaica's motto?`,o:['One Love One Heart','Out of Many One People','Forward Ever Backward Never','Unity is Strength'],a:1,cat:'General'},
-{q:`Which parish is the birthplace of Bob Marley?`,o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1,cat:'General'},
-{q:`The Blue Mountains in Jamaica are famous for producing what?`,o:['Rum','Coffee','Sugar Cane','Cocoa'],a:1,cat:'Food'},
-{q:`Which Jamaican sprinter won 3 gold medals at the 2008 Beijing Olympics?`,o:['Yohan Blake','Asafa Powell','Usain Bolt','Michael Frater'],a:2,cat:'Sports'},
-{q:`What is the main ingredient in Jamaican jerk seasoning?`,o:['Cumin','Allspice','Turmeric','Coriander'],a:1,cat:'Food'},
-{q:`Which dance is associated with Elephant Man's 2003 hit "Log On"?`,o:['Bogle','Butterfly','Dutty Wine','Row di Boat'],a:1,cat:'Culture'},
-{q:`Usain Bolt's 100m world record of 9.58 seconds was set in which city?`,o:['Beijing','London','Berlin','Tokyo'],a:2,cat:'Sports'},
-{q:`Which Jamaican won the Voice UK Season 4?`,o:['Tessanne Chin','Shaggy','Romain Virgo','Alaine'],a:0,cat:'Music'},
-{q:`What is "festival" in Jamaican cuisine?`,o:['A sweet fried dumpling','A fish soup','A cornmeal porridge','A sugarcane drink'],a:0,cat:'Food'},
-{q:`Which Jamaican parish is known as the breadbasket of Jamaica?`,o:['St. Elizabeth','Portland','Trelawny','Westmoreland'],a:0,cat:'General'},
-{q:`Reggae music originated in Jamaica in which decade?`,o:['1950s','1960s','1970s','1980s'],a:1,cat:'Music'},
-{q:`What is the name of the famous Jamaica market in Kingston?`,o:['Coronation Market','Jubilee Market','Papine Market','Half Way Tree Market'],a:0,cat:'General'},
-{q:`Which Jamaican national hero led the 1865 Morant Bay Rebellion?`,o:['Marcus Garvey','Paul Bogle','Sam Sharpe','Nanny'],a:1,cat:'History'},
-{q:`What does "irie" mean in Jamaican patois?`,o:['Angry','Everything is good','Hungry','Tired'],a:1,cat:'Culture'},
-{q:`Which Jamaican food is made from goat offal and considered an aphrodisiac?`,o:['Pepper Pot','Cow Foot Soup','Mannish Water','Run Down'],a:2,cat:'Food'},
-{q:`Who is known as the "Ambassador of Reggae"?`,o:['Peter Tosh','Bob Marley','Bunny Wailer','Jimmy Cliff'],a:1,cat:'Music'},
-{q:`Which Jamaican-born sprinter became the first woman to win back-to-back Olympic 100m titles?`,o:['Shelly-Ann Fraser-Pryce','Elaine Thompson-Herah','Merlene Ottey','Veronica Campbell-Brown'],a:1,cat:'Sports'},
-{q:`What is "Sky Juice" in Jamaica?`,o:['A cocktail','Snow cone with syrup','A fruit punch','A fizzy drink'],a:1,cat:'Food'},
-{q:`Which Jamaican film featured the song "The Harder They Come"?`,o:['Rockers','Dancehall Queen','The Harder They Come','Shottas'],a:2,cat:'Culture'},
-{q:`What does "Wagwan" mean in Jamaican patois?`,o:['Goodbye','What is going on','Good morning','Be careful'],a:1,cat:'Culture'},
-{q:`Which parish is Jamaica's capital Kingston located in?`,o:['St. Andrew','St. Catherine','Kingston','St. Thomas'],a:2,cat:'General'},
-{q:`Burning Spear's real name is?`,o:['Winston Rodney','Delroy Wilson','Freddie McGregor','Clinton Fearon'],a:0,cat:'Music'},
-{q:`Which Jamaican river is the longest on the island?`,o:['Rio Cobre','Black River','Rio Minho','White River'],a:2,cat:'General'},
-{q:`What is "Bammy" made from in Jamaica?`,o:['Cornmeal','Cassava','Breadfruit','Plantain'],a:1,cat:'Food'},
-{q:`Which Jamaican artist is known for the song "Informer"?`,o:['Snow','Shaggy','Sean Paul','Shabba Ranks'],a:0,cat:'Music'},
-{q:`What is the name of Jamaica's national fruit?`,o:['Mango','Breadfruit','Ackee','Guava'],a:2,cat:'General'},
-{q:`The Rastafari movement originated in Jamaica in which decade?`,o:['1910s','1920s','1930s','1940s'],a:2,cat:'Culture'},
-{q:`Which Jamaican town is known as the "Garden Parish Capital"?`,o:['Falmouth','Mandeville','Black River','Port Antonio'],a:1,cat:'General'},
-{q:`What is "Run Dung" (Run Down) made with?`,o:['Saltfish','Mackerel in coconut milk','Ackee','Callaloo'],a:1,cat:'Food'},
-{q:`Which Jamaican singer won The Voice USA Season 5?`,o:['Tessanne Chin','Christopher Martin','Romain Virgo','Alaine'],a:0,cat:'Music'},
-{q:`What is Jamaica's most popular exported beer?`,o:['Heineken','Red Stripe','Banks','Carib'],a:1,cat:'Culture'},
-{q:`Shelly-Ann Fraser-Pryce is from which Kingston community?`,o:['Trench Town','Waterhouse','Arnett Gardens','Tivoli Gardens'],a:1,cat:'Sports'},
-{q:`Which Jamaican artist is known as "Teacha"?`,o:['Sizzla','Capleton','Luciano','Buju Banton'],a:3,cat:'Music'},
-{q:`What is "Escovitch" fish in Jamaica?`,o:['Smoked fish','Fried fish with pickled vegetables','Steamed fish','Curried fish'],a:1,cat:'Food'},
-{q:`Port Royal was once known as what?`,o:['The wickedest city on earth','The city of gold','The pearl of the Caribbean','The pirates\'s paradise'],a:0,cat:'History'},
-{q:`Which Jamaican artist is known for "Heads High" and "Telephone Love"?`,o:['Buju Banton','Mr. Vegas','Elephant Man','Bounty Killer'],a:1,cat:'Music'},
-{q:`What is Jamaica's national tree?`,o:['Poinciana','Blue Mahoe','Lignum Vitae','Cotton Tree'],a:1,cat:'General'},
-{q:`Which Jamaican dish consists of salted cod cooked with onions and tomatoes?`,o:['Jerk Pork','Ackee and Saltfish','Stamp and Go','Solomon Gundy'],a:1,cat:'Food'},
-{q:`The Jamaican bobsled team famously competed at which Winter Olympics?`,o:['1984 Sarajevo','1988 Calgary','1992 Albertville','1994 Lillehammer'],a:1,cat:'Sports'},
-{q:`Which Jamaican national hero founded the Universal Negro Improvement Association?`,o:['Paul Bogle','Norman Manley','Marcus Garvey','Alexander Bustamante'],a:2,cat:'History'},
-{q:`What is "Guinep" in Jamaica?`,o:['A type of fish','A tropical fruit','A root vegetable','A herbal drink'],a:1,cat:'Food'},
-{q:`Which Jamaican dancehall artist is known as "Gaza"?`,o:['Alkaline','Tommy Lee Sparta','Vybz Kartel','Mavado'],a:2,cat:'Music'},
-{q:`Jamaica gained independence from Britain in which year?`,o:['1958','1960','1962','1964'],a:2,cat:'History'},
-{q:`Which Jamaican-American actress starred in "Monster's Ball"?`,o:['Grace Jones','Naomi Campbell','Halle Berry','Janet Jackson'],a:2,cat:'Culture'},
-{q:`What colour is the Jamaican flag?`,o:['Green, black and gold','Red, green and gold','Black, gold and green','Green, white and gold'],a:0,cat:'General'},
-{q:`Which Jamaican artist is known for the song "Murder She Wrote"?`,o:['Buju Banton','Chaka Demus and Pliers','Beenie Man','Super Cat'],a:1,cat:'Music'},
-{q:`What is "Callaloo" in Jamaican cooking?`,o:['A spice blend','A leafy green vegetable dish','A type of dumpling','A coconut dessert'],a:1,cat:'Food'},
-{q:`Which Jamaican has won the most Olympic gold medals?`,o:['Asafa Powell','Shelly-Ann Fraser-Pryce','Yohan Blake','Usain Bolt'],a:3,cat:'Sports'},
-{q:`What is the name of the famous beach in Negril?`,o:['Doctor\'s Cave Beach','Seven Mile Beach','Frenchman\'s Cove','Treasure Beach'],a:1,cat:'General'},
-{q:`Which Jamaican singer recorded "Pressure Drop" with Toots and the Maytals?`,o:['Jimmy Cliff','Bob Marley','Desmond Dekker','Ken Boothe'],a:0,cat:'Music'},
-{q:`What does "Likkle more" mean in Jamaican patois?`,o:['I love you','See you later','Good morning','Thank you'],a:1,cat:'Culture'},
-{q:`Which Jamaican artist is known as "Bounty Killer" — what is his real name?`,o:['Rodney Price','Mark Myrie','Anthony Cruz','Cleveland Browne'],a:0,cat:'Music'},
-{q:`What is "Irish Moss" in Jamaica?`,o:['A type of seaweed drink','A potato dish','A type of moss used in cooking','A herbal tea'],a:0,cat:'Food'},
-{q:`Which Jamaican community is most associated with the birth of reggae music?`,o:['August Town','Trench Town','Arnett Gardens','Tivoli Gardens'],a:1,cat:'Music'},
-{q:`What is the name of Jamaica's most famous rum brand?`,o:['Mount Gay','Appleton','Bacardi','Captain Morgan'],a:1,cat:'Culture'},
-{q:`Which Jamaican sprinter won the women\'s 100m at the 2012 London Olympics?`,o:['Merlene Ottey','Shelly-Ann Fraser-Pryce','Elaine Thompson','Veronica Campbell-Brown'],a:1,cat:'Sports'},
-{q:`What is "Escoveitched" fish marinated in?`,o:['Lemon and herbs','Vinegar and scotch bonnet peppers','Coconut milk and spices','Rum and allspice'],a:1,cat:'Food'},
-{q:`Which Jamaican artist is known for the anthem "Many Rivers to Cross"?`,o:['Bob Marley','Jimmy Cliff','Toots Hibbert','Burning Spear'],a:1,cat:'Music'},
-{q:`Jamaican patois word "Duppy" refers to what?`,o:['Friend','Ghost or spirit','Food','Money'],a:1,cat:'Culture'},
-{q:`Which Jamaican won the men\'s 200m at the 2016 Rio Olympics?`,o:['Yohan Blake','Usain Bolt','Warren Weir','Nickel Ashmeade'],a:1,cat:'Sports'},
-{q:`What is "Jerk" cooking — the traditional method?`,o:['Deep frying','Slow cooking over pimento wood','Steaming in banana leaves','Baking in a clay pot'],a:1,cat:'Food'},
-{q:`Which Jamaican fashion designer is known internationally for avant-garde designs?`,o:['Grace Jones','Patrick Kelly','Ozwald Boateng','Charles Hevez'],a:0,cat:'Culture'},
-{q:`Which Jamaican song became a global hit in 1968 and is considered the first reggae song?`,o:['Rivers of Babylon','Do the Reggay','Pressure Drop','The Harder They Come'],a:1,cat:'Music'},
-{q:`What is "Roots Tonic" in Jamaica?`,o:['A herbal energy drink','A type of rum','A fruit juice','A coffee blend'],a:0,cat:'Culture'},
-{q:`Which Jamaican track and field coach is credited with developing many Olympic champions?`,o:['Norman Peart','Dennis Johnson','Stephen Francis','Glen Mills'],a:3,cat:'Sports'},
-{q:`What does "Rasta" mean in Jamaican culture?`,o:['Happy person','Follower of Rastafari','Musician','Wise elder'],a:1,cat:'Culture'},
-{q:`Which Jamaican song is played at every football World Cup since 1990?`,o:['One Love','No Woman No Cry','Informer','The Harder They Come'],a:1,cat:'Music'},
-{q:`What is "Pimento" better known as outside Jamaica?`,o:['Paprika','Allspice','Chili','Cumin'],a:1,cat:'Food'},
-{q:`Which area of Kingston is famous for its music studios and known as "Music Mile"?`,o:['Cross Roads','Orange Street','Half Way Tree','New Kingston'],a:1,cat:'Music'},
-{q:`Which Jamaican won the Nobel Peace Prize for Literature in the 20th century?`,o:['Claude McKay','Derek Walcott','Olive Senior','Linton Kwesi Johnson'],a:1,cat:'History'},
-{q:`What is "Coco Bread" in Jamaica?`,o:['Coconut cake','A soft bread roll used for patties','Cornmeal bread','A sweet coconut bun'],a:1,cat:'Food'},
-{q:`Which Jamaican produced the most reggae music globally through his Studio One label?`,o:['Joe Gibbs','Coxsone Dodd','King Tubby','Lee "Scratch" Perry'],a:1,cat:'Music'},
-{q:`What is the Jamaican patois word for a party or dance event?`,o:['Bashment','Jamboree','Riddim','Vibes'],a:0,cat:'Culture'},
-{q:`Which Jamaican athlete was the first person to run the 100m in under 10 seconds?`,o:['Don Quarrie','Michael Green','Asafa Powell','Linford Christie'],a:2,cat:'Sports'},
-{q:`What is "Breadfruit" used for in Jamaican cooking?`,o:['Only desserts','A starchy staple like potato','Only soups','Only drinks'],a:1,cat:'Food'},
-{q:`Which Jamaican music producer is known as the "Originator"?`,o:['King Tubby','Lee Scratch Perry','Duke Reid','Bunny Lee'],a:1,cat:'Music'},
-{q:`What is the name of the famous Jamaican patty pastry shell?`,o:['Flaky golden pastry','Cornmeal crust','Puff pastry','Shortcrust pastry'],a:0,cat:'Food'},
-{q:`Which reggae artist is known for the 1975 hit "Curly Locks"?`,o:['Burning Spear','Junior Byles','Gregory Isaacs','Freddie McGregor'],a:1,cat:'Music'},
-{q:`What does "Nyam" mean in Jamaican patois?`,o:['Sleep','Eat','Dance','Laugh'],a:1,cat:'Culture'},
-{q:`Which Jamaican became the first Black Miss World in 1976?`,o:['Grace Jones','Cindy Breakspeare','Naomi Campbell','Lisa Hanna'],a:1,cat:'History'},
-{q:`What is "Hard Dough Bread" in Jamaica?`,o:['A dense sweet bread','A sourdough loaf','A flatbread','A cornmeal bread'],a:0,cat:'Food'},
-{q:`Which Jamaican sound system is considered the oldest in the world?`,o:['Stone Love','Bass Odyssey','Downbeat','Killamanjaro'],a:2,cat:'Music'},
-{q:`What are "Plantain chips" made from?`,o:['Green unripe plantains','Ripe sweet plantains','Banana','Cassava'],a:0,cat:'Food'},
-{q:`Which Jamaican director made the film "Dancehall Queen"?`,o:['Perry Henzell','Chris Browne','Don Letts','Trevor Rhone'],a:1,cat:'Culture'}
+var TRYOUT_QUESTIONS=[
+{q:`Who is known as the "King of Dancehall"?`,o:['Buju Banton','Vybz Kartel','Beenie Man','Bounty Killer'],a:2},
+{q:`Which Jamaican won the 100m at the 2008 and 2012 Olympics?`,o:['Asafa Powell','Yohan Blake','Usain Bolt','Michael Frater'],a:2},
+{q:`What is Jamaica's national dish?`,o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],a:2},
+{q:`Bob Marley was born in which Jamaican parish?`,o:['Kingston','St. Ann','St. Elizabeth','Westmoreland'],a:1},
+{q:`Which Jamaican artist is known as "The Gong"?`,o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],a:1},
+{q:`What annual Kingston concert is the biggest dancehall show in the world?`,o:['Sumfest','Rebel Salute','Sting','Bacchanal'],a:2},
+{q:`Koffee won the Grammy for Best Reggae Album in 2024 with which project?`,o:['Gifted','Rapture','West Indies','Sink or Swim'],a:0},
+{q:`What is Jamaica's national fruit?`,o:['Mango','Breadfruit','Ackee','Soursop'],a:2},
+{q:`Which Jamaican sprinter holds the 100m world record?`,o:['Asafa Powell','Yohan Blake','Michael Frater','Usain Bolt'],a:3},
+{q:`What is the name of Jamaica's most famous carnival street party?`,o:['Sumfest','Bacchanal','Rebel Salute','Sting'],a:1},
+{q:`Which female dancehall artist is known as the "Queen of the Dancehall"?`,o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],a:2},
+{q:`What shoe brand is iconic in dancehall culture and called "Clarks" by fans?`,o:['Timberland','Clarks Originals','Nike','Adidas'],a:1},
+{q:`Which traditional Jamaican Christmas drink is made from a red flower?`,o:['Irish Moss','Roots Tonic','Sorrel','Sky Juice'],a:2},
+{q:`Usain Bolt's 9.58s world record was set in which city?`,o:['Beijing','London','Berlin','Tokyo'],a:2},
+{q:`Which Jamaican film starred Paul Campbell and became a cult classic?`,o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],a:2},
+{q:`What Jamaican phrase means everything is alright?`,o:['Weh yuh seh','Irie','Likkle more','Wagwan'],a:1},
+{q:`Which Bob Marley song begins "Rise up this morning, smiled with the rising sun"?`,o:['No Woman No Cry','Three Little Birds','Redemption Song','One Love'],a:1},
+{q:`Jamaica gained independence from Britain in which year?`,o:['1958','1960','1962','1964'],a:2},
+{q:`Which Jamaican music genre came before reggae in the 1960s?`,o:['Calypso','Mento','Rocksteady','Ska'],a:3},
+{q:`Vybz Kartel created which popular dance move in the early 2010s?`,o:['Whining','Daggering','Gully Creepa','Bruk Out'],a:2},
+{q:`Which Jamaican artist featured on Beyonce's "Black Is King" visual album?`,o:['Koffee','Spice','Govana','Chronixx'],a:0},
+{q:`What is the capital city of Jamaica?`,o:['Montego Bay','Ocho Rios','Kingston','Mandeville'],a:2},
+{q:`Which Jamaican singer won The Voice USA in 2012?`,o:['Koffee','Tessanne Chin','Jada Kingdom','Shenseea'],a:1},
+{q:`The Jamaican phrase "Dutty Wine" refers to what?`,o:['Bad wine','A popular dance move','A cocktail','A street party'],a:1},
+{q:`Which Shaggy hit featuring RikRok is one of the best-selling singles of all time?`,o:['Angel','Boombastic',`It Wasn't Me`,'Oh Carolina'],a:2},
+{q:`What is Jamaica's national bird?`,o:['Parrot','Pelican','Doctor Bird','Frigatebird'],a:2},
+{q:`Which Jamaican artiste holds the record for most Reggae Grammy wins?`,o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],a:3},
+{q:`What is the main ingredient in Jamaican festival bread?`,o:['Wheat flour only','Cornmeal and flour','Rice flour','Breadfruit'],a:1},
+{q:`Which neighbourhood is most associated with the birth of reggae music?`,o:['New Kingston','Trench Town','Barbican','Tivoli Gardens'],a:1},
+{q:`Shelly-Ann Fraser-Pryce is a multiple Olympic champion in which event?`,o:['200m','Long Jump','100m','400m'],a:2},
+{q:`What is mannish water in Jamaican cuisine?`,o:['A rum cocktail','Fish broth','Goat head soup','Pepper pot'],a:2},
+{q:`Which Jamaican music festival is held in Montego Bay every July?`,o:['Rebel Salute','Sumfest','Sting','Bacchanal'],a:1},
+{q:`"One Love" is most associated with which Jamaican artist?`,o:['Peter Tosh','Bunny Wailer','Bob Marley','Jimmy Cliff'],a:2},
+{q:`What is the name of the famous Jamaican rum brand with a bat logo?`,o:['Appleton','Wray and Nephew','Bacardi','Captain Morgan'],a:2},
+{q:`Which parish in Jamaica is known as the breadbasket?`,o:['St. Elizabeth','Westmoreland','Clarendon','Manchester'],a:0},
+{q:`Jamaica's motto "Out of Many One People" reflects what?`,o:['Its geography','Its mixed heritage','Its independence','Its exports'],a:1},
+{q:`Which Jamaican track athlete competed in six Olympic Games?`,o:['Usain Bolt','Shelly-Ann Fraser-Pryce','Merlene Ottey','Asafa Powell'],a:2},
+{q:`What is Blue Mountain in Jamaica famous for?`,o:['Hiking trails','Coffee','Waterfalls','Rum'],a:1},
+{q:`What is jerk seasoning primarily flavoured with?`,o:['Cumin and coriander','Allspice and scotch bonnet','Turmeric and ginger','Bay leaf and thyme'],a:1},
+{q:`Jimmy Cliff starred in which 1972 Jamaican film?`,o:['Shottas','The Harder They Come','Dancehall Queen','Rockers'],a:1},
+{q:`What is sky juice in Jamaica?`,o:['Coconut water','Shaved ice with syrup','Soursop drink','Sorrel punch'],a:1},
+{q:`Chronixx is associated with which music genre?`,o:['Dancehall','Reggae revival','Soca','R&B'],a:1},
+{q:`Which Jamaican city is known as the tourist capital?`,o:['Kingston','Ocho Rios','Negril','Montego Bay'],a:3},
+{q:`What does wagwan mean in Jamaican patois?`,o:['Goodbye','What is going on','Come here','Move quickly'],a:1},
+{q:`Which Jamaican national hero led the 1865 Morant Bay Rebellion?`,o:['Marcus Garvey','Alexander Bustamante','Paul Bogle','Norman Manley'],a:2},
+{q:`Damian Marley is the son of Bob Marley and which Miss World winner?`,o:['Rita Marley','Cindy Breakspeare','Janet Hunt','Joan Andrea Hutchinson'],a:1},
+{q:`What is Jamaica's national flower?`,o:['Hibiscus','Lignum Vitae','Bougainvillea','Bird of Paradise'],a:1},
+{q:`Which Jamaican sprinter won 100m gold at the 2020 Tokyo Olympics?`,o:['Shelly-Ann Fraser-Pryce','Shericka Jackson','Elaine Thompson-Herah','Briana Williams'],a:2},
+{q:`"Redemption Song" by Bob Marley was released on which album?`,o:['Exodus','Uprising','Rastaman Vibration','Survival'],a:1},
+{q:`What is the traditional Jamaican Christmas cake soaked in?`,o:['Rum','Beer','Wine','Brandy'],a:0},
+{q:`What does likkle more mean in Jamaican patois?`,o:['A little bit more','See you later','Hurry up','Thank you'],a:1},
+{q:`Which Jamaican musician is credited with pioneering the reggae genre?`,o:['Jimmy Cliff','Desmond Dekker','Toots Hibbert','Byron Lee'],a:2},
+{q:`"Boombastic" was a number one hit for which Jamaican artist?`,o:['Sean Paul','Ini Kamoze','Shaggy','Shabba Ranks'],a:2},
+{q:`Which of these is a traditional Jamaican breakfast?`,o:['Saltfish and callaloo','Jerk pork','Rice and peas','Oxtail'],a:0},
+{q:`What is a duppy in Jamaican folklore?`,o:['A ghost or spirit','A local dance','A type of food','A musical instrument'],a:0},
+{q:`Shenseea is known for which type of music?`,o:['Reggae','Soca','Dancehall','Afrobeats'],a:2},
+{q:`What is the name of the famous Jamaican all-inclusive resort chain?`,o:['Sandals','Beaches','Couples','Hedonism'],a:0},
+{q:`Which patois word describes a young child?`,o:['Bredren','Duppy','Pickney','Yardie'],a:2},
+{q:`Which Jamaican patois word means friend or mate?`,o:['Bredren','Pickney','Duppy','Ital'],a:0},
+{q:`The Jamaican bobsled team story was turned into which 1993 movie?`,o:['Cool Runnings','Island Heat','Run Yard','Tropical Thunder'],a:0},
+{q:`What is ital food in Rastafari culture?`,o:['Spicy food','Natural food without salt or meat','Street food','Seafood'],a:1},
+{q:`Which Jamaican artist released "Here Comes the Hotstepper"?`,o:['Shabba Ranks','Super Cat','Ini Kamoze','Chaka Demus'],a:2},
+{q:`What colour are the stripes on the Jamaican flag?`,o:['Blue and red','Gold and black','Green and gold','Black and white'],a:1},
+{q:`Alkaline is a major artist in which genre?`,o:['Reggae','Soca','Dancehall','Jazz'],a:2},
+{q:`What does "one love" represent in Jamaican culture?`,o:['Romantic love','Unity and peace','National pride','Reggae music'],a:1},
+{q:`"Informer" was a massive hit for which Canadian-Jamaican artist?`,o:['Snow','Maestro Fresh Wes','Chaka Demus','Carlene Davis'],a:0},
+{q:`Which Jamaican city is known as the second city?`,o:['Portmore','Spanish Town','Montego Bay','May Pen'],a:2},
+{q:`What flavour is the classic Jamaican drink Ting?`,o:['Orange','Lime','Grapefruit','Pineapple'],a:2},
+{q:`In which decade did Jamaican sound system culture emerge?`,o:['1930s','1940s','1950s','1960s'],a:2},
+{q:`Protoje is associated with which genre of music?`,o:['Soca','Dancehall','Reggae revival','Hip hop'],a:2},
+{q:`Which Jamaican landmark is a UNESCO World Heritage Site?`,o:[`Dunn's River Falls`,'Blue and John Crow Mountains','Port Royal','Rio Grande'],a:1},
+{q:`What does bredren mean in Jamaican patois?`,o:['Brother or close friend','Enemy','Neighbourhood','Celebration'],a:0},
+{q:`Which Jamaican rum is nicknamed Whites or Overproof?`,o:['Appleton Estate','Myers','Wray and Nephew Overproof','Sangster'],a:2},
+{q:`Buju Banton's real name is?`,o:['Mark Myrie','Robert Livingston','Winston Foster','Trevor Smith'],a:0},
+{q:`Which Jamaican food festival is held annually in Boston Bay Portland?`,o:['Jerk Festival','Breadfruit Festival','Curry Festival','Seafood Festival'],a:0},
+{q:`What does Rastafari mean?`,o:['Lion of Judah','Head creator','Prince Tafari','God of Africa'],a:2},
+{q:`Grace Jones was born in which Jamaican parish?`,o:['Kingston','Spanish Town','St. Catherine','Westmoreland'],a:2},
+{q:`What is run dung in Jamaican cuisine?`,o:['A type of stew','Fish cooked in coconut milk','A fried dumpling','Braised oxtail'],a:1},
+{q:`Which Jamaican city hosts the annual Jazz and Blues Festival?`,o:['Kingston','Negril','Ocho Rios','Montego Bay'],a:3},
+{q:`What is the currency of Jamaica?`,o:['Jamaican Dollar','Jamaican Pound','Caribbean Dollar','West Indian Dollar'],a:0},
+{q:`Which Jamaican dancehall artist released the album "Pon Di Gaza"?`,o:['Bounty Killer','Mavado','Vybz Kartel','Beenie Man'],a:2},
+{q:`Ky-Mani Marley is known primarily as a?`,o:['Politician','Reggae artist and actor','Chef','Sprinter'],a:1},
+{q:`What is lasco in Jamaica?`,o:['A dance','A powdered food drink','A type of rum','A street food'],a:1},
+{q:`What dance became globally popular in Jamaican dancehall around 2012?`,o:['Dutty Wine','Gully Creepa','Daggering','Bruk Out'],a:1},
+{q:`Which reggae legend recorded much of "The Harder They Come" soundtrack?`,o:['Burning Spear','Toots Hibbert','Jimmy Cliff','Dennis Brown'],a:2},
+{q:`What is a traditional Jamaican Easter treat?`,o:['Bun and cheese','Jerk bun','Easter cake','Sweet potato pudding'],a:0},
+{q:`Sean Paul collaborated with Dua Lipa on which 2021 hit?`,o:['Temperature','No Lie','Cheap Thrills','Calling On Me'],a:3},
+{q:`Which Jamaican waterfall is one of the most photographed in the Caribbean?`,o:['YS Falls','Mayfield Falls','Blue Hole',`Dunn's River Falls`],a:3},
+{q:`What Jamaican term refers to someone from Jamaica?`,o:['Rasta','Yardie','Duppy','Bredren'],a:1},
+{q:`Koffee's breakthrough hit Toast won which major award?`,o:['BET Award','Grammy Award','MOBO Award','Billboard Award'],a:0},
+{q:`What is the name of the Jamaican patois term for a community street dance?`,o:['Session','Bashment','Rave','Juggling'],a:1},
+{q:`Which Jamaican city is closest to the Blue Mountains?`,o:['Montego Bay','Kingston','Ocho Rios','Mandeville'],a:1},
+{q:`Irie vibes is most associated with which Jamaican concept?`,o:['Feeling good and at peace','Going to a party','Being angry','Running fast'],a:0},
+{q:`Which Jamaican singer is known as the Gyptian?`,o:['Windel Edwards','Norman Grandison','Everton Williams','Desmond Brown'],a:1},
+{q:`What does bashment mean in Jamaican slang?`,o:['A fight','A big party','A bad person','A dance style'],a:1},
+{q:`Which Jamaican parish is home to the famous Boston Jerk Centre?`,o:['St. Elizabeth','St. Ann','Portland','Manchester'],a:2},
+{q:`Which Jamaican artist released the hit "Bruk It Down"?`,o:['Mr Vegas','Beenie Man','Sean Paul','Elephant Man'],a:3},
+{q:`What is the name of the famous Jamaican sprint relay team?`,o:['The Bolts','The Bullets','The Cheetahs','Racers Track Club'],a:3},
+{q:`Which Jamaican-born sprinter represented Canada at the Olympics?`,o:['Ben Johnson','Donovan Bailey','Andre De Grasse','Bruny Surin'],a:0}
+{q:,o:["St. Ann","St. Elizabeth","Westmoreland","Portland"],a:0}
 ];
+
 
 var LT=['A','B','C','D'];
 var TOTAL=5,TSECS=10;
