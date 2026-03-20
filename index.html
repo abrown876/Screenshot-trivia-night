@@ -710,7 +710,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const ROOM='SQNX';
 const ROOM=(function(){
   var p=new URLSearchParams(window.location.search).get('room');
   if(p&&p.length>=2){try{localStorage.setItem('sqn_room',p.toUpperCase());}catch(e){}return p.toUpperCase();}
@@ -1347,7 +1346,15 @@ showScreen = function(name) {
     var el=document.getElementById('scr-'+s);
     if(el) el.classList.toggle('on', s===name);
   });
-  if(name!=='entrance'&&name!=='lb') _origShowScreen(name);
+  if(name==='entrance'||name==='lb'||name==='practice'){
+    // Hide all base screens when showing entrance/lb/practice
+    ['code','register','wait','error','ready','question','feedback','break','results'].forEach(function(s){
+      var el=document.getElementById('scr-'+s);
+      if(el) el.classList.remove('on');
+    });
+  } else {
+    _origShowScreen(name);
+  }
   // header visibility
   var inGame=['question','feedback','break','results','ready'].includes(name);
   var inJoin=['code','register','wait'].includes(name);
@@ -1411,8 +1418,27 @@ init = function(){
 
   // Existing session — rejoin
   if(hasSession){
-    document.getElementById('scr-entrance').classList.remove('on');
-    _origInit();
+    // Validate session — if game was reset, clear it and show entrance
+    var sess=null;
+    try{sess=JSON.parse(sessionStorage.getItem('trivia_team')||localStorage.getItem('trivia_session'));}catch(e){}
+    if(sess&&sess.roomCode&&db){
+      db.ref('games/'+sess.roomCode+'/host/command').once('value',function(snap){
+        var cmd=snap.val();
+        var wasReset=cmd&&(cmd.action==='reset'||cmd.action==='end');
+        if(wasReset){
+          // Game was reset — clear session, show entrance
+          try{sessionStorage.clear();localStorage.removeItem('trivia_session');localStorage.removeItem('trivia_team');}catch(e){}
+          document.getElementById('scr-entrance').classList.add('on');
+          setupCodeInputs();
+        } else {
+          document.getElementById('scr-entrance').classList.remove('on');
+          _origInit();
+        }
+      });
+    } else {
+      document.getElementById('scr-entrance').classList.remove('on');
+      _origInit();
+    }
     return;
   }
 
