@@ -508,59 +508,51 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
   authDomain:"screenshot-trivia-night.firebaseapp.com",
   databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
-  projectId:"screenshot-trivia-night",
-  storageBucket:"screenshot-trivia-night.firebasestorage.app",
-  messagingSenderId:"482758352954",
-  appId:"1:482758352954:web:832d1cba008bc0b789d503"
+  projectId:"screenshot-trivia-night"
 });
 const db = firebase.database();
-const dbSet = (p,v) => db.ref(p).set(v).catch(console.error);
-const dbGet = (p,cb) => db.ref(p).once('value').then(s=>cb(s.val())).catch(()=>cb(null));
-const dbOn  = (p,cb) => db.ref(p).on('value', s=>cb(s.val()));
-const dbOff = p      => db.ref(p).off();
 
-// CONFIG
-const ROOM='SQNX', TIMER_SECS=10, FEEDBACK_MS=3500, COUNTDOWN=3, Q_PER_ROUND=5, ROUNDS=3;
+const QUESTIONS = [
+  {cat:'m',lb:'Music',   q:'Which Jamaican artist is known as "The Gong"?',                        o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],                   a:1},
+  {cat:'m',lb:'Music',   q:"Sean Paul's Temperature peaked at #1 in how many countries?",          o:['3','5','8','12'],                                                         a:2},
+  {cat:'x',lb:'Culture', q:"What is Jamaica's most famous carnival street party?",                 o:['Sumfest','Bacchanal','Rebel Salute','Sting'],                             a:1},
+  {cat:'m',lb:'Music',   q:"Which artist featured on Beyoncé's Black Is King?",                    o:['Koffee','Spice','Govana','Chronixx'],                                     a:0},
+  {cat:'x',lb:'Culture', q:'What Kingston event is the biggest dancehall concert?',                o:['Sumfest','Fully Loaded','Sting','Reggae Month'],                          a:2},
+  {cat:'m',lb:'Music',   q:"Koffee's 2024 Grammy-winning album?",                                  o:['Gifted','Rapture','West Indies','Sink or Swim'],                          a:0},
+  {cat:'x',lb:'Culture', q:'Who is the "Queen of the Dancehall"?',                                 o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],                             a:2},
+  {cat:'f',lb:'Food',    q:"What is Jamaica's national dish?",                                     o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],           a:2},
+  {cat:'m',lb:'Music',   q:'Vybz Kartel created which popular dance move?',                        o:['Whining','Daggering','Gully Creepa','Bruk Out'],                          a:2},
+  {cat:'x',lb:'Culture', q:'Which film starred Paul Campbell and became a cult classic?',          o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],                 a:2},
+  {cat:'m',lb:'Music',   q:'Which Shaggy hit became one of the best-selling singles of all time?', o:['Angel','Boombastic',"It Wasn't Me",'Oh Carolina'],                        a:2},
+  {cat:'x',lb:'Culture', q:'What shoe brand is iconic in dancehall culture?',                      o:['Timberland','Clarks Originals','Nike','Adidas'],                          a:1},
+  {cat:'m',lb:'Music',   q:'Who holds the most Reggae Grammy wins?',                               o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],                    a:3},
+  {cat:'x',lb:'Culture', q:'"Dutty Wine" refers to what?',                                         o:['Bad wine','A dance move','A cocktail','A street party'],                  a:1},
+  {cat:'f',lb:'Food',    q:'Which red flower drink is a Jamaican Christmas staple?',               o:['Irish Moss','Roots Tonic','Sorrel Punch','Sky Juice'],                    a:2}
+];
+
+const TIMER_SECS=10, FEEDBACK_MS=4000, COUNTDOWN=3, Q_PER_ROUND=5, ROUNDS=3;
 const LETTERS=['A','B','C','D'], MEDALS=['🥇','🥈','🥉'];
 const GOOD=['Nailed it!','On fire! 🔥','Yes!','Perfect!','Keep going!'];
 const BAD=['Next one!','Stay sharp!','You got this!','Keep focus!'];
-const QUESTIONS = [
-  {cat:'m',lb:'Music',   q:`Which Jamaican artist is known as "The Gong"?`,                                       o:['Buju Banton','Bob Marley','Bounty Killer','Beenie Man'],                   a:1},
-  {cat:'m',lb:'Music',   q:`Sean Paul's "Temperature" peaked at #1 in how many countries?`,                      o:['3','5','8','12'],                                                         a:2},
-  {cat:'x',lb:'Culture', q:`What is the name of Jamaica's most famous carnival street party?`,                    o:['Sumfest','Bacchanal','Rebel Salute','Sting'],                             a:1},
-  {cat:'m',lb:'Music',   q:`Which Jamaican artist featured on Beyoncé's "Black Is King" visual album?`,           o:['Koffee','Spice','Govana','Chronixx'],                                     a:0},
-  {cat:'x',lb:'Culture', q:`What annual Kingston event is the biggest dancehall concert in the world?`,           o:['Sumfest','Fully Loaded','Sting','Reggae Month'],                          a:2},
-  {cat:'m',lb:'Music',   q:`Koffee won the Grammy for Best Reggae Album in 2024 with which project?`,             o:['Gifted','Rapture','West Indies','Sink or Swim'],                          a:0},
-  {cat:'x',lb:'Culture', q:`Which female dancehall artist is known as the "Queen of the Dancehall"?`,             o:['Lisa Hanna','Tessanne Chin','Spice','Ce Ce'],                             a:2},
-  {cat:'f',lb:'Food',    q:`What is Jamaica's national dish?`,                                                    o:['Jerk Chicken','Oxtail Stew','Ackee and Saltfish','Curry Goat'],           a:2},
-  {cat:'m',lb:'Music',   q:`Vybz Kartel created which popular dance move in the early 2010s?`,                    o:['Whining','Daggering','Gully Creepa','Bruk Out'],                          a:2},
-  {cat:'x',lb:'Culture', q:`Which Kingston street life film starred Paul Campbell and became a cult classic?`,    o:['Third World Cop','Dancehall Queen','Shottas','Rude Boy'],                  a:2},
-  {cat:'m',lb:'Music',   q:`Which Shaggy hit featuring RikRok became one of the best-selling singles of all time?`, o:['Angel','Boombastic',"It Wasn't Me",'Oh Carolina'],                    a:2},
-  {cat:'x',lb:'Culture', q:`What shoe brand is iconic in dancehall culture and called "Clarks" by fans?`,          o:['Timberland','Clarks Originals','Nike','Adidas'],                          a:1},
-  {cat:'m',lb:'Music',   q:`Which Jamaican artiste holds the record for most Reggae Grammy wins?`,                 o:['Beenie Man','Shaggy','Burning Spear','Damian Marley'],                    a:3},
-  {cat:'x',lb:'Culture', q:`The Jamaican phrase "Dutty Wine" refers to what?`,                                    o:['Bad wine','A popular dance move','A cocktail','A street party'],          a:1},
-  {cat:'f',lb:'Food',    q:`Which red flower drink is a Jamaican Christmas staple?`,                              o:['Irish Moss','Roots Tonic','Sorrel Punch','Sky Juice'],                    a:2}
-];
 
-// STATE
-let playerName='', emailKey='', round=1, qIndex=0, totalScore=0;
+let playerName='', playerEmail='', scoreKey='', round=1, qIndex=0, totalScore=0;
 let answered=false, tmr=null, timerVal=TIMER_SECS, startTime=0;
 let roundCorrect=[0,0,0], roundPts=[0,0,0], roundBonus=[0,0,0], roundAnswers=[[],[],[]];
-let lbListener=false;
 
 const $=id=>document.getElementById(id);
 const SCREENS=['register','ready','question','feedback','break','results','leaderboard'];
 
 function showScreen(name) {
   SCREENS.forEach(s=>{ const el=$('scr-'+s); if(el) el.classList.toggle('on',s===name); });
-  document.querySelector('header.hdr').style.display = name==='register'?'none':'flex';
   const inGame=['question','feedback','break','results','ready'].includes(name);
-  $('hdr-score').style.display = ['question','feedback','break','results'].includes(name)?'block':'none';
+  $('hdr-score').style.display = inGame?'block':'none';
   $('hdr-score').textContent   = totalScore;
 }
 
@@ -569,7 +561,6 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// REGISTER
 function doStart() {
   const email=$('inp-email').value.trim().toLowerCase();
   const name=$('inp-team').value.trim();
@@ -577,60 +568,41 @@ function doStart() {
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Enter a valid email';err.classList.add('show');return;}
   if(!name||name.length<2){err.textContent='Enter your team name';err.classList.add('show');return;}
   err.classList.remove('show');
-  playerName=name; emailKey=email.replace(/[.#$[\]]/g,'_');
+  playerName=name; playerEmail=email;
+  scoreKey=email.replace(/[.#$[\]]/g,'_');
   round=1;qIndex=0;totalScore=0;answered=false;
   roundCorrect=[0,0,0];roundPts=[0,0,0];roundBonus=[0,0,0];roundAnswers=[[],[],[]];
   clearInterval(tmr);
   $('hdr-team').textContent=playerName;
-  const teamData={name:playerName,email,emailKey,players:1,status:'waiting',room:ROOM,joinedAt:Date.now()};
-  dbSet('teams/'+emailKey, teamData);
-  dbSet('live_scores/'+emailKey, {team:playerName,score:0,r0:0,r1:0,r2:0,players:1});
-  goToWaiting();
+  startCountdown(1);
 }
 
 $('inp-email').addEventListener('keydown',e=>{if(e.key==='Enter')$('inp-team').focus();});
 $('inp-team').addEventListener('keydown', e=>{if(e.key==='Enter')doStart();});
 
-// WAITING — listen for host command
-function goToWaiting() {
-  dbOn('host/command', cmd=>{
-    if(!cmd) return;
-    if(cmd.action==='question'||cmd.action==='start') {
-      dbOff('host/command');
-      dbGet('game/current', cur=>{
-        round  = cur?cur.round||1:1;
-        qIndex = cur?cur.index||0:0;
-        startCountdown(round);
-      });
-    } else if(cmd.action==='reset') {
-    }
-  });
-}
-
-// COUNTDOWN
 function startCountdown(r) {
   round=r;
   $('ready-round').textContent='Round '+r+' of '+ROUNDS;
   let c=COUNTDOWN; $('ready-count').textContent=c;
   showScreen('ready');
-  const iv=setInterval(()=>{c--;if(c>0)$('ready-count').textContent=c;else{clearInterval(iv);loadQuestion();}},1000);
+  const iv=setInterval(()=>{ c--; if(c>0) $('ready-count').textContent=c; else{clearInterval(iv);loadQuestion();} },1000);
 }
 
-// QUESTION
+function getQI() { return (round-1)*Q_PER_ROUND+qIndex; }
+
 function loadQuestion() {
-  const q=QUESTIONS[((round-1)*Q_PER_ROUND)+qIndex];
-  if(!q){showResults();return;}
-  answered=false;timerVal=TIMER_SECS;startTime=Date.now();
+  const q=QUESTIONS[getQI()];
+  answered=false; timerVal=TIMER_SECS; startTime=Date.now();
   $('q-counter').textContent='Q'+(qIndex+1)+' / '+Q_PER_ROUND;
   $('q-cat').textContent=q.lb; $('q-cat').className='q-cat cat-'+q.cat;
   $('q-text').textContent=q.q;
   $('timer-num').textContent=timerVal; $('timer-num').className='timer-num';
-  $('timer-wrap').className='timer-wrap'; $('q-progress-fill').style.width='100%';
+  $('timer-wrap').className='timer-wrap';
+  $('q-progress-fill').style.width='100%';
   $('opts').innerHTML=q.o.map((opt,i)=>`<button class="opt" onclick="onAnswer(${i})"><span class="opt-letter">${LETTERS[i]}</span>${opt}</button>`).join('');
   showScreen('question'); runTimer();
 }
 
-// TIMER
 function runTimer() {
   clearInterval(tmr);
   tmr=setInterval(()=>{
@@ -643,21 +615,13 @@ function runTimer() {
   },100);
 }
 
-// ANSWER
 function onAnswer(sel) {
   if(answered)return;
-  answered=true;clearInterval(tmr);
-  const q=QUESTIONS[((round-1)*Q_PER_ROUND)+qIndex];
-  const correct=sel===q.a,pts=correct?1:0;
+  answered=true; clearInterval(tmr);
+  const q=QUESTIONS[getQI()]; const correct=sel===q.a; const pts=correct?1:0;
   if(correct)roundCorrect[round-1]++;
-  totalScore+=pts;roundPts[round-1]+=pts;
+  totalScore+=pts; roundPts[round-1]+=pts;
   roundAnswers[round-1].push({correct,pts,q:q.q,ans:q.o[q.a]});
-  // Write to Firebase
-  dbSet('teams/'+emailKey+'/answers/r'+(round-1)+'q'+qIndex,{correct,pts});
-  dbSet('teams/'+emailKey+'/total',totalScore);
-  const live={team:playerName,score:totalScore,players:1};
-  live['r'+(round-1)]=roundPts[round-1];
-  dbSet('live_scores/'+emailKey,live);
   document.querySelectorAll('.opt').forEach((btn,i)=>{
     btn.classList.add('locked');
     if(i===q.a)btn.classList.add('correct');
@@ -667,79 +631,46 @@ function onAnswer(sel) {
 }
 
 function onTimeout() {
-  if(answered)return;answered=true;
-  const q=QUESTIONS[((round-1)*Q_PER_ROUND)+qIndex];
+  if(answered)return; answered=true;
+  const q=QUESTIONS[getQI()];
   roundAnswers[round-1].push({correct:false,pts:0,q:q.q,ans:q.o[q.a]});
   document.querySelectorAll('.opt').forEach((btn,i)=>{btn.classList.add('locked');if(i===q.a)btn.classList.add('correct');});
   setTimeout(()=>showFeedback(false,0,true),400);
 }
 
-// FEEDBACK
 function showFeedback(correct,pts,timeout) {
-  $('fb-icon').textContent  =correct?'✅':(timeout?'⏰':'❌');
-  $('fb-title').textContent =correct?'Correct!':(timeout?"Time's Up!":'Wrong');
-  $('fb-title').style.color =correct?'var(--green)':'var(--red)';
-  $('fb-sub').textContent   =correct?GOOD[Math.floor(Math.random()*GOOD.length)]:BAD[Math.floor(Math.random()*BAD.length)];
+  $('fb-icon').textContent=correct?'✅':(timeout?'⏰':'❌');
+  $('fb-title').textContent=correct?'Correct!':(timeout?"Time's Up!":'Wrong');
+  $('fb-title').style.color=correct?'var(--green)':'var(--red)';
+  $('fb-sub').textContent=correct?GOOD[Math.floor(Math.random()*GOOD.length)]:BAD[Math.floor(Math.random()*BAD.length)];
   $('fb-points').textContent=correct?'+1':'+0';
-  $('fb-points').className  ='fb-points'+(correct?'':' zero');
+  $('fb-points').className='fb-points'+(correct?'':' zero');
   showScreen('feedback');
   setTimeout(advance,FEEDBACK_MS);
 }
 
-// ADVANCE
-function advance() {
-  qIndex++;
-  if(qIndex>=Q_PER_ROUND)showRoundBreak();
-  else loadQuestion();
-}
+function advance() { qIndex++; if(qIndex>=Q_PER_ROUND)showRoundBreak(); else loadQuestion(); }
 
-// ROUND BREAK
 function showRoundBreak() {
-  const correct=roundCorrect[round-1],pts=roundPts[round-1];
+  const correct=roundCorrect[round-1], pts=roundPts[round-1];
   const bonus=correct>=Q_PER_ROUND?5:0;
   if(bonus){roundBonus[round-1]=bonus;totalScore+=bonus;}
   $('break-badge').textContent='ROUND '+round+' COMPLETE';
   $('break-title').textContent=bonus?'Perfect Round! 🔥':(correct>=3?'Nice work!':'Keep going!');
   $('br-correct').textContent=correct+'/'+Q_PER_ROUND;
-  $('br-pts').textContent=pts;
-  $('br-bonus').textContent=bonus?'+'+bonus:'—';
+  $('br-pts').textContent=pts; $('br-bonus').textContent=bonus?'+'+bonus:'—';
+  $('btn-next').textContent=round<ROUNDS?'Continue to Round '+(round+1)+' →':'See Final Results →';
   let html='';
   roundAnswers[round-1].forEach(a=>{
     const qt=a.q.length>42?a.q.slice(0,42)+'…':a.q;
     html+=`<div class="break-answer"><span class="break-answer-icon">${a.correct?'✅':'❌'}</span><span class="break-answer-q">${qt}</span><span class="break-answer-pts ${a.correct?'green':'red'}">${a.correct?'+1':'0'}</span></div>`;
   });
   $('break-answers-list').innerHTML=html;
-  // Write round to Firebase
-  dbSet('teams/'+emailKey+'/rounds/'+round,{correct,bonus,total:pts+bonus});
-  const live={team:playerName,score:totalScore,players:1};
-  for(let i=0;i<ROUNDS;i++)live['r'+i]=roundPts[i]+(roundBonus[i]||0);
-  dbSet('live_scores/'+emailKey,live);
-  // Listen for host's round_end command to advance
-  if(round<ROUNDS){
-    $('btn-next').style.display='none';
-    dbOn('host/command',cmd=>{
-      if(!cmd)return;
-      if(cmd.action==='round_end'||cmd.action==='question'){
-        dbOff('host/command');
-        if(round>=ROUNDS)showResults();
-        else{round++;qIndex=0;startCountdown(round);}
-      } else if(cmd.action==='end'){
-        dbOff('host/command');showResults();
-      }
-    });
-  } else {
-    $('btn-next').style.display='block';
-    $('btn-next').textContent='See Final Results →';
-  }
   showScreen('break');
 }
 
-function startNextRound() {
-  if(round<ROUNDS){round++;qIndex=0;startCountdown(round);}
-  else showResults();
-}
+function startNextRound() { if(round<ROUNDS){round++;qIndex=0;startCountdown(round);}else showResults(); }
 
-// RESULTS
 function grade(s) {
   if(s>=28)return{trophy:'🏆',label:'Legendary! Jamaica would crown you'};
   if(s>=22)return{trophy:'🔥',label:'Fire! Jamaica would be proud'};
@@ -750,63 +681,37 @@ function grade(s) {
 
 function showResults() {
   const g=grade(totalScore);
-  $('res-trophy').textContent=g.trophy;
-  $('res-score').textContent=totalScore;
-  $('res-grade').textContent=g.label;
+  $('res-trophy').textContent=g.trophy; $('res-score').textContent=totalScore; $('res-grade').textContent=g.label;
   $('res-rounds').innerHTML=Array.from({length:ROUNDS},(_,i)=>{
-    const rp=roundPts[i]+(roundBonus[i]||0),perf=roundBonus[i]?'<span class="results-round-perfect"> ⭐</span>':'';
+    const rp=roundPts[i]+(roundBonus[i]||0), perf=roundBonus[i]?'<span class="results-round-perfect"> ⭐</span>':'';
     return `<div class="results-round"><span class="results-round-name">Round ${i+1}</span><span class="results-round-score">${rp} pts${perf}</span></div>`;
   }).join('');
-  dbSet('teams/'+emailKey+'/status','finished');
-  dbSet('teams/'+emailKey+'/completedAt',Date.now());
   showScreen('results');
+  db.ref('scores/'+scoreKey).set({name:playerName,email:playerEmail,score:totalScore,ts:Date.now()});
 }
 
-// LEADERBOARD — reads same live_scores path as leaderboard.html
-function showLB() {
-  showScreen('leaderboard');
-  $('lb-list').innerHTML='<div class="lb-empty">Loading…</div>';
-  if(!lbListener){
-    lbListener=true;
-    dbOn('live_scores',data=>renderLB(data));
-  }
-}
-
-function renderLB(data) {
-  if(!data){$('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';return;}
-  const entries=Object.entries(data)
-    .map(([k,v])=>typeof v==='object'?{key:k,...v}:{key:k,team:k,score:0})
-    .filter(e=>e.team).sort((a,b)=>b.score-a.score);
-  if(!entries.length){$('lb-list').innerHTML='<div class="lb-empty">No scores yet</div>';return;}
-  $('lb-list').innerHTML=entries.map((e,i)=>{
-    const isYou=e.key===emailKey,cls=['','first','second','third'][i]||'';
-    const medal=MEDALS[i]||`<span style="font-size:11px">#${i+1}</span>`;
-    let pills='';
-    if(e.r0>0)pills+=`<span class="rpill">R1 ${e.r0}</span>`;
-    if(e.r1>0)pills+=`<span class="rpill">R2 ${e.r1}</span>`;
-    if(e.r2>0)pills+=`<span class="rpill">R3 ${e.r2}</span>`;
-    if(!pills)pills='<span style="font-size:11px;color:var(--text-muted)">answering…</span>';
-    return `<div class="lb-row ${cls}${isYou?' lb-you':''}">
-      <div class="lb-rank">${medal}</div>
-      <div class="lb-info"><div class="lb-name">${e.team}${isYou?' (you)':''}</div><div class="lb-meta">${pills}</div></div>
-      <div><div class="lb-score">${e.score||0}</div><div class="lb-score-den">/30</div></div>
-    </div>`;
-  }).join('');
-}
-
-// SHARE / PLAY AGAIN
 function shareResult() {
   const url=window.location.origin+window.location.pathname;
-  window.open('https://wa.me/?text='+encodeURIComponent(`🎵 I scored *${totalScore}/30* on Screenshot Quiz Night!\nCan you beat me? 👇\n${url}`),'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(`🎵 I scored *${totalScore}/30* on Screenshot Quiz Night — Jamaica Edition!\n\nCan you beat me? 👇\n${url}`),'_blank');
+}
+
+function showLeaderboard() {
+  showScreen('leaderboard');
+  $('lb-list').innerHTML='<div class="lb-empty">Loading…</div>';
+  db.ref('scores').orderByChild('score').limitToLast(20).once('value',snap=>{
+    const entries=Object.entries(snap.val()||{}).map(([k,v])=>({key:k,name:v.name,score:v.score})).sort((a,b)=>b.score-a.score);
+    if(!entries.length){$('lb-list').innerHTML='<div class="lb-empty">No scores yet — you could be first!</div>';return;}
+    $('lb-list').innerHTML=entries.map((e,i)=>{
+      const cls=['','first','second','third'][i]||'', medal=MEDALS[i]||`<span style="font-size:11px">#${i+1}</span>`;
+      return `<div class="lb-row ${cls}${e.key===scoreKey?' lb-you':''}"><div class="lb-rank">${medal}</div><div class="lb-info"><div class="lb-name">${e.name}${e.key===scoreKey?' (you)':''}</div></div><div><div class="lb-score">${e.score}</div><div class="lb-score-den">/30</div></div></div>`;
+    }).join('');
+  });
 }
 
 function playAgain() {
-  if(lbListener){db.ref('live_scores').off();lbListener=false;}
-  $('inp-team').value=playerName; $('inp-email').value='';
+  $('inp-email').value=playerEmail; $('inp-team').value=playerName;
   showScreen('register');
 }
-
-document.querySelector('header.hdr').style.display='none';
 </script>
 </body>
 </html>
