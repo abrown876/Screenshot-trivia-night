@@ -280,13 +280,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
   <div class="reg-body">
     <div class="reg-card">
-      <div class="reg-field" id="room-field-wrap" style="display:none">
+      <div class="reg-field" id="room-field-wrap">
         <label class="reg-label">Game Room Code</label>
-        <div class="room-locked" id="room-display" style="display:flex">
+        <div class="room-locked" id="room-display" style="display:none">
           <span class="room-locked-icon">🔐</span>
-          <span id="room-display-code">SQNX</span>
+          <span id="room-display-code">----</span>
         </div>
-        <input class="reg-input room-field" id="reg-room" type="text" maxlength="6" value="SQNX" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text">
+        <input class="reg-input room-field" id="reg-room" type="text" maxlength="6" placeholder="e.g. ABCD" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text">
       </div>
       <div class="reg-field">
         <label class="reg-label">Your Email</label>
@@ -522,7 +522,7 @@ const dbPush = (p,v) => db && db.ref(p).push(v);
 // ═══════════════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════
-let roomCode = 'SQNX';
+let roomCode = '';
 let emailKey = '';
 let teamName = '';
 
@@ -567,7 +567,7 @@ function init() {
   }
   
   const params = new URLSearchParams(window.location.search);
-  const urlRoom = params.get('room') || params.get('r') || 'SQNX';
+  const urlRoom = (params.get('room') || params.get('r') || '').toUpperCase();
   
   // Helper: wipe any saved session and drop back to registration
   function clearSessionAndRegister(prefilledRoom) {
