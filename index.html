@@ -406,7 +406,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="error-icon">🎮</div>
     <h2 class="error-title">Something went wrong</h2>
     <p class="error-msg">This game session has ended or isn't available.</p>
-    <button class="btn btn-purple" style="max-width:220px;margin:0 auto" onclick="showScreen('code')">← Back to Join</button>
+    <button class="btn btn-purple" style="max-width:220px;margin:0 auto" onclick="showScreen('entrance')">← Back to Start</button>
   </div>
 </div>
 
@@ -727,7 +727,7 @@ document.querySelectorAll('.player-btn').forEach(btn => {
   };
 });
 
-$('btn-back').onclick = () => showScreen('code');
+$('btn-back').onclick = () => showScreen('entrance');
 
 $('btn-register').onclick = () => {
   const email = $('inp-email').value.trim();
