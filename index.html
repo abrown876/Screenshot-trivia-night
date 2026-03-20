@@ -960,24 +960,20 @@ function goToWaiting(name) {
   $('hdr-team').textContent = name;
   $('hdr-room').style.display='none';
   showScreen('wait');
-  // Listen for host launching first question
+  // Listen for host commands
   dbOn('games/'+roomCode+'/host/command', function(cmd){
     if(!cmd) return;
-    if(cmd.action==='question'||cmd.action==='playing'){
+    if(cmd.action==='start'){
+      // Host hit Start Game — show get ready countdown
       dbOff('games/'+roomCode+'/host/command');
-      // Load the question from game/current
+      startRound(1);
+    } else if(cmd.action==='question'||cmd.action==='playing'){
+      dbOff('games/'+roomCode+'/host/command');
       dbGet('games/'+roomCode+'/game/current', function(cur){
-        if(cur){
-          round=cur.round||1;
-          qIndex=cur.index||0;
-          showGetReady();
-        } else {
-          startRound(1);
-        }
+        if(cur){ round=cur.round||1; qIndex=cur.index||0; showGetReady(); }
+        else { startRound(1); }
       });
-    }
-    if(cmd.action==='reset'){
-      // Game was reset while waiting — stay on waiting screen
+    } else if(cmd.action==='reset'){
       $('wait-team').textContent = name;
     }
   });
