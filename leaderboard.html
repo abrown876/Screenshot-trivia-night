@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\\\<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -262,13 +262,16 @@ body::before{content:'';position:fixed;inset:0;background:
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
-  authDomain:"screenshot-trivia-night.firebaseapp.com",
-  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
-  projectId:"screenshot-trivia-night"
-});
-const db = firebase.database();
+let db = null;
+try {
+  firebase.initializeApp({
+    apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+    authDomain:"screenshot-trivia-night.firebaseapp.com",
+    databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+    projectId:"screenshot-trivia-night"
+  });
+  db = firebase.database();
+} catch(e) { console.warn('Firebase:', e.message); }
 const MEDALS = ['🥇','🥈','🥉'];
 const CLS    = ['gold','silver','bronze'];
 
