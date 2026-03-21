@@ -63,7 +63,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .entrance{flex:1;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .entrance-hero{
   background:linear-gradient(160deg,rgba(124,110,246,.22) 0%,rgba(255,92,138,.12) 100%);
-  padding:2rem 1.25rem 1.5rem;text-align:center;position:relative;overflow:hidden;flex-shrink:0
+  padding:2rem 1.25rem 1.5rem;text-align:center;position:relative;overflow:visible;flex-shrink:0
 }
 .entrance-hero::before{
   content:'';position:absolute;inset:0;
@@ -72,7 +72,7 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 .entrance-hero-inner{position:relative;z-index:1}
 .entrance-title{
-  font-weight:900;font-size:2.2rem;line-height:1;
+  font-weight:900;font-size:2.2rem;line-height:1.15;padding-bottom:.1em;
   background:linear-gradient(135deg,#fff 0%,#C4BEFF 45%,#FF5C8A 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   margin:.5rem 0 .3rem
