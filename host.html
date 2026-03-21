@@ -448,13 +448,16 @@ body::before{content:'';position:fixed;inset:0;
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
-  authDomain:"screenshot-trivia-night.firebaseapp.com",
-  databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
-  projectId:"screenshot-trivia-night"
-});
-const db = firebase.database();
+let db = null;
+try {
+  firebase.initializeApp({
+    apiKey:"AIzaSyBoxCE9DY4VCHiq8beeaGmX5237KiPuFWA",
+    authDomain:"screenshot-trivia-night.firebaseapp.com",
+    databaseURL:"https://screenshot-trivia-night-default-rtdb.firebaseio.com",
+    projectId:"screenshot-trivia-night"
+  });
+  db = firebase.database();
+} catch(e) { console.warn('Firebase:', e.message); }
 
 // ── QUESTIONS DATA ──────────────────────────────────────────────────────────
 const QUESTIONS = [
@@ -770,13 +773,11 @@ function copyLink() {
 function exportCSV() {
   const entries = Object.values(allScores).sort((a,b)=>b.score-a.score);
   if(!entries.length) { showToast('No scores to export', 'warning'); return; }
-  const header = 'Rank,Name,Email,Score,Max,Time
-';
+  const header = 'Rank,Name,Email,Score,Max,Time\n';
   const rows = entries.map((e,i) => {
     const ts = e.ts ? new Date(e.ts).toLocaleString() : '';
     return `${i+1},"${e.name}","${e.email||''},${e.score},30,"${ts}"`;
-  }).join('
-');
+  }).join('\n');
   const blob = new Blob([header+rows], {type:'text/csv'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
