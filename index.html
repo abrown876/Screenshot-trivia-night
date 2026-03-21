@@ -102,6 +102,7 @@ body::before{content:'';position:fixed;inset:0;
 .opt{width:100%;text-align:left;padding:1.1rem 1.1rem;border-radius:14px;border:2px solid var(--border);background:var(--surface);font-size:17px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.75rem;cursor:pointer;font-family:var(--font-display);transition:border-color .12s,background .12s,transform .1s;touch-action:manipulation;min-height:72px}
 .opt:active:not(.locked){transform:scale(.98)}
 .opt:hover:not(.locked){border-color:rgba(124,110,246,.4);background:var(--surface2)}
+.opt.selected{border-color:var(--purple)!important;background:rgba(124,110,246,.18)!important;transform:scale(.99)}
 .opt.locked{pointer-events:none}
 .opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;animation:correctBounce .4s ease forwards}
 .opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;animation:wrongShake .4s ease forwards}
@@ -331,6 +332,8 @@ body::before{content:'';position:fixed;inset:0;
 
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 let db = null;
 try {
@@ -532,15 +535,22 @@ function onAnswer(sel){
   if(answered)return;
   answered=true; clearInterval(tmr);
   const q=activeQ[qi()]; const ok=sel===q.a;
+  // Highlight selected immediately so tap feels responsive
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    if(i===sel) b.classList.add('selected');
+  });
   if(ok)rCorrect[round-1]++;
   const pts=ok?1:0; total+=pts; rPts[round-1]+=pts;
   rAns[round-1].push({ok,pts,q:q.q,ans:q.o[q.a]});
-  document.querySelectorAll('.opt').forEach((b,i)=>{
-    b.classList.add('locked');
-    if(i===q.a)b.classList.add('correct');
-    else if(i===sel&&!ok)b.classList.add('wrong');
-  });
-  setTimeout(()=>showFeedback(ok,pts,false),400);
+  setTimeout(()=>{
+    document.querySelectorAll('.opt').forEach((b,i)=>{
+      b.classList.add('locked');
+      b.classList.remove('selected');
+      if(i===q.a)b.classList.add('correct');
+      else if(i===sel&&!ok)b.classList.add('wrong');
+    });
+    showFeedback(ok,pts,false);
+  },400);
 }
 
 function onTimeout(){
@@ -621,10 +631,13 @@ function shareResult(){
 function showLeaderboard(){
   showScreen('leaderboard');
   $('lb-list').innerHTML='<div class="lb-empty">Loading…</div>';
-  if(!db){$('lb-list').innerHTML='<div class="lb-empty">Leaderboard unavailable offline</div>';return;}
-  db.ref('scores').orderByChild('score').limitToLast(20).once('value',snap=>{
+  if(!db){
+    $('lb-list').innerHTML='<div class="lb-empty">⚠️ Leaderboard requires an internet connection</div>';
+    return;
+  }
+  db.ref('scores').orderByChild('score').limitToLast(50).once('value',snap=>{
     const rows=Object.entries(snap.val()||{})
-      .map(([k,v])=>{return{key:k,name:v.name,score:v.score};})
+      .map(([k,v])=>{return{key:k,name:v.name,score:v.score,ts:v.ts};})
       .sort((a,b)=>b.score-a.score);
     if(!rows.length){$('lb-list').innerHTML='<div class="lb-empty">No scores yet — be first!</div>';return;}
     $('lb-list').innerHTML=rows.map((e,i)=>{
