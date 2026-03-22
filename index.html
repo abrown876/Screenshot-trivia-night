@@ -152,6 +152,18 @@ body::before{content:'';position:fixed;inset:0;
 .results-breakdown{background:var(--surface);border-radius:var(--r);padding:1rem;border:1px solid var(--border);margin-bottom:.75rem}
 .results-breakdown-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
 .results-round{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border2)}
+.review-round{margin-bottom:.85rem}
+.review-round-hdr{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0 .5rem;border-bottom:2px solid var(--border);margin-bottom:.4rem}
+.review-round-name{font-weight:800;font-size:13px;color:var(--text)}
+.review-item{padding:.45rem .5rem;border-radius:8px;margin-bottom:.3rem}
+.review-item-top{display:flex;align-items:flex-start;gap:.4rem}
+.review-ok{background:rgba(61,220,132,.06)}
+.review-wrong{background:rgba(255,75,92,.06)}
+.review-icon{font-size:.9rem;flex-shrink:0;margin-top:1px}
+.review-q{flex:1;font-size:12px;color:var(--text-dim);line-height:1.4}
+.review-pts{font-family:var(--font-mono);font-weight:700;font-size:12px;flex-shrink:0}
+.review-pts.green{color:var(--green)}.review-pts.red{color:var(--red)}
+.review-correct-ans{font-size:11px;color:var(--green);margin:.2rem 0 0 1.3rem;font-weight:600}
 .results-round:last-child{border-bottom:none}
 .results-round-name{font-weight:600;color:var(--text-dim);font-size:13px}
 .results-round-score{font-family:var(--font-mono);font-weight:800;color:var(--purple);font-size:13px}
@@ -270,6 +282,7 @@ body::before{content:'';position:fixed;inset:0;
     <h2 class="fb-title" id="fb-title">Correct!</h2>
     <p class="fb-sub" id="fb-sub">Nailed it!</p>
     <div class="fb-points ok" id="fb-points">+1</div>
+    <button class="btn btn-purple" id="fb-next-btn" onclick="advance()" style="display:none;margin-top:1.5rem;max-width:240px">Next →</button>
   </div>
 </div>
 
@@ -506,6 +519,7 @@ function startCountdown(r){
 function qi(){return(round-1)*QPR+qIdx;}
 
 function loadQ(){
+  const nb=$('fb-next-btn');if(nb)nb.style.display='none';
   const q=activeQ[qi()];
   answered=false; tStart=Date.now();
   $('q-counter').textContent='Q'+(qIdx+1)+' / '+QPR;
@@ -533,7 +547,8 @@ function runTimer(){
 
 function onAnswer(sel){
   if(answered)return;
-  answered=true; clearInterval(tmr);
+  answered=true;
+  clearInterval(tmr);
   const q=activeQ[qi()]; const ok=sel===q.a;
   // Highlight selected immediately so tap feels responsive
   document.querySelectorAll('.opt').forEach((b,i)=>{
@@ -569,7 +584,8 @@ function showFeedback(ok,pts,timeout){
   $('fb-points').textContent= ok?'+1':'+0';
   $('fb-points').className  = 'fb-points'+(ok?'':' zero');
   showScreen('feedback');
-  setTimeout(advance,FB_DELAY);
+  // Manual advance — show Next button
+  $('fb-next-btn').style.display='block';
 }
 
 function advance(){
@@ -615,10 +631,32 @@ function showResults(){
   $('res-trophy').textContent=g.t;
   $('res-score').textContent=total;
   $('res-grade').textContent=g.l;
+
+  // Full Q&A review per round
   $('res-rounds').innerHTML=Array.from({length:ROUNDS},(_,i)=>{
-    const p=rPts[i]+(rBonus[i]||0);
-    return`<div class="results-round"><span class="results-round-name">Round ${i+1}</span><span class="results-round-score">${p} pts${rBonus[i]?' ⭐':''}</span></div>`;
+    const rp=rPts[i]+(rBonus[i]||0);
+    const perf=rBonus[i]?'<span class="results-round-perfect"> ⭐ +5 bonus</span>':'';
+    const qaRows=rAns[i].map(a=>{
+      const icon=a.ok?'✅':'❌';
+      const correctLine=a.ok?'':`<div class="review-correct-ans">✔ ${a.ans}</div>`;
+      return `<div class="review-item ${a.ok?'review-ok':'review-wrong'}">
+        <div class="review-item-top">
+          <span class="review-icon">${icon}</span>
+          <span class="review-q">${a.q}</span>
+          <span class="review-pts ${a.ok?'green':'red'}">${a.ok?'+1':'0'}</span>
+        </div>
+        ${correctLine}
+      </div>`;
+    }).join('');
+    return `<div class="review-round">
+      <div class="review-round-hdr">
+        <span class="review-round-name">Round ${i+1}</span>
+        <span class="results-round-score">${rp} pts${perf}</span>
+      </div>
+      ${qaRows}
+    </div>`;
   }).join('');
+
   showScreen('results');
   if(db) db.ref('scores/'+scoreKey).set({name,email,score:total,ts:Date.now()});
 }
