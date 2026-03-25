@@ -521,6 +521,7 @@ function joinLive(){
   liveQIdx = 0;
   playerSelection = -1;
   lastRevealedIdx = -1;
+  gameEnded = false;
   rAns = [[]];
   clearInterval(tmr);
   
@@ -540,7 +541,10 @@ function joinLive(){
       const game = snap.val();
       if(!game || !liveMode) return;
       
-      if(game.status === 'question' && game.questionIndex >= 0){
+      if(game.status === 'ended'){
+        // Game ended - show final results (takes priority)
+        showLiveResults();
+      } else if(game.status === 'question' && game.questionIndex >= 0){
         // New question - only load if different from current
         if(game.questionIndex !== liveQIdx || !answered){
           playerSelection = -1;
@@ -558,8 +562,6 @@ function joinLive(){
       } else if(game.status === 'waiting'){
         showScreen('waiting');
         $('waiting-msg').textContent = 'Get ready! Next question coming soon...';
-      } else if(game.status === 'ended'){
-        showLiveResults();
       }
     });
   }
@@ -745,7 +747,11 @@ function showLiveLeaderboard(){
   showScreen('live-leaderboard');
 }
 
+let gameEnded = false; // Guard to prevent multiple results calls
+
 function showLiveResults(){
+  if(gameEnded) return; // Already showed results
+  gameEnded = true;
   liveMode = false;
   const g = grade(total);
   $('res-trophy').textContent = g.t;
