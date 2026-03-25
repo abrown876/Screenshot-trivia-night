@@ -665,13 +665,13 @@ function revealLiveAnswer(game){
   const ok = (playerSelection === correctIdx);
   const didAnswer = (playerSelection >= 0);
   
-  // Update score only if they answered correctly
+  // Update score - 10 points per correct answer
   if(didAnswer && ok){
-    total++;
+    total += 10;
     rCorrect[0]++;
-    rPts[0]++;
+    rPts[0] += 10;
   }
-  rAns[0].push({ok: didAnswer && ok, pts: (didAnswer && ok)?1:0, q: currentLiveQ.q, ans: currentLiveQ.o[correctIdx]});
+  rAns[0].push({ok: didAnswer && ok, pts: (didAnswer && ok)?10:0, q: currentLiveQ.q, ans: currentLiveQ.o[correctIdx]});
   
   $('hdr-score').textContent = total;
   
@@ -680,23 +680,28 @@ function revealLiveAnswer(game){
     db.ref('teams/'+scoreKey).update({score: total, lastUpdate: Date.now()});
   }
   
-  // Show feedback immediately (player was on answer-locked screen)
-  showLiveFeedback(ok, didAnswer);
+  // Show feedback with correct answer
+  showLiveFeedback(ok, didAnswer, currentLiveQ.o[correctIdx]);
 }
 
-function showLiveFeedback(ok, didAnswer){
+function showLiveFeedback(ok, didAnswer, correctAnswer){
   if(!didAnswer){
     $('fb-icon').textContent = '⏰';
     $('fb-title').textContent = "Time's Up!";
     $('fb-title').style.color = 'var(--gold)';
-    $('fb-sub').textContent = "You didn't answer in time";
+    $('fb-sub').textContent = correctAnswer;
+  } else if(ok){
+    $('fb-icon').textContent = '✅';
+    $('fb-title').textContent = 'Correct!';
+    $('fb-title').style.color = 'var(--green)';
+    $('fb-sub').textContent = correctAnswer;
   } else {
-    $('fb-icon').textContent = ok ? '✅' : '❌';
-    $('fb-title').textContent = ok ? 'Correct!' : 'Wrong';
-    $('fb-title').style.color = ok ? 'var(--green)' : 'var(--red)';
-    $('fb-sub').textContent = ok ? GOOD[Math.floor(Math.random()*GOOD.length)] : BAD[Math.floor(Math.random()*BAD.length)];
+    $('fb-icon').textContent = '❌';
+    $('fb-title').textContent = 'Wrong!';
+    $('fb-title').style.color = 'var(--red)';
+    $('fb-sub').textContent = correctAnswer;
   }
-  $('fb-points').textContent = (didAnswer && ok) ? '+1' : '+0';
+  $('fb-points').textContent = (didAnswer && ok) ? '+10' : '+0';
   $('fb-points').className = 'fb-points' + ((didAnswer && ok) ? '' : ' zero');
   
   // Hide Next button - host controls pace
@@ -704,7 +709,6 @@ function showLiveFeedback(ok, didAnswer){
   
   showScreen('feedback');
   
-  // Stay on feedback screen - host will push next question
   // Reset player selection for next question
   playerSelection = -1;
 }
@@ -749,7 +753,7 @@ function showLiveResults(){
   // Show answers review
   $('res-rounds').innerHTML = `<div class="review-round">
     <div class="review-round-hdr">
-      <span class="review-round-name">Live Game</span>
+      <span class="review-round-name">Final Results</span>
       <span class="results-round-score">${total} pts</span>
     </div>
     ${rAns[0].map(a => {
@@ -759,7 +763,7 @@ function showLiveResults(){
         <div class="review-item-top">
           <span class="review-icon">${icon}</span>
           <span class="review-q">${a.q}</span>
-          <span class="review-pts ${a.ok ? 'green' : 'red'}">${a.ok ? '+1' : '0'}</span>
+          <span class="review-pts ${a.ok ? 'green' : 'red'}">${a.ok ? '+10' : '0'}</span>
         </div>
         ${correctLine}
       </div>`;
@@ -881,11 +885,11 @@ function startNextRound(){
 }
 
 function grade(s){
-  if(s>=10)return{t:'🏆',l:'Perfect! You really know Andrew!'};
-  if(s>=8) return{t:'🔥',l:'Fire! Almost perfect!'};
-  if(s>=6) return{t:'⭐',l:'Solid! You know Andrew well'};
-  if(s>=4) return{t:'🎵',l:'Not bad — room to improve'};
-  return         {t:'🤔',l:'Maybe get to know Andrew better!'};
+  if(s>=100)return{t:'🏆',l:'Perfect! You really know Andrew!'};
+  if(s>=80) return{t:'🔥',l:'Fire! Almost perfect!'};
+  if(s>=60) return{t:'⭐',l:'Solid! You know Andrew well'};
+  if(s>=40) return{t:'🎵',l:'Not bad — room to improve'};
+  return          {t:'🤔',l:'Maybe get to know Andrew better!'};
 }
 
 function showResults(){
