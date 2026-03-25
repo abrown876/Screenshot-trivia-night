@@ -326,9 +326,9 @@ body::before{content:'';position:fixed;inset:0;
 <!-- ANSWER LOCKED -->
 <div class="screen" id="scr-answer-locked">
   <div class="ready-content anim">
-    <div class="answer-locked-icon">✓</div>
-    <h2 class="ready-title" style="font-size:1.6rem;color:var(--green)">Answer Locked!</h2>
-    <p style="color:var(--text-dim);margin-top:.5rem;font-size:15px">Waiting for host to reveal the answer...</p>
+    <div class="answer-locked-icon" id="locked-icon">✓</div>
+    <h2 class="ready-title" id="locked-title" style="font-size:1.6rem;color:var(--green)">Answer Locked!</h2>
+    <p id="locked-sub" style="color:var(--text-dim);margin-top:.5rem;font-size:15px">Waiting for host to reveal the answer...</p>
     <div class="pulse-dot" style="margin-top:1.5rem"></div>
   </div>
 </div>
@@ -415,7 +415,7 @@ body::before{content:'';position:fixed;inset:0;
     <div class="results-card">
       <div class="results-trophy" id="res-trophy">🏆</div>
       <div class="results-score"  id="res-score">0</div>
-      <div class="results-max">out of 30</div>
+      <div class="results-max">out of 100</div>
       <div class="results-label"  id="res-grade"></div>
     </div>
     <div class="results-breakdown">
@@ -473,93 +473,87 @@ const QUESTIONS = [
   {cat:"x",lb:"Values",    q:"What would Andrew do if he won $100M tomorrow?",                          o:["Retire immediately","Build 3 new businesses","Tell no one","Buy property"],a:2},
 ];
 
-let activeQ = [];
+// Constants
+const TIMER = 10;
+const LTRS = ['A','B','C','D'];
 
-function pickQuestions() {
-  const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 10);
-}
+// Game state
+let name = '', scoreKey = '';
+let total = 0, answered = false, tmr = null;
+let liveMode = false;
+let liveQIdx = 0;
+let playerSelection = -1;
+let currentLiveQ = null;
+let lastRevealedIdx = -1;
+let rAns = [[]]; // Track answers for results review
 
-const TIMER=10, FB_DELAY=4000, CNTDN=5, QPR=5, ROUNDS=2;
-const LTRS=['A','B','C','D'], MEDALS=['🥇','🥈','🥉'];
-const GOOD=['Nailed it!','On fire! 🔥','Yes!','Perfect!','Keep going!'];
-const BAD=['Next one!','Stay sharp!','You got this!','Keep focus!'];
-
-let name='', scoreKey='';
-let round=1, qIdx=0, total=0, answered=false, tmr=null, tStart=0;
-let rCorrect=[0,0], rPts=[0,0], rBonus=[0,0], rAns=[[],[]];
-let liveMode = false; // Track if we're in host-controlled live mode
-let liveQIdx = 0; // Track questions in live mode
-
-const $=id=>document.getElementById(id);
-const SCREENS=['register','ready','question','feedback','break','results','leaderboard','waiting','answer-locked','live-leaderboard'];
+const $ = id => document.getElementById(id);
+const SCREENS = ['register','waiting','question','answer-locked','feedback','live-leaderboard','results'];
 
 function showScreen(s){
-  SCREENS.forEach(id=>{ const el=$('scr-'+id); if(el) el.classList.toggle('on',id===s); });
-  const game=['ready','question','feedback','break','results','answer-locked','live-leaderboard'].includes(s);
-  $('hdr-centre').style.display = game?'flex':'none';
+  SCREENS.forEach(id => { 
+    const el = $('scr-'+id); 
+    if(el) el.classList.toggle('on', id===s); 
+  });
+  const showHeader = ['question','answer-locked','feedback','live-leaderboard','results'].includes(s);
+  $('hdr-centre').style.display = showHeader ? 'flex' : 'none';
   $('hdr-score').textContent = total;
 }
 
-function doStart(){
-  const nm=$('inp-team').value.trim();
-  const err=$('reg-error');
-  if(!nm||nm.length<2){err.textContent='Enter your name or team name';err.classList.add('show');return;}
-  err.classList.remove('show');
-  name=nm; scoreKey=nm.replace(/[.#$[\]@\s]/g,'_')+'_'+Date.now();
-  round=1; qIdx=0; total=0; answered=false;
-  rCorrect=[0,0]; rPts=[0,0]; rBonus=[0,0]; rAns=[[],[]];
-  // Shuffle and pick 10 questions for this session
-  activeQ = pickQuestions();
-  clearInterval(tmr);
-  $('hdr-team').textContent=name;
-  startCountdown(1);
-}
-
-$('inp-team').addEventListener('keydown', e=>{if(e.key==='Enter')doStart();});
-
-// Join Live Game mode - listens to host pushes
+// Join the live game
 function joinLive(){
-  const nm=$('inp-team').value.trim();
-  const err=$('reg-error');
-  if(!nm||nm.length<2){err.textContent='Enter your name or team name';err.classList.add('show');return;}
+  const nm = $('inp-team').value.trim();
+  const err = $('reg-error');
+  
+  if(!nm || nm.length < 2){
+    err.textContent = 'Enter your name';
+    err.classList.add('show');
+    return;
+  }
   err.classList.remove('show');
   
-  name=nm; scoreKey=nm.replace(/[.#$[\]@\s]/g,'_')+'_'+Date.now();
-  round=1; qIdx=0; total=0; answered=false; liveMode=true; liveQIdx=0;
-  rCorrect=[0,0]; rPts=[0,0]; rBonus=[0,0]; rAns=[[],[]];
+  // Set up player state
+  name = nm;
+  scoreKey = nm.replace(/[.#$[\]@\s]/g,'_') + '_' + Date.now();
+  total = 0;
+  answered = false;
+  liveMode = true;
+  liveQIdx = 0;
+  playerSelection = -1;
+  lastRevealedIdx = -1;
+  rAns = [[]];
   clearInterval(tmr);
-  $('hdr-team').textContent=name;
+  
+  $('hdr-team').textContent = name;
   
   // Register player in Firebase
   if(db){
-    db.ref('teams/'+scoreKey).set({name:name,score:0,ts:Date.now()});
+    db.ref('teams/'+scoreKey).set({name: name, score: 0, ts: Date.now()});
   }
   
   showScreen('waiting');
-  $('hdr-centre').style.display='flex';
+  $('hdr-centre').style.display = 'flex';
   
-  // Listen for host-pushed questions
+  // Listen for host-pushed game state
   if(db){
-    db.ref('game').on('value', snap=>{
+    db.ref('game').on('value', snap => {
       const game = snap.val();
       if(!game || !liveMode) return;
       
       if(game.status === 'question' && game.questionIndex >= 0){
-        // Host pushed a new question - only load if it's a new question index
+        // New question - only load if different from current
         if(game.questionIndex !== liveQIdx || !answered){
           playerSelection = -1;
-          lastRevealedIdx = -1; // Reset reveal tracker for new question
+          lastRevealedIdx = -1;
           loadLiveQuestion(game);
         }
       } else if(game.status === 'revealed' && game.revealed){
-        // Host revealed the answer - only process once per question
+        // Host revealed answer - only process once per question
         if(lastRevealedIdx !== game.questionIndex){
           lastRevealedIdx = game.questionIndex;
           revealLiveAnswer(game);
         }
       } else if(game.status === 'leaderboard'){
-        // Host showing live leaderboard
         showLiveLeaderboard();
       } else if(game.status === 'waiting'){
         showScreen('waiting');
@@ -571,87 +565,99 @@ function joinLive(){
   }
 }
 
-// Load a question pushed by the host
+// Allow Enter key to join
+$('inp-team').addEventListener('keydown', e => {
+  if(e.key === 'Enter') joinLive();
+});
+
+// Load question from host
 function loadLiveQuestion(game){
-  answered=false;
-  tStart=Date.now();
+  answered = false;
   liveQIdx = game.questionIndex;
   
-  // Store current question for answer checking
   currentLiveQ = {
     q: game.question,
     o: game.options,
     cat: game.category,
-    correctAnswer: -1 // Will be set when revealed
+    correctAnswer: -1
   };
   
-  $('q-counter').textContent='Q'+(liveQIdx+1)+' of 10';
-  $('q-cat').textContent=game.category || 'Quiz';
-  $('q-cat').className='q-cat cat-x';
-  $('q-text').textContent=game.question;
-  $('timer-num').textContent=game.timer || TIMER;
-  $('timer-num').className='timer-num';
-  $('timer-wrap').className='timer-wrap';
-  $('timer-wrap').style.display='flex';
-  $('q-progress-fill').style.width='100%';
+  $('q-counter').textContent = 'Q' + (liveQIdx + 1) + ' of 10';
+  $('q-cat').textContent = game.category || 'Quiz';
+  $('q-cat').className = 'q-cat cat-x';
+  $('q-text').textContent = game.question;
+  $('timer-num').textContent = game.timer || TIMER;
+  $('timer-num').className = 'timer-num';
+  $('timer-wrap').className = 'timer-wrap';
+  $('timer-wrap').style.display = 'flex';
+  $('q-progress-fill').style.width = '100%';
   
-  $('opts').innerHTML=game.options.map((o,i)=>`<button class="opt" onclick="onLiveAnswer(${i})"><span class="opt-letter">${LTRS[i]}</span>${o}</button>`).join('');
+  $('opts').innerHTML = game.options.map((o,i) => 
+    `<button class="opt" onclick="onLiveAnswer(${i})">
+      <span class="opt-letter">${LTRS[i]}</span>${o}
+    </button>`
+  ).join('');
+  
   showScreen('question');
-  
-  // Run local timer synced with host
   runLiveTimer(game.timer || TIMER);
 }
 
-let currentLiveQ = null;
-let lastRevealedIdx = -1; // Track which question was last revealed to prevent duplicate reveals
-
-function runLiveTimer(startTime){
+// Run countdown timer
+function runLiveTimer(duration){
   clearInterval(tmr);
-  let remaining = startTime;
+  let remaining = duration;
   
-  tmr = setInterval(()=>{
+  tmr = setInterval(() => {
     remaining--;
     $('timer-num').textContent = Math.max(0, remaining);
-    $('q-progress-fill').style.width = ((remaining/TIMER)*100)+'%';
+    $('q-progress-fill').style.width = ((remaining / TIMER) * 100) + '%';
     
     if(remaining <= 3){
-      $('timer-num').className='timer-num danger';
-      $('timer-wrap').className='timer-wrap danger';
+      $('timer-num').className = 'timer-num danger';
+      $('timer-wrap').className = 'timer-wrap danger';
     } else if(remaining <= 5){
-      $('timer-num').className='timer-num warn';
-      $('timer-wrap').className='timer-wrap warn';
+      $('timer-num').className = 'timer-num warn';
+      $('timer-wrap').className = 'timer-wrap warn';
     }
     
     if(remaining <= 0){
       clearInterval(tmr);
-      // Timer expired - if player hasn't answered, mark as no answer and show locked screen
-      // They'll stay here until host reveals
+      // Time's up - lock player if they haven't answered
       if(!answered){
         answered = true;
-        playerSelection = -1; // No answer selected
+        playerSelection = -1;
         $('timer-wrap').style.display = 'none';
+        // Show time's up state
+        $('locked-icon').textContent = '⏰';
+        $('locked-title').textContent = "Time's Up!";
+        $('locked-title').style.color = 'var(--gold)';
+        $('locked-sub').textContent = 'Waiting for host to reveal the answer...';
         showScreen('answer-locked');
       }
     }
   }, 1000);
 }
 
+// Handle player answer selection
 function onLiveAnswer(sel){
   if(answered) return;
   answered = true;
   clearInterval(tmr);
   
-  // Store the player's selection
   playerSelection = sel;
   
-  // Highlight selected and lock all options
-  document.querySelectorAll('.opt').forEach((b,i)=>{
+  // Lock all options and highlight selected
+  document.querySelectorAll('.opt').forEach((b,i) => {
     b.classList.add('locked');
-    if(i===sel) b.classList.add('selected','pend');
+    if(i === sel) b.classList.add('selected','pend');
   });
   
-  // Show locked state - stays until host reveals
   $('timer-wrap').style.display = 'none';
+  // Show answer locked state
+  $('locked-icon').textContent = '✓';
+  $('locked-title').textContent = 'Answer Locked!';
+  $('locked-title').style.color = 'var(--green)';
+  $('locked-sub').textContent = 'Waiting for host to reveal the answer...';
   showScreen('answer-locked');
 }
 
@@ -774,190 +780,25 @@ function showLiveResults(){
   if(db) db.ref('scores/'+scoreKey).set({name,score:total,ts:Date.now()});
 }
 
-function startCountdown(r){
-  round=r;
-  $('ready-round').textContent='Round '+r+' of '+ROUNDS;
-  let c=CNTDN; $('ready-count').textContent=c;
-  showScreen('ready');
-  const iv=setInterval(()=>{c--;if(c>0)$('ready-count').textContent=c;else{clearInterval(iv);loadQ();}},1000);
-}
-
-function qi(){return(round-1)*QPR+qIdx;}
-
-function loadQ(){
-  const nb=$('fb-next-btn');if(nb)nb.style.display='none';
-  const q=activeQ[qi()];
-  answered=false; tStart=Date.now();
-  $('q-counter').textContent='Q'+(qIdx+1)+' / '+QPR;
-  $('q-cat').textContent=q.lb; $('q-cat').className='q-cat cat-'+q.cat;
-  $('q-text').textContent=q.q;
-  $('timer-num').textContent=TIMER; $('timer-num').className='timer-num';
-  $('timer-wrap').className='timer-wrap';
-  $('q-progress-fill').style.width='100%';
-  $('opts').innerHTML=q.o.map((o,i)=>`<button class="opt" onclick="onAnswer(${i})"><span class="opt-letter">${LTRS[i]}</span>${o}</button>`).join('');
-  showScreen('question');
-  runTimer();
-}
-
-function runTimer(){
-  clearInterval(tmr);
-  tmr=setInterval(()=>{
-    const t=Math.max(0,TIMER-Math.floor((Date.now()-tStart)/1000));
-    $('timer-num').textContent=t;
-    $('q-progress-fill').style.width=((t/TIMER)*100)+'%';
-    if(t<=3){$('timer-num').className='timer-num danger';$('timer-wrap').className='timer-wrap danger';}
-    else if(t<=5){$('timer-num').className='timer-num warn';$('timer-wrap').className='timer-wrap warn';}
-    if(t<=0){clearInterval(tmr);onTimeout();}
-  },100);
-}
-
-function onAnswer(sel){
-  if(answered)return;
-  answered=true;
-  clearInterval(tmr);
-  const q=activeQ[qi()]; const ok=sel===q.a;
-  // Highlight selected immediately so tap feels responsive
-  document.querySelectorAll('.opt').forEach((b,i)=>{
-    if(i===sel) b.classList.add('selected');
-  });
-  if(ok)rCorrect[round-1]++;
-  const pts=ok?1:0; total+=pts; rPts[round-1]+=pts;
-  rAns[round-1].push({ok,pts,q:q.q,ans:q.o[q.a]});
-  setTimeout(()=>{
-    document.querySelectorAll('.opt').forEach((b,i)=>{
-      b.classList.add('locked');
-      b.classList.remove('selected');
-      if(i===q.a)b.classList.add('correct');
-      else if(i===sel&&!ok)b.classList.add('wrong');
-    });
-    showFeedback(ok,pts,false);
-  },400);
-}
-
-function onTimeout(){
-  if(answered)return; answered=true;
-  const q=activeQ[qi()];
-  rAns[round-1].push({ok:false,pts:0,q:q.q,ans:q.o[q.a]});
-  document.querySelectorAll('.opt').forEach((b,i)=>{b.classList.add('locked');if(i===q.a)b.classList.add('correct');});
-  setTimeout(()=>showFeedback(false,0,true),400);
-}
-
-function showFeedback(ok,pts,timeout){
-  $('fb-icon').textContent  = ok?'✅':(timeout?'⏰':'❌');
-  $('fb-title').textContent = ok?'Correct!':(timeout?"Time's Up!":'Wrong');
-  $('fb-title').style.color = ok?'var(--green)':'var(--red)';
-  $('fb-sub').textContent   = ok?GOOD[Math.floor(Math.random()*GOOD.length)]:BAD[Math.floor(Math.random()*BAD.length)];
-  $('fb-points').textContent= ok?'+1':'+0';
-  $('fb-points').className  = 'fb-points'+(ok?'':' zero');
-  showScreen('feedback');
-  // Manual advance — show Next button
-  $('fb-next-btn').style.display='block';
-}
-
-function advance(){
-  qIdx++;
-  if(qIdx>=QPR)showBreak();
-  else loadQ();
-}
-
-function showBreak(){
-  const c=rCorrect[round-1], p=rPts[round-1];
-  const bonus=c>=QPR?5:0;
-  if(bonus){rBonus[round-1]=bonus;total+=bonus;}
-  $('break-badge').textContent ='ROUND '+round+' COMPLETE';
-  $('break-title').textContent = bonus?'Perfect Round! 🔥':(c>=3?'Nice work!':'Keep going!');
-  $('br-correct').textContent  = c+'/'+QPR;
-  $('br-pts').textContent      = p;
-  $('br-bonus').textContent    = bonus?'+'+bonus:'—';
-  $('btn-next').textContent    = round<ROUNDS?'Continue to Round '+(round+1)+' →':'See Final Results →';
-  let html='';
-  rAns[round-1].forEach(a=>{
-    const qt=a.q.length>42?a.q.slice(0,42)+'…':a.q;
-    html+=`<div class="break-answer"><span class="break-answer-icon">${a.ok?'✅':'❌'}</span><span class="break-answer-q">${qt}</span><span class="break-answer-pts ${a.ok?'green':'red'}">${a.ok?'+1':'0'}</span></div>`;
-  });
-  $('break-answers-list').innerHTML=html;
-  showScreen('break');
-}
-
-function startNextRound(){
-  if(round<ROUNDS){round++;qIdx=0;startCountdown(round);}
-  else showResults();
-}
-
+// Grade based on score (max 100 points)
 function grade(s){
-  if(s>=100)return{t:'🏆',l:'Perfect! You really know Andrew!'};
-  if(s>=80) return{t:'🔥',l:'Fire! Almost perfect!'};
-  if(s>=60) return{t:'⭐',l:'Solid! You know Andrew well'};
-  if(s>=40) return{t:'🎵',l:'Not bad — room to improve'};
-  return          {t:'🤔',l:'Maybe get to know Andrew better!'};
+  if(s >= 100) return {t:'🏆', l:'Perfect! You really know Andrew!'};
+  if(s >= 80)  return {t:'🔥', l:'Fire! Almost perfect!'};
+  if(s >= 60)  return {t:'⭐', l:'Solid! You know Andrew well'};
+  if(s >= 40)  return {t:'🎵', l:'Not bad — room to improve'};
+  return              {t:'🤔', l:'Maybe get to know Andrew better!'};
 }
 
-function showResults(){
-  const g=grade(total);
-  $('res-trophy').textContent=g.t;
-  $('res-score').textContent=total;
-  $('res-grade').textContent=g.l;
-
-  // Full Q&A review per round
-  $('res-rounds').innerHTML=Array.from({length:ROUNDS},(_,i)=>{
-    const rp=rPts[i]+(rBonus[i]||0);
-    const perf=rBonus[i]?'<span class="results-round-perfect"> ⭐ +5 bonus</span>':'';
-    const qaRows=rAns[i].map(a=>{
-      const icon=a.ok?'✅':'❌';
-      const correctLine=a.ok?'':`<div class="review-correct-ans">✔ ${a.ans}</div>`;
-      return `<div class="review-item ${a.ok?'review-ok':'review-wrong'}">
-        <div class="review-item-top">
-          <span class="review-icon">${icon}</span>
-          <span class="review-q">${a.q}</span>
-          <span class="review-pts ${a.ok?'green':'red'}">${a.ok?'+1':'0'}</span>
-        </div>
-        ${correctLine}
-      </div>`;
-    }).join('');
-    return `<div class="review-round">
-      <div class="review-round-hdr">
-        <span class="review-round-name">Round ${i+1}</span>
-        <span class="results-round-score">${rp} pts${perf}</span>
-      </div>
-      ${qaRows}
-    </div>`;
-  }).join('');
-
-  showScreen('results');
-  if(db) db.ref('scores/'+scoreKey).set({name,score:total,ts:Date.now()});
-}
-
+// Share result on WhatsApp
 function shareResult(){
-  const url=window.location.origin+window.location.pathname;
-  window.open('https://wa.me/?text='+encodeURIComponent(`🎉 I scored *${total}/10* on How Well Do You Know Andrew!\n\nCan you beat me? 👇\n${url}`),'_blank');
+  const url = window.location.origin + window.location.pathname;
+  const text = `🎉 I scored *${total}/100* on Andrew's Birthday Quiz!\n\nCan you beat me? 👇\n${url}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
-function showLeaderboard(){
-  showScreen('leaderboard');
-  $('lb-list').innerHTML='<div class="lb-empty">Loading…</div>';
-  if(!db){
-    $('lb-list').innerHTML='<div class="lb-empty">⚠️ Leaderboard requires an internet connection</div>';
-    return;
-  }
-  db.ref('scores').orderByChild('score').limitToLast(50).once('value',snap=>{
-    const rows=Object.entries(snap.val()||{})
-      .map(([k,v])=>{return{key:k,name:v.name,score:v.score,ts:v.ts};})
-      .sort((a,b)=>b.score-a.score);
-    if(!rows.length){$('lb-list').innerHTML='<div class="lb-empty">No scores yet — be first!</div>';return;}
-    $('lb-list').innerHTML=rows.map((e,i)=>{
-      const cls=['','first','second','third'][i]||'';
-      const medal=MEDALS[i]||`<span style="font-size:11px">#${i+1}</span>`;
-      return`<div class="lb-row ${cls}${e.key===scoreKey?' lb-you':''}">
-        <div class="lb-rank">${medal}</div>
-        <div class="lb-info"><div class="lb-name">${e.name}${e.key===scoreKey?' (you)':''}</div></div>
-        <div><div class="lb-score">${e.score}</div><div class="lb-score-den">/10</div></div>
-      </div>`;
-    }).join('');
-  });
-}
-
+// Play again
 function playAgain(){
-  $('inp-team').value=name;
+  $('inp-team').value = name;
   showScreen('register');
 }
 </script>
