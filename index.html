@@ -496,7 +496,7 @@ const SCREENS=['register','ready','question','feedback','break','results','leade
 
 function showScreen(s){
   SCREENS.forEach(id=>{ const el=$('scr-'+id); if(el) el.classList.toggle('on',id===s); });
-  const game=['ready','question','feedback','break','results'].includes(s);
+  const game=['ready','question','feedback','break','results','answer-locked','live-leaderboard'].includes(s);
   $('hdr-centre').style.display = game?'flex':'none';
   $('hdr-score').textContent = total;
 }
@@ -546,12 +546,18 @@ function joinLive(){
       if(!game || !liveMode) return;
       
       if(game.status === 'question' && game.questionIndex >= 0){
-        // Host pushed a new question - reset state
-        playerSelection = -1;
-        loadLiveQuestion(game);
+        // Host pushed a new question - only load if it's a new question index
+        if(game.questionIndex !== liveQIdx || !answered){
+          playerSelection = -1;
+          lastRevealedIdx = -1; // Reset reveal tracker for new question
+          loadLiveQuestion(game);
+        }
       } else if(game.status === 'revealed' && game.revealed){
-        // Host revealed the answer
-        revealLiveAnswer(game);
+        // Host revealed the answer - only process once per question
+        if(lastRevealedIdx !== game.questionIndex){
+          lastRevealedIdx = game.questionIndex;
+          revealLiveAnswer(game);
+        }
       } else if(game.status === 'leaderboard'){
         // Host showing live leaderboard
         showLiveLeaderboard();
@@ -597,6 +603,7 @@ function loadLiveQuestion(game){
 }
 
 let currentLiveQ = null;
+let lastRevealedIdx = -1; // Track which question was last revealed to prevent duplicate reveals
 
 function runLiveTimer(startTime){
   clearInterval(tmr);
