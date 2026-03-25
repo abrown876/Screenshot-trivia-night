@@ -72,6 +72,7 @@ body::before{content:'';position:fixed;inset:0;
 .btn-green{background:linear-gradient(135deg,var(--green),#2AB870);color:#000;box-shadow:0 4px 24px rgba(61,220,132,.3)}
 .btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text-dim)}
 .btn-red{background:linear-gradient(135deg,var(--red),#CC3344);color:#fff;box-shadow:0 4px 24px rgba(255,75,92,.25)}
+.btn-gold{background:linear-gradient(135deg,#FFB740,#E59A20);color:#000;box-shadow:0 4px 24px rgba(255,183,64,.3)}
 .btn-sm{padding:12px 20px;font-size:14px;width:auto}
 
 /* CONTROLS */
@@ -195,6 +196,9 @@ body::before{content:'';position:fixed;inset:0;
       <div class="controls">
         <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()">✨ Reveal Answer</button>
         <button class="btn btn-purple" id="btn-next" onclick="nextQuestion()">Next Question →</button>
+      </div>
+      <div class="controls" style="margin-top:.5rem">
+        <button class="btn btn-gold" id="btn-leaderboard" onclick="showLeaderboard()">🏆 Show Leaderboard</button>
       </div>
     </div>
 
@@ -573,6 +577,18 @@ function resetPlayers() {
   players = {};
   renderPlayers();
   toast('All players cleared!');
+}
+
+// Show leaderboard to all players
+function showLeaderboard() {
+  if (!db) return;
+  
+  db.ref('game').update({
+    status: 'leaderboard',
+    timestamp: Date.now()
+  });
+  
+  toast('Showing leaderboard to players!');
 }
 
 // Listen for players
