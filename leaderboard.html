@@ -530,6 +530,231 @@ body::before {
   color:var(--purple);
 }
 
+/* Winner Podium - Game Over */
+.winner-podium {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  z-index:100;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+}
+
+.winner-podium.show {
+  display:flex;
+  animation:fadeIn 0.5s ease;
+}
+
+.winner-podium::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(124,110,246,.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 70%, rgba(255,183,64,.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 70%, rgba(255,92,138,.15) 0%, transparent 40%);
+  pointer-events:none;
+}
+
+.podium-title {
+  font-size:3.5rem;
+  font-weight:900;
+  background:linear-gradient(135deg,#fff 0%,#C4BEFF 45%,#FF5C8A 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:1rem;
+  position:relative;
+  z-index:1;
+  text-align:center;
+}
+
+.podium-subtitle {
+  font-size:1.5rem;
+  color:var(--text-dim);
+  margin-bottom:3rem;
+  position:relative;
+  z-index:1;
+}
+
+.podium-places {
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:1.5rem;
+  margin-bottom:3rem;
+  position:relative;
+  z-index:1;
+}
+
+.podium-place {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  animation:podiumRise 0.8s ease backwards;
+}
+
+.podium-place:nth-child(1) { animation-delay:0.4s; }
+.podium-place:nth-child(2) { animation-delay:0.2s; }
+.podium-place:nth-child(3) { animation-delay:0.6s; }
+
+@keyframes podiumRise {
+  from { opacity:0; transform:translateY(50px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.podium-trophy {
+  font-size:4rem;
+  margin-bottom:1rem;
+  animation:trophyBounce 1s ease infinite;
+  animation-delay:inherit;
+}
+
+.podium-place:nth-child(2) .podium-trophy {
+  font-size:5.5rem;
+  animation-delay:0.1s;
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform:translateY(0) rotate(-3deg); }
+  50% { transform:translateY(-10px) rotate(3deg); }
+}
+
+.podium-name {
+  font-size:1.4rem;
+  font-weight:800;
+  color:var(--text);
+  margin-bottom:0.5rem;
+  text-align:center;
+  max-width:180px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.podium-place:nth-child(2) .podium-name {
+  font-size:1.8rem;
+  color:var(--gold);
+  max-width:220px;
+}
+
+.podium-score {
+  font-size:1.2rem;
+  font-weight:700;
+  font-family:var(--font-mono);
+  color:var(--purple);
+  background:rgba(124,110,246,.15);
+  padding:0.4rem 1rem;
+  border-radius:2rem;
+  margin-bottom:1rem;
+}
+
+.podium-place:nth-child(2) .podium-score {
+  font-size:1.5rem;
+  color:var(--gold);
+  background:rgba(255,183,64,.15);
+}
+
+.podium-stand {
+  width:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2.5rem;
+  font-weight:900;
+  color:rgba(255,255,255,.9);
+  border-radius:12px 12px 0 0;
+  position:relative;
+}
+
+.podium-place:nth-child(1) .podium-stand {
+  height:100px;
+  background:linear-gradient(180deg, var(--silver), #8a8a8a);
+}
+
+.podium-place:nth-child(2) .podium-stand {
+  height:140px;
+  width:160px;
+  background:linear-gradient(180deg, var(--gold), #cc9a00);
+}
+
+.podium-place:nth-child(3) .podium-stand {
+  height:70px;
+  background:linear-gradient(180deg, var(--bronze), #8B4513);
+}
+
+.podium-rest {
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:500px;
+}
+
+.podium-rest-title {
+  font-size:1rem;
+  font-weight:700;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-bottom:1rem;
+  text-align:center;
+}
+
+.podium-rest-list {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1rem;
+  max-height:200px;
+  overflow-y:auto;
+}
+
+.podium-rest-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0.75rem 1rem;
+  border-radius:8px;
+  margin-bottom:0.5rem;
+  background:rgba(255,255,255,.02);
+}
+
+.podium-rest-row:last-child { margin-bottom:0; }
+
+.podium-rest-rank {
+  font-weight:800;
+  color:var(--text-dim);
+  width:30px;
+}
+
+.podium-rest-name {
+  flex:1;
+  font-weight:600;
+  margin-left:0.75rem;
+}
+
+.podium-rest-score {
+  font-weight:700;
+  font-family:var(--font-mono);
+  color:var(--purple);
+}
+
+.podium-footer {
+  margin-top:2rem;
+  font-size:0.9rem;
+  color:var(--text-muted);
+  position:relative;
+  z-index:1;
+}
+
+.podium-footer span {
+  color:var(--purple);
+  font-weight:700;
+}
+
 /* Confetti container */
 .confetti-container {
   position:fixed;
@@ -628,6 +853,30 @@ body::before {
 
 <div class="confetti-container" id="confetti-container"></div>
 
+<!-- Sound effects -->
+<audio id="sound-cheer" preload="auto">
+  <source src="https://cdn.freesound.org/previews/462/462086_1676145-lq.mp3" type="audio/mpeg">
+</audio>
+<audio id="sound-win" preload="auto">
+  <source src="https://cdn.freesound.org/previews/270/270402_5123851-lq.mp3" type="audio/mpeg">
+</audio>
+
+<div class="winner-podium" id="winner-podium">
+  <div class="podium-title">🎉 Game Over!</div>
+  <div class="podium-subtitle">And the winners are...</div>
+  
+  <div class="podium-places" id="podium-places">
+    <!-- Filled dynamically -->
+  </div>
+  
+  <div class="podium-rest" id="podium-rest">
+    <div class="podium-rest-title">Other Players</div>
+    <div class="podium-rest-list" id="podium-rest-list"></div>
+  </div>
+  
+  <div class="podium-footer">Powered by <span>Screenshot Interactive</span></div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
@@ -654,6 +903,25 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// Sound effects
+function playCheer() {
+  const sound = $('sound-cheer');
+  if (sound) {
+    sound.currentTime = 0;
+    sound.volume = 0.5;
+    sound.play().catch(() => {});
+  }
+}
+
+function playWin() {
+  const sound = $('sound-win');
+  if (sound) {
+    sound.currentTime = 0;
+    sound.volume = 0.6;
+    sound.play().catch(() => {});
+  }
 }
 
 // Confetti burst for score changes
@@ -734,6 +1002,7 @@ function showQuestion(game) {
   $('waiting-state').style.display = 'none';
   $('question-content').style.display = 'block';
   $('answer-reveal').classList.remove('show');
+  $('winner-podium').classList.remove('show');
   
   const card = $('question-card');
   card.classList.add('active');
@@ -774,6 +1043,9 @@ function revealAnswer(game) {
   $('correct-answer').textContent = correctOpt;
   $('answer-reveal').classList.add('show');
   
+  // Play cheer sound
+  playCheer();
+  
   // Trigger confetti for reveal
   triggerConfetti();
 }
@@ -784,6 +1056,7 @@ function showWaiting(message) {
   $('question-content').style.display = 'none';
   $('answer-reveal').classList.remove('show');
   $('question-card').classList.remove('active', 'revealed');
+  $('winner-podium').classList.remove('show');
   
   $('waiting-state').innerHTML = `
     <div class="waiting-icon">🎮</div>
@@ -807,20 +1080,106 @@ function showLeaderboardMode() {
   triggerConfetti();
 }
 
-// Show game ended
+// Show game ended with winner podium
 function showGameEnded() {
-  $('waiting-state').style.display = 'flex';
-  $('question-content').style.display = 'none';
-  $('answer-reveal').classList.remove('show');
+  // Get sorted players
+  const sorted = Object.entries(previousScores)
+    .map(([k, score]) => {
+      // Try to get name from existing leaderboard
+      const existingRow = document.querySelector(`.lb-row .lb-name`);
+      return { key: k, score };
+    });
   
-  $('waiting-state').innerHTML = `
-    <div class="waiting-icon">🎉</div>
-    <div class="waiting-text">Game Over! Thanks for playing!</div>
-  `;
-  
-  // Big confetti burst
-  for (let i = 0; i < 3; i++) {
-    setTimeout(() => triggerConfetti(), i * 300);
+  // Re-fetch teams for names
+  if (db) {
+    db.ref('teams').once('value', snap => {
+      const teams = snap.val() || {};
+      const players = Object.entries(teams)
+        .map(([k, v]) => ({ key: k, name: v.name || 'Player', score: v.score || 0 }))
+        .sort((a, b) => b.score - a.score);
+      
+      if (players.length === 0) {
+        // No players, just show basic game over
+        $('waiting-state').style.display = 'flex';
+        $('question-content').style.display = 'none';
+        $('answer-reveal').classList.remove('show');
+        $('waiting-state').innerHTML = `
+          <div class="waiting-icon">🎉</div>
+          <div class="waiting-text">Game Over! Thanks for playing!</div>
+        `;
+        return;
+      }
+      
+      // Build podium
+      const top3 = players.slice(0, 3);
+      const rest = players.slice(3);
+      
+      // Podium order: 2nd, 1st, 3rd (for visual layout)
+      const trophies = ['🥈', '🥇', '🥉'];
+      const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+      
+      let podiumHTML = '';
+      
+      // If we have at least 2nd place
+      if (top3[1]) {
+        podiumHTML += `
+          <div class="podium-place">
+            <div class="podium-trophy">🥈</div>
+            <div class="podium-name">${escapeHtml(top3[1].name)}</div>
+            <div class="podium-score">${top3[1].score} pts</div>
+            <div class="podium-stand">2</div>
+          </div>`;
+      }
+      
+      // 1st place (center, always if we have players)
+      if (top3[0]) {
+        podiumHTML += `
+          <div class="podium-place">
+            <div class="podium-trophy">🏆</div>
+            <div class="podium-name">${escapeHtml(top3[0].name)}</div>
+            <div class="podium-score">${top3[0].score} pts</div>
+            <div class="podium-stand">1</div>
+          </div>`;
+      }
+      
+      // 3rd place
+      if (top3[2]) {
+        podiumHTML += `
+          <div class="podium-place">
+            <div class="podium-trophy">🥉</div>
+            <div class="podium-name">${escapeHtml(top3[2].name)}</div>
+            <div class="podium-score">${top3[2].score} pts</div>
+            <div class="podium-stand">3</div>
+          </div>`;
+      }
+      
+      $('podium-places').innerHTML = podiumHTML;
+      
+      // Rest of players
+      if (rest.length > 0) {
+        $('podium-rest').style.display = 'block';
+        $('podium-rest-list').innerHTML = rest.map((p, i) => `
+          <div class="podium-rest-row">
+            <span class="podium-rest-rank">${i + 4}</span>
+            <span class="podium-rest-name">${escapeHtml(p.name)}</span>
+            <span class="podium-rest-score">${p.score}</span>
+          </div>
+        `).join('');
+      } else {
+        $('podium-rest').style.display = 'none';
+      }
+      
+      // Show podium overlay
+      $('winner-podium').classList.add('show');
+      
+      // Play victory sound
+      playWin();
+      
+      // Big confetti celebration
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => triggerConfetti(), i * 400);
+      }
+    });
   }
 }
 
