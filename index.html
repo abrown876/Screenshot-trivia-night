@@ -197,7 +197,59 @@ body::before{content:'';position:fixed;inset:0;
 /* FOOTER */
 .site-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:10}
 
-@media(max-width:430px){.q-text{font-size:1.15rem}.opt{min-height:68px;font-size:16px}.opts{gap:.55rem}.timer-num{font-size:2.5rem}.fb-title{font-size:1.9rem}.fb-points{font-size:3rem}.results-score{font-size:3.5rem}.ready-count{font-size:5rem}}
+@media(max-width:430px){
+  .q-text{font-size:1.15rem}
+  .opt{min-height:68px;font-size:16px;padding:1rem}
+  .opts{gap:.55rem}
+  .timer-num{font-size:2.5rem}
+  .fb-title{font-size:1.9rem}
+  .fb-points{font-size:3rem}
+  .results-score{font-size:3.5rem}
+  .ready-count{font-size:5rem}
+  .entrance-title{font-size:1.8rem}
+  .entrance-hero{padding:1.5rem 1rem 1.25rem}
+  .reg-body{padding:1rem}
+  .card{padding:1rem}
+  .btn{padding:16px;font-size:16px}
+  .form-input{padding:.8rem;font-size:16px}
+  .hdr{padding:.5rem .75rem}
+  .hdr-logo{height:24px}
+  .screen-inner{padding:1rem}
+}
+
+/* Extra small screens */
+@media(max-width:360px){
+  .entrance-title{font-size:1.5rem}
+  .q-text{font-size:1.05rem}
+  .opt{min-height:60px;font-size:15px;padding:.85rem}
+  .opt-letter{width:30px;height:30px;font-size:11px}
+  .timer-num{font-size:2.2rem}
+  .ready-count{font-size:4rem}
+  .fb-title{font-size:1.6rem}
+  .fb-points{font-size:2.5rem}
+  .results-score{font-size:3rem}
+  .reg-pill{font-size:10px;padding:4px 10px}
+}
+
+/* Safe area padding for notched phones */
+@supports(padding: max(0px)) {
+  .hdr{padding-top:max(.5rem, env(safe-area-inset-top));padding-left:max(.75rem, env(safe-area-inset-left));padding-right:max(.75rem, env(safe-area-inset-right))}
+  .screen{padding-top:calc(52px + env(safe-area-inset-top))}
+  .site-footer{padding-bottom:max(.75rem, env(safe-area-inset-bottom))}
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+  select, textarea, input[type="text"], input[type="email"] {
+    font-size: 16px !important;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .opt{min-height:72px}
+  .btn{min-height:56px}
+}
 </style>
 </head>
 <body>
@@ -222,8 +274,8 @@ body::before{content:'';position:fixed;inset:0;
         <div class="entrance-title">Quiz Night</div>
         <div class="entrance-sub">Live Trivia · Win Prizes · Have Fun</div>
         <div class="reg-pills">
-          <span class="reg-pill rp-q">15 Questions</span>
-          <span class="reg-pill rp-r">3 Rounds</span>
+          <span class="reg-pill rp-q">10 Questions</span>
+          <span class="reg-pill rp-r">2 Rounds</span>
           <span class="reg-pill rp-p">Prizes 🏆</span>
         </div>
       </div>
@@ -231,17 +283,23 @@ body::before{content:'';position:fixed;inset:0;
     <div class="reg-body">
       <div class="card anim">
         <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" id="inp-email" placeholder="you@email.com" autocomplete="email" inputmode="email" autocorrect="off" spellcheck="false">
-        </div>
-        <div class="form-group">
           <label class="form-label">Your Name or Team Name</label>
           <input type="text" class="form-input" id="inp-team" placeholder="e.g. Quiz Killers" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
         </div>
         <p class="form-error" id="reg-error"></p>
-        <button class="btn btn-coral" style="margin-top:.75rem" onclick="doStart()">START THE QUIZ →</button>
+        <button class="btn btn-coral" onclick="joinLive()">JOIN GAME 🔴</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- WAITING FOR HOST -->
+<div class="screen" id="scr-waiting">
+  <div class="ready-content anim">
+    <div class="ready-round">Live Game</div>
+    <h2 class="ready-title" style="font-size:1.4rem">Waiting for Host...</h2>
+    <div class="ready-count" style="font-size:3rem;animation:pulse 1.5s infinite">🔴</div>
+    <p style="color:var(--text-dim);margin-top:1rem;font-size:14px" id="waiting-msg">The host will push questions to your screen</p>
   </div>
 </div>
 
@@ -360,126 +418,38 @@ try {
 } catch(e) { console.warn('Firebase unavailable:', e.message); }
 
 const QUESTIONS = [
-  {cat:"m",lb:"Music",   q:'Which Jamaican artist is known as "The Gong"?',                              o:["Buju Banton","Bob Marley","Bounty Killer","Beenie Man"],a:1},
-  {cat:"m",lb:"Music",   q:"Sean Paul's Temperature peaked at #1 in how many countries?",               o:["3","5","8","12"],a:2},
-  {cat:"x",lb:"Culture", q:"What is Jamaica's most famous carnival street party?",                       o:["Sumfest","Bacchanal","Rebel Salute","Sting"],a:1},
-  {cat:"m",lb:"Music",   q:"Which artist featured on Beyoncé's Black Is King?",                         o:["Koffee","Spice","Govana","Chronixx"],a:0},
-  {cat:"x",lb:"Culture", q:"What Kingston event is the biggest dancehall concert?",                     o:["Sumfest","Fully Loaded","Sting","Reggae Month"],a:2},
-  {cat:"m",lb:"Music",   q:"Koffee's 2024 Grammy-winning album?",                                       o:["Gifted","Rapture","West Indies","Sink or Swim"],a:0},
-  {cat:"x",lb:"Culture", q:'Who is the "Queen of the Dancehall"?',                                      o:["Lisa Hanna","Tessanne Chin","Spice","Ce Ce"],a:2},
-  {cat:"f",lb:"Food",    q:"What is Jamaica's national dish?",                                           o:["Jerk Chicken","Oxtail Stew","Ackee and Saltfish","Curry Goat"],a:2},
-  {cat:"m",lb:"Music",   q:"Vybz Kartel created which popular dance move?",                             o:["Whining","Daggering","Gully Creepa","Bruk Out"],a:2},
-  {cat:"x",lb:"Culture", q:"Which film starred Paul Campbell and became a cult classic?",               o:["Third World Cop","Dancehall Queen","Shottas","Rude Boy"],a:2},
-  {cat:"m",lb:"Music",   q:"Which Shaggy hit became one of the best-selling singles of all time?",      o:["Angel","Boombastic","It Wasn't Me","Oh Carolina"],a:2},
-  {cat:"x",lb:"Culture", q:"What shoe brand is iconic in dancehall culture?",                           o:["Timberland","Clarks Originals","Nike","Adidas"],a:1},
-  {cat:"m",lb:"Music",   q:"Who holds the most Reggae Grammy wins?",                                    o:["Beenie Man","Shaggy","Burning Spear","Damian Marley"],a:3},
-  {cat:"x",lb:"Culture", q:'"Dutty Wine" refers to what?',                                              o:["Bad wine","A dance move","A cocktail","A street party"],a:1},
-  {cat:"f",lb:"Food",    q:"Which red flower drink is a Jamaican Christmas staple?",                    o:["Irish Moss","Roots Tonic","Sorrel Punch","Sky Juice"],a:2},
-  {cat:"m",lb:"Music",   q:"Reggae was officially recognised by UNESCO in what year?",                  o:["2011","2015","2018","2020"],a:2},
-  {cat:"x",lb:"Culture", q:"What is the name of the Jamaican currency?",                               o:["Dollar","Peso","Patacón","Lempira"],a:0},
-  {cat:"f",lb:"Food",    q:"Which fruit is most commonly used to make Jamaican rum punch?",             o:["Mango","Pineapple","Lime","Passion Fruit"],a:2},
-  {cat:"m",lb:"Music",   q:"Chronixx is known for which genre?",                                       o:["Dancehall","Reggae Revival","Ska","Dub"],a:1},
-  {cat:"x",lb:"Culture", q:'What does the Jamaican phrase "Irie" mean?',                               o:["Angry","Feeling good","Confused","Hungry"],a:1},
-  {cat:"m",lb:"Music",   q:"Which label launched Bob Marley and the Wailers?",                         o:["Trojan","Island Records","Studio One","VP Records"],a:2},
-  {cat:"x",lb:"Culture", q:"What sport is Jamaica most famous for internationally?",                   o:["Cricket","Football","Athletics","Basketball"],a:2},
-  {cat:"f",lb:"Food",    q:"What gives Jamaican jerk its distinctive flavour?",                        o:["Curry powder","Scotch bonnet pepper","Tamarind","Allspice and scotch bonnet"],a:3},
-  {cat:"m",lb:"Music",   q:"Which Jamaican singer won The Voice UK in 2012?",                          o:["Tessanne Chin","Shaggy","Koffee","Diana King"],a:0},
-  {cat:"x",lb:"Culture", q:"What is the capital of Jamaica?",                                          o:["Montego Bay","Ocho Rios","Kingston","Mandeville"],a:2},
-  {cat:"m",lb:"Music",   q:"Buju Banton served prison time in which country?",                         o:["Jamaica","USA","UK","Canada"],a:1},
-  {cat:"x",lb:"Culture", q:"Jamaica gained independence from Britain in which year?",                  o:["1958","1960","1962","1966"],a:2},
-  {cat:"f",lb:"Food",    q:"What is escovitch fish?",                                                  o:["Smoked fish","Fried fish with pickled vegetables","Steamed fish in coconut","Raw fish salad"],a:1},
-  {cat:"m",lb:"Music",   q:"Who sang Murder She Wrote with Chaka Demus?",                              o:["Pliers","Bounty Killer","Beenie Man","Elephant Man"],a:0},
-  {cat:"x",lb:"Culture", q:"What colours are on the Jamaican flag?",                                  o:["Red, white, blue","Black, gold, green","Green, black, yellow","Yellow, red, green"],a:1},
-  {cat:"m",lb:"Music",   q:"Which producer is known as the Godfather of Dancehall?",                  o:["Sly Dunbar","King Jammy","Bunny Lee","Duke Reid"],a:1},
-  {cat:"x",lb:"Culture", q:"The Blue Mountains in Jamaica are famous for what product?",              o:["Rum","Coffee","Beer","Spice"],a:1},
-  {cat:"f",lb:"Food",    q:"What is Jamaica's most popular fast food chain?",                         o:["McDonald's","KFC","Island Grill","Burger King"],a:2},
-  {cat:"m",lb:"Music",   q:'Which Jamaican artist recorded "Informer" in 1992?',                      o:["Super Cat","Snow","Shabba Ranks","Patra"],a:1},
-  {cat:"x",lb:"Culture", q:"What is the Jamaican word for friend?",                                   o:["Bredin","Irie","Dutty","Yaad"],a:0},
-  {cat:"m",lb:"Music",   q:"Protoje is associated with which music movement?",                        o:["Early reggae","Raggamuffin","Reggae Revival","Lovers Rock"],a:2},
-  {cat:"x",lb:"Culture", q:"Which Jamaican sprinter is the most decorated in Olympic history?",       o:["Asafa Powell","Shelly-Ann Fraser-Pryce","Usain Bolt","Yohan Blake"],a:2},
-  {cat:"f",lb:"Food",    q:"What is bammy made from?",                                                o:["Corn","Cassava","Plantain","Yam"],a:1},
-  {cat:"m",lb:"Music",   q:"Grace Jones was born in which Jamaican parish?",                          o:["Kingston","St. Andrew","Spanish Town","St. Catherine"],a:3},
-  {cat:"x",lb:"Culture", q:"What Jamaican sport involves horses and is held at Caymanas Park?",       o:["Polo","Horse racing","Show jumping","Rodeo"],a:1},
-  {cat:"m",lb:"Music",   q:"Which song by Inner Circle became the theme for the TV show Cops?",      o:["Sweat","Bad Boys","Rock with You","Games People Play"],a:1},
-  {cat:"x",lb:"Culture", q:"The Maroons of Jamaica are descendants of whom?",                         o:["Indentured workers","Runaway enslaved Africans","Taino indigenous people","Portuguese settlers"],a:1},
-  {cat:"f",lb:"Food",    q:"What is the main ingredient in festival?",                                o:["Flour and cornmeal","Plantain","Sweet potato","Breadfruit"],a:0},
-  {cat:"m",lb:"Music",   q:'Which Jamaican deejay is known as "Teacha"?',                             o:["Sizzla","Luciano","Capleton","Bunny Wailer"],a:2},
-  {cat:"x",lb:"Culture", q:"Montego Bay is located in which county of Jamaica?",                     o:["Surrey","Middlesex","Cornwall","Richmond"],a:2},
-  {cat:"m",lb:"Music",   q:"Which album is Bob Marley's best-selling of all time?",                   o:["Natty Dread","Rastaman Vibration","Legend","Exodus"],a:2},
-  {cat:"x",lb:"Culture", q:"What is Jamaica's national bird?",                                        o:["Hummingbird","Doctor Bird","Pelican","Egret"],a:1},
-  {cat:"f",lb:"Food",    q:"What is mannish water?",                                                  o:["A spiced rum drink","A goat head soup","A fish stew","A cornmeal porridge"],a:1},
-  {cat:"m",lb:"Music",   q:"Which label is associated with Vybz Kartel?",                             o:["Gaza Music","Portmore Empire","Black Chiney","Alliance"],a:1},
-  {cat:"x",lb:"Culture", q:"What is the name of the famous waterfall in Ocho Rios?",                 o:["Reach Falls","Dunns River Falls","YS Falls","Mayfield Falls"],a:1},
-  {cat:"m",lb:"Music",   q:"Toots and the Maytals are credited with coining which term?",             o:["Ska","Reggae","Rocksteady","Dancehall"],a:1},
-  {cat:"x",lb:"Culture", q:'Which parish is known as the "Garden Parish" of Jamaica?',               o:["St. Elizabeth","Portland","Trelawny","Manchester"],a:0},
-  {cat:"f",lb:"Food",    q:"What is pepper pot soup traditionally made with?",                       o:["Chicken","Callaloo and other vegetables","Seafood","Pork"],a:1},
-  {cat:"m",lb:"Music",   q:"Lady Saw retired from dancehall to pursue which career?",                o:["Acting","Ministry","Fashion","Teaching"],a:1},
-  {cat:"x",lb:"Culture", q:"What is the name of the Rastafarian holy land?",                         o:["Babylon","Zion","Yaad","Livity"],a:1},
-  {cat:"m",lb:"Music",   q:'Which Jamaican trio is known as "The Mighty Diamonds"?',                 o:["Culture","Toots and the Maytals","The Mighty Diamonds","The Heptones"],a:2},
-  {cat:"x",lb:"Culture", q:"What is the traditional Jamaican Christmas drink besides sorrel?",       o:["Rum punch","Carrot juice","Guinness punch","Egg nog"],a:0},
-  {cat:"f",lb:"Food",    q:"Which cooking style involves slow-cooking meat in a pit?",               o:["Jerk","Stew","Roast","Barbacoa"],a:0},
-  {cat:"m",lb:"Music",   q:'Which year did Shaggy release "Boombastic"?',                            o:["1991","1993","1995","1998"],a:2},
-  {cat:"x",lb:"Culture", q:"Usain Bolt was born in which Jamaican parish?",                          o:["Kingston","Trelawny","St. James","Portland"],a:1},
-  {cat:"m",lb:"Music",   q:'Which song starts with "Excuse me mister, can you tell me..."?',         o:["Mr. Vegas - Heads High","Beenie Man - Who Am I","Bounty Killer - Look","Capleton - Jah Jah City"],a:0},
-  {cat:"x",lb:"Culture", q:'What does "yard" mean in Jamaican slang?',                               o:["Garden","Home / Jamaica","Prison","School"],a:1},
-  {cat:"f",lb:"Food",    q:"What is run dung?",                                                      o:["A type of dancehall","Coconut milk stew","A children's game","A festival dessert"],a:1},
-  {cat:"m",lb:"Music",   q:"What is Burning Spear's real name?",                                     o:["Winston Rodney","Neville Livingston","Carlton Barrett","Joseph Hill"],a:0},
-  {cat:"x",lb:"Culture", q:"What is the Jamaican patois word for eating?",                           o:["Nyam","Eat","Chow","Bite"],a:0},
-  {cat:"m",lb:"Music",   q:"Which Jamaican artist first popularised lovers rock?",                   o:["Dennis Brown","Gregory Isaacs","Freddie McGregor","John Holt"],a:1},
-  {cat:"x",lb:"Culture", q:"Appleton Estate is famous for producing what?",                          o:["Coffee","Rum","Beer","Hot sauce"],a:1},
-  {cat:"f",lb:"Food",    q:"What bread is eaten with Jamaican ackee and saltfish?",                  o:["Baguette","Hard dough bread","Corn bread","Flatbread"],a:1},
-  {cat:"m",lb:"Music",   q:'Which Jamaican artist has a hit called "Wickedest Slam"?',               o:["Elephant Man","Mavado","Alkaline","Aidonia"],a:0},
-  {cat:"x",lb:"Culture", q:"What is Nine Night in Jamaican culture?",                                o:["A music festival","A nine-day mourning ritual","A harvest celebration","A wedding tradition"],a:1},
-  {cat:"m",lb:"Music",   q:"What is Cocoa Tea's real name?",                                          o:["Calvin Scott","Winston Churchill","Fitzroy Simpson","Garnett Silk"],a:2},
-  {cat:"x",lb:"Culture", q:"What is the national motto of Jamaica?",                                 o:["Unity is strength","Out of Many, One People","Land of Wood and Water","Forward ever, backward never"],a:1},
-  {cat:"f",lb:"Food",    q:"Which vegetable is used in Jamaican callaloo?",                          o:["Spinach","Amaranth leaves","Kale","Swiss chard"],a:1},
-  {cat:"m",lb:"Music",   q:"Alkaline is known for having which distinctive look?",                   o:["Face tattoos","Tattooed eyeballs","Bleached skin","Dreadlocks to the floor"],a:1},
-  {cat:"x",lb:"Culture", q:"What is the Jamaican term for a small sum of money or loose change?",   o:["Likkle money","Coppers","Pennie","Meds"],a:0},
-  {cat:"m",lb:"Music",   q:'Which Studio One artist is known as "The Rocksteady King"?',             o:["Ken Boothe","Alton Ellis","John Holt","Delroy Wilson"],a:1},
-  {cat:"x",lb:"Culture", q:'What Jamaican city is known as the "Second City"?',                     o:["Spanish Town","Portmore","Montego Bay","Mandeville"],a:2},
-  {cat:"f",lb:"Food",    q:"What is the main spice in Jamaican curry?",                              o:["Cumin","Turmeric","Scotch bonnet","Jamaican curry powder"],a:3},
-  {cat:"m",lb:"Music",   q:"What is Damian Marley's nickname?",                                      o:["Jr. Gong","Ziggy","Ky-Mani","Stephen"],a:0},
-  {cat:"x",lb:"Culture", q:"The Doctor Bird belongs to which bird family?",                         o:["Eagles","Parrots","Hummingbirds","Owls"],a:2},
-  {cat:"m",lb:"Music",   q:"Which Jamaican female artist is known as the First Lady of Dancehall?", o:["Ce Ce","D'Angel","Tanya Stephens","Macka Diamond"],a:2},
-  {cat:"x",lb:"Culture", q:"What is the longest river in Jamaica?",                                 o:["Rio Grande","Black River","Rio Cobre","Martha Brae"],a:1},
-  {cat:"f",lb:"Food",    q:"What is a Jamaican patty filled with?",                                 o:["Cheese only","Spiced ground meat","Ackee","Callaloo"],a:1},
-  {cat:"m",lb:"Music",   q:"Which year was Bob Marley born?",                                        o:["1942","1945","1947","1950"],a:1},
-  {cat:"x",lb:"Culture", q:"What is Emancipation Day celebrated on in Jamaica?",                    o:["July 1","August 1","October 18","November 5"],a:1},
-  {cat:"m",lb:"Music",   q:"Which song made Patra internationally famous?",                          o:["Worker Man","Queen of the Pack","Pull It Up","Romantic Call"],a:0},
-  {cat:"x",lb:"Culture", q:"What is the name of Jamaica's largest stadium?",                         o:["Sabina Park","Independence Park","National Stadium","Tinson Pen"],a:2},
-  {cat:"f",lb:"Food",    q:"What nut is used in Jamaican grater cake?",                               o:["Peanut","Coconut","Cashew","Almond"],a:1},
-  {cat:"m",lb:"Music",   q:"Sizzla Kalonji is known for which sub-genre?",                           o:["Dancehall","Roots reggae","Ska","Dub"],a:0},
-  {cat:"x",lb:"Culture", q:"What is the traditional Jamaican game played with marbles called?",      o:["Dandy shandy","Pitching marbles","Jacks","Tops"],a:1},
-  {cat:"m",lb:"Music",   q:"Which producer created the riddim culture of dancehall?",               o:["Clive Chin","Joe Gibbs","Jack Scorpio","King Jammy"],a:3},
-  {cat:"x",lb:"Culture", q:"What is the primary religion associated with Rastafari?",               o:["Islam","Christianity (Ethiopian Orthodox)","Hinduism","Animism"],a:1},
-  {cat:"f",lb:"Food",    q:"Which Jamaican dish is traditionally eaten on Good Friday?",             o:["Jerk pork","Fish (no meat)","Oxtail","Curry chicken"],a:1},
-  {cat:"m",lb:"Music",   q:"Junior Gong is the son of which legendary artist?",                     o:["Peter Tosh","Bunny Wailer","Bob Marley","Jimmy Cliff"],a:2},
-  {cat:"x",lb:"Culture", q:'What does "walk good" mean in Jamaican culture?',                       o:["Walk fast","Farewell / take care","Walk quietly","Walk straight"],a:1},
-  {cat:"m",lb:"Music",   q:'Which Jamaican artist is known as "The Gypsy"?',                        o:["Beenie Man","Bounty Killer","Elephant Man","Ninjaman"],a:1},
-  {cat:"x",lb:"Culture", q:"What type of tree is the national tree of Jamaica?",                    o:["Mango","Blue Mahoe","Lignum Vitae","Ackee"],a:1},
-  {cat:"f",lb:"Food",    q:"What is tie-a-leaf in Jamaican Christmas cooking?",                     o:["Jerk chicken wrapped in banana leaf","Blue drawers / duckanoo","Steamed fish in leaves","Roasted breadfruit"],a:1},
-  {cat:"m",lb:"Music",   q:'Which song by Koffee features the lyric "Trophy, we a go win the trophy"?',o:["Toast","Rapture","Throne","Trophy"],a:3},
-  {cat:"x",lb:"Culture", q:'What is the meaning of "likkle more" in Jamaican patois?',              o:["A little earlier","See you later","A little more food","More time please"],a:1}
+  {cat:"f",lb:"Favorites", q:"What is Andrew's #1 favourite candy?",                                    o:["Twizzlers","Pull n Peel Twizzlers","Gummy Bears","M&Ms"],a:0},
+  {cat:"m",lb:"Movies",    q:"What is Andrew's all-time favourite movie?",                              o:["The Dark Knight","The Truman Show","Zoolander","Austin Powers: International Man of Mystery"],a:3},
+  {cat:"f",lb:"Food",      q:"What is Andrew's go-to fast food order?",                                 o:["KFC Wings","Hawaiian Pizza","Grilled Chicken Whole Bowl","Oxtail with Rice and Peas"],a:0},
+  {cat:"x",lb:"Lifestyle", q:"What is Andrew's ideal vacation destination?",                            o:["Miami","Tulum","Italy","Germany"],a:2},
+  {cat:"x",lb:"Lifestyle", q:"What is Andrew's biggest pet peeve?",                                     o:["Being late","Poor communication","Double dippers","People who chew with their mouth open"],a:2},
+  {cat:"x",lb:"Lifestyle", q:"What time does Andrew ACTUALLY wake up?",                                 o:["4:00 AM","5:30 AM","6:00 AM","Depends on the night before"],a:1},
+  {cat:"x",lb:"Values",    q:"What would Andrew choose first?",                                         o:["Money","Freedom","Stability","Power"],a:1},
+  {cat:"x",lb:"Values",    q:"What does Andrew value most in people?",                                  o:["Loyalty","Consistency","Ambition","Going 50/50"],a:0},
+  {cat:"x",lb:"Lifestyle", q:"What would Andrew NEVER do?",                                             o:["Go skydiving","Move away from Jamaica","Turn right at the Upper Waterloo entrance to Fontana","Go to Eleni's"],a:2},
+  {cat:"x",lb:"Values",    q:"What would Andrew do if he won $100M tomorrow?",                          o:["Retire immediately","Build 3 new businesses","Tell no one","Buy property"],a:2},
 ];
 
 let activeQ = [];
 
 function pickQuestions() {
   const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 15);
+  return shuffled.slice(0, 10);
 }
 
-const TIMER=10, FB_DELAY=4000, CNTDN=5, QPR=5, ROUNDS=3;
+const TIMER=10, FB_DELAY=4000, CNTDN=5, QPR=5, ROUNDS=2;
 const LTRS=['A','B','C','D'], MEDALS=['🥇','🥈','🥉'];
 const GOOD=['Nailed it!','On fire! 🔥','Yes!','Perfect!','Keep going!'];
 const BAD=['Next one!','Stay sharp!','You got this!','Keep focus!'];
 
-let name='', email='', scoreKey='';
+let name='', scoreKey='';
 let round=1, qIdx=0, total=0, answered=false, tmr=null, tStart=0;
-let rCorrect=[0,0,0], rPts=[0,0,0], rBonus=[0,0,0], rAns=[[],[],[]];
+let rCorrect=[0,0], rPts=[0,0], rBonus=[0,0], rAns=[[],[]];
+let liveMode = false; // Track if we're in host-controlled live mode
+let liveQIdx = 0; // Track questions in live mode
 
 const $=id=>document.getElementById(id);
-const SCREENS=['register','ready','question','feedback','break','results','leaderboard'];
+const SCREENS=['register','ready','question','feedback','break','results','leaderboard','waiting'];
 
 function showScreen(s){
   SCREENS.forEach(id=>{ const el=$('scr-'+id); if(el) el.classList.toggle('on',id===s); });
@@ -489,24 +459,230 @@ function showScreen(s){
 }
 
 function doStart(){
-  const em=$('inp-email').value.trim().toLowerCase();
   const nm=$('inp-team').value.trim();
   const err=$('reg-error');
-  if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){err.textContent='Enter a valid email';err.classList.add('show');return;}
-  if(!nm||nm.length<2){err.textContent='Enter your team name';err.classList.add('show');return;}
+  if(!nm||nm.length<2){err.textContent='Enter your name or team name';err.classList.add('show');return;}
   err.classList.remove('show');
-  name=nm; email=em; scoreKey=em.replace(/[.#$[\]@]/g,'_');
+  name=nm; scoreKey=nm.replace(/[.#$[\]@\s]/g,'_')+'_'+Date.now();
   round=1; qIdx=0; total=0; answered=false;
-  rCorrect=[0,0,0]; rPts=[0,0,0]; rBonus=[0,0,0]; rAns=[[],[],[]];
-  // Shuffle and pick 15 questions (5 per category group) for this session
+  rCorrect=[0,0]; rPts=[0,0]; rBonus=[0,0]; rAns=[[],[]];
+  // Shuffle and pick 10 questions for this session
   activeQ = pickQuestions();
   clearInterval(tmr);
   $('hdr-team').textContent=name;
   startCountdown(1);
 }
 
-$('inp-email').addEventListener('keydown',e=>{if(e.key==='Enter')$('inp-team').focus();});
 $('inp-team').addEventListener('keydown', e=>{if(e.key==='Enter')doStart();});
+
+// Join Live Game mode - listens to host pushes
+function joinLive(){
+  const nm=$('inp-team').value.trim();
+  const err=$('reg-error');
+  if(!nm||nm.length<2){err.textContent='Enter your name or team name';err.classList.add('show');return;}
+  err.classList.remove('show');
+  
+  name=nm; scoreKey=nm.replace(/[.#$[\]@\s]/g,'_')+'_'+Date.now();
+  round=1; qIdx=0; total=0; answered=false; liveMode=true; liveQIdx=0;
+  rCorrect=[0,0]; rPts=[0,0]; rBonus=[0,0]; rAns=[[],[]];
+  clearInterval(tmr);
+  $('hdr-team').textContent=name;
+  
+  // Register player in Firebase
+  if(db){
+    db.ref('teams/'+scoreKey).set({name:name,score:0,ts:Date.now()});
+  }
+  
+  showScreen('waiting');
+  $('hdr-centre').style.display='flex';
+  
+  // Listen for host-pushed questions
+  if(db){
+    db.ref('game').on('value', snap=>{
+      const game = snap.val();
+      if(!game || !liveMode) return;
+      
+      if(game.status === 'question' && game.questionIndex >= 0){
+        // Host pushed a new question
+        loadLiveQuestion(game);
+      } else if(game.status === 'revealed' && game.revealed){
+        // Host revealed the answer
+        revealLiveAnswer(game);
+      } else if(game.status === 'waiting'){
+        showScreen('waiting');
+        $('waiting-msg').textContent = 'Get ready! First question coming soon...';
+      } else if(game.status === 'ended'){
+        showLiveResults();
+      }
+    });
+  }
+}
+
+// Load a question pushed by the host
+function loadLiveQuestion(game){
+  answered=false;
+  tStart=Date.now();
+  liveQIdx = game.questionIndex;
+  
+  // Find the matching question from our local array
+  const q = QUESTIONS[game.questionIndex] || {
+    q: game.question,
+    o: game.options,
+    a: -1, // We don't know the answer until revealed
+    cat: 'x',
+    lb: game.category || 'Quiz'
+  };
+  
+  // Store current question for answer checking
+  currentLiveQ = {
+    q: game.question,
+    o: game.options,
+    cat: game.category,
+    correctAnswer: -1 // Will be set when revealed
+  };
+  
+  $('q-counter').textContent='Q'+(liveQIdx+1);
+  $('q-cat').textContent=game.category || 'Quiz';
+  $('q-cat').className='q-cat cat-x';
+  $('q-text').textContent=game.question;
+  $('timer-num').textContent=game.timer || TIMER;
+  $('timer-num').className='timer-num';
+  $('timer-wrap').className='timer-wrap';
+  $('q-progress-fill').style.width='100%';
+  
+  $('opts').innerHTML=game.options.map((o,i)=>`<button class="opt" onclick="onLiveAnswer(${i})"><span class="opt-letter">${LTRS[i]}</span>${o}</button>`).join('');
+  showScreen('question');
+  
+  // Run local timer synced with host
+  runLiveTimer(game.timer || TIMER);
+}
+
+let currentLiveQ = null;
+
+function runLiveTimer(startTime){
+  clearInterval(tmr);
+  let remaining = startTime;
+  
+  tmr = setInterval(()=>{
+    remaining--;
+    $('timer-num').textContent = Math.max(0, remaining);
+    $('q-progress-fill').style.width = ((remaining/TIMER)*100)+'%';
+    
+    if(remaining <= 3){
+      $('timer-num').className='timer-num danger';
+      $('timer-wrap').className='timer-wrap danger';
+    } else if(remaining <= 5){
+      $('timer-num').className='timer-num warn';
+      $('timer-wrap').className='timer-wrap warn';
+    }
+    
+    if(remaining <= 0){
+      clearInterval(tmr);
+    }
+  }, 1000);
+}
+
+function onLiveAnswer(sel){
+  if(answered) return;
+  answered = true;
+  clearInterval(tmr);
+  
+  // Store the player's selection
+  playerSelection = sel;
+  
+  // Highlight selected
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    if(i===sel) b.classList.add('selected');
+  });
+  
+  // Wait for host to reveal
+  $('q-text').textContent = 'Answer locked! Waiting for reveal...';
+}
+
+let playerSelection = -1;
+
+function revealLiveAnswer(game){
+  clearInterval(tmr);
+  const correctIdx = game.correctAnswer;
+  currentLiveQ.correctAnswer = correctIdx;
+  
+  const ok = (playerSelection === correctIdx);
+  
+  // Lock all options and show correct/wrong
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('locked');
+    b.classList.remove('selected');
+    if(i === correctIdx) b.classList.add('correct');
+    else if(i === playerSelection && !ok) b.classList.add('wrong');
+  });
+  
+  // Update score
+  if(ok){
+    total++;
+    rCorrect[0]++;
+    rPts[0]++;
+  }
+  rAns[0].push({ok, pts: ok?1:0, q: currentLiveQ.q, ans: currentLiveQ.o[correctIdx]});
+  
+  $('hdr-score').textContent = total;
+  
+  // Show feedback
+  setTimeout(()=>{
+    showLiveFeedback(ok);
+  }, 800);
+}
+
+function showLiveFeedback(ok){
+  $('fb-icon').textContent = ok ? '✅' : '❌';
+  $('fb-title').textContent = ok ? 'Correct!' : 'Wrong';
+  $('fb-title').style.color = ok ? 'var(--green)' : 'var(--red)';
+  $('fb-sub').textContent = ok ? GOOD[Math.floor(Math.random()*GOOD.length)] : BAD[Math.floor(Math.random()*BAD.length)];
+  $('fb-points').textContent = ok ? '+1' : '+0';
+  $('fb-points').className = 'fb-points' + (ok ? '' : ' zero');
+  
+  // Hide Next button in live mode - host controls pace
+  $('fb-next-btn').style.display = 'none';
+  
+  showScreen('feedback');
+  
+  // Go back to waiting after a moment
+  setTimeout(()=>{
+    showScreen('waiting');
+    $('waiting-msg').textContent = 'Waiting for next question...';
+    playerSelection = -1;
+  }, 2500);
+}
+
+function showLiveResults(){
+  liveMode = false;
+  const g = grade(total);
+  $('res-trophy').textContent = g.t;
+  $('res-score').textContent = total;
+  $('res-grade').textContent = g.l;
+  
+  // Show answers review
+  $('res-rounds').innerHTML = `<div class="review-round">
+    <div class="review-round-hdr">
+      <span class="review-round-name">Live Game</span>
+      <span class="results-round-score">${total} pts</span>
+    </div>
+    ${rAns[0].map(a => {
+      const icon = a.ok ? '✅' : '❌';
+      const correctLine = a.ok ? '' : `<div class="review-correct-ans">✔ ${a.ans}</div>`;
+      return `<div class="review-item ${a.ok ? 'review-ok' : 'review-wrong'}">
+        <div class="review-item-top">
+          <span class="review-icon">${icon}</span>
+          <span class="review-q">${a.q}</span>
+          <span class="review-pts ${a.ok ? 'green' : 'red'}">${a.ok ? '+1' : '0'}</span>
+        </div>
+        ${correctLine}
+      </div>`;
+    }).join('')}
+  </div>`;
+  
+  showScreen('results');
+  if(db) db.ref('scores/'+scoreKey).set({name,score:total,ts:Date.now()});
+}
 
 function startCountdown(r){
   round=r;
@@ -619,11 +795,11 @@ function startNextRound(){
 }
 
 function grade(s){
-  if(s>=28)return{t:'🏆',l:'Legendary! Jamaica would crown you'};
-  if(s>=22)return{t:'🔥',l:'Fire! Jamaica would be proud'};
-  if(s>=15)return{t:'⭐',l:'Solid! Good vibes, good answers'};
-  if(s>=8) return{t:'🎵',l:'Respectable — keep listening'};
-  return         {t:'🌴',l:'Just Warming Up — try again!'};
+  if(s>=10)return{t:'🏆',l:'Perfect! You really know Andrew!'};
+  if(s>=8) return{t:'🔥',l:'Fire! Almost perfect!'};
+  if(s>=6) return{t:'⭐',l:'Solid! You know Andrew well'};
+  if(s>=4) return{t:'🎵',l:'Not bad — room to improve'};
+  return         {t:'🤔',l:'Maybe get to know Andrew better!'};
 }
 
 function showResults(){
@@ -658,12 +834,12 @@ function showResults(){
   }).join('');
 
   showScreen('results');
-  if(db) db.ref('scores/'+scoreKey).set({name,email,score:total,ts:Date.now()});
+  if(db) db.ref('scores/'+scoreKey).set({name,score:total,ts:Date.now()});
 }
 
 function shareResult(){
   const url=window.location.origin+window.location.pathname;
-  window.open('https://wa.me/?text='+encodeURIComponent(`🎵 I scored *${total}/30* on Screenshot Quiz Night!\n\nCan you beat me? 👇\n${url}`),'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(`🎉 I scored *${total}/10* on How Well Do You Know Andrew!\n\nCan you beat me? 👇\n${url}`),'_blank');
 }
 
 function showLeaderboard(){
@@ -684,14 +860,13 @@ function showLeaderboard(){
       return`<div class="lb-row ${cls}${e.key===scoreKey?' lb-you':''}">
         <div class="lb-rank">${medal}</div>
         <div class="lb-info"><div class="lb-name">${e.name}${e.key===scoreKey?' (you)':''}</div></div>
-        <div><div class="lb-score">${e.score}</div><div class="lb-score-den">/30</div></div>
+        <div><div class="lb-score">${e.score}</div><div class="lb-score-den">/10</div></div>
       </div>`;
     }).join('');
   });
 }
 
 function playAgain(){
-  $('inp-email').value=email;
   $('inp-team').value=name;
   showScreen('register');
 }
