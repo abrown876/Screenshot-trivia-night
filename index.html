@@ -488,7 +488,7 @@ let lastRevealedIdx = -1;
 let rAns = [[]]; // Track answers for results review
 
 const $ = id => document.getElementById(id);
-const SCREENS = ['register','waiting','question','answer-locked','feedback','live-leaderboard','results'];
+const SCREENS = ['register','waiting','question','answer-locked','feedback','live-leaderboard','results','leaderboard'];
 
 function showScreen(s){
   SCREENS.forEach(id => { 
@@ -796,6 +796,37 @@ function shareResult(){
   const url = window.location.origin + window.location.pathname;
   const text = `🎉 I scored *${total}/100* on Andrew's Birthday Quiz!\n\nCan you beat me? 👇\n${url}`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+// Show leaderboard from results screen
+function showLeaderboard(){
+  showScreen('leaderboard');
+  
+  // Fetch and display leaderboard
+  if(db){
+    db.ref('teams').once('value', snap => {
+      const teams = snap.val() || {};
+      const sorted = Object.entries(teams)
+        .map(([k,v]) => ({key:k, name:v.name||'Player', score:v.score||0}))
+        .sort((a,b) => b.score - a.score);
+      
+      if(sorted.length === 0){
+        $('lb-list').innerHTML = '<div class="lb-empty">No players yet</div>';
+        return;
+      }
+      
+      $('lb-list').innerHTML = sorted.map((p,i) => {
+        const isYou = p.key === scoreKey;
+        const posClass = i===0 ? 'first' : i===1 ? 'second' : i===2 ? 'third' : '';
+        const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1);
+        return `<div class="lb-row ${posClass} ${isYou?'lb-you':''}">
+          <div class="lb-rank">${medal}</div>
+          <div class="lb-name">${p.name}${isYou?' (You)':''}</div>
+          <div class="lb-score" style="margin-left:auto;font-weight:800">${p.score}</div>
+        </div>`;
+      }).join('');
+    });
+  }
 }
 
 // Play again
