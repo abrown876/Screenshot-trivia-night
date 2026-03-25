@@ -661,8 +661,6 @@ function onLiveAnswer(sel){
   showScreen('answer-locked');
 }
 
-let playerSelection = -1;
-
 function revealLiveAnswer(game){
   clearInterval(tmr);
   const correctIdx = game.correctAnswer;
@@ -674,8 +672,6 @@ function revealLiveAnswer(game){
   // Update score - 10 points per correct answer
   if(didAnswer && ok){
     total += 10;
-    rCorrect[0]++;
-    rPts[0] += 10;
   }
   rAns[0].push({ok: didAnswer && ok, pts: (didAnswer && ok)?10:0, q: currentLiveQ.q, ans: currentLiveQ.o[correctIdx]});
   
