@@ -399,7 +399,8 @@ function startTimer() {
     
     if (gameState.timer <= 0) {
       clearInterval(timerInterval);
-      revealAnswer();
+      // Timer expired - DO NOT auto-reveal. Host must click Reveal button.
+      toast('Time\'s up! Click Reveal Answer when ready.');
     }
   }, 1000);
 }
