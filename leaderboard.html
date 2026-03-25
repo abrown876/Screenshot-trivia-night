@@ -5,19 +5,24 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Leaderboard — Andrew's Birthday Quiz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0A0A1A;
-  --purple:#7C6EF6;
+  --bg:#080818;
+  --surface:#10102A;--surface2:#181832;--surface3:#20203C;
+  --purple:#7C6EF6;--purple-dim:#5B50C8;--purple-glow:rgba(124,110,246,.3);--purple-glow2:rgba(124,110,246,.12);
+  --coral:#FF5C8A;--coral-glow:rgba(255,92,138,.25);
   --pink:#FF5C8A;
-  --gold:#FFD700;
+  --gold:#FFB740;
   --silver:#C0C0C0;
   --bronze:#CD7F32;
-  --green:#34D399;
-  --text:#F0F0FF;
-  --text-dim:#8888BB;
-  --border:rgba(124,110,246,.18);
+  --green:#3DDC84;--green-bg:rgba(61,220,132,.12);
+  --red:#FF4B5C;--red-bg:rgba(255,75,92,.12);
+  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;
+  --border:rgba(124,110,246,.18);--border2:rgba(124,110,246,.08);
+  --r:16px;
+  --font-display:'Outfit',sans-serif;
+  --font-mono:'Space Mono',monospace;
   --font:'Outfit',sans-serif;
 }
 
@@ -42,8 +47,8 @@ body::before {
   position:fixed;
   inset:0;
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(124,110,246,.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(255,92,138,.1) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 0%, rgba(124,110,246,.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 0%, rgba(255,92,138,.08) 0%, transparent 50%);
   pointer-events:none;
   z-index:0;
 }
@@ -78,7 +83,7 @@ body::before {
 .title {
   font-size:2.5rem;
   font-weight:900;
-  background:linear-gradient(135deg, var(--purple), var(--pink));
+  background:linear-gradient(135deg,#fff 0%,#C4BEFF 45%,#FF5C8A 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   background-clip:text;
@@ -175,8 +180,8 @@ body::before {
 }
 
 .lb-row:nth-child(1) {
-  background:linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
-  border:1px solid rgba(255,215,0,0.3);
+  background:linear-gradient(135deg, rgba(255,183,64,0.15), rgba(255,183,64,0.05));
+  border:1px solid rgba(255,183,64,0.3);
 }
 
 .lb-row:nth-child(2) {
@@ -231,6 +236,7 @@ body::before {
   font-weight:800;
   text-align:right;
   color:var(--purple);
+  font-family:var(--font-mono);
 }
 
 .lb-row:nth-child(1) .lb-score {
@@ -260,6 +266,7 @@ body::before {
   font-size:1.2rem;
   font-weight:800;
   color:var(--purple);
+  font-family:var(--font-mono);
 }
 
 .q-status {
@@ -270,9 +277,9 @@ body::before {
 }
 
 .q-status.live {
-  background:rgba(52,211,153,0.15);
+  background:rgba(61,220,132,0.15);
   color:var(--green);
-  border:1px solid rgba(52,211,153,0.3);
+  border:1px solid rgba(61,220,132,0.3);
 }
 
 .q-status.waiting {
@@ -301,7 +308,7 @@ body::before {
 /* Footer */
 .footer {
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
   padding-top:1rem;
   border-top:1px solid var(--border);
@@ -310,25 +317,12 @@ body::before {
   z-index:1;
 }
 
-.sponsor {
-  display:flex;
-  align-items:center;
-  gap:0.75rem;
-  color:var(--text-dim);
-  font-size:0.85rem;
-  font-weight:600;
-}
-
-.sponsor-logo {
-  height:36px;
-  width:auto;
-}
-
 .powered-by {
-  font-size:0.8rem;
+  font-size:11px;
   color:var(--text-muted);
   font-weight:600;
-  letter-spacing:0.05em;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
 }
 
 .powered-by span {
@@ -417,10 +411,6 @@ body::before {
 </div>
 
 <div class="footer">
-  <div class="sponsor">
-    <span>Sponsored by</span>
-    <img src="chilitoswhite.png" alt="Chilitos" class="sponsor-logo" onerror="this.parentElement.innerHTML='<span>Chilitos Jamexican Food</span>'">
-  </div>
   <div class="powered-by">Powered by <span>Screenshot Interactive</span></div>
 </div>
 
