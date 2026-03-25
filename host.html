@@ -153,7 +153,7 @@ body::before{content:'';position:fixed;inset:0;
 <body>
 
 <header class="hdr">
-  <span class="hdr-title">🎮 Host Control</span>
+  <span class="hdr-title">Andrew's Birthday Quiz</span>
   <span class="hdr-badge" id="status-badge">Offline</span>
 </header>
 
@@ -193,7 +193,7 @@ body::before{content:'';position:fixed;inset:0;
         <div class="timer-label">Seconds Remaining</div>
       </div>
       <div class="controls">
-        <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()">Reveal Answer</button>
+        <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()">✨ Reveal Answer</button>
         <button class="btn btn-purple" id="btn-next" onclick="nextQuestion()">Next Question →</button>
       </div>
     </div>
@@ -202,22 +202,26 @@ body::before{content:'';position:fixed;inset:0;
     <div class="card">
       <div class="card-title">Game Controls</div>
       <div class="controls">
-        <button class="btn btn-coral" id="btn-start" onclick="startGame()">🚀 Start Game</button>
-        <button class="btn btn-ghost" id="btn-reset" onclick="resetGame()">🔄 Reset</button>
+        <button class="btn btn-coral" id="btn-start" onclick="startGame()">🎉 Start Party!</button>
+        <button class="btn btn-ghost" id="btn-reset" onclick="resetGame()">🔄 Reset Game</button>
+      </div>
+      <div class="controls" style="margin-top:.75rem">
+        <button class="btn btn-red" id="btn-reset-players" onclick="resetPlayers()">👥 Clear All Players</button>
+        <button class="btn btn-ghost" id="btn-end" onclick="endGame()">🏁 End Game</button>
       </div>
     </div>
 
     <!-- QUESTION QUEUE -->
     <div class="card">
-      <div class="card-title">Questions (Click to Push)</div>
+      <div class="card-title">Questions — Tap to Push</div>
       <div class="q-list" id="q-list"></div>
     </div>
 
     <!-- CONNECTED PLAYERS -->
     <div class="card">
-      <div class="card-title">Connected Players</div>
+      <div class="card-title">Players <span id="player-count-badge" style="background:var(--purple);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;margin-left:6px">0</span></div>
       <div class="players-grid" id="players-grid">
-        <div style="color:var(--text-muted);font-size:13px;grid-column:1/-1">No players connected yet</div>
+        <div style="color:var(--text-muted);font-size:13px;grid-column:1/-1">Waiting for players to join...</div>
       </div>
     </div>
 
@@ -536,9 +540,10 @@ function renderPlayers() {
   const entries = Object.entries(players);
   
   $('player-count').textContent = entries.length;
+  $('player-count-badge').textContent = entries.length;
   
   if (entries.length === 0) {
-    grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;grid-column:1/-1">No players connected yet</div>';
+    grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;grid-column:1/-1">Waiting for players to join...</div>';
     return;
   }
   
@@ -554,6 +559,20 @@ function renderPlayers() {
       </div>
     `;
   }).join('');
+}
+
+// Reset/clear all players
+function resetPlayers() {
+  if (!confirm('Clear all players? They will need to rejoin.')) return;
+  
+  if (db) {
+    db.ref('teams').remove();
+    db.ref('scores').remove();
+  }
+  
+  players = {};
+  renderPlayers();
+  toast('All players cleared!');
 }
 
 // Listen for players
