@@ -439,7 +439,7 @@ function nextQuestion() {
   const nextIdx = gameState.currentQ + 1;
   
   if (nextIdx >= QUESTIONS.length) {
-    endGame();
+    toast('All 10 questions complete! Click "End Game" when ready.');
     return;
   }
   
