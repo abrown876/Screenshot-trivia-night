@@ -200,6 +200,21 @@ body::before{content:'';position:fixed;inset:0;
 .pulse-dot{width:12px;height:12px;border-radius:50%;background:var(--purple);margin:0 auto;animation:pulseDot 1.2s infinite}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
 
+/* LIVE LEADERBOARD */
+.live-lb-header{text-align:center;padding:1.5rem 0 1rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.live-lb-title{font-size:1.8rem;font-weight:900;margin-bottom:.5rem}
+.live-lb-your-score{font-size:1.1rem;color:var(--purple);font-weight:700}
+.live-lb-your-score span{font-family:var(--font-mono);font-size:1.3rem}
+.live-lb-list{display:flex;flex-direction:column;gap:.6rem}
+.live-lb-row{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--surface);border-radius:12px;border:1px solid var(--border)}
+.live-lb-row.you{background:linear-gradient(135deg,rgba(124,110,246,.15),rgba(255,92,138,.1));border-color:var(--purple)}
+.live-lb-rank{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--text-dim);font-family:var(--font-mono)}
+.live-lb-row:nth-child(1) .live-lb-rank{background:linear-gradient(135deg,#FFD700,#FFA500);color:#000}
+.live-lb-row:nth-child(2) .live-lb-rank{background:linear-gradient(135deg,#C0C0C0,#A0A0A0);color:#000}
+.live-lb-row:nth-child(3) .live-lb-rank{background:linear-gradient(135deg,#CD7F32,#8B4513);color:#fff}
+.live-lb-name{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-lb-pts{font-family:var(--font-mono);font-weight:900;font-size:16px;color:var(--purple)}
+
 /* FOOTER */
 .site-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:10}
 
@@ -315,6 +330,19 @@ body::before{content:'';position:fixed;inset:0;
     <h2 class="ready-title" style="font-size:1.6rem;color:var(--green)">Answer Locked!</h2>
     <p style="color:var(--text-dim);margin-top:.5rem;font-size:15px">Waiting for host to reveal the answer...</p>
     <div class="pulse-dot" style="margin-top:1.5rem"></div>
+  </div>
+</div>
+
+<!-- LIVE LEADERBOARD -->
+<div class="screen" id="scr-live-leaderboard">
+  <div class="screen-inner">
+    <div class="live-lb-header anim">
+      <div class="live-lb-title">🏆 Leaderboard</div>
+      <div class="live-lb-your-score">Your Score: <span id="live-lb-score">0</span></div>
+    </div>
+    <div class="live-lb-list" id="live-lb-list">
+      <div class="lb-empty">Loading...</div>
+    </div>
   </div>
 </div>
 
@@ -464,7 +492,7 @@ let liveMode = false; // Track if we're in host-controlled live mode
 let liveQIdx = 0; // Track questions in live mode
 
 const $=id=>document.getElementById(id);
-const SCREENS=['register','ready','question','feedback','break','results','leaderboard','waiting','answer-locked'];
+const SCREENS=['register','ready','question','feedback','break','results','leaderboard','waiting','answer-locked','live-leaderboard'];
 
 function showScreen(s){
   SCREENS.forEach(id=>{ const el=$('scr-'+id); if(el) el.classList.toggle('on',id===s); });
@@ -518,14 +546,18 @@ function joinLive(){
       if(!game || !liveMode) return;
       
       if(game.status === 'question' && game.questionIndex >= 0){
-        // Host pushed a new question
+        // Host pushed a new question - reset state
+        playerSelection = -1;
         loadLiveQuestion(game);
       } else if(game.status === 'revealed' && game.revealed){
         // Host revealed the answer
         revealLiveAnswer(game);
+      } else if(game.status === 'leaderboard'){
+        // Host showing live leaderboard
+        showLiveLeaderboard();
       } else if(game.status === 'waiting'){
         showScreen('waiting');
-        $('waiting-msg').textContent = 'Get ready! First question coming soon...';
+        $('waiting-msg').textContent = 'Get ready! Next question coming soon...';
       } else if(game.status === 'ended'){
         showLiveResults();
       }
@@ -585,10 +617,12 @@ function runLiveTimer(startTime){
     
     if(remaining <= 0){
       clearInterval(tmr);
-      // If player hasn't answered, show times up screen
+      // Timer expired - if player hasn't answered, mark as no answer and show locked screen
+      // They'll stay here until host reveals
       if(!answered){
         answered = true;
-        playerSelection = -1;
+        playerSelection = -1; // No answer selected
+        $('timer-wrap').style.display = 'none';
         showScreen('answer-locked');
       }
     }
@@ -624,15 +658,7 @@ function revealLiveAnswer(game){
   const ok = (playerSelection === correctIdx);
   const didAnswer = (playerSelection >= 0);
   
-  // Lock all options and show correct/wrong
-  document.querySelectorAll('.opt').forEach((b,i)=>{
-    b.classList.add('locked');
-    b.classList.remove('selected');
-    if(i === correctIdx) b.classList.add('correct');
-    else if(i === playerSelection && !ok) b.classList.add('wrong');
-  });
-  
-  // Update score only if they answered
+  // Update score only if they answered correctly
   if(didAnswer && ok){
     total++;
     rCorrect[0]++;
@@ -642,10 +668,13 @@ function revealLiveAnswer(game){
   
   $('hdr-score').textContent = total;
   
-  // Show feedback after a moment to see the answer highlight
-  setTimeout(()=>{
-    showLiveFeedback(ok, didAnswer);
-  }, 1200);
+  // Update score in Firebase for live leaderboard
+  if(db && scoreKey){
+    db.ref('teams/'+scoreKey).update({score: total, lastUpdate: Date.now()});
+  }
+  
+  // Show feedback immediately (player was on answer-locked screen)
+  showLiveFeedback(ok, didAnswer);
 }
 
 function showLiveFeedback(ok, didAnswer){
@@ -671,6 +700,36 @@ function showLiveFeedback(ok, didAnswer){
   // Stay on feedback screen - host will push next question
   // Reset player selection for next question
   playerSelection = -1;
+}
+
+function showLiveLeaderboard(){
+  $('live-lb-score').textContent = total;
+  
+  // Fetch all teams and display sorted by score
+  if(db){
+    db.ref('teams').once('value', snap=>{
+      const teams = snap.val() || {};
+      const sorted = Object.entries(teams)
+        .map(([k,v])=>({key:k, name:v.name||'Player', score:v.score||0}))
+        .sort((a,b)=>b.score - a.score);
+      
+      if(sorted.length === 0){
+        $('live-lb-list').innerHTML = '<div class="lb-empty">No players yet</div>';
+        return;
+      }
+      
+      $('live-lb-list').innerHTML = sorted.map((p,i)=>{
+        const isYou = p.key === scoreKey;
+        return `<div class="live-lb-row ${isYou?'you':''}">
+          <div class="live-lb-rank">${i+1}</div>
+          <div class="live-lb-name">${p.name}${isYou?' (You)':''}</div>
+          <div class="live-lb-pts">${p.score}</div>
+        </div>`;
+      }).join('');
+    });
+  }
+  
+  showScreen('live-leaderboard');
 }
 
 function showLiveResults(){
