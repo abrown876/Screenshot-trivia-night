@@ -38,7 +38,7 @@ html, body {
 
 body {
   display:grid;
-  grid-template-columns:1fr 380px;
+  grid-template-columns:1fr 420px;
   grid-template-rows:auto 1fr auto;
   gap:1.5rem;
   padding:1.5rem 2rem;
@@ -690,13 +690,13 @@ body::before {
   position:relative;
   z-index:1;
   width:100%;
-  max-width:500px;
+  max-width:600px;
 }
 
 .podium-rest-title {
-  font-size:1rem;
-  font-weight:700;
-  color:var(--text-dim);
+  font-size:1.2rem;
+  font-weight:800;
+  color:var(--text);
   text-transform:uppercase;
   letter-spacing:0.1em;
   margin-bottom:1rem;
@@ -708,7 +708,7 @@ body::before {
   border:1px solid var(--border);
   border-radius:16px;
   padding:1rem;
-  max-height:200px;
+  max-height:280px;
   overflow-y:auto;
 }
 
@@ -722,18 +722,33 @@ body::before {
   background:rgba(255,255,255,.02);
 }
 
+.podium-rest-row.top3 {
+  background:rgba(124,110,246,.1);
+  border:1px solid rgba(124,110,246,.2);
+}
+
 .podium-rest-row:last-child { margin-bottom:0; }
 
 .podium-rest-rank {
   font-weight:800;
   color:var(--text-dim);
-  width:30px;
+  width:40px;
+  font-size:1.1rem;
+}
+
+.podium-rest-row.top3 .podium-rest-rank {
+  font-size:1.3rem;
 }
 
 .podium-rest-name {
   flex:1;
   font-weight:600;
   margin-left:0.75rem;
+}
+
+.podium-rest-row.top3 .podium-rest-name {
+  font-weight:700;
+  color:var(--text);
 }
 
 .podium-rest-score {
@@ -870,7 +885,7 @@ body::before {
   </div>
   
   <div class="podium-rest" id="podium-rest">
-    <div class="podium-rest-title">Other Players</div>
+    <div class="podium-rest-title" id="podium-rest-title">Final Standings</div>
     <div class="podium-rest-list" id="podium-rest-list"></div>
   </div>
   
@@ -1155,19 +1170,21 @@ function showGameEnded() {
       
       $('podium-places').innerHTML = podiumHTML;
       
-      // Rest of players
-      if (rest.length > 0) {
-        $('podium-rest').style.display = 'block';
-        $('podium-rest-list').innerHTML = rest.map((p, i) => `
-          <div class="podium-rest-row">
-            <span class="podium-rest-rank">${i + 4}</span>
+      // Rest of players (everyone ranked)
+      $('podium-rest').style.display = 'block';
+      $('podium-rest-title').textContent = 'Final Standings';
+      $('podium-rest-list').innerHTML = players.map((p, i) => {
+        const rank = i + 1;
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+        const isTop3 = rank <= 3;
+        return `
+          <div class="podium-rest-row ${isTop3 ? 'top3' : ''}">
+            <span class="podium-rest-rank">${medal || rank}</span>
             <span class="podium-rest-name">${escapeHtml(p.name)}</span>
-            <span class="podium-rest-score">${p.score}</span>
+            <span class="podium-rest-score">${p.score} pts</span>
           </div>
-        `).join('');
-      } else {
-        $('podium-rest').style.display = 'none';
-      }
+        `;
+      }).join('');
       
       // Show podium overlay
       $('winner-podium').classList.add('show');
