@@ -885,7 +885,7 @@ body::before {
     
     <div id="question-content" style="display:none">
       <div class="q-header">
-        <div class="q-number" id="q-number">Q1 of 10</div>
+        <div class="q-number" id="q-number">Q1 of 20</div>
         <div class="q-timer" id="q-timer">10</div>
       </div>
       <div class="q-text" id="q-text"></div>
@@ -1098,7 +1098,7 @@ function showQuestion(game) {
   
   currentQuestionIdx = game.questionIndex;
   
-  $('q-number').textContent = `Q${currentQuestionIdx + 1} of 10`;
+  $('q-number').textContent = `Q${currentQuestionIdx + 1} of 20`;
   $('q-text').textContent = game.question;
   $('q-timer').textContent = game.timer || 10;
   $('q-timer').className = 'q-timer';
