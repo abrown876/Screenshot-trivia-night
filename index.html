@@ -511,6 +511,18 @@ function doStart(){
   activeQ = pickQuestions();
   clearInterval(tmr);
   $('hdr-team').textContent=name;
+  // Register team for host visibility (non-fatal if Firebase unavailable)
+  if(db){
+    try{
+      db.ref('teams/'+scoreKey).set({
+        name: name,
+        email: email,
+        joinedAt: Date.now(),
+        currentRound: 1,
+        status: 'playing'
+      });
+    }catch(e){ console.warn('team register failed:', e); }
+  }
   startCountdown(1);
 }
 
@@ -520,6 +532,10 @@ $('gate-input').addEventListener('keydown', e=>{if(e.key==='Enter')verifyCode();
 
 function startCountdown(r){
   round=r;
+  // Update team progress for host visibility
+  if(db && scoreKey){
+    try{ db.ref('teams/'+scoreKey+'/currentRound').set(r); }catch(e){}
+  }
   $('ready-round').textContent='Round '+r+' of '+ROUNDS;
   let c=CNTDN; $('ready-count').textContent=c;
   showScreen('ready');
@@ -701,6 +717,10 @@ function showResults(){
   }).join('');
   showScreen('results');
   if(db) db.ref('scores/'+scoreKey).set({name,email,score:total,ts:Date.now()});
+  // Mark team as finished for host visibility (separate from scores write)
+  if(db && scoreKey){
+    try{ db.ref('teams/'+scoreKey+'/status').set('finished'); }catch(e){}
+  }
 }
 
 function shareResult(){

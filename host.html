@@ -320,6 +320,7 @@ body::before{content:'';position:fixed;inset:0;
   <div class="main-panel">
     <div class="tabs">
       <div class="tab active" onclick="switchTab('leaderboard',this)">🏅 Leaderboard</div>
+      <div class="tab" onclick="switchTab('live',this)">👥 Live Players <span id="live-count" style="opacity:.7;font-size:11px"></span></div>
       <div class="tab" onclick="switchTab('questions',this)">❓ Questions</div>
       <div class="tab" onclick="switchTab('activity',this)">⚡ Activity</div>
     </div>
@@ -339,6 +340,24 @@ body::before{content:'';position:fixed;inset:0;
           </thead>
           <tbody id="lb-tbody">
             <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">Waiting for players…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LIVE PLAYERS TAB -->
+      <div class="tab-pane" id="tab-live">
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>Player / Team</th>
+              <th>Email</th>
+              <th style="width:90px">Round</th>
+              <th style="width:100px">Status</th>
+              <th style="width:110px">Joined</th>
+            </tr>
+          </thead>
+          <tbody id="live-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">Waiting for players to join…</td></tr>
           </tbody>
         </table>
       </div>
@@ -773,6 +792,67 @@ db.ref('scores').on('value', snap => {
   document.getElementById('fb-status').style.color = 'var(--red)';
 });
 
+// ── LIVE TEAMS LISTENER (in-progress players) ────────────────────────────────
+let allTeams = {};
+let prevTeamKeys = new Set();
+db.ref('teams').on('value', snap => {
+  const data = snap.val() || {};
+  const newKeys = new Set(Object.keys(data));
+  // Activity feed: announce new joiners (not on first snapshot)
+  if(prevTeamKeys.size > 0){
+    newKeys.forEach(k => {
+      if(!prevTeamKeys.has(k) && data[k] && data[k].name){
+        addActivity('🎮', `<strong>${data[k].name}</strong> joined the quiz`);
+      }
+    });
+  }
+  allTeams = data;
+  prevTeamKeys = newKeys;
+  renderLiveTeams();
+}, err => {
+  console.warn('teams listener error:', err);
+});
+
+function renderLiveTeams(){
+  const tbody = document.getElementById('live-tbody');
+  const countEl = document.getElementById('live-count');
+  if(!tbody) return;
+  const entries = Object.entries(allTeams)
+    .map(([k,v]) => Object.assign({key:k}, v||{}))
+    .filter(t => t && t.email);
+  // Active = anyone playing; show finished too but de-emphasized
+  const playing = entries.filter(t => t.status !== 'finished').length;
+  if(countEl) countEl.textContent = playing ? '('+playing+')' : '';
+  if(!entries.length){
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">Waiting for players to join…</td></tr>';
+    return;
+  }
+  // Sort: playing first (by joinedAt desc), finished last
+  entries.sort((a,b) => {
+    if((a.status==='finished') !== (b.status==='finished')) return a.status==='finished' ? 1 : -1;
+    return (b.joinedAt||0) - (a.joinedAt||0);
+  });
+  tbody.innerHTML = entries.map(t => {
+    const isFinished = t.status === 'finished';
+    const round = t.currentRound || 1;
+    const statusBadge = isFinished
+      ? '<span style="color:var(--text-muted);font-size:12px">Finished</span>'
+      : '<span style="color:var(--green,#3DDC84);font-size:12px;font-weight:600">● Playing</span>';
+    const rowOpacity = isFinished ? 'opacity:.55' : '';
+    return `<tr style="${rowOpacity}">
+      <td>${escapeHtml(t.name||'—')}</td>
+      <td style="font-size:12px;color:var(--text-dim,#aab)">${escapeHtml(t.email||'')}</td>
+      <td>R${round}/3</td>
+      <td>${statusBadge}</td>
+      <td class="ts-cell">${t.joinedAt ? timeAgo(t.joinedAt) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 // ── ACTIVITY FEED ────────────────────────────────────────────────────────────
 function addActivity(icon, text) {
   const feed = document.getElementById('activity-feed');
@@ -822,6 +902,12 @@ function clearScores() {
     showToast('🗑️ All scores cleared', 'warning');
     addActivity('🗑️', 'All scores cleared by host');
   });
+  // Also clear the live teams roster (best-effort, non-blocking)
+  db.ref('teams').remove().then(() => {
+    allTeams = {};
+    prevTeamKeys = new Set();
+    if(typeof renderLiveTeams === 'function') renderLiveTeams();
+  }).catch(()=>{});
 }
 
 function deletePlayer(key, name) {
