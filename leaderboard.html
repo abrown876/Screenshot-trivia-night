@@ -41,14 +41,6 @@ body::before{content:'';position:fixed;inset:0;background:
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 1.5s ease-in-out infinite}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
 
-/* Active gate code banner — for live events */
-.code-banner{display:none;background:linear-gradient(135deg,rgba(255,183,64,.18),rgba(255,92,138,.10));border:2px solid rgba(255,183,64,.4);border-radius:14px;padding:.85rem 1.1rem;margin:.75rem 1rem 0;text-align:center;animation:codePulse 2s ease-in-out infinite}
-.code-banner.show{display:block}
-.code-banner-lbl{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
-.code-banner-val{font-family:var(--font-mono);font-size:32px;font-weight:900;color:var(--gold);letter-spacing:.15em;line-height:1;text-shadow:0 0 20px rgba(255,183,64,.4)}
-.code-banner-hint{font-size:10px;color:var(--text-dim);margin-top:.4rem;font-weight:600}
-@keyframes codePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,183,64,.3)}50%{box-shadow:0 0 0 10px rgba(255,183,64,0)}}
-
 /* LAYOUT */
 .main{flex:1;margin-top:52px;display:flex;flex-direction:column;position:relative;z-index:1;max-width:600px;width:100%;margin-left:auto;margin-right:auto}
 @media(min-width:600px){.main{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
@@ -212,26 +204,6 @@ body::before{content:'';position:fixed;inset:0;background:
     </div>
   </div>
 
-  <!-- ACTIVE GATE CODES — visible during live event so room can see codes -->
-  <div class="code-banner" id="code-banner">
-    <div class="code-banner-lbl">Round Codes</div>
-    <div id="code-banner-list" style="display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem">
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:.6rem">
-        <span style="font-size:11px;color:var(--text-dim);font-weight:700;width:62px;text-align:right">ROUND 2</span>
-        <span class="code-banner-val" id="code-r2" style="font-size:24px">—</span>
-      </div>
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:.6rem">
-        <span style="font-size:11px;color:var(--text-dim);font-weight:700;width:62px;text-align:right">ROUND 3</span>
-        <span class="code-banner-val" id="code-r3" style="font-size:24px">—</span>
-      </div>
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:.6rem">
-        <span style="font-size:11px;color:var(--text-dim);font-weight:700;width:62px;text-align:right">RESULTS</span>
-        <span class="code-banner-val" id="code-results" style="font-size:24px">—</span>
-      </div>
-    </div>
-    <div class="code-banner-hint">Enter on your phone to advance</div>
-  </div>
-
   <!-- PODIUM top 3 -->
   <div class="podium-wrap" id="podium-wrap" style="display:none">
     <div class="podium-title">Top Performers</div>
@@ -368,28 +340,6 @@ load();
 setInterval(load, 30000);
 db.ref('scores').on('child_changed', ()=>load());
 db.ref('scores').on('child_added',   ()=>load());
-
-// Live-listen for gate code updates from host
-try {
-  if(db) {
-    db.ref('gate/codes').on('value', snap => {
-      const v = snap.val() || {};
-      const banner = document.getElementById('code-banner');
-      const r2El = document.getElementById('code-r2');
-      const r3El = document.getElementById('code-r3');
-      const resEl = document.getElementById('code-results');
-      const anySet = !!(v.r2 || v.r3 || v.results);
-      if(anySet) {
-        r2El.textContent  = v.r2      || '—';
-        r3El.textContent  = v.r3      || '—';
-        resEl.textContent = v.results || '—';
-        banner.classList.add('show');
-      } else {
-        banner.classList.remove('show');
-      }
-    });
-  }
-} catch(e) { console.warn('gate listener:', e.message); }
 </script>
 </body>
 </html>

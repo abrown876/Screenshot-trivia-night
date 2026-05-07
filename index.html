@@ -282,7 +282,7 @@ body::before{content:'';position:fixed;inset:0;
         <span class="q-cat" id="q-cat"></span>
       </div>
       <div class="timer-wrap" id="timer-wrap">
-        <span class="timer-num" id="timer-num">10</span>
+        <span class="timer-num" id="timer-num">15</span>
       </div>
     </div>
     <div class="q-progress"><div class="q-progress-fill" id="q-progress-fill" style="width:100%"></div></div>
@@ -312,7 +312,6 @@ body::before{content:'';position:fixed;inset:0;
       <div class="break-stats">
         <div class="break-stat"><div class="break-stat-num green" id="br-correct">0</div><div class="break-stat-lbl">Correct</div></div>
         <div class="break-stat"><div class="break-stat-num"       id="br-pts">0</div>    <div class="break-stat-lbl">Points</div></div>
-        <div class="break-stat"><div class="break-stat-num gold"  id="br-bonus">—</div>  <div class="break-stat-lbl">Bonus</div></div>
       </div>
       <div class="break-answers">
         <div class="break-answers-title">Your Answers</div>
@@ -528,14 +527,14 @@ function pickQuestions() {
   return shuffled.slice(0, 15);
 }
 
-const TIMER=10, FB_DELAY=4000, CNTDN=5, QPR=5, ROUNDS=3;
+const TIMER=15, FB_DELAY=4000, CNTDN=5, QPR=5, ROUNDS=3;
 const LTRS=['A','B','C','D'], MEDALS=['🥇','🥈','🥉'];
 const GOOD=['Nailed it!','On fire! 🔥','Yes!','Perfect!','Keep going!'];
 const BAD=['Next one!','Stay sharp!','You got this!','Keep focus!'];
 
 let name='', email='', scoreKey='';
 let round=1, qIdx=0, total=0, answered=false, tmr=null, tStart=0;
-let rCorrect=[0,0,0], rPts=[0,0,0], rBonus=[0,0,0], rAns=[[],[],[]];
+let rCorrect=[0,0,0], rPts=[0,0,0], rAns=[[],[],[]];
 
 const $=id=>document.getElementById(id);
 const SCREENS=['register','entrygate','ready','question','feedback','break','results','leaderboard'];
@@ -556,7 +555,7 @@ function doStart(){
   err.classList.remove('show');
   name=nm; email=em; scoreKey=em.replace(/[.#$[\]@]/g,'_');
   round=1; qIdx=0; total=0; answered=false;
-  rCorrect=[0,0,0]; rPts=[0,0,0]; rBonus=[0,0,0]; rAns=[[],[],[]];
+  rCorrect=[0,0,0]; rPts=[0,0,0]; rAns=[[],[],[]];
   // activeQ is populated after entry-gate verification (gives Firebase question load extra time)
   clearInterval(tmr);
   $('hdr-team').textContent=name;
@@ -725,13 +724,10 @@ function advance(){
 
 function showBreak(){
   const c=rCorrect[round-1], p=rPts[round-1];
-  const bonus=c>=QPR?5:0;
-  if(bonus){rBonus[round-1]=bonus;total+=bonus;}
   $('break-badge').textContent ='ROUND '+round+' COMPLETE';
-  $('break-title').textContent = bonus?'Perfect Round! 🔥':(c>=3?'Nice work!':'Keep going!');
+  $('break-title').textContent = c>=QPR?'Perfect Round! 🔥':(c>=3?'Nice work!':'Keep going!');
   $('br-correct').textContent  = c+'/'+QPR;
   $('br-pts').textContent      = p;
-  $('br-bonus').textContent    = bonus?'+'+bonus:'—';
   // Reveal correct answers for every Q in this round
   let html='';
   rAns[round-1].forEach(a=>{
@@ -827,8 +823,8 @@ function showResults(){
   $('res-score').textContent=total;
   $('res-grade').textContent=g.l;
   $('res-rounds').innerHTML=Array.from({length:ROUNDS},(_,i)=>{
-    const p=rPts[i]+(rBonus[i]||0);
-    return`<div class="results-round"><span class="results-round-name">Round ${i+1}</span><span class="results-round-score">${p} pts${rBonus[i]?' ⭐':''}</span></div>`;
+    const p=rPts[i];
+    return`<div class="results-round"><span class="results-round-name">Round ${i+1}</span><span class="results-round-score">${p} pts</span></div>`;
   }).join('');
   showScreen('results');
   if(db) db.ref('scores/'+scoreKey).set({name,email,score:total,ts:Date.now()});
