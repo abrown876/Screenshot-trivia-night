@@ -421,10 +421,10 @@ body::before{content:'';position:fixed;inset:0;
     <!-- Round Code Gates — controls when players can advance -->
     <div class="rp-section" style="background:rgba(255,183,64,.06);border-bottom:1px solid rgba(255,183,64,.2)">
       <div class="rp-label" style="color:var(--gold)">🔒 Round Codes</div>
-      <div style="font-size:10px;color:var(--text-muted);margin:-.3rem 0 .6rem;line-height:1.4">Players enter these codes between rounds to advance.</div>
+      <div style="font-size:10px;color:var(--text-muted);margin:-.3rem 0 .6rem;line-height:1.4">Players enter these codes to start each round. No code needed to view final results.</div>
+      <div class="gc-row"><span class="gc-lbl">Round 1</span><input class="gc-input" id="gc-r1" type="text" maxlength="20" placeholder="e.g. WELCOME" autocomplete="off"></div>
       <div class="gc-row"><span class="gc-lbl">Round 2</span><input class="gc-input" id="gc-r2" type="text" maxlength="20" placeholder="e.g. JAMAICA" autocomplete="off"></div>
       <div class="gc-row"><span class="gc-lbl">Round 3</span><input class="gc-input" id="gc-r3" type="text" maxlength="20" placeholder="e.g. REGGAE" autocomplete="off"></div>
-      <div class="gc-row"><span class="gc-lbl">Results</span><input class="gc-input" id="gc-results" type="text" maxlength="20" placeholder="e.g. CHAMPION" autocomplete="off"></div>
       <div class="action-grid">
         <button class="action-btn primary" style="justify-content:center;text-align:center" onclick="saveGateCodes()">💾 Save Codes</button>
       </div>
@@ -941,10 +941,10 @@ function loadGateCodes(){
   if(!db){ _gcSetStatus('Offline — codes will be set when reconnected', 'error'); return; }
   db.ref('gate/codes').once('value').then(snap=>{
     const v = snap.val() || {};
-    if(v.r2)      document.getElementById('gc-r2').value      = v.r2;
-    if(v.r3)      document.getElementById('gc-r3').value      = v.r3;
-    if(v.results) document.getElementById('gc-results').value = v.results;
-    const anySet = !!(v.r2 || v.r3 || v.results);
+    if(v.r1) document.getElementById('gc-r1').value = v.r1;
+    if(v.r2) document.getElementById('gc-r2').value = v.r2;
+    if(v.r3) document.getElementById('gc-r3').value = v.r3;
+    const anySet = !!(v.r1 || v.r2 || v.r3);
     _gcSetStatus(anySet ? 'Loaded current codes' : 'No codes set yet — fill in and save');
   }).catch(e=>{
     console.warn('loadGateCodes failed:', e);
@@ -954,23 +954,23 @@ function loadGateCodes(){
 
 function saveGateCodes(){
   if(!db){ _gcSetStatus('Offline — try again', 'error'); return; }
-  const r2  = (document.getElementById('gc-r2').value      || '').trim().toUpperCase();
-  const r3  = (document.getElementById('gc-r3').value      || '').trim().toUpperCase();
-  const res = (document.getElementById('gc-results').value || '').trim().toUpperCase();
-  if(!r2 || !r3 || !res){
+  const r1 = (document.getElementById('gc-r1').value || '').trim().toUpperCase();
+  const r2 = (document.getElementById('gc-r2').value || '').trim().toUpperCase();
+  const r3 = (document.getElementById('gc-r3').value || '').trim().toUpperCase();
+  if(!r1 || !r2 || !r3){
     _gcSetStatus('Fill in all 3 codes before saving', 'error');
     return;
   }
-  if(r2===r3 || r3===res || r2===res){
+  if(r1===r2 || r2===r3 || r1===r3){
     _gcSetStatus('Codes must be different from each other', 'error');
     return;
   }
   _gcSetStatus('Saving…');
-  db.ref('gate/codes').set({r2:r2, r3:r3, results:res}).then(()=>{
+  db.ref('gate/codes').set({r1:r1, r2:r2, r3:r3}).then(()=>{
     _gcSetStatus('✓ Codes saved — share with your room', 'saved');
-    document.getElementById('gc-r2').value      = r2;
-    document.getElementById('gc-r3').value      = r3;
-    document.getElementById('gc-results').value = res;
+    document.getElementById('gc-r1').value = r1;
+    document.getElementById('gc-r2').value = r2;
+    document.getElementById('gc-r3').value = r3;
     addActivity('🔒', 'Round codes updated by host');
     setTimeout(()=>{ const el=document.getElementById('gc-status'); if(el && el.classList.contains('saved')) _gcSetStatus('Codes active'); }, 4000);
   }).catch(e=>{
