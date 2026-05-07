@@ -179,6 +179,46 @@ body::before{content:'';position:fixed;inset:0;
 .q-cat-f{background:rgba(255,92,138,.15);color:var(--coral)}
 .q-cat-x{background:rgba(255,183,64,.12);color:var(--gold)}
 
+/* ── QUESTION EDITOR ──────────────────────────────────────── */
+.q-actions{display:flex;flex-direction:column;gap:.25rem;flex-shrink:0;margin-left:.5rem}
+.q-action-btn{
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text-dim);
+  width:28px;height:24px;border-radius:6px;cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;font-weight:700;
+  transition:all .15s
+}
+.q-action-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--purple)}
+.q-action-btn.danger:hover{color:var(--red);border-color:var(--red)}
+.q-action-btn:disabled{opacity:.3;cursor:not-allowed}
+.q-edit-form{
+  background:var(--surface2);border:2px solid var(--purple);border-radius:10px;
+  padding:.75rem;display:flex;flex-direction:column;gap:.5rem
+}
+.q-edit-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.q-edit-input{
+  flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:.45rem .6rem;font-family:var(--font-display);
+  font-size:12px;color:var(--text);outline:none
+}
+.q-edit-input:focus{border-color:var(--purple);background:var(--surface3)}
+.q-edit-input.q-edit-q{font-weight:600;font-size:13px}
+.q-edit-opt-row{display:flex;gap:.5rem;align-items:center}
+.q-edit-opt-row input[type=radio]{accent-color:var(--green);cursor:pointer;flex-shrink:0}
+.q-edit-opt-ltr{font-family:var(--font-mono);font-size:11px;font-weight:900;color:var(--text-muted);width:14px;flex-shrink:0}
+.q-edit-select{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  padding:.4rem .5rem;font-family:var(--font-display);font-size:12px;color:var(--text);
+  outline:none;cursor:pointer
+}
+.q-edit-select:focus{border-color:var(--purple)}
+.q-edit-actions{display:flex;gap:.4rem;justify-content:flex-end;margin-top:.25rem}
+.q-edit-actions button{
+  padding:.4rem .85rem;font-size:11px;font-weight:700;border-radius:6px;border:none;
+  cursor:pointer;font-family:var(--font-display)
+}
+.q-edit-save{background:var(--green);color:#000}
+.q-edit-cancel{background:var(--surface3);color:var(--text-dim);border:1px solid var(--border)!important}
+
 /* ── RIGHT PANEL ───────────────────────────────────────────── */
 .right-panel{
   background:var(--surface);border-left:1px solid var(--border);
@@ -364,6 +404,21 @@ body::before{content:'';position:fixed;inset:0;
 
       <!-- QUESTIONS TAB -->
       <div class="tab-pane" id="tab-questions">
+        <!-- PIN gate: blocks editing until host enters PIN -->
+        <div id="q-pin-gate" style="background:rgba(255,183,64,.06);border:1px solid rgba(255,183,64,.3);border-radius:12px;padding:1rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+          <span style="font-size:13px;color:var(--gold);font-weight:700">🔒 Editing locked</span>
+          <input type="password" class="q-search" id="q-pin-input" placeholder="Host PIN" style="max-width:160px" autocomplete="off" onkeydown="if(event.key==='Enter')unlockEditor()">
+          <button class="action-btn primary" style="padding:.45rem .9rem;font-size:12px" onclick="unlockEditor()">Unlock</button>
+          <span id="q-pin-msg" style="font-size:11px;color:var(--text-muted);width:100%"></span>
+        </div>
+        <!-- Editor toolbar (shown after unlock) -->
+        <div id="q-edit-toolbar" style="display:none;gap:.5rem;margin-bottom:.65rem;flex-wrap:wrap">
+          <button class="action-btn primary" style="padding:.45rem .9rem;font-size:12px" onclick="addQuestion()">+ Add Question</button>
+          <button class="action-btn" style="padding:.45rem .9rem;font-size:12px;background:linear-gradient(135deg,var(--green),#2BB069);color:#000;font-weight:800" onclick="saveAllQuestions()">💾 Save All to Firebase</button>
+          <button class="action-btn ghost" style="padding:.45rem .9rem;font-size:12px" onclick="resetQuestionsToDefaults()">↺ Reset to Defaults</button>
+          <button class="action-btn ghost" style="padding:.45rem .9rem;font-size:12px" onclick="lockEditor()">🔒 Lock</button>
+          <span id="q-edit-status" style="font-size:11px;color:var(--text-muted);align-self:center;margin-left:auto"></span>
+        </div>
         <div class="q-filter-row">
           <button class="q-filter-btn active" onclick="filterQ('all',this)">All</button>
           <button class="q-filter-btn" onclick="filterQ('m',this)">🎵 Music</button>
@@ -610,8 +665,84 @@ const MEDALS  = ['🥇','🥈','🥉'];
 const RANK_CLS= ['tr-first','tr-second','tr-third'];
 const PLAYER_LINK = 'https://quiz.screenshotinteractive.com';
 
-// ── QUESTION BROWSER ────────────────────────────────────────────────────────
+// ── QUESTION EDITOR (PIN-gated CRUD with Firebase sync) ─────────────────────
+const HOST_PIN = 'craqquiz'; // Default host PIN (change in source to update)
+const DEFAULT_QUESTIONS = QUESTIONS.map(q => ({cat:q.cat, lb:q.lb, q:q.q, o:[...q.o], a:q.a}));
+let WORKING_QUESTIONS = QUESTIONS.map(q => ({cat:q.cat, lb:q.lb, q:q.q, o:[...q.o], a:q.a}));
+let EDIT_LOCKED = true;
+let editingIdx = -1; // index in WORKING_QUESTIONS being edited (-1 = none)
 let qFilter = 'all';
+
+const CAT_LABELS = {m:'Music', x:'Culture', f:'Food'};
+
+function isValidQ(q){
+  if(!q || typeof q !== 'object') return false;
+  if(typeof q.q !== 'string' || !q.q.trim()) return false;
+  if(!Array.isArray(q.o) || q.o.length !== 4) return false;
+  if(!q.o.every(o => typeof o === 'string' && o.trim())) return false;
+  if(typeof q.a !== 'number' || q.a < 0 || q.a > 3) return false;
+  if(!['m','x','f'].includes(q.cat)) return false;
+  return true;
+}
+
+function loadQuestionsFromFirebase(){
+  if(!db) return;
+  try{
+    db.ref('quiz/questions').once('value').then(snap=>{
+      const v = snap.val();
+      if(!v) return; // nothing saved → keep defaults
+      const arr = Array.isArray(v) ? v : Object.keys(v).sort((a,b)=>(+a)-(+b)).map(k=>v[k]);
+      const valid = arr.filter(isValidQ);
+      if(valid.length){
+        WORKING_QUESTIONS = valid.map(q => ({cat:q.cat, lb:CAT_LABELS[q.cat], q:q.q, o:[...q.o], a:q.a}));
+        renderQuestions();
+        addActivity('📥', 'Loaded '+valid.length+' questions from Firebase');
+      }
+    }).catch(e=>{ console.warn('Question load failed:', e); });
+  }catch(e){ console.warn('Question load threw:', e); }
+}
+
+function unlockEditor(){
+  const inp = document.getElementById('q-pin-input');
+  const msg = document.getElementById('q-pin-msg');
+  if(inp.value === HOST_PIN){
+    EDIT_LOCKED = false;
+    document.getElementById('q-pin-gate').style.display = 'none';
+    document.getElementById('q-edit-toolbar').style.display = 'flex';
+    inp.value = '';
+    msg.textContent = '';
+    renderQuestions();
+    addActivity('🔓', 'Question editor unlocked');
+  } else {
+    msg.textContent = 'Wrong PIN';
+    msg.style.color = 'var(--red)';
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+function lockEditor(){
+  if(editingIdx >= 0){
+    if(!confirm('You have unsaved changes to a question. Discard?')) return;
+  }
+  EDIT_LOCKED = true;
+  editingIdx = -1;
+  document.getElementById('q-pin-gate').style.display = 'flex';
+  document.getElementById('q-edit-toolbar').style.display = 'none';
+  document.getElementById('q-pin-msg').textContent = '';
+  renderQuestions();
+}
+
+function _editStatus(msg, cls){
+  const el = document.getElementById('q-edit-status');
+  if(!el) return;
+  el.textContent = msg || '';
+  el.style.color = cls === 'error' ? 'var(--red)' : (cls === 'ok' ? 'var(--green)' : 'var(--text-muted)');
+}
+
+function escapeAttr(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 function filterQ(cat, btn) {
   qFilter = cat;
@@ -621,32 +752,199 @@ function filterQ(cat, btn) {
 }
 
 function renderQuestions() {
-  const search = document.getElementById('q-search').value.toLowerCase();
-  const filtered = QUESTIONS.filter(q => {
+  const search = (document.getElementById('q-search').value || '').toLowerCase();
+  // Tag each question with its true index in WORKING_QUESTIONS, then filter
+  const annotated = WORKING_QUESTIONS.map((q, i) => ({q, i}));
+  const filtered = annotated.filter(({q}) => {
     const catMatch = qFilter === 'all' || q.cat === qFilter;
     const textMatch = !search || q.q.toLowerCase().includes(search) || q.o.some(o => o.toLowerCase().includes(search));
     return catMatch && textMatch;
   });
-  document.getElementById('q-count').textContent = filtered.length + ' of ' + QUESTIONS.length + ' questions';
-  document.getElementById('q-list').innerHTML = filtered.map((q, idx) => {
-    const num = QUESTIONS.indexOf(q) + 1;
+  document.getElementById('q-count').textContent = filtered.length + ' of ' + WORKING_QUESTIONS.length + ' questions';
+
+  document.getElementById('q-list').innerHTML = filtered.map(({q, i}) => {
+    const num = i + 1;
+    if(i === editingIdx) return renderEditForm(q, i);
+    // Read-only row
+    const editControls = EDIT_LOCKED ? '' : `
+      <div class="q-actions">
+        <button class="q-action-btn" title="Move up"   onclick="moveQuestion(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="q-action-btn" title="Move down" onclick="moveQuestion(${i},1)"  ${i===WORKING_QUESTIONS.length-1?'disabled':''}>↓</button>
+        <button class="q-action-btn" title="Edit"      onclick="startEdit(${i})">✎</button>
+        <button class="q-action-btn danger" title="Delete" onclick="deleteQuestion(${i})">🗑</button>
+      </div>`;
     return `<div class="q-item">
       <div class="q-num">#${num}</div>
       <div class="q-body">
         <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.4rem">
-          <div class="q-text" style="flex:1">${q.q}</div>
-          <div class="q-cat-tag q-cat-${q.cat}">${q.lb}</div>
+          <div class="q-text" style="flex:1">${escapeAttr(q.q)}</div>
+          <div class="q-cat-tag q-cat-${q.cat}">${escapeAttr(q.lb||CAT_LABELS[q.cat]||'')}</div>
         </div>
         <div class="q-opts">
-          ${q.o.map((o,i) => `<div class="q-opt${i===q.a?' correct':''}">
-            <div class="q-opt-ltr">${LETTERS[i]}</div>
-            ${o}
+          ${q.o.map((o,oi) => `<div class="q-opt${oi===q.a?' correct':''}">
+            <div class="q-opt-ltr">${LETTERS[oi]}</div>
+            ${escapeAttr(o)}
           </div>`).join('')}
         </div>
       </div>
+      ${editControls}
     </div>`;
   }).join('');
 }
+
+function renderEditForm(q, i){
+  const num = i + 1;
+  const optRows = [0,1,2,3].map(oi => `
+    <div class="q-edit-opt-row">
+      <input type="radio" name="qe-correct-${i}" value="${oi}" ${oi===q.a?'checked':''} title="Mark as correct answer">
+      <span class="q-edit-opt-ltr">${LETTERS[oi]}</span>
+      <input class="q-edit-input" id="qe-opt-${i}-${oi}" type="text" value="${escapeAttr(q.o[oi]||'')}" placeholder="Option ${LETTERS[oi]}">
+    </div>`).join('');
+  return `<div class="q-item" style="background:rgba(124,110,246,.05)">
+    <div class="q-num">#${num}</div>
+    <div class="q-edit-form" style="flex:1">
+      <div class="q-edit-row">
+        <input class="q-edit-input q-edit-q" id="qe-q-${i}" type="text" value="${escapeAttr(q.q)}" placeholder="Question text">
+        <select class="q-edit-select" id="qe-cat-${i}">
+          <option value="m" ${q.cat==='m'?'selected':''}>🎵 Music</option>
+          <option value="x" ${q.cat==='x'?'selected':''}>🌍 Culture</option>
+          <option value="f" ${q.cat==='f'?'selected':''}>🍽️ Food</option>
+        </select>
+      </div>
+      ${optRows}
+      <div style="font-size:10px;color:var(--text-muted);margin-top:.2rem">Select the radio next to the correct answer</div>
+      <div class="q-edit-actions">
+        <button class="q-edit-cancel" onclick="cancelEdit()">Cancel</button>
+        <button class="q-edit-save" onclick="saveEdit(${i})">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startEdit(i){
+  if(editingIdx >= 0 && editingIdx !== i){
+    if(!confirm('You have unsaved changes to another question. Discard?')) return;
+  }
+  editingIdx = i;
+  renderQuestions();
+}
+
+function cancelEdit(){
+  editingIdx = -1;
+  renderQuestions();
+}
+
+function saveEdit(i){
+  const qText = document.getElementById('qe-q-'+i).value.trim();
+  const opts = [0,1,2,3].map(oi => document.getElementById('qe-opt-'+i+'-'+oi).value.trim());
+  const cat = document.getElementById('qe-cat-'+i).value;
+  const correctRadio = document.querySelector('input[name="qe-correct-'+i+'"]:checked');
+  if(!qText){ _editStatus('Question text is required', 'error'); return; }
+  if(!opts.every(o => o)){ _editStatus('All 4 options must be filled in', 'error'); return; }
+  if(!correctRadio){ _editStatus('Select the correct answer', 'error'); return; }
+  if(!CAT_LABELS[cat]){ _editStatus('Invalid category', 'error'); return; }
+  WORKING_QUESTIONS[i] = {
+    cat: cat,
+    lb: CAT_LABELS[cat],
+    q: qText,
+    o: opts,
+    a: parseInt(correctRadio.value, 10)
+  };
+  editingIdx = -1;
+  _editStatus('✓ Edit saved (not yet pushed to Firebase)', 'ok');
+  renderQuestions();
+}
+
+function addQuestion(){
+  if(editingIdx >= 0){
+    if(!confirm('You have unsaved changes. Discard and add a new question?')) return;
+  }
+  WORKING_QUESTIONS.unshift({cat:'m', lb:'Music', q:'', o:['','','',''], a:0});
+  editingIdx = 0;
+  renderQuestions();
+  // Scroll the new edit form into view
+  setTimeout(()=>{
+    const inp = document.getElementById('qe-q-0');
+    if(inp){ inp.scrollIntoView({behavior:'smooth', block:'center'}); inp.focus(); }
+  }, 50);
+}
+
+function deleteQuestion(i){
+  const q = WORKING_QUESTIONS[i];
+  if(!q) return;
+  const preview = q.q.length > 50 ? q.q.slice(0,50)+'…' : q.q;
+  if(!confirm('Delete this question?\n\n"'+preview+'"\n\n(You still need to click "Save All to Firebase" to make it permanent.)')) return;
+  WORKING_QUESTIONS.splice(i, 1);
+  if(editingIdx === i) editingIdx = -1;
+  else if(editingIdx > i) editingIdx--;
+  _editStatus('✓ Deleted (not yet pushed to Firebase)', 'ok');
+  renderQuestions();
+}
+
+function moveQuestion(i, dir){
+  const j = i + dir;
+  if(j < 0 || j >= WORKING_QUESTIONS.length) return;
+  const tmp = WORKING_QUESTIONS[i];
+  WORKING_QUESTIONS[i] = WORKING_QUESTIONS[j];
+  WORKING_QUESTIONS[j] = tmp;
+  if(editingIdx === i) editingIdx = j;
+  else if(editingIdx === j) editingIdx = i;
+  renderQuestions();
+}
+
+function saveAllQuestions(){
+  if(!db){ _editStatus('Offline — Firebase unreachable', 'error'); return; }
+  if(editingIdx >= 0){ _editStatus('Finish editing the open question first (Save or Cancel)', 'error'); return; }
+  if(WORKING_QUESTIONS.length < 15){
+    if(!confirm('You only have '+WORKING_QUESTIONS.length+' questions. The quiz needs at least 15 to run a full session. Save anyway?')) return;
+  }
+  // Validate all questions before publish
+  for(let i=0; i<WORKING_QUESTIONS.length; i++){
+    if(!isValidQ(WORKING_QUESTIONS[i])){
+      _editStatus('Question #'+(i+1)+' is invalid — fix it before saving', 'error');
+      return;
+    }
+  }
+  _editStatus('Saving…');
+  // Strip to canonical shape (drop any extra fields)
+  const payload = WORKING_QUESTIONS.map(q => ({cat:q.cat, lb:CAT_LABELS[q.cat], q:q.q, o:q.o.slice(0,4), a:q.a}));
+  db.ref('quiz/questions').set(payload).then(()=>{
+    _editStatus('✓ Saved '+payload.length+' questions to Firebase', 'ok');
+    addActivity('💾', 'Question bank updated — '+payload.length+' questions');
+    setTimeout(()=>_editStatus(''), 4000);
+  }).catch(e=>{
+    console.warn('saveAllQuestions failed:', e);
+    let msg = 'Save failed — check connection';
+    if(e && (e.code === 'PERMISSION_DENIED' || /permission/i.test(e.message||''))){
+      msg = 'BLOCKED — Firebase rules need to allow writes to quiz/questions';
+      console.error('Firebase rules blocking quiz/questions write. Update rules to allow .write at this path.');
+    }
+    _editStatus(msg, 'error');
+  });
+}
+
+function resetQuestionsToDefaults(){
+  if(!confirm('Reset all questions to the original built-in list?\n\nThis will:\n• Discard your working edits\n• Wipe quiz/questions in Firebase\n• Players will use the embedded list until you save again')) return;
+  WORKING_QUESTIONS = DEFAULT_QUESTIONS.map(q => ({cat:q.cat, lb:q.lb, q:q.q, o:[...q.o], a:q.a}));
+  editingIdx = -1;
+  renderQuestions();
+  if(db){
+    _editStatus('Resetting Firebase…');
+    db.ref('quiz/questions').remove().then(()=>{
+      _editStatus('✓ Reset complete — Firebase node cleared, working copy restored', 'ok');
+      addActivity('↺', 'Question bank reset to defaults');
+      setTimeout(()=>_editStatus(''), 4000);
+    }).catch(e=>{
+      console.warn('reset failed:', e);
+      _editStatus('Working copy reset, but Firebase clear failed', 'error');
+    });
+  } else {
+    _editStatus('✓ Working copy reset to defaults', 'ok');
+  }
+}
+
+// On load, try to pull current Firebase question bank into the editor's working copy
+setTimeout(loadQuestionsFromFirebase, 700);
 
 // ── CLOCK ────────────────────────────────────────────────────────────────────
 function updateClock() {
