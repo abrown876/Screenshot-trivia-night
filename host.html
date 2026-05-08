@@ -609,7 +609,7 @@ body::before{content:'';position:fixed;inset:0;
       <div class="info-row"><span class="info-key">Edition</span><span class="info-val">Jamaica</span></div>
       <div class="info-row"><span class="info-key">Questions</span><span class="info-val">100 (15 per game)</span></div>
       <div class="info-row"><span class="info-key">Rounds</span><span class="info-val">3 × 5</span></div>
-      <div class="info-row"><span class="info-key">Max Score</span><span class="info-val gold">30 pts</span></div>
+      <div class="info-row"><span class="info-key">Max Score</span><span class="info-val gold">15 pts</span></div>
       <div class="info-row"><span class="info-key">Firebase</span><span class="info-val green" id="fb-status">Connecting…</span></div>
     </div>
 
@@ -1086,7 +1086,7 @@ function renderAll() {
   if(n) {
     document.getElementById('stat-top').textContent  = entries[0].score;
     document.getElementById('stat-avg').textContent  = (entries.reduce((s,e)=>s+e.score,0)/n).toFixed(1);
-    document.getElementById('stat-perfect').textContent = entries.filter(e=>e.score===30).length;
+    document.getElementById('stat-perfect').textContent = entries.filter(e=>e.score===15).length;
   } else {
     document.getElementById('stat-top').textContent  = '—';
     document.getElementById('stat-avg').textContent  = '—';
@@ -1097,18 +1097,17 @@ function renderAll() {
   [1,2,3].forEach(r => {
     const e = entries[r-1];
     document.getElementById('rp-'+r+'-name').textContent  = e ? e.name    : '—';
-    document.getElementById('rp-'+r+'-score').textContent = e ? e.score+'/30' : '—';
+    document.getElementById('rp-'+r+'-score').textContent = e ? e.score+'/15' : '—';
   });
 
   // Score distribution
   if(n) {
     const bands = [
-      {label:'26-30', min:26, max:30},
-      {label:'21-25', min:21, max:25},
-      {label:'16-20', min:16, max:20},
-      {label:'11-15', min:11, max:15},
-      {label:'6-10',  min:6,  max:10},
-      {label:'0-5',   min:0,  max:5},
+      {label:'13-15', min:13, max:15},
+      {label:'10-12', min:10, max:12},
+      {label:'7-9',   min:7,  max:9},
+      {label:'4-6',   min:4,  max:6},
+      {label:'0-3',   min:0,  max:3},
     ];
     const max = Math.max(...bands.map(b => entries.filter(e=>e.score>=b.min&&e.score<=b.max).length)) || 1;
     document.getElementById('score-dist').innerHTML = bands.map(b => {
@@ -1154,7 +1153,7 @@ function renderAll() {
         <td><span class="medal">${medal}</span></td>
         <td class="lb-name-cell">${e.name}</td>
         <td class="lb-email-cell">${e.email||'—'}</td>
-        <td class="lb-score-cell" style="text-align:right">${e.score}<span style="font-size:10px;color:var(--text-muted)">/30</span></td>
+        <td class="lb-score-cell" style="text-align:right">${e.score}<span style="font-size:10px;color:var(--text-muted)">/15</span></td>
         <td class="ts-cell">${e.ts ? timeAgo(e.ts) : '—'}</td>
       </tr>`;
     }).join('');
@@ -1169,9 +1168,9 @@ db.ref('scores').on('value', snap => {
   // Detect new players
   newKeys.forEach(k => {
     if(!prevKeys.has(k) && data[k]) {
-      addActivity('👤', `<strong>${data[k].name}</strong> just completed the quiz with <strong>${data[k].score}/30</strong>`);
+      addActivity('👤', `<strong>${data[k].name}</strong> just completed the quiz with <strong>${data[k].score}/15</strong>`);
     } else if(prevKeys.has(k) && data[k] && allScores[k] && data[k].score !== allScores[k].score) {
-      addActivity('🔄', `<strong>${data[k].name}</strong> updated score to <strong>${data[k].score}/30</strong>`);
+      addActivity('🔄', `<strong>${data[k].name}</strong> updated score to <strong>${data[k].score}/15</strong>`);
     }
   });
 
@@ -1273,7 +1272,7 @@ function exportCSV() {
   const header = 'Rank,Name,Email,Score,Max,Time\n';
   const rows = entries.map((e,i) => {
     const ts = e.ts ? new Date(e.ts).toLocaleString() : '';
-    return `${i+1},"${e.name}","${e.email||''},${e.score},30,"${ts}"`;
+    return `${i+1},"${e.name}","${e.email||''},${e.score},15,"${ts}"`;
   }).join('\n');
   const blob = new Blob([header+rows], {type:'text/csv'});
   const a = document.createElement('a');

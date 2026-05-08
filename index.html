@@ -355,7 +355,7 @@ body::before{content:'';position:fixed;inset:0;
     <div class="results-card">
       <div class="results-trophy" id="res-trophy">🏆</div>
       <div class="results-score"  id="res-score">0</div>
-      <div class="results-max">out of 30</div>
+      <div class="results-max">out of 15</div>
       <div class="results-label"  id="res-grade"></div>
     </div>
     <div class="results-breakdown">
@@ -883,7 +883,7 @@ function showResults(){
 
 function shareResult(){
   const url=window.location.origin+window.location.pathname;
-  window.open('https://wa.me/?text='+encodeURIComponent(`🎵 I scored *${total}/30* on Screenshot Quiz Night!\n\nCan you beat me? 👇\n${url}`),'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(`🎵 I scored *${total}/15* on Screenshot Quiz Night!\n\nCan you beat me? 👇\n${url}`),'_blank');
 }
 
 function showLeaderboard(){
@@ -904,7 +904,7 @@ function showLeaderboard(){
       return`<div class="lb-row ${cls}${e.key===scoreKey?' lb-you':''}">
         <div class="lb-rank">${medal}</div>
         <div class="lb-info"><div class="lb-name">${e.name}${e.key===scoreKey?' (you)':''}</div></div>
-        <div><div class="lb-score">${e.score}</div><div class="lb-score-den">/30</div></div>
+        <div><div class="lb-score">${e.score}</div><div class="lb-score-den">/15</div></div>
       </div>`;
     }).join('');
   });
