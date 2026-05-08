@@ -101,7 +101,9 @@ body::before{content:'';position:fixed;inset:0;
 .opts{display:flex;flex-direction:column;gap:.65rem}
 .opt{width:100%;text-align:left;padding:1.1rem 1.1rem;border-radius:14px;border:2px solid var(--border);background:var(--surface);font-size:17px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.75rem;cursor:pointer;font-family:var(--font-display);transition:border-color .12s,background .12s,transform .1s;touch-action:manipulation;min-height:72px}
 .opt:active:not(.locked){transform:scale(.98)}
-.opt:hover:not(.locked){border-color:rgba(124,110,246,.4);background:var(--surface2)}
+.opt:focus{outline:none}
+.opt:focus-visible{outline:none}
+@media (hover:hover){.opt:hover:not(.locked){border-color:rgba(124,110,246,.4);background:var(--surface2)}}
 .opt.selected{border-color:var(--purple)!important;background:rgba(124,110,246,.18)!important;transform:scale(.99)}
 .opt.locked{pointer-events:none}
 .opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;animation:correctBounce .4s ease forwards}
