@@ -95,6 +95,28 @@ button,a{touch-action:manipulation}
   .hero-title{font-size:1.4rem}
   .join-btn{padding:.75rem 1.5rem;font-size:.9rem}
 }
+
+/* FOOTER + RULES MODAL (added) */
+.site-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:.6rem;flex-shrink:0;flex-wrap:wrap;margin-top:auto}
+.footer-sep{font-size:11px;color:var(--text-dim);opacity:.6}
+.footer-brand{font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.footer-brand .accent{color:var(--purple)}
+.rules-link{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);text-decoration:none;cursor:pointer;border:0;background:transparent;padding:0;font-family:inherit}
+.rules-link:hover,.rules-link:focus{color:var(--coral);outline:none;text-decoration:underline}
+.rules-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:flex-end;justify-content:center;padding:0}
+.rules-modal.show{display:flex}
+@media(min-width:600px){.rules-modal{align-items:center;padding:1.5rem}}
+.rules-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.rules-modal-card{position:relative;width:100%;max-width:560px;max-height:85vh;background:var(--surface);border:1px solid var(--border);border-radius:18px 18px 0 0;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.5);animation:rulesSlideUp .25s ease-out}
+@media(min-width:600px){.rules-modal-card{border-radius:18px;animation:rulesFadeIn .2s ease-out}}
+@keyframes rulesSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes rulesFadeIn{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.rules-modal-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .65rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.rules-modal-title{font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:.01em}
+.rules-modal-close{background:transparent;border:0;color:var(--text-dim);font-size:1.7rem;line-height:1;cursor:pointer;padding:0 .25rem;border-radius:6px;font-weight:300}
+.rules-modal-close:hover,.rules-modal-close:focus{color:var(--text);background:rgba(255,255,255,.06);outline:none}
+.rules-modal-body{padding:1rem 1.1rem 1.4rem;overflow-y:auto;font-size:13.5px;line-height:1.55;color:var(--text-dim);white-space:pre-wrap;word-wrap:break-word;-webkit-overflow-scrolling:touch}
+.rules-modal-body strong{color:var(--text);font-weight:700}
 </style>
 </head>
 <body>
@@ -141,6 +163,25 @@ button,a{touch-action:manipulation}
       Try It Out
     </a>
     <div style="font-size:11px;color:var(--text-dim);margin-top:.5rem">5 random Jamaica pop culture questions</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="site-footer">
+  <span class="footer-brand">Powered by <span class="accent">Screenshot Interactive</span></span>
+  <span class="footer-sep">·</span>
+  <a href="#" class="rules-link" id="open-rules">Rules &amp; Terms</a>
+</div>
+
+<!-- RULES MODAL -->
+<div class="rules-modal" id="rules-modal" aria-hidden="true">
+  <div class="rules-modal-backdrop" data-close-rules></div>
+  <div class="rules-modal-card" role="dialog" aria-modal="true" aria-labelledby="rules-modal-title">
+    <div class="rules-modal-head">
+      <div class="rules-modal-title" id="rules-modal-title">📜 Rules &amp; Terms</div>
+      <button class="rules-modal-close" data-close-rules aria-label="Close">×</button>
+    </div>
+    <div class="rules-modal-body" id="rules-modal-body">Loading…</div>
   </div>
 </div>
 
@@ -195,6 +236,33 @@ if (db) {
     });
   } catch (e) { console.warn('gate listener:', e.message); }
 }
+
+// === RULES & TERMS MODAL ===
+var RULES_DEFAULT = "HOW TO PLAY\n• 3 rounds, 5 questions each\n• 15 seconds per question\n• 1 point per correct answer\n• Highest total score wins\n\nTERMS\n• One entry per email address\n• Host's decision is final on all scoring\n• Be respectful — this is meant to be fun\n\nFor questions, contact the host.";
+function _rulesEsc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c];});}
+function _rulesRender(txt){
+  var safe = _rulesEsc(txt && txt.trim() ? txt : RULES_DEFAULT);
+  var withHeadings = safe.replace(/^([A-Z][A-Z0-9 &]{2,})$/gm, '<strong>$1</strong>');
+  var body = document.getElementById('rules-modal-body'); if(body) body.innerHTML = withHeadings;
+}
+function openRules(){ var m=document.getElementById('rules-modal'); if(m){ m.classList.add('show'); m.setAttribute('aria-hidden','false'); } }
+function closeRules(){ var m=document.getElementById('rules-modal'); if(m){ m.classList.remove('show'); m.setAttribute('aria-hidden','true'); } }
+(function initRules(){
+  var link=document.getElementById('open-rules');
+  if(link){ link.addEventListener('click', function(e){ e.preventDefault(); openRules(); }); }
+  var closers = document.querySelectorAll('[data-close-rules]');
+  for(var i=0;i<closers.length;i++){ closers[i].addEventListener('click', closeRules); }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeRules(); });
+  _rulesRender(null);
+  try{
+    if(db){
+      db.ref('config/rules').on('value', function(snap){
+        var v = snap.val();
+        _rulesRender(typeof v === 'string' ? v : null);
+      });
+    }
+  }catch(e){ console.warn('rules listener:', e && e.message); }
+})();
 </script>
 </body>
 </html>

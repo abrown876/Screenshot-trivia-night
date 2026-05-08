@@ -272,6 +272,13 @@ body::before{content:'';position:fixed;inset:0;
 .gc-status.saved{color:var(--green)}
 .gc-status.error{color:var(--red)}
 
+/* Rules editor */
+.rules-textarea{width:100%;min-height:140px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.6rem .7rem;font-family:var(--font-body),system-ui,sans-serif;font-size:12.5px;line-height:1.45;color:var(--text);outline:none;resize:vertical;box-sizing:border-box}
+.rules-textarea:focus{border-color:var(--purple);background:rgba(124,110,246,.06)}
+.rules-status{font-size:10px;color:var(--text-muted);margin-top:.4rem;min-height:1.1em;text-align:center}
+.rules-status.saved{color:var(--green)}
+.rules-status.error{color:var(--red)}
+
 /* Session info */
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--border2)}
 .info-row:last-child{border-bottom:none}
@@ -484,6 +491,17 @@ body::before{content:'';position:fixed;inset:0;
         <button class="action-btn primary" style="justify-content:center;text-align:center" onclick="saveGateCodes()">💾 Save Codes</button>
       </div>
       <div class="gc-status" id="gc-status"></div>
+    </div>
+
+    <!-- Rules / Terms editor — appears in player + leaderboard footer popup -->
+    <div class="rp-section" style="background:rgba(124,110,246,.05);border-bottom:1px solid rgba(124,110,246,.2)">
+      <div class="rp-label" style="color:var(--purple)">📜 Rules &amp; Terms</div>
+      <div style="font-size:10px;color:var(--text-muted);margin:-.3rem 0 .6rem;line-height:1.4">Players see this when they tap "Rules" in the footer. Plain text — line breaks are preserved.</div>
+      <textarea class="rules-textarea" id="rules-text" placeholder="e.g.&#10;HOW TO PLAY&#10;- 3 rounds, 5 questions each&#10;- 15 seconds per question&#10;- 1 point per correct answer&#10;&#10;TERMS&#10;- One entry per email&#10;- Host's decision is final"></textarea>
+      <div class="action-grid" style="margin-top:.5rem">
+        <button class="action-btn primary" style="justify-content:center;text-align:center" onclick="saveRules()">💾 Save Rules</button>
+      </div>
+      <div class="rules-status" id="rules-status"></div>
     </div>
 
     <!-- Reset — prominent at top of right panel -->
@@ -1289,6 +1307,55 @@ function saveGateCodes(){
 
 // Load existing codes once Firebase is ready
 setTimeout(loadGateCodes, 600);
+
+// === Rules / Terms Management ===
+function _rulesSetStatus(msg, cls){
+  const el = document.getElementById('rules-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'rules-status' + (cls ? ' '+cls : '');
+}
+
+function loadRules(){
+  if(!db){ _rulesSetStatus('Offline — rules will load when reconnected', 'error'); return; }
+  db.ref('config/rules').once('value').then(snap=>{
+    const v = snap.val();
+    if(typeof v === 'string' && v.length){
+      document.getElementById('rules-text').value = v;
+      _rulesSetStatus('Loaded current rules');
+    } else {
+      _rulesSetStatus('No rules set yet — players will see the default text');
+    }
+  }).catch(e=>{
+    console.warn('loadRules failed:', e);
+    _rulesSetStatus('Could not load existing rules', 'error');
+  });
+}
+
+function saveRules(){
+  if(!db){ _rulesSetStatus('Offline — try again', 'error'); return; }
+  const txt = (document.getElementById('rules-text').value || '').trim();
+  if(txt.length > 8000){
+    _rulesSetStatus('Rules too long — keep under 8000 characters', 'error');
+    return;
+  }
+  _rulesSetStatus('Saving…');
+  db.ref('config/rules').set(txt).then(()=>{
+    _rulesSetStatus(txt ? '✓ Rules saved — visible in footer popup' : '✓ Cleared — players see default text', 'saved');
+    addActivity('📜', 'Rules updated by host');
+    setTimeout(()=>{ const el=document.getElementById('rules-status'); if(el && el.classList.contains('saved')) _rulesSetStatus(txt ? 'Rules active' : 'Using default rules text'); }, 4000);
+  }).catch(e=>{
+    console.warn('saveRules failed:', e);
+    var msg = 'Save failed — check connection';
+    if(e && (e.code === 'PERMISSION_DENIED' || /permission/i.test(e.message||''))){
+      msg = 'BLOCKED — Firebase rules need updating';
+    }
+    _rulesSetStatus(msg, 'error');
+  });
+}
+
+// Load rules once Firebase is ready
+setTimeout(loadRules, 700);
 </script>
 </body>
 </html>
