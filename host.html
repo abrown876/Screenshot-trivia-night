@@ -319,9 +319,87 @@ body::before{content:'';position:fixed;inset:0;
 @media(max-width:1100px){
   .layout{grid-template-columns:240px 1fr 280px}
 }
+
+/* === TABLET (≤880px): stack panels vertically instead of hiding them === */
 @media(max-width:880px){
-  .layout{grid-template-columns:1fr}
-  .sidebar,.right-panel{display:none}
+  /* Override desktop's body overflow lock so the page can scroll naturally */
+  html,body{overflow:auto;height:auto;min-height:100%}
+  body{-webkit-overflow-scrolling:touch}
+  .topbar{position:sticky;top:0}
+
+  /* Stack everything in one column. Order matters: most-actionable host tools first. */
+  .layout{
+    display:flex;flex-direction:column;
+    overflow:visible;
+    height:auto;flex:1 1 auto
+  }
+  /* Override desktop's overflow:hidden on inner panels so the page can scroll naturally */
+  .sidebar,.main-panel,.right-panel{
+    display:flex;flex-direction:column;overflow:visible;
+    width:100%;border-right:none;border-left:none
+  }
+  /* Stack order: main (questions/leaderboard/feed) first, then right-panel actions, then sidebar stats */
+  .main-panel{order:1;min-height:50vh}
+  .right-panel{order:2;border-top:1px solid var(--border)}
+  .sidebar{order:3;border-top:1px solid var(--border)}
+
+  /* Tabs: allow horizontal scroll instead of awkward wrap */
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:.85rem 1.1rem;font-size:13px;flex-shrink:0;min-height:44px;display:flex;align-items:center}
+
+  /* Topbar: trim non-essential elements that crowd small screens */
+  .topbar{padding:.55rem 1rem;gap:.5rem}
+  .topbar-left{gap:.6rem;min-width:0;flex:1}
+  .topbar-title{display:none}
+  .event-name{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .topbar-sep{display:none}
+  .time-display{display:none}
+
+  /* Sidebar: cap player list height so it doesn't push everything else off-screen */
+  .player-list{max-height:50vh}
+
+  /* Main content padding shrinks, scroll happens on body not nested panel */
+  .tab-content{overflow:visible;padding:1rem}
+
+  /* Bigger touch targets on action buttons */
+  .action-btn{padding:.85rem 1rem;font-size:13px;min-height:44px}
+}
+
+/* === PHONE (≤480px): tighter spacing + single-column where it helps === */
+@media(max-width:480px){
+  .topbar{padding:.5rem .75rem}
+  .topbar-logo{height:22px}
+  .event-name{font-size:11px}
+  .live-badge{padding:3px 8px;font-size:10px}
+
+  .tab{padding:.8rem .9rem;font-size:12px}
+  .tab-content{padding:.85rem}
+
+  .sidebar-section,.rp-section{padding:.75rem .85rem}
+  .stat-grid{grid-template-columns:1fr 1fr;gap:.4rem}
+  .stat-num{font-size:1.25rem}
+
+  /* Question item: stack actions below content on narrow screens */
+  .q-item{padding:.7rem .8rem;flex-direction:column;gap:.6rem}
+  .q-actions{flex-direction:row;margin-left:0;align-self:flex-end}
+  .q-actions button{width:36px;height:36px;font-size:14px}
+  .q-opts{grid-template-columns:1fr}
+
+  /* Rules editor: reachable Save button without huge scroll */
+  .rules-textarea{min-height:120px;font-size:13px}
+  .rules-status{font-size:11px}
+
+  /* Filter row wraps neatly */
+  .q-filter-row{gap:.4rem}
+
+  /* Action buttons remain easy to tap, slightly larger label */
+  .action-btn{font-size:13.5px;padding:.9rem 1rem}
+
+  /* Player list rows: more breathing room */
+  .player-row{padding:.65rem .55rem}
+  .player-name{font-size:13px}
+  .player-meta{font-size:11px}
 }
 </style>
 </head>
