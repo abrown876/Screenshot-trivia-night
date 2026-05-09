@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Firebase Diagnostic — Screenshot Quiz Night</title>
+<title>Firebase Diagnostic — Screen Test</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Outfit',-apple-system,sans-serif}
 body{background:#080818;color:#F0F0FF;padding:1.5rem;min-height:100vh;line-height:1.5}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,110,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,110,246,.03) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
 h1{font-size:1.4rem;margin-bottom:.4rem;color:#FFB740}
 .sub{color:#8888BB;font-size:13px;margin-bottom:1.5rem}
 .test{background:#10102A;border:1px solid rgba(124,110,246,.2);border-radius:12px;padding:1rem;margin-bottom:.85rem}
@@ -32,6 +33,7 @@ button:hover{background:#5B50C8}
 </style>
 </head>
 <body>
+<img src="images/screen-test-logo.webp" alt="Screen Test" style="max-width:160px;width:40%;height:auto;display:block;margin:0 auto 1rem">
 <h1>🔧 Firebase Diagnostic</h1>
 <div class="sub">Tests connection to <code>screenshot-trivia-night</code> database. Run this and screenshot the results.</div>
 
