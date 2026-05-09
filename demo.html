@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#080818">
+<title>Demo — Screen Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080818;--surface:#10102A;--surface2:#181832;
+  --purple:#7C6EF6;--purple-dim:#5B50C8;--purple-glow:rgba(124,110,246,.3);
+  --coral:#FF5C8A;--coral-glow:rgba(255,92,138,.25);
+  --gold:#FFB740;--green:#3DDC84;--green-bg:rgba(61,220,132,.15);
+  --red:#FF4B5C;--red-bg:rgba(255,75,92,.15);
+  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;
+  --border:rgba(124,110,246,.18);
+  --r:16px;--font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text);overflow-x:hidden}
+body{display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 20% 0%,rgba(124,110,246,.12) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 0%,rgba(255,92,138,.08) 0%,transparent 50%);
+  pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,110,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,110,246,.03) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+
+/* HEADER */
+.hdr{background:rgba(8,8,24,.95);padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;z-index:100;position:fixed;top:0;left:0;right:0}
+.hdr-logo{height:28px;width:auto;display:block;flex-shrink:0}
+.hdr-pill{font-size:11px;font-weight:800;color:var(--purple);background:rgba(124,110,246,.15);border:1px solid rgba(124,110,246,.25);padding:4px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:.05em}
+
+/* SCREENS */
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;position:relative;z-index:1;padding-top:52px}
+.screen.on{display:flex}
+.screen-inner{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1.25rem;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%}
+.gameplay-logo{display:block;margin:.25rem auto;max-width:90px;width:28%;height:auto;flex-shrink:0}
+
+/* WELCOME */
+.welcome-card{background:linear-gradient(145deg,rgba(124,110,246,.15),rgba(255,92,138,.08));border-radius:var(--r);padding:2rem 1.25rem;border:1px solid rgba(124,110,246,.25);text-align:center;margin-top:1.5rem}
+.welcome-logo{max-width:280px;width:100%;height:auto;display:block;margin:0 auto 1rem}
+.welcome-title{font-size:1.4rem;font-weight:900;margin-bottom:.4rem;background:linear-gradient(135deg,#fff 0%,#C4BEFF 45%,#FF5C8A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome-sub{font-size:14px;color:var(--text-dim);margin-bottom:1.25rem;line-height:1.5}
+.welcome-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;margin-bottom:1.5rem}
+.welcome-pill{font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(124,110,246,.15);color:var(--purple);letter-spacing:.04em}
+
+/* READY COUNTDOWN */
+.ready-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.ready-round{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.65rem}
+.ready-title{font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,var(--purple),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.25rem}
+.ready-row{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.ready-logo{height:5rem;width:auto;flex-shrink:0}
+.ready-count{font-family:var(--font-mono);font-size:6rem;font-weight:900;color:var(--purple);text-shadow:0 0 60px var(--purple-glow);animation:countPop 1s ease-in-out infinite;line-height:1}
+
+/* QUESTION */
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;gap:.75rem}
+.q-meta{display:flex;align-items:center;gap:.65rem}
+.q-counter{font-size:12px;color:var(--text-dim);font-weight:700;font-family:var(--font-mono)}
+.q-cat{font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px}
+.cat-m{background:rgba(124,110,246,.15);color:var(--purple)}
+.cat-f{background:rgba(255,92,138,.15);color:var(--coral)}
+.cat-x{background:rgba(255,183,64,.12);color:var(--gold)}
+.timer-wrap{display:flex;align-items:center;justify-content:center;background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:.3rem .75rem;transition:all .25s;min-width:72px}
+.timer-wrap.warn{border-color:var(--gold);background:rgba(255,183,64,.1);box-shadow:0 0 12px rgba(255,183,64,.25)}
+.timer-wrap.danger{border-color:var(--red);background:rgba(255,75,92,.1);animation:timerDanger .35s ease infinite;box-shadow:0 0 16px rgba(255,75,92,.3)}
+.timer-num{font-family:var(--font-mono);font-size:2.8rem;font-weight:900;min-width:48px;text-align:center;line-height:1}
+.timer-num.warn{color:var(--gold)}
+.timer-num.danger{color:var(--red)}
+.timer-logo{height:2.4rem;width:auto;flex-shrink:0;display:block;margin-right:.5rem}
+.q-progress{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:.9rem}
+.q-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--coral));border-radius:3px;transition:width .1s linear}
+.q-text{font-size:1.3rem;font-weight:700;line-height:1.55;margin-bottom:1rem;color:var(--text)}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:.65rem}
+.opt{width:100%;text-align:left;padding:1.1rem 1.1rem;border-radius:14px;border:2px solid var(--border);background:var(--surface);font-size:17px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.75rem;cursor:pointer;font-family:var(--font-display);transition:border-color .12s,background .12s,transform .1s;touch-action:manipulation;min-height:72px}
+.opt:active:not(.locked){transform:scale(.98)}
+.opt:focus,.opt:focus-visible{outline:none}
+@media (hover:hover){.opt:hover:not(.locked){border-color:rgba(124,110,246,.4);background:var(--surface2)}}
+.opt.selected{border-color:var(--purple)!important;background:rgba(124,110,246,.18)!important;transform:scale(.99)}
+.opt.locked{pointer-events:none}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;animation:correctBounce .4s ease forwards}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;animation:wrongShake .4s ease forwards}
+.opt.locked:not(.correct):not(.wrong){opacity:.35}
+.opt-letter{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(124,110,246,.15);color:var(--purple);font-family:var(--font-mono);font-weight:900;font-size:14px;flex-shrink:0}
+
+/* FEEDBACK */
+.fb-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.fb-icon{font-size:5rem;margin-bottom:.75rem;animation:iconPop .4s cubic-bezier(.17,.89,.32,1.49)}
+.fb-title{font-size:2.2rem;font-weight:900;margin-bottom:.35rem}
+.fb-sub{font-size:15px;color:var(--text-dim)}
+.fb-points{font-family:var(--font-mono);font-size:3.5rem;font-weight:900;margin-top:.75rem;line-height:1;animation:pointsPop .5s cubic-bezier(.17,.89,.32,1.49)}
+.fb-points.ok{background:linear-gradient(135deg,var(--green),#2AB870);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.fb-points.zero{background:linear-gradient(135deg,var(--red),#CC3344);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* RESULTS */
+.results-card{background:linear-gradient(145deg,rgba(124,110,246,.15),rgba(255,92,138,.08));border-radius:var(--r);padding:2rem 1.25rem;border:1px solid rgba(124,110,246,.25);text-align:center;margin-bottom:.9rem}
+.results-trophy{font-size:3.5rem;margin-bottom:.4rem;animation:iconPop .5s cubic-bezier(.17,.89,.32,1.49)}
+.results-score{font-family:var(--font-mono);font-size:4rem;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--purple),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.results-max{font-size:13px;color:var(--text-dim);margin-top:.2rem;font-family:var(--font-mono)}
+.results-label{font-size:1.05rem;font-weight:800;color:var(--text);margin-top:.85rem}
+
+/* SPONSOR */
+.sponsor-wrap{flex-shrink:0;line-height:0}
+
+/* BUTTONS */
+.btn{width:100%;padding:1rem;border-radius:14px;border:none;font-size:17px;font-weight:800;font-family:var(--font-display);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:.6rem;transition:transform .12s,box-shadow .15s;touch-action:manipulation}
+.btn:active{transform:scale(.98)}
+.btn-coral{background:linear-gradient(135deg,#FF5C8A,#E8446F);color:#fff;box-shadow:0 4px 24px var(--coral-glow)}
+.btn-purple{background:linear-gradient(135deg,var(--purple),var(--purple-dim));color:#fff;box-shadow:0 4px 24px var(--purple-glow)}
+
+/* FOOTER */
+.site-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:.6rem;flex-shrink:0;z-index:10}
+.footer-text{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.footer-text .accent{color:var(--purple)}
+
+/* ANIMATIONS */
+@keyframes countPop{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}}
+@keyframes timerDanger{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes iconPop{from{transform:scale(0) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes pointsPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes correctBounce{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes anim{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:anim .35s ease-out both}
+
+@media(max-width:430px){
+  .q-text{font-size:1.15rem}
+  .opt{min-height:68px;font-size:16px}
+  .opts{gap:.55rem}
+  .timer-num{font-size:2.5rem}
+  .timer-logo{height:2.1rem}
+  .fb-title{font-size:1.9rem}
+  .fb-points{font-size:3rem}
+  .results-score{font-size:3.5rem}
+  .ready-count{font-size:5rem}
+  .ready-logo{height:4rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener">
+    <img src="images/screenshot-logo.png" class="hdr-logo" alt="Screenshot Interactive">
+  </a>
+  <span class="hdr-pill">DEMO MODE</span>
+</header>
+
+<!-- WELCOME -->
+<div class="screen on" id="scr-welcome">
+  <div class="sponsor-wrap"><a class="sponsor-link" target="_blank" rel="noopener"><img class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="screen-inner">
+    <div class="welcome-card">
+      <img src="images/screen-test-logo.webp" class="welcome-logo" alt="Screen Test">
+      <div class="welcome-title">Try the Demo</div>
+      <div class="welcome-sub">3 random Jamaica pop culture questions.<br>No signup, no host needed — just play.</div>
+      <div class="welcome-pills">
+        <span class="welcome-pill">3 Questions</span>
+        <span class="welcome-pill">15s each</span>
+        <span class="welcome-pill">No score saved</span>
+      </div>
+      <button class="btn btn-coral" onclick="startDemo()">Start Demo →</button>
+      <button class="btn btn-purple" onclick="location.href='join.html'" style="background:transparent;color:var(--text-dim);box-shadow:none;border:1px solid var(--border);font-weight:600;font-size:13px;padding:.6rem">← Back to Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- READY -->
+<div class="screen" id="scr-ready">
+  <div class="sponsor-wrap"><a class="sponsor-link" target="_blank" rel="noopener"><img class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="ready-content anim">
+    <div class="ready-round">DEMO ROUND</div>
+    <h2 class="ready-title">Get Ready!</h2>
+    <div class="ready-row">
+      <img src="images/screen-test-logo.webp" class="ready-logo" alt="Screen Test">
+      <div class="ready-count" id="ready-count">3</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div class="screen" id="scr-question">
+  <div class="sponsor-wrap"><a class="sponsor-link" target="_blank" rel="noopener"><img class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <img src="images/screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
+  <div class="screen-inner">
+    <div class="q-header">
+      <div class="q-meta">
+        <span class="q-counter" id="q-counter">Q1 / 3</span>
+        <span class="q-cat" id="q-cat"></span>
+      </div>
+      <div class="timer-wrap" id="timer-wrap">
+        <img src="images/screen-test-logo.webp" class="timer-logo" alt="Screen Test">
+        <span class="timer-num" id="timer-num">15</span>
+      </div>
+    </div>
+    <div class="q-progress"><div class="q-progress-fill" id="q-progress-fill" style="width:100%"></div></div>
+    <p class="q-text" id="q-text"></p>
+    <div class="opts" id="opts"></div>
+  </div>
+</div>
+
+<!-- FEEDBACK -->
+<div class="screen" id="scr-feedback">
+  <div class="sponsor-wrap"><a class="sponsor-link" target="_blank" rel="noopener"><img class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <img src="images/screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
+  <div class="fb-content anim">
+    <div class="fb-icon" id="fb-icon">✅</div>
+    <h2 class="fb-title" id="fb-title">Correct!</h2>
+    <p class="fb-sub" id="fb-sub">Nailed it!</p>
+    <div class="fb-points ok" id="fb-points">+1</div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="scr-results">
+  <div class="sponsor-wrap"><a class="sponsor-link" target="_blank" rel="noopener"><img class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <img src="images/screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
+  <div class="screen-inner anim">
+    <div class="results-card">
+      <div class="results-trophy" id="res-trophy">🏆</div>
+      <div class="results-score" id="res-score">0</div>
+      <div class="results-max">out of 3</div>
+      <div class="results-label" id="res-grade"></div>
+    </div>
+    <button class="btn btn-coral" onclick="startDemo()">↺ Play Again</button>
+    <button class="btn btn-purple" onclick="location.href='join.html'">← Back to Join</button>
+  </div>
+</div>
+
+<div class="site-footer">
+  <span class="footer-text">Powered by <span class="accent">Screenshot Interactive</span></span>
+</div>
+
+<script src="branding.js"></script>
+<script>document.addEventListener('DOMContentLoaded', applyBranding);</script>
+<script>
+const POOL = [
+  {cat:"m",lb:"Music",   q:'Which Jamaican artist is known as "The Gong"?',                     o:["Buju Banton","Bob Marley","Bounty Killer","Beenie Man"],a:1},
+  {cat:"x",lb:"Culture", q:"What is Jamaica's most famous carnival street party?",              o:["Sumfest","Bacchanal","Rebel Salute","Sting"],a:1},
+  {cat:"f",lb:"Food",    q:"What is Jamaica's national dish?",                                  o:["Jerk Chicken","Oxtail Stew","Ackee and Saltfish","Curry Goat"],a:2},
+  {cat:"m",lb:"Music",   q:"Which Shaggy hit became one of the best-selling singles of all time?",o:["Angel","Boombastic","It Wasn't Me","Oh Carolina"],a:2},
+  {cat:"x",lb:"Culture", q:"What shoe brand is iconic in dancehall culture?",                   o:["Timberland","Clarks Originals","Nike","Adidas"],a:1},
+  {cat:"x",lb:"Culture", q:'What does the Jamaican phrase "Irie" mean?',                        o:["Angry","Feeling good","Confused","Hungry"],a:1},
+  {cat:"f",lb:"Food",    q:"Which red flower drink is a Jamaican Christmas staple?",            o:["Irish Moss","Roots Tonic","Sorrel Punch","Sky Juice"],a:2},
+  {cat:"m",lb:"Music",   q:"Reggae was officially recognised by UNESCO in what year?",          o:["2011","2015","2018","2020"],a:2},
+  {cat:"x",lb:"Culture", q:"What sport is Jamaica most famous for internationally?",            o:["Cricket","Football","Athletics","Basketball"],a:2},
+  {cat:"f",lb:"Food",    q:"What gives Jamaican jerk its distinctive flavour?",                 o:["Curry powder","Scotch bonnet pepper","Tamarind","Allspice and scotch bonnet"],a:3},
+];
+const QPR=3, TIMER=15, FB_DELAY=2500, CNTDN=3;
+const LTRS=['A','B','C','D'];
+const GOOD=['Nailed it!','On fire! 🔥','Yes!','Perfect!'];
+const BAD=['Next one!','Stay sharp!','You got this!'];
+const SCREENS=['welcome','ready','question','feedback','results'];
+const $=id=>document.getElementById(id);
+
+let activeQ=[], qIdx=0, total=0, answered=false, tmr=null, tStart=0;
+
+function showScreen(s){
+  SCREENS.forEach(id=>{ const el=$('scr-'+id); if(el) el.classList.toggle('on',id===s); });
+}
+
+function pick(){
+  return [...POOL].sort(()=>Math.random()-0.5).slice(0,QPR);
+}
+
+function startDemo(){
+  activeQ = pick();
+  qIdx=0; total=0; answered=false;
+  startCountdown();
+}
+
+function startCountdown(){
+  showScreen('ready');
+  let c=CNTDN; $('ready-count').textContent=c;
+  const iv=setInterval(()=>{
+    c--;
+    if(c>0) $('ready-count').textContent=c;
+    else { clearInterval(iv); loadQ(); }
+  },1000);
+}
+
+function loadQ(){
+  const q=activeQ[qIdx];
+  answered=false; tStart=Date.now();
+  $('q-counter').textContent='Q'+(qIdx+1)+' / '+QPR;
+  $('q-cat').textContent=q.lb; $('q-cat').className='q-cat cat-'+q.cat;
+  $('q-text').textContent=q.q;
+  $('timer-num').textContent=TIMER; $('timer-num').className='timer-num';
+  $('timer-wrap').className='timer-wrap';
+  $('q-progress-fill').style.width='100%';
+  $('opts').innerHTML=q.o.map((o,i)=>`<button class="opt" onclick="onAnswer(${i})"><span class="opt-letter">${LTRS[i]}</span>${o}</button>`).join('');
+  showScreen('question');
+  runTimer();
+}
+
+function runTimer(){
+  clearInterval(tmr);
+  tmr=setInterval(()=>{
+    const t=Math.max(0, TIMER-Math.floor((Date.now()-tStart)/1000));
+    $('timer-num').textContent=t;
+    $('q-progress-fill').style.width=((t/TIMER)*100)+'%';
+    if(t<=3){ $('timer-num').className='timer-num danger'; $('timer-wrap').className='timer-wrap danger'; }
+    else if(t<=5){ $('timer-num').className='timer-num warn'; $('timer-wrap').className='timer-wrap warn'; }
+    if(t<=0){ clearInterval(tmr); onTimeout(); }
+  },100);
+}
+
+function onAnswer(sel){
+  if(answered) return;
+  answered=true; clearInterval(tmr);
+  const q=activeQ[qIdx]; const ok = sel===q.a;
+  document.querySelectorAll('.opt').forEach((b,i)=>{ if(i===sel) b.classList.add('selected'); });
+  if(ok) total++;
+  setTimeout(()=>{
+    document.querySelectorAll('.opt').forEach((b,i)=>{
+      b.classList.add('locked'); b.classList.remove('selected');
+      if(i===q.a) b.classList.add('correct');
+      else if(i===sel && !ok) b.classList.add('wrong');
+    });
+    showFeedback(ok, false);
+  }, 400);
+}
+
+function onTimeout(){
+  if(answered) return; answered=true;
+  const q=activeQ[qIdx];
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===q.a) b.classList.add('correct');
+  });
+  setTimeout(()=>showFeedback(false, true), 400);
+}
+
+function showFeedback(ok, timeout){
+  $('fb-icon').textContent  = ok?'✅':(timeout?'⏰':'❌');
+  $('fb-title').textContent = ok?'Correct!':(timeout?"Time's Up!":'Wrong');
+  $('fb-title').style.color = ok?'var(--green)':'var(--red)';
+  $('fb-sub').textContent   = ok?GOOD[Math.floor(Math.random()*GOOD.length)]:BAD[Math.floor(Math.random()*BAD.length)];
+  $('fb-points').textContent= ok?'+1':'+0';
+  $('fb-points').className  = 'fb-points'+(ok?' ok':' zero');
+  showScreen('feedback');
+  setTimeout(advance, FB_DELAY);
+}
+
+function advance(){
+  qIdx++;
+  if(qIdx >= QPR) showResults();
+  else loadQ();
+}
+
+function showResults(){
+  $('res-score').textContent = total;
+  const labels = ['Tough one — try again!','Nice effort!','Solid!','Perfect demo run! 🔥'];
+  const trophies = ['💪','👏','🎯','🏆'];
+  $('res-grade').textContent = labels[total];
+  $('res-trophy').textContent = trophies[total];
+  showScreen('results');
+}
+</script>
+</body>
+</html>
