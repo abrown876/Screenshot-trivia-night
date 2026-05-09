@@ -36,7 +36,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .hdr-centre{display:flex;align-items:center;gap:.5rem;position:absolute;left:50%;transform:translateX(-50%)}
 .hdr-team{font-weight:800;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
 .hdr-score{background:linear-gradient(135deg,var(--purple),var(--purple-dim));color:#fff;font-size:12px;font-weight:900;padding:4px 12px;border-radius:20px;font-family:var(--font-mono)}
-body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:none}
+body.quiz-active .partner-link,body.quiz-active .hdr-logo-link{pointer-events:none}
 
 /* SCREENS */
 .screen{display:none;flex:1;flex-direction:column;overflow:hidden;position:relative;z-index:1;padding-top:52px}
@@ -258,7 +258,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- REGISTER -->
 <div class="screen on" id="scr-register">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <div class="entrance">
     <div class="entrance-hero">
       <div style="position:relative;z-index:1">
@@ -290,7 +290,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- ENTRY GATE (before Round 1) -->
 <div class="screen" id="scr-entrygate">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <div class="screen-inner anim">
     <div class="gate-card" style="margin-top:2rem">
       <div class="gate-title">🔒 Round 1 Code Required</div>
@@ -304,7 +304,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- READY -->
 <div class="screen" id="scr-ready">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <div class="ready-content anim">
     <div class="ready-round" id="ready-round">Round 1 of 3</div>
     <h2 class="ready-title">Get Ready!</h2>
@@ -317,7 +317,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- QUESTION -->
 <div class="screen" id="scr-question">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <img src="screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
   <div class="screen-inner">
     <div class="q-header">
@@ -338,7 +338,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- FEEDBACK -->
 <div class="screen" id="scr-feedback">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <img src="screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
   <div class="fb-content anim">
     <div class="fb-icon" id="fb-icon">✅</div>
@@ -350,7 +350,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- ROUND BREAK -->
 <div class="screen" id="scr-break">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <img src="screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
   <div class="screen-inner anim">
     <div class="break-card">
@@ -377,7 +377,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- RESULTS -->
 <div class="screen" id="scr-results">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <img src="screen-test-logo.webp" class="gameplay-logo" alt="Screen Test">
   <div class="screen-inner anim">
     <div class="results-card">
@@ -399,7 +399,7 @@ body.quiz-active .sponsor-link,body.quiz-active .hdr-logo-link{pointer-events:no
 
 <!-- LEADERBOARD -->
 <div class="screen" id="scr-leaderboard">
-  <div class="sponsor-wrap" style="flex-shrink:0;line-height:0"><a class="sponsor-link" target="_blank" rel="noopener"><img src="chilitos-banner.jpg" class="sponsor-logo" alt="Sponsored by Chilitos" style="width:100%;display:block;height:auto"><span class="sponsor-label" style="position:absolute;left:-9999px"></span></a></div>
+  <div class="partner-wrap" style="flex-shrink:0;line-height:0"><a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos" style="width:100%;display:block;height:auto"><span class="partner-label" style="position:absolute;left:-9999px"></span></a></div>
   <div class="lb-inner anim">
     <div class="lb-hdr">
       <div class="lb-title">🏅 Global Leaderboard</div>
