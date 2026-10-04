@@ -1,0 +1,247 @@
+{
+  "rules": {
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    "scores": {
+      ".read": true,
+      ".write": true
+    },
+    "teams": {
+      ".read": true,
+      ".write": true
+    },
+    "gate": {
+      ".read": true,
+      ".write": true
+    },
+    "quiz": {
+      ".read": true,
+      ".write": true
+    },
+    "surveys": {
+      ".read": true,
+      ".write": true
+    },
+    "config": {
+      ".read": true,
+      ".write": true
+    },
+    "featured": {
+      "events": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "answerKeys": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "registrations": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$pid": {
+            ".read": true,
+            ".write": "$pid.matches(/^p[0-9a-f]{16}$/) && root.child('featured/events').child($e).child('status').val() !== 'live' && root.child('featured/events').child($e).child('status').val() !== 'closed'",
+            "email": {
+              ".validate": "newData.isString() && newData.val().length <= 254 && newData.val().matches(/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/)"
+            },
+            "originalEmail": {
+              ".validate": "newData.isString() && newData.val().length <= 254"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40"
+            },
+            "registeredAt": {
+              ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      },
+      "scores": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$pid": {
+            "name": {
+              ".write": "root.child('featured/registrations').child($e).child($pid).exists()",
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40"
+            },
+            "answers": {
+              "$slot": {
+                "pick": {
+                  ".write": "!data.exists() && root.child('featured/registrations').child($e).child($pid).exists() && root.child('featured/events').child($e).child('liveSlot').val() === $slot",
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+                },
+                "submittedAt": {
+                  ".write": "!data.exists() && root.child('featured/registrations').child($e).child($pid).exists() && root.child('featured/events').child($e).child('liveSlot').val() === $slot",
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "correct": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "correctIdx": {
+                  ".validate": "newData.isNumber()"
+                },
+                "correctText": {
+                  ".validate": "newData.isString()"
+                },
+                "ms": {
+                  ".validate": "newData.isNumber()"
+                },
+                "missed": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              }
+            },
+            "score": {
+              ".validate": "newData.isNumber()"
+            },
+            "totalTimeMs": {
+              ".validate": "newData.isNumber()"
+            },
+            "finishedAt": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    },
+    "restaurant": {
+      "current": {
+        ".read": true,
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      },
+      "events": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "secrets": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "answerKeys": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "standings": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+        }
+      },
+      "players": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$pid": {
+            ".write": "!data.exists() && $pid.matches(/^p[0-9a-f]{16}$/) && root.child('restaurant/events').child($e).exists() && root.child('restaurant/events').child($e).child('joinClosed').val() !== true && root.child('restaurant/events').child($e).child('status').val() !== 'final' && newData.child('code').val() === root.child('restaurant/secrets').child($e).child('code').val()",
+            ".validate": "newData.hasChildren(['email','name','table','code','joinedAt'])",
+            "email": {
+              ".validate": "newData.isString() && newData.val().length <= 254 && newData.val().matches(/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/)"
+            },
+            "originalEmail": {
+              ".validate": "newData.isString() && newData.val().length <= 254"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"
+            },
+            "table": {
+              ".validate": "newData.isString() && (newData.val() === 'bar' || newData.val().matches(/^[0-9]{1,2}$/))"
+            },
+            "code": {
+              ".validate": "newData.isString()"
+            },
+            "joinedAt": {
+              ".validate": "newData.val() === now"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      },
+      "roster": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$pid": {
+            ".write": "!data.exists() && root.child('restaurant/players').child($e).child($pid).exists()",
+            ".validate": "newData.hasChildren(['name','table','joinedAt'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val() === root.child('restaurant/players').child($e).child($pid).child('name').val()"
+            },
+            "table": {
+              ".validate": "newData.isString() && newData.val() === root.child('restaurant/players').child($e).child($pid).child('table').val()"
+            },
+            "joinedAt": {
+              ".validate": "newData.val() === now"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      },
+      "tableNames": {
+        "$e": {
+          ".read": true,
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$t": {
+            ".write": "!data.exists() && root.child('restaurant/events').child($e).exists()",
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24 && ($t === 'bar' || $t.matches(/^[0-9]{1,2}$/))"
+          }
+        }
+      },
+      "answers": {
+        "$e": {
+          ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          "$pid": {
+            "$q": {
+              "pick": {
+                ".write": "!data.exists() && root.child('restaurant/roster').child($e).child($pid).exists() && root.child('restaurant/events').child($e).child('liveSlot').val() === $q",
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+              },
+              "submittedAt": {
+                ".write": "!data.exists() && root.child('restaurant/roster').child($e).child($pid).exists() && root.child('restaurant/events').child($e).child('liveSlot').val() === $q",
+                ".validate": "newData.isNumber() && newData.val() === now"
+              },
+              "correct": {
+                ".validate": "newData.isBoolean()"
+              },
+              "ms": {
+                ".validate": "newData.isNumber()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

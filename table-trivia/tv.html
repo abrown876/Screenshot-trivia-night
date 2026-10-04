@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#080818">
+<title>Table Trivia — TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080818;--surface:#10102A;--surface2:#181832;--surface3:#20203C;
+  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--green:#3DDC84;--red:#FF4B5C;
+  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;--border:rgba(124,110,246,.2);
+  --font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font-display)}
+body{background:radial-gradient(ellipse at 15% 0%,rgba(124,110,246,.18) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(255,92,138,.12) 0%,transparent 55%),var(--bg);display:flex;flex-direction:column;font-size:1.6vw}
+.top{display:flex;align-items:center;justify-content:space-between;padding:1.2vw 2.2vw;border-bottom:1px solid var(--border)}
+.top-logo{height:2.6vw;display:block}
+.top-mid{font-family:var(--font-mono);font-size:1vw;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim)}
+.top-code{font-family:var(--font-mono);font-size:1.1vw;color:var(--text-dim)}
+.top-code b{color:var(--gold);letter-spacing:.25em;font-size:1.5vw}
+.stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2vw 3vw;min-height:0}
+.foot{display:flex;align-items:center;justify-content:space-between;padding:.9vw 2.2vw;border-top:1px solid var(--border);gap:2vw}
+.foot-msg{font-weight:800;color:var(--gold);font-size:1.3vw;flex:1}
+.partner-wrap{display:none;width:40vw;flex-shrink:0}
+.partner-link{display:block;line-height:0;border-radius:.6vw;overflow:hidden}
+.partner-link img{width:100%;display:block;height:auto}
+.partner-label{display:none}
+.hidden{display:none !important}
+
+/* lobby */
+.lobby{display:grid;grid-template-columns:34vw 1fr;gap:4vw;align-items:center}
+.qr-card{background:#fff;border-radius:1.5vw;padding:1.6vw;display:flex;flex-direction:column;align-items:center}
+#qr{width:28vw;height:28vw}
+#qr img,#qr canvas{width:100% !important;height:100% !important}
+.qr-cap{color:#080818;font-weight:900;font-size:2vw;margin-top:1vw}
+.lobby h1{font-weight:900;font-size:5vw;line-height:1;margin-bottom:1vw}
+.lobby .code{font-family:var(--font-mono);font-size:7vw;font-weight:700;letter-spacing:.3em;color:var(--gold);margin:.6vw 0 1.6vw}
+.lobby .steps{color:var(--text-dim);font-size:1.6vw;line-height:1.6}
+.tbl-chips{display:flex;flex-wrap:wrap;gap:.7vw;margin-top:2vw}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:.8vw;padding:.6vw 1vw;font-weight:800;font-size:1.3vw}
+.chip span{color:var(--gold);font-family:var(--font-mono);margin-left:.5vw}
+.chip.empty{opacity:.35}
+
+/* question */
+.q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6vw}
+.q-label{font-family:var(--font-mono);font-size:1.3vw;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.q-answered{font-family:var(--font-mono);font-size:1.3vw;color:var(--text-dim)}
+.ring{position:relative;width:9vw;height:9vw;flex-shrink:0}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .bg{stroke:var(--surface3)}
+.ring .fg{stroke:var(--coral);stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:3.4vw}
+.ring.urgent .fg{stroke:var(--red)}
+.q-body{display:flex;gap:3vw;align-items:center;margin-bottom:2.2vw}
+.q-text{font-weight:900;font-size:3.6vw;line-height:1.15;flex:1}
+.q-emoji{font-size:9vw;line-height:1;letter-spacing:.1em}
+.q-img{max-height:22vw;max-width:36vw;border-radius:1vw}
+.bonus{background:rgba(255,183,64,.12);border:2px solid var(--gold);color:var(--gold);border-radius:1vw;padding:.8vw 1.4vw;font-weight:800;font-size:1.6vw;margin-bottom:1.6vw;text-align:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:1.2vw}
+.opt{display:flex;align-items:center;gap:1.2vw;background:var(--surface2);border:2px solid var(--border);border-radius:1.2vw;padding:1.4vw 1.6vw;font-weight:700;font-size:2.2vw;transition:opacity .3s,border-color .3s,background .3s}
+.opt-l{width:3.6vw;height:3.6vw;border-radius:.8vw;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.7vw;flex-shrink:0}
+.opt.ok{border-color:var(--green);background:rgba(61,220,132,.15)}
+.opt.ok .opt-l{background:var(--green);color:#03210f}
+.opt.dim{opacity:.3}
+.reveal-strip{display:flex;gap:2vw;margin-top:1.8vw;align-items:center}
+.pct{font-family:var(--font-mono);font-size:2vw;color:var(--text-dim)}
+.pct b{color:var(--green);font-size:2.6vw}
+.bonus-win{background:var(--gold);color:#1a1300;border-radius:1vw;padding:.8vw 1.4vw;font-weight:900;font-size:1.8vw}
+
+/* standings */
+.st-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:3vw;align-items:start}
+.st-title{font-weight:900;font-size:4vw;line-height:1;margin-bottom:.6vw}
+.st-sub{color:var(--text-dim);font-size:1.6vw;margin-bottom:1.8vw}
+.st-h{font-family:var(--font-mono);font-size:1.1vw;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.8vw}
+.st-row{display:grid;grid-template-columns:3vw 1fr auto;gap:1vw;align-items:center;padding:.75vw 1vw;background:var(--surface);border:1px solid var(--border);border-radius:.8vw;margin-bottom:.55vw;font-size:1.7vw}
+.st-row .rk{font-family:var(--font-mono);font-weight:700;color:var(--text-dim)}
+.st-row .nm{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-row .nm small{color:var(--text-dim);font-weight:600;font-size:1.2vw;margin-left:.6vw}
+.st-row .pt{font-family:var(--font-mono);font-weight:700;color:var(--gold)}
+.st-row.first{background:linear-gradient(135deg,rgba(124,110,246,.35),rgba(255,92,138,.3));border-color:transparent}
+.next-up{margin-top:1.6vw;font-size:1.6vw;color:var(--text-dim)}
+.next-up b{color:var(--text)}
+
+/* final */
+.final{text-align:center}
+.final .crown{font-size:7vw;line-height:1}
+.final .lbl{font-family:var(--font-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);font-size:1.3vw;margin-top:1vw}
+.final .winner{font-weight:900;font-size:6vw;line-height:1.05;background:linear-gradient(135deg,var(--purple),var(--coral),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;margin:.6vw 0}
+.final .pts{font-family:var(--font-mono);font-size:2vw;color:var(--gold)}
+.final .star{margin-top:2.4vw;font-size:2.2vw;font-weight:800}
+.final .star span{color:var(--gold)}
+.final .runners{display:flex;justify-content:center;gap:1.4vw;margin-top:2.4vw;flex-wrap:wrap}
+.final .runners div{background:var(--surface);border:1px solid var(--border);border-radius:.8vw;padding:.7vw 1.2vw;font-size:1.4vw}
+
+.overlay{position:fixed;inset:0;background:rgba(8,8,24,.85);display:flex;align-items:center;justify-content:center;z-index:50;flex-direction:column;gap:1vw;cursor:pointer}
+.overlay h2{font-weight:900;font-size:4vw}
+.overlay p{color:var(--text-dim);font-size:1.6vw}
+.paused{position:fixed;top:5.5vw;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1300;font-weight:900;padding:.8vw 2vw;border-radius:2vw;font-size:1.8vw;z-index:40}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:30}
+.confetti i{position:absolute;top:-3vw;width:.9vw;height:1.6vw;border-radius:.2vw;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="top-logo"></a>
+  <div class="top-mid" id="top-mid">Table Trivia</div>
+  <div class="top-code" id="top-code">Room code <b id="top-code-v">····</b></div>
+</div>
+
+<div class="stage">
+  <!-- no game -->
+  <section id="v-none"><div class="final"><div class="crown">🌮</div><div class="winner" style="font-size:4vw">Table Trivia</div><div class="lbl">Waiting for the host</div></div></section>
+
+  <!-- lobby -->
+  <section id="v-lobby" class="hidden">
+    <div class="lobby">
+      <div class="qr-card"><div id="qr"></div><div class="qr-cap">Scan to play</div></div>
+      <div>
+        <h1>Grab your phone.<br>Your table is your team.</h1>
+        <div class="steps">1 · Scan the code (or the one on your table)<br>2 · Pick your table · enter name + email<br>3 · Room code:</div>
+        <div class="code" id="lobby-code">····</div>
+        <div class="steps" id="lobby-count">0 players in</div>
+        <div class="tbl-chips" id="lobby-tables"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- question / reveal -->
+  <section id="v-q" class="hidden">
+    <div class="q-head">
+      <div>
+        <div class="q-label" id="q-label">Round 1 · Question 1</div>
+        <div class="q-answered" id="q-answered">0 answered</div>
+      </div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" id="ring-fg" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg>
+        <div class="num" id="ring-num">20</div>
+      </div>
+    </div>
+    <div class="bonus hidden" id="q-bonus"></div>
+    <div class="q-body">
+      <div class="q-emoji hidden" id="q-emoji"></div>
+      <img class="q-img hidden" id="q-img" alt="">
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="reveal-strip hidden" id="reveal-strip">
+      <div class="pct"><b id="pct">0%</b> got it right</div>
+      <div class="bonus-win hidden" id="bonus-win"></div>
+    </div>
+  </section>
+
+  <!-- break -->
+  <section id="v-break" class="hidden">
+    <div class="st-title" id="b-title">Round 1 complete</div>
+    <div class="st-sub" id="b-sub">Standings after Round 1</div>
+    <div class="st-wrap">
+      <div><div class="st-h">Tables</div><div id="b-tables"></div></div>
+      <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next-up" id="b-next"></div></div>
+    </div>
+  </section>
+
+  <!-- final -->
+  <section id="v-final" class="hidden">
+    <div class="final">
+      <div class="crown">🏆</div>
+      <div class="lbl">Tonight's winning table</div>
+      <div class="winner" id="f-winner">—</div>
+      <div class="pts" id="f-pts"></div>
+      <div class="star" id="f-star"></div>
+      <div class="runners" id="f-runners"></div>
+    </div>
+  </section>
+</div>
+
+<div class="foot">
+  <div class="foot-msg" id="foot-msg"></div>
+  <div class="partner-wrap">
+    <a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos"></a>
+    <span class="partner-label"></span>
+  </div>
+</div>
+
+<div class="paused hidden" id="paused">⏸ PAUSED</div>
+<div class="overlay" id="sound-gate"><h2>🔊 Click to start the TV</h2><p>Turns on game sounds · put this window full-screen (F11 / Ctrl+Cmd+F)</p></div>
+<div class="confetti" id="confetti"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="branding.js"></script>
+<script src="tt-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
+
+const VIEWS = ['v-none','v-lobby','v-q','v-break','v-final'];
+function show(id){ VIEWS.forEach(v => $(v).classList.toggle('hidden', v !== id)); }
+
+// ── Sound (Web Audio, no files) ──
+let ac = null;
+$('sound-gate').onclick = () => {
+  try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
+  $('sound-gate').classList.add('hidden');
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch(e){}
+};
+function tone(freq, dur = .12, type = 'sine', vol = .25, delay = 0){
+  if (!ac) return;
+  const t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + .02);
+}
+const SFX = {
+  tick:   () => tone(880, .06, 'square', .12),
+  start:  () => [523, 659, 784].forEach((f, i) => tone(f, .18, 'triangle', .25, i * .09)),
+  reveal: () => { tone(784, .12, 'triangle', .3); tone(1047, .35, 'triangle', .3, .12); },
+  fanfare:() => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .3, i * .14)),
+};
+
+// ── State ──
+let eventId = null, ev = null, roster = {}, names = {}, standings = null, code = null;
+let lastKey = '', lastTick = -1, qrFor = null, offs = [];
+
+if (db) ttRef('current').on('value', s => {
+  const c = s.val(); const id = c && c.eventId;
+  if (!id) { eventId = null; ev = null; render(); return; }
+  if (id !== eventId) attach(id);
+});
+
+function attach(id){
+  offs.forEach(f => f()); offs = [];
+  eventId = id; ev = null; roster = {}; names = {}; standings = null;
+  const L = (p, cb) => { const r = ttRef(p); r.on('value', s => cb(s.val())); offs.push(() => r.off()); };
+  L('events/' + id, v => { ev = v; render(); });
+  L('roster/' + id, v => { roster = v || {}; if (ev && ev.status === 'lobby') renderLobby(); });
+  L('tableNames/' + id, v => { names = v || {}; render(); });
+  L('standings/' + id, v => { standings = v; render(); });
+}
+
+function render(){
+  if (!eventId || !ev) { show('v-none'); $('foot-msg').textContent = ''; return; }
+  $('paused').classList.toggle('hidden', !ev.paused);
+  $('foot-msg').textContent = ev.sponsorMsg || '';
+  const round = ev.round ? (ev.rounds || [])[ev.round - 1] : null;
+  $('top-mid').textContent = ev.status === 'final' ? 'Final Results'
+    : (round ? `Round ${ev.round} · ${round.title}${round.sponsored ? ' · Presented by Chilitos' : ''}` : 'Table Trivia');
+  $('top-code').classList.toggle('hidden', !!ev.joinClosed);
+
+  // sound cues on state change
+  const key = ev.status + ':' + ev.qIndex;
+  if (key !== lastKey) {
+    if (ev.status === 'question') SFX.start();
+    if (ev.status === 'reveal') SFX.reveal();
+    if (ev.status === 'final') { SFX.fanfare(); confetti(); }
+    lastKey = key;
+  }
+
+  if (ev.status === 'lobby') return renderLobby();
+  if (ev.status === 'question' || ev.status === 'reveal') return renderQ();
+  if (ev.status === 'break') return renderBreak();
+  if (ev.status === 'final') return renderFinal();
+  show('v-none');
+}
+
+// room code shown on TV comes from the join flow: players type it; the TV
+// can't read /secrets, so the host mirrors it into the event as `displayCode`.
+function roomCode(){ return ev && ev.displayCode ? ev.displayCode : '····'; }
+
+function renderLobby(){
+  show('v-lobby');
+  const url = joinUrl();
+  if (qrFor !== url && window.QRCode) {
+    $('qr').innerHTML = '';
+    new QRCode($('qr'), { text: url, width: 512, height: 512, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    qrFor = url;
+  }
+  $('lobby-code').textContent = roomCode();
+  $('top-code-v').textContent = roomCode();
+  const counts = {}; let total = 0;
+  for (const pid in roster) { counts[roster[pid].table] = (counts[roster[pid].table] || 0) + 1; total++; }
+  $('lobby-count').textContent = `${total} player${total === 1 ? '' : 's'} in`;
+  const ids = []; for (let i = 1; i <= (ev.tables || 0); i++) ids.push(String(i));
+  if (ev.barEnabled !== false) ids.push('bar');
+  $('lobby-tables').innerHTML = ids.map(t =>
+    `<div class="chip ${counts[t] ? '' : 'empty'}">${esc(names[t] || (t === 'bar' ? '🍹 Bar' : 'T' + t))}<span>${counts[t] || 0}</span></div>`).join('');
+}
+
+function renderQ(){
+  show('v-q');
+  $('top-code-v').textContent = roomCode();
+  const qi = ev.status === 'reveal' && ev.reveal ? ev.reveal.q : ev.qIndex;
+  const q = (ev.questions || [])[qi]; if (!q) return;
+  $('q-label').textContent = `Round ${q.round} · Question ${(qi % TT.ROUND_SIZE) + 1} of ${TT.ROUND_SIZE}`;
+  $('q-bonus').textContent = q.bonus ? '🎁 ' + q.bonus : '';
+  $('q-bonus').classList.toggle('hidden', !q.bonus);
+  $('q-emoji').textContent = q.emoji || ''; $('q-emoji').classList.toggle('hidden', !q.emoji);
+  if (q.img) { $('q-img').src = q.img; $('q-img').classList.remove('hidden'); } else $('q-img').classList.add('hidden');
+  $('q-text').textContent = q.q;
+  const revealing = ev.status === 'reveal' && ev.reveal;
+  const ci = revealing ? ev.reveal.correctIdx : -1;
+  $('opts').innerHTML = q.o.map((o, i) =>
+    `<div class="opt ${revealing ? (i === ci ? 'ok' : 'dim') : ''}"><span class="opt-l">${'ABCD'[i]}</span><span>${esc(o)}</span></div>`).join('');
+  $('ring').classList.toggle('hidden', !!revealing);
+  $('q-answered').textContent = revealing ? `${ev.reveal.answered || 0} answered` : `${ev.answeredCount || 0} answered`;
+  $('reveal-strip').classList.toggle('hidden', !revealing);
+  if (revealing) {
+    $('pct').textContent = (ev.reveal.pct || 0) + '%';
+    const bw = ev.reveal.bonusWinner;
+    $('bonus-win').textContent = bw ? `🎁 Bonus won by ${bw.name} · ${tableLabel(bw.table, names)}` : '';
+    $('bonus-win').classList.toggle('hidden', !bw);
+  }
+}
+
+// countdown ring + last-5-seconds tick
+setInterval(() => {
+  if (!ev || ev.status !== 'question') return;
+  const total = questionDurationSec(ev), left = secondsLeft(ev);
+  $('ring-num').textContent = left;
+  $('ring-fg').setAttribute('stroke-dashoffset', String(276.5 * (1 - left / total)));
+  $('ring').classList.toggle('urgent', left <= 5);
+  if (!ev.paused && left <= 5 && left > 0 && left !== lastTick) { SFX.tick(); }
+  lastTick = left;
+}, 200);
+
+function standingRows(limit){
+  const s = standings || {};
+  const order = (s.tableOrder || []).slice(0, limit);
+  return order.map((t, i) => `<div class="st-row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>
+    <span class="nm">${esc(names[t] || (t === 'bar' ? 'The Bar' : 'Table ' + t))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}<small>👤${s.tables[t].players}</small></span>
+    <span class="pt">${fmtPts(s.tables[t].score)}</span></div>`).join('') || '<div class="st-sub">No scores yet</div>';
+}
+function playerRows(limit){
+  const s = standings || {};
+  return (s.playerOrder || []).slice(0, limit).map((p, i) => {
+    const r = s.players[p];
+    return `<div class="st-row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span><span class="nm">${esc(r.name)}<small>${tableShort(r.table)}</small></span><span class="pt">${r.score}</span></div>`;
+  }).join('');
+}
+
+function renderBreak(){
+  show('v-break');
+  const r = ev.round || 1, total = (ev.rounds || []).length;
+  $('b-title').textContent = r >= total ? 'That was the final round!' : `Round ${r} complete`;
+  $('b-sub').textContent = r >= total ? 'Final results coming up…' : `Standings after Round ${r} · time to order 🌮`;
+  $('b-tables').innerHTML = standingRows(10);
+  $('b-players').innerHTML = playerRows(5);
+  const next = (ev.rounds || [])[r];
+  $('b-next').innerHTML = next ? `Up next: <b>Round ${r + 1} · ${esc(next.title)}</b>${next.sponsored ? ' · presented by Chilitos' : ''}` : '';
+}
+
+function renderFinal(){
+  show('v-final');
+  const s = standings || {};
+  const w = (s.tableOrder || [])[0];
+  $('f-winner').textContent = w ? (names[w] ? `${names[w]}` : (w === 'bar' ? 'The Bar' : 'Table ' + w)) : '—';
+  $('f-pts').textContent = w ? `${names[w] ? (w === 'bar' ? 'The Bar · ' : 'Table ' + w + ' · ') : ''}${fmtPts(s.tables[w].score)} pts` : '';
+  const p = (s.playerOrder || [])[0];
+  $('f-star').innerHTML = p ? `⭐ Top player: <span>${esc(s.players[p].name)}</span> (${tableShort(s.players[p].table)}) · ${s.players[p].score} correct` : '';
+  $('f-runners').innerHTML = (s.tableOrder || []).slice(1, 6).map((t, i) =>
+    `<div>${i + 2}. ${esc(names[t] || (t === 'bar' ? 'The Bar' : 'Table ' + t))} · ${fmtPts(s.tables[t].score)}</div>`).join('');
+}
+
+function confetti(){
+  const box = $('confetti'); box.innerHTML = '';
+  const colors = ['#7C6EF6', '#FF5C8A', '#FFB740', '#3DDC84', '#F0F0FF'];
+  for (let i = 0; i < 140; i++) {
+    const c = document.createElement('i');
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+    c.style.animationDelay = (Math.random() * 1.5) + 's';
+    box.appendChild(c);
+  }
+  setTimeout(() => box.innerHTML = '', 8000);
+}
+</script>
+</body>
+</html>

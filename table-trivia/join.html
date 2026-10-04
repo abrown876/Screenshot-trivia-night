@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#080818">
+<title>Table Trivia — Play</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080818;--surface:#10102A;--surface2:#181832;--surface3:#20203C;
+  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;
+  --green:#3DDC84;--green-bg:rgba(61,220,132,.12);--red:#FF4B5C;--red-bg:rgba(255,75,92,.12);
+  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;
+  --border:rgba(124,110,246,.18);
+  --font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
+}
+html,body{min-height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text)}
+body{background:radial-gradient(ellipse at 20% 0%,rgba(124,110,246,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(255,92,138,.08) 0%,transparent 50%),var(--bg);min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:rgba(8,8,24,.95);padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.hdr-logo{height:28px;width:auto;display:block}
+.hdr-right{display:flex;align-items:center;gap:.6rem}
+.hdr-tag{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase}
+.hdr-score{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)}
+.wrap{flex:1;width:100%;max-width:480px;margin:0 auto;padding:1.25rem 1rem 1rem}
+.hidden{display:none !important}
+h1{font-weight:900;font-size:1.9rem;line-height:1.1;margin-bottom:.4rem}
+.sub{color:var(--text-dim);font-size:.95rem;margin-bottom:1.25rem}
+.label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:1rem 0 .45rem;display:block}
+.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;color:var(--text);font-family:var(--font-display);font-size:1rem;outline:none}
+.inp:focus{border-color:var(--purple)}
+.inp.code{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.3em;font-size:1.3rem;text-align:center}
+.tables{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem}
+.tbl{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 0;text-align:center;font-weight:800;font-size:1rem;color:var(--text);cursor:pointer;min-height:44px}
+.tbl.bar{grid-column:span 5;font-size:.95rem}
+.tbl.on{background:linear-gradient(135deg,var(--purple),var(--coral));border-color:transparent}
+.btn{width:100%;padding:1rem;border:none;border-radius:14px;font-family:var(--font-display);font-weight:800;font-size:1.05rem;cursor:pointer;margin-top:1.25rem;background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;min-height:52px}
+.btn:disabled{opacity:.5}
+.btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-weight:700}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;text-align:center}
+.big-ico{font-size:3rem;margin-bottom:.5rem}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--surface3);color:var(--gold);padding:.35rem .7rem;border-radius:20px;margin-bottom:.8rem}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.q-round{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.q-timer{font-family:var(--font-mono);font-weight:700;font-size:1.6rem;color:var(--text)}
+.q-timer.urgent{color:var(--red)}
+.q-text{font-weight:800;font-size:1.3rem;line-height:1.3;margin-bottom:1rem}
+.q-img{display:block;max-width:100%;max-height:200px;margin:0 auto 1rem;border-radius:12px}
+.q-emoji{font-size:3.4rem;text-align:center;margin-bottom:1rem;letter-spacing:.1em}
+.bonus-tag{background:rgba(255,183,64,.12);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:.5rem .75rem;font-size:.85rem;font-weight:700;margin-bottom:.9rem;text-align:center}
+.opts{display:flex;flex-direction:column;gap:.6rem}
+.opt{display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:.95rem 1rem;color:var(--text);font-family:var(--font-display);font-size:1.02rem;font-weight:600;cursor:pointer;min-height:56px}
+.opt-letter{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:.85rem}
+.opt.selected{border-color:var(--purple);background:rgba(124,110,246,.18)}
+.opt.correct{border-color:var(--green);background:var(--green-bg)}
+.opt.wrong{border-color:var(--red);background:var(--red-bg)}
+.opt:disabled{cursor:default}
+.locked-note{text-align:center;color:var(--text-dim);font-size:.9rem;margin-top:.9rem}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1rem 0}
+.stat{background:var(--surface2);border-radius:12px;padding:.8rem}
+.stat-n{font-family:var(--font-mono);font-weight:700;font-size:1.5rem}
+.stat-l{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem}
+.sponsor-msg{background:rgba(255,183,64,.08);border:1px dashed var(--gold);border-radius:12px;padding:.85rem;color:var(--gold);font-weight:700;margin-top:1rem}
+.banner{background:var(--gold);color:#1a1300;text-align:center;font-weight:800;padding:.5rem;font-size:.9rem}
+.partner-wrap{width:100%;margin:1.5rem 0 .5rem;display:none}
+.partner-link{display:block;line-height:0;border-radius:12px;overflow:hidden;margin-bottom:.5rem}
+.partner-link img{width:100%;display:block;height:auto}
+.partner-label{display:block;text-align:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)}
+.footer{padding:1.25rem 1rem;text-align:center;font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono)}
+.toast{position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,200%);opacity:0;background:var(--surface3);color:var(--text);padding:.8rem 1.1rem;border-radius:10px;border:1px solid var(--border);font-size:.9rem;transition:transform .25s;z-index:1000;max-width:90vw;text-align:center}
+.toast.show{transform:translate(-50%,0);opacity:1}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="hdr-logo"></a>
+  <div class="hdr-right">
+    <span class="hdr-score hidden" id="hdr-score">0 pts</span>
+    <span class="hdr-tag" id="hdr-tag">Table Trivia</span>
+  </div>
+</header>
+<div class="banner hidden" id="paused-banner">⏸ Paused by host</div>
+
+<main class="wrap">
+
+  <!-- No event -->
+  <section id="s-none" class="hidden">
+    <div class="card"><div class="big-ico">🌮</div><h1>No game running</h1><p class="sub">Trivia hasn't started yet. Check back when the host opens the room.</p></div>
+  </section>
+
+  <!-- Join -->
+  <section id="s-join" class="hidden">
+    <h1>Join the game</h1>
+    <p class="sub">Play on your phone. Your table plays as a team.</p>
+
+    <span class="label">Where are you sitting?</span>
+    <div class="tables" id="table-grid"></div>
+
+    <div id="team-name-row" class="hidden">
+      <span class="label">Name your table (optional)</span>
+      <input class="inp" id="j-team" maxlength="24" placeholder="e.g. Taco Bout It">
+    </div>
+
+    <span class="label">Your name</span>
+    <input class="inp" id="j-name" maxlength="30" autocomplete="given-name" placeholder="First name">
+    <span class="label">Email (required to win)</span>
+    <input class="inp" id="j-email" type="email" autocomplete="email" placeholder="you@email.com">
+    <span class="label">Room code (on the TV)</span>
+    <input class="inp code" id="j-code" maxlength="4" autocomplete="off" placeholder="····">
+
+    <button class="btn" id="j-go">Join →</button>
+  </section>
+
+  <!-- Lobby / waiting -->
+  <section id="s-wait" class="hidden">
+    <div class="card">
+      <span class="pill" id="w-table">Table</span>
+      <div class="big-ico">🎤</div>
+      <h1 id="w-title">You're in!</h1>
+      <p class="sub" id="w-sub">Eyes on the TV — the host is about to start.</p>
+    </div>
+  </section>
+
+  <!-- Question -->
+  <section id="s-q" class="hidden">
+    <div class="q-meta"><span class="q-round" id="q-round">Round 1 · Q1</span><span class="q-timer" id="q-timer">20</span></div>
+    <div class="bonus-tag hidden" id="q-bonus"></div>
+    <div class="q-emoji hidden" id="q-emoji"></div>
+    <img class="q-img hidden" id="q-img" alt="">
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="opts"></div>
+    <div class="locked-note hidden" id="q-locked">Answer locked in ✓ — waiting for the reveal</div>
+  </section>
+
+  <!-- Reveal -->
+  <section id="s-reveal" class="hidden">
+    <div class="card">
+      <div class="big-ico" id="r-ico">✓</div>
+      <h1 id="r-title">Correct!</h1>
+      <p class="sub" id="r-answer"></p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" id="r-score">0</div><div class="stat-l">Your points</div></div>
+        <div class="stat"><div class="stat-n" id="r-table">—</div><div class="stat-l" id="r-table-l">Table rank</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Round break -->
+  <section id="s-break" class="hidden">
+    <div class="card">
+      <span class="pill" id="b-pill">Round 1 complete</span>
+      <h1 id="b-title">Round break</h1>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" id="b-score">0</div><div class="stat-l">Your points</div></div>
+        <div class="stat"><div class="stat-n" id="b-rank">—</div><div class="stat-l">Your table</div></div>
+      </div>
+      <p class="sub" id="b-sub">Next round starts soon — good time to order.</p>
+      <div class="sponsor-msg hidden" id="b-sponsor"></div>
+    </div>
+  </section>
+
+  <!-- Final -->
+  <section id="s-final" class="hidden">
+    <div class="card">
+      <span class="pill">Final results</span>
+      <div class="big-ico" id="f-ico">🏆</div>
+      <h1 id="f-title">Thanks for playing!</h1>
+      <p class="sub" id="f-sub"></p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" id="f-score">0</div><div class="stat-l">Your points</div></div>
+        <div class="stat"><div class="stat-n" id="f-rank">—</div><div class="stat-l">Your rank</div></div>
+      </div>
+      <button class="btn" id="f-share">Share on WhatsApp</button>
+    </div>
+  </section>
+
+  <div class="partner-wrap">
+    <a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos"></a>
+    <span class="partner-label"></span>
+  </div>
+</main>
+
+<footer class="footer">Powered by Screenshot Interactive</footer>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="branding.js"></script>
+<script src="tt-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
+
+const SCREENS = ['s-none','s-join','s-wait','s-q','s-reveal','s-break','s-final'];
+function show(id){ SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); }
+
+const params = new URLSearchParams(location.search);
+let eventId = null, ev = null, names = {}, standings = null;
+let me = null;            // {id, name, table}
+let myPicks = {};         // local: {qIndex: pick}
+let pickedTable = params.get('t') ? String(params.get('t')).toLowerCase() : null;
+let timerIv = null;
+
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function lsSet(k,v){ try { localStorage.setItem(k, v); } catch(e){} }
+
+// ── boot: follow the host's "current" event pointer ──
+if (!db) { show('s-none'); toast('Connection issue — refresh'); }
+else {
+  ttRef('current').on('value', snap => {
+    const cur = snap.val();
+    const id = cur && cur.eventId;
+    if (!id) { eventId = null; show('s-none'); return; }
+    if (id !== eventId) attachEvent(id);
+  });
+}
+
+let evOff = [];
+function attachEvent(id){
+  evOff.forEach(f => f()); evOff = [];
+  eventId = id; ev = null; names = {}; standings = null; myPicks = {};
+  const saved = lsGet('tt_me_' + id);
+  me = saved ? JSON.parse(saved) : null;
+  try { myPicks = JSON.parse(lsGet('tt_picks_' + id) || '{}'); } catch(e){ myPicks = {}; }
+  const r1 = ttRef('events/' + id), r2 = ttRef('tableNames/' + id), r3 = ttRef('standings/' + id);
+  r1.on('value', s => { ev = s.val(); render(); });
+  r2.on('value', s => { names = s.val() || {}; renderTableGrid(); render(); });
+  r3.on('value', s => { standings = s.val(); render(); });
+  evOff.push(() => r1.off(), () => r2.off(), () => r3.off());
+}
+
+// ── join form ──
+function renderTableGrid(){
+  if (!ev) return;
+  const n = ev.tables || 12;
+  const grid = $('table-grid');
+  let html = '';
+  for (let i = 1; i <= n; i++) html += `<button class="tbl ${pickedTable===String(i)?'on':''}" data-t="${i}">${i}</button>`;
+  if (ev.barEnabled !== false) html += `<button class="tbl bar ${pickedTable==='bar'?'on':''}" data-t="bar">🍹 At the bar</button>`;
+  grid.innerHTML = html;
+  grid.querySelectorAll('.tbl').forEach(b => b.onclick = () => { pickedTable = b.dataset.t; renderTableGrid(); });
+  $('team-name-row').classList.toggle('hidden', !pickedTable || !!names[pickedTable]);
+}
+
+$('j-go').onclick = async () => {
+  if (!ev) return;
+  const name = $('j-name').value.trim();
+  const rawEmail = $('j-email').value.trim();
+  const code = $('j-code').value.trim().toUpperCase();
+  const team = $('j-team').value.trim();
+  if (!pickedTable) return toast('Pick your table first');
+  if (name.length < 1) return toast('Enter your name');
+  if (!isValidEmail(rawEmail)) return toast('Enter a valid email');
+  const email = normalizeEmail(rawEmail);
+  if (DISPOSABLE_DOMAINS.has(email.split('@')[1] || '')) return toast("Please use a permanent email");
+  if (code.length !== 4) return toast('Enter the 4-letter room code from the TV');
+
+  const id = emailToPlayerId(email);
+  const btn = $('j-go'); btn.disabled = true; btn.textContent = 'Joining…';
+  try {
+    // Private record (email) → then public roster entry (no email)
+    await ttRef(`players/${eventId}/${id}`).set({
+      email, originalEmail: rawEmail, name, table: pickedTable, code,
+      joinedAt: firebase.database.ServerValue.TIMESTAMP,
+    });
+    await ttRef(`roster/${eventId}/${id}`).set({ name, table: pickedTable, joinedAt: firebase.database.ServerValue.TIMESTAMP });
+    if (team && !names[pickedTable]) {
+      ttRef(`tableNames/${eventId}/${pickedTable}`).set(team).catch(() => {});
+    }
+    me = { id, name, table: pickedTable };
+    lsSet('tt_me_' + eventId, JSON.stringify(me));
+    lsSet('tt_email', rawEmail); lsSet('tt_name', name);
+    render();
+  } catch (e) {
+    console.warn(e);
+    const msg = String(e && (e.code || e.message) || '');
+    if (/permission/i.test(msg)) {
+      // Same email already joined (e.g. phone died, new device) → resume that player.
+      const back = (await ttRef(`roster/${eventId}/${id}`).once('value').catch(() => null));
+      const rv = back && back.val && back.val();
+      if (rv) {
+        me = { id, name: rv.name, table: rv.table };
+        lsSet('tt_me_' + eventId, JSON.stringify(me));
+        toast('Welcome back, ' + rv.name);
+        render();
+      }
+      else if (ev.joinClosed) toast('Joining is closed for this game');
+      else toast('Wrong room code — or this email already joined. Check the TV.');
+    } else toast('Could not join — try again');
+  } finally { btn.disabled = false; btn.textContent = 'Join →'; }
+};
+// ── answering ──
+function pick(qIndex, i){
+  if (!ev || ev.liveSlot !== String(qIndex) || ev.paused) return;
+  if (myPicks[qIndex] !== undefined) return;
+  myPicks[qIndex] = i;
+  lsSet('tt_picks_' + eventId, JSON.stringify(myPicks));
+  renderQuestion();
+  ttRef(`answers/${eventId}/${me.id}/${qIndex}`).update({
+    pick: i, submittedAt: firebase.database.ServerValue.TIMESTAMP,
+  }).catch(e => { console.warn(e); toast("Too late — that answer didn't count"); });
+}
+
+// ── rendering ──
+function myStanding(){
+  const p = standings && standings.players && me && standings.players[me.id];
+  return p || { score: 0 };
+}
+function tableRank(t){
+  const rows = (standings && standings.tableOrder) || [];
+  const i = rows.indexOf(t);
+  return i >= 0 ? i + 1 : null;
+}
+function playerRank(){
+  const rows = (standings && standings.playerOrder) || [];
+  const i = me ? rows.indexOf(me.id) : -1;
+  return i >= 0 ? i + 1 : null;
+}
+function ordinal(n){ if (!n) return '—'; const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+
+function render(){
+  clearInterval(timerIv); timerIv = null;
+  if (!eventId) return show('s-none');
+  if (!ev) return;
+  $('paused-banner').classList.toggle('hidden', !ev.paused);
+  const tableTxt = me ? tableLabel(me.table, names) : '';
+  $('hdr-tag').textContent = me ? (me.table === 'bar' ? 'The Bar' : 'Table ' + me.table) : 'Table Trivia';
+  const sc = myStanding().score || 0;
+  $('hdr-score').textContent = sc + ' pts';
+  $('hdr-score').classList.toggle('hidden', !me);
+
+  if (!me) {
+    if (ev.joinClosed || ev.status === 'final') {
+      show('s-none');
+      $('s-none').querySelector('h1').textContent = ev.status === 'final' ? 'Game over' : 'Joining is closed';
+      $('s-none').querySelector('.sub').textContent = 'Catch the next game night!';
+      return;
+    }
+    if ($('s-join').classList.contains('hidden')) {
+      $('j-name').value = $('j-name').value || lsGet('tt_name') || '';
+      $('j-email').value = $('j-email').value || lsGet('tt_email') || '';
+    }
+    renderTableGrid();
+    return show('s-join');
+  }
+
+  const st = ev.status;
+  if (st === 'lobby') {
+    $('w-table').textContent = tableTxt;
+    $('w-title').textContent = "You're in!";
+    $('w-sub').textContent = 'Eyes on the TV — the host is about to start.';
+    return show('s-wait');
+  }
+  if (st === 'question') return renderQuestion();
+  if (st === 'reveal') return renderReveal();
+  if (st === 'break') {
+    $('b-pill').textContent = `Round ${ev.round} complete`;
+    $('b-title').textContent = (ev.round || 1) >= (ev.rounds || []).length ? 'Final round done!' : 'Round break';
+    $('b-score').textContent = sc;
+    $('b-rank').textContent = ordinal(tableRank(me.table));
+    $('b-sponsor').textContent = ev.sponsorMsg || '';
+    $('b-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
+    return show('s-break');
+  }
+  if (st === 'final') {
+    const tr = tableRank(me.table), pr = playerRank();
+    const winner = standings && standings.tableOrder && standings.tableOrder[0];
+    $('f-ico').textContent = (tr === 1) ? '🏆' : (pr === 1 ? '⭐' : '🎉');
+    $('f-title').textContent = tr === 1 ? 'Your table won!' : (pr === 1 ? 'Top player tonight!' : 'Thanks for playing!');
+    $('f-sub').textContent = winner ? `Winning table: ${tableLabel(winner, names)}` : '';
+    $('f-score').textContent = sc;
+    $('f-rank').textContent = ordinal(pr);
+    return show('s-final');
+  }
+  show('s-wait');
+}
+
+function renderQuestion(){
+  const qi = ev.qIndex;
+  const q = (ev.questions || [])[qi];
+  if (!q) return show('s-wait');
+  const roundTitle = ((ev.rounds || [])[q.round - 1] || {}).title || '';
+  $('q-round').textContent = `R${q.round}${roundTitle ? ' · ' + roundTitle : ''} · Q${(qi % TT.ROUND_SIZE) + 1}`;
+  $('q-bonus').textContent = q.bonus ? '🎁 ' + q.bonus : '';
+  $('q-bonus').classList.toggle('hidden', !q.bonus);
+  $('q-emoji').textContent = q.emoji || '';
+  $('q-emoji').classList.toggle('hidden', !q.emoji);
+  if (q.img) { $('q-img').src = q.img; $('q-img').classList.remove('hidden'); } else $('q-img').classList.add('hidden');
+  $('q-text').textContent = q.q;
+  const mine = myPicks[qi];
+  const L = ['A','B','C','D'];
+  $('opts').innerHTML = q.o.map((o, i) =>
+    `<button class="opt ${mine===i?'selected':''}" data-i="${i}" ${mine!==undefined||ev.paused?'disabled':''}><span class="opt-letter">${L[i]}</span><span>${esc(o)}</span></button>`).join('');
+  $('opts').querySelectorAll('.opt').forEach(b => b.onclick = () => pick(qi, +b.dataset.i));
+  $('q-locked').classList.toggle('hidden', mine === undefined);
+  const tick = () => {
+    const left = secondsLeft(ev);
+    $('q-timer').textContent = left;
+    $('q-timer').classList.toggle('urgent', left <= 5);
+  };
+  tick(); clearInterval(timerIv); timerIv = setInterval(tick, 250);
+  show('s-q');
+}
+
+function renderReveal(){
+  const rv = ev.reveal || {};
+  const qi = rv.q;
+  const mine = myPicks[qi];
+  const ok = mine !== undefined && mine === rv.correctIdx;
+  $('r-ico').textContent = mine === undefined ? '⏰' : (ok ? '✅' : '❌');
+  $('r-title').textContent = mine === undefined ? "Time's up" : (ok ? 'Correct!' : 'Not quite');
+  $('r-answer').textContent = rv.correctText ? 'Answer: ' + rv.correctText : '';
+  $('r-score').textContent = myStanding().score || 0;
+  $('r-table').textContent = ordinal(tableRank(me.table));
+  $('r-table-l').textContent = me.table === 'bar' ? 'Bar rank' : 'Table rank';
+  show('s-reveal');
+}
+
+$('f-share').onclick = () => {
+  const sc = myStanding().score || 0;
+  const pr = playerRank();
+  const total = (ev && ev.questions || []).length;
+  const txt = `🌮 I scored *${sc}/${total}* at Table Trivia${pr ? ` and finished ${ordinal(pr)}` : ''}! Come play next week 👇\n${joinUrl()}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+};
+</script>
+</body>
+</html>
