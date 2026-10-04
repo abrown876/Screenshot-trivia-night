@@ -2,180 +2,272 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#080818">
-<title>Table Trivia — Play</title>
+<title>Table Trivia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#080818;--surface:#10102A;--surface2:#181832;--surface3:#20203C;
-  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;
-  --green:#3DDC84;--green-bg:rgba(61,220,132,.12);--red:#FF4B5C;--red-bg:rgba(255,75,92,.12);
-  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;
-  --border:rgba(124,110,246,.18);
-  --font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
+  --bg:#080818;--s1:#10102A;--s2:#181832;--s3:#22223F;
+  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--green:#3DDC84;--red:#FF4B5C;
+  --text:#F0F0FF;--dim:#9A9AC8;--muted:#5A5A8A;--line:rgba(124,110,246,.16);
+  --display:'Outfit',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;
+  --r:14px;
 }
-html,body{min-height:100%;background:var(--bg);font-family:var(--font-display);color:var(--text)}
-body{background:radial-gradient(ellipse at 20% 0%,rgba(124,110,246,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(255,92,138,.08) 0%,transparent 50%),var(--bg);min-height:100vh;display:flex;flex-direction:column}
-.hdr{background:rgba(8,8,24,.95);padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
-.hdr-logo{height:28px;width:auto;display:block}
-.hdr-right{display:flex;align-items:center;gap:.6rem}
-.hdr-tag{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase}
-.hdr-score{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)}
-.wrap{flex:1;width:100%;max-width:480px;margin:0 auto;padding:1.25rem 1rem 1rem}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--display);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+  background:radial-gradient(120% 60% at 10% -10%,rgba(124,110,246,.16),transparent 60%),radial-gradient(90% 50% at 100% 110%,rgba(255,92,138,.10),transparent 60%),var(--bg)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .hidden{display:none !important}
-h1{font-weight:900;font-size:1.9rem;line-height:1.1;margin-bottom:.4rem}
-.sub{color:var(--text-dim);font-size:.95rem;margin-bottom:1.25rem}
-.label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:1rem 0 .45rem;display:block}
-.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;color:var(--text);font-family:var(--font-display);font-size:1rem;outline:none}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 20px;padding-top:calc(10px + env(safe-area-inset-top));background:rgba(8,8,24,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hdr-logo{height:28px;width:auto;display:block}
+.hdr-me{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.hdr-table{color:var(--dim);font-weight:600;max-width:42vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-pts{font-family:var(--mono);font-size:13px;color:var(--bg);background:var(--gold);border-radius:999px;padding:3px 10px}
+.banner{position:sticky;top:49px;z-index:19;text-align:center;font-weight:700;font-size:14px;padding:8px 16px}
+.banner.pause{background:var(--gold);color:#1a1300}
+.banner.offline{background:var(--red);color:#fff}
+.tbar{height:4px;background:var(--s2);overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--purple);transform-origin:left;transition:transform .25s linear,background .3s}
+.tbar.warn i{background:var(--red)}
+
+main{flex:1;width:100%;max-width:460px;margin:0 auto;padding:24px 20px 16px;display:flex;flex-direction:column}
+section{display:flex;flex-direction:column;flex:1;animation:in .28s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.center{justify-content:center;text-align:center}
+
+h1{font-weight:900;font-size:30px;line-height:1.08;letter-spacing:-.01em}
+h2{font-weight:800;font-size:22px;line-height:1.2}
+.lede{color:var(--dim);font-size:16px;line-height:1.45;margin-top:8px}
+.fine{color:var(--muted);font-size:12.5px;line-height:1.45;text-align:center;margin-top:14px}
+
+/* form */
+.field{margin-top:24px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:15px;margin-bottom:10px}
+.lbl small{font-weight:500;font-size:13px;color:var(--dim)}
+.inp{width:100%;height:54px;background:var(--s2);border:1.5px solid var(--line);border-radius:var(--r);padding:0 16px;font-size:17px;outline:none;transition:border-color .15s}
 .inp:focus{border-color:var(--purple)}
-.inp.code{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.3em;font-size:1.3rem;text-align:center}
-.tables{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem}
-.tbl{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 0;text-align:center;font-weight:800;font-size:1rem;color:var(--text);cursor:pointer;min-height:44px}
-.tbl.bar{grid-column:span 5;font-size:.95rem}
-.tbl.on{background:linear-gradient(135deg,var(--purple),var(--coral));border-color:transparent}
-.btn{width:100%;padding:1rem;border:none;border-radius:14px;font-family:var(--font-display);font-weight:800;font-size:1.05rem;cursor:pointer;margin-top:1.25rem;background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;min-height:52px}
+.inp::placeholder{color:var(--muted)}
+.inp.code{font-family:var(--mono);font-size:24px;letter-spacing:.5em;text-align:center;text-transform:uppercase;padding-left:calc(16px + .5em)}
+.tables{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}
+.tbl{height:50px;border-radius:12px;background:var(--s2);border:1.5px solid var(--line);font-weight:800;font-size:17px}
+.tbl.bar{grid-column:1/-1;font-size:16px}
+.tbl[aria-pressed="true"]{background:var(--purple);border-color:var(--purple)}
+.picked{display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 8px 0 16px;background:var(--s2);border:1.5px solid var(--purple);border-radius:var(--r);font-weight:800;font-size:18px}
+.ghost{background:none;border:none;color:var(--dim);font-weight:600;font-size:14px;padding:10px 12px;text-decoration:underline;text-underline-offset:3px}
+.ok{color:var(--green);font-weight:700;font-size:14px}
+.btn{width:100%;min-height:56px;border:none;border-radius:var(--r);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .08s,opacity .15s}
+.btn:active{transform:scale(.985)}
 .btn:disabled{opacity:.5}
-.btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-weight:700}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;text-align:center}
-.big-ico{font-size:3rem;margin-bottom:.5rem}
-.pill{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--surface3);color:var(--gold);padding:.35rem .7rem;border-radius:20px;margin-bottom:.8rem}
-.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
-.q-round{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.q-timer{font-family:var(--font-mono);font-weight:700;font-size:1.6rem;color:var(--text)}
-.q-timer.urgent{color:var(--red)}
-.q-text{font-weight:800;font-size:1.3rem;line-height:1.3;margin-bottom:1rem}
-.q-img{display:block;max-width:100%;max-height:200px;margin:0 auto 1rem;border-radius:12px}
-.q-emoji{font-size:3.4rem;text-align:center;margin-bottom:1rem;letter-spacing:.1em}
-.bonus-tag{background:rgba(255,183,64,.12);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:.5rem .75rem;font-size:.85rem;font-weight:700;margin-bottom:.9rem;text-align:center}
-.opts{display:flex;flex-direction:column;gap:.6rem}
-.opt{display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:.95rem 1rem;color:var(--text);font-family:var(--font-display);font-size:1.02rem;font-weight:600;cursor:pointer;min-height:56px}
-.opt-letter{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:.85rem}
-.opt.selected{border-color:var(--purple);background:rgba(124,110,246,.18)}
-.opt.correct{border-color:var(--green);background:var(--green-bg)}
-.opt.wrong{border-color:var(--red);background:var(--red-bg)}
+.btn-main{background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;margin-top:28px}
+.btn-google{background:#fff;color:#1f1f1f}
+.btn-google svg{width:20px;height:20px}
+.btn-soft{background:var(--s2);border:1.5px solid var(--line);color:var(--text);margin-top:12px}
+.signed{display:flex;align-items:center;justify-content:space-between;gap:10px;height:54px;padding:0 8px 0 16px;background:var(--s2);border:1.5px solid rgba(61,220,132,.5);border-radius:var(--r);font-size:15px;font-weight:600}
+.signed span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:10px;text-align:center}
+
+/* waiting */
+.pulse{width:72px;height:72px;margin:0 auto 20px;border-radius:50%;background:rgba(124,110,246,.15);display:grid;place-items:center;font-size:34px;position:relative}
+.pulse::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--purple);animation:ring 1.8s ease-out infinite}
+@keyframes ring{from{transform:scale(1);opacity:.8}to{transform:scale(1.45);opacity:0}}
+.mates{margin-top:24px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left}
+.mates h3{font-size:14px;font-weight:700;color:var(--dim);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--s3);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+.chip.me{background:var(--purple)}
+
+/* question */
+.qmeta{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-weight:600;font-size:14px}
+.timer{font-family:var(--mono);font-size:22px;color:var(--text);min-width:2ch;text-align:right}
+.timer.warn{color:var(--red)}
+.dots{display:flex;gap:5px;margin-top:10px}
+.dots i{flex:1;height:4px;border-radius:2px;background:var(--s3)}
+.dots i.done{background:var(--muted)}
+.dots i.now{background:var(--purple)}
+.bonus{margin-top:16px;background:rgba(255,183,64,.1);border:1.5px solid rgba(255,183,64,.6);color:var(--gold);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;line-height:1.35}
+.qvis{text-align:center;margin-top:20px}
+.qemoji{font-size:56px;letter-spacing:.08em;line-height:1.1}
+.qimg{max-width:100%;max-height:200px;border-radius:12px}
+.qtext{font-weight:800;font-size:23px;line-height:1.25;margin-top:18px}
+.opts{display:grid;gap:10px;margin-top:22px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;text-align:left;background:var(--s2);border:2px solid transparent;border-radius:var(--r);padding:10px 14px;font-weight:700;font-size:17px;line-height:1.25;transition:opacity .2s,border-color .2s,transform .08s}
+.opt:active{transform:scale(.985)}
+.opt .k{flex-shrink:0;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:16px;background:var(--c);color:var(--ink)}
+.opt[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--s2))}
+.opts.locked .opt:not([aria-pressed="true"]){opacity:.35}
 .opt:disabled{cursor:default}
-.locked-note{text-align:center;color:var(--text-dim);font-size:.9rem;margin-top:.9rem}
-.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1rem 0}
-.stat{background:var(--surface2);border-radius:12px;padding:.8rem}
-.stat-n{font-family:var(--font-mono);font-weight:700;font-size:1.5rem}
-.stat-l{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem}
-.sponsor-msg{background:rgba(255,183,64,.08);border:1px dashed var(--gold);border-radius:12px;padding:.85rem;color:var(--gold);font-weight:700;margin-top:1rem}
-.banner{background:var(--gold);color:#1a1300;text-align:center;font-weight:800;padding:.5rem;font-size:.9rem}
-.partner-wrap{width:100%;margin:1.5rem 0 .5rem;display:none}
-.partner-link{display:block;line-height:0;border-radius:12px;overflow:hidden;margin-bottom:.5rem}
-.partner-link img{width:100%;display:block;height:auto}
-.partner-label{display:block;text-align:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted)}
-.footer{padding:1.25rem 1rem;text-align:center;font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono)}
-.toast{position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,200%);opacity:0;background:var(--surface3);color:var(--text);padding:.8rem 1.1rem;border-radius:10px;border:1px solid var(--border);font-size:.9rem;transition:transform .25s;z-index:1000;max-width:90vw;text-align:center}
-.toast.show{transform:translate(-50%,0);opacity:1}
+.lockin{margin-top:16px;text-align:center;font-weight:700;font-size:15px;color:var(--dim)}
+.lockin b{color:var(--text)}
+
+/* result cards */
+.badge{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;font-size:46px;font-weight:900;animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.badge.good{background:rgba(61,220,132,.16);color:var(--green);border:3px solid var(--green)}
+.badge.bad{background:rgba(255,75,92,.14);color:var(--red);border:3px solid var(--red)}
+.badge.idle{background:var(--s2);color:var(--dim);border:3px solid var(--s3)}
+.ans{display:inline-flex;align-items:center;gap:10px;margin-top:14px;background:var(--s2);border-radius:12px;padding:8px 14px 8px 8px;font-weight:700;font-size:17px}
+.ans .k{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:14px;background:var(--c);color:var(--ink)}
+.mine{color:var(--dim);font-size:14px;margin-top:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px 10px;text-align:center}
+.stat b{display:block;font-family:var(--mono);font-size:26px;line-height:1.1}
+.stat span{display:block;color:var(--dim);font-size:13px;font-weight:600;margin-top:4px}
+.win{margin-top:16px;background:var(--gold);color:#1a1300;border-radius:12px;padding:12px 14px;font-weight:800;text-align:center}
+.board{margin-top:20px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-align:left}
+.row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);font-weight:700;font-size:15px}
+.row:first-child{border-top:none}
+.row .n{font-family:var(--mono);color:var(--dim);font-size:14px}
+.row .p{font-family:var(--mono);color:var(--gold)}
+.row.me{background:rgba(124,110,246,.16)}
+.sponsor{margin-top:16px;border:1.5px dashed rgba(255,183,64,.6);border-radius:var(--r);padding:14px;color:var(--gold);font-weight:700;line-height:1.4;text-align:center}
+.next{color:var(--dim);font-size:14px;margin-top:16px;text-align:center}
+
+.partner-wrap{display:none;width:100%;margin-top:28px}
+.partner-link{display:block;line-height:0;border-radius:10px;overflow:hidden}
+.partner-link img{width:100%;height:auto;display:block}
+.partner-label{display:block;text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin-top:8px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  background:var(--s3);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600;font-size:14.5px;max-width:calc(100vw - 40px);text-align:center;transition:opacity .2s,transform .2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
 <body>
 
 <header class="hdr">
   <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="hdr-logo"></a>
-  <div class="hdr-right">
-    <span class="hdr-score hidden" id="hdr-score">0 pts</span>
-    <span class="hdr-tag" id="hdr-tag">Table Trivia</span>
-  </div>
+  <div class="hdr-me hidden" id="hdr-me"><span class="hdr-table" id="hdr-table"></span><span class="hdr-pts" id="hdr-pts">0</span></div>
 </header>
-<div class="banner hidden" id="paused-banner">⏸ Paused by host</div>
+<div class="banner offline hidden" id="b-offline">Reconnecting… your answers are safe</div>
+<div class="banner pause hidden" id="b-pause">Paused by the host</div>
+<div class="tbar hidden" id="tbar"><i id="tbar-i"></i></div>
 
-<main class="wrap">
+<main>
 
-  <!-- No event -->
-  <section id="s-none" class="hidden">
-    <div class="card"><div class="big-ico">🌮</div><h1>No game running</h1><p class="sub">Trivia hasn't started yet. Check back when the host opens the room.</p></div>
+  <!-- Empty / closed -->
+  <section id="s-none" class="center hidden">
+    <div class="pulse">🌮</div>
+    <h1 id="n-title">Trivia starts soon</h1>
+    <p class="lede" id="n-sub">The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.</p>
   </section>
 
   <!-- Join -->
   <section id="s-join" class="hidden">
-    <h1>Join the game</h1>
-    <p class="sub">Play on your phone. Your table plays as a team.</p>
+    <h1>Join tonight's trivia</h1>
+    <p class="lede">Answer on your phone. Everyone at your table plays as one team.</p>
 
-    <span class="label">Where are you sitting?</span>
-    <div class="tables" id="table-grid"></div>
-
-    <div id="team-name-row" class="hidden">
-      <span class="label">Name your table (optional)</span>
-      <input class="inp" id="j-team" maxlength="24" placeholder="e.g. Taco Bout It">
+    <div class="field">
+      <div class="lbl">Where are you sitting?</div>
+      <div id="tbl-picked" class="picked hidden"><span id="tbl-picked-txt"></span><button class="ghost" id="tbl-change" type="button">Change</button></div>
+      <div id="tbl-grid" class="tables"></div>
     </div>
 
-    <span class="label">Your name</span>
-    <input class="inp" id="j-name" maxlength="30" autocomplete="given-name" placeholder="First name">
-    <span class="label">Email (required to win)</span>
-    <input class="inp" id="j-email" type="email" autocomplete="email" placeholder="you@email.com">
-    <span class="label">Room code (on the TV)</span>
-    <input class="inp code" id="j-code" maxlength="4" autocomplete="off" placeholder="····">
+    <div class="field">
+      <div class="lbl">Sign in <small>To win prizes</small></div>
+      <div id="id-choose">
+        <button class="btn btn-google" id="j-google" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.9-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-10l-7.9 6C6.5 42.6 14.6 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <p class="note hidden" id="inapp-note">Google sign-in is blocked inside WhatsApp and Instagram. Open this page in Safari or Chrome, or use your email.</p>
+        <button class="btn btn-soft" id="j-use-email" type="button">Use my email instead</button>
+      </div>
+      <div id="id-google" class="hidden">
+        <div class="signed"><span id="g-email"></span><button class="ghost" id="j-signout" type="button">Switch</button></div>
+      </div>
+      <div id="id-email" class="hidden">
+        <input class="inp" id="j-email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com">
+        <button class="ghost" id="j-back-google" type="button" style="padding-left:0">Use Google instead</button>
+      </div>
+    </div>
 
-    <button class="btn" id="j-go">Join →</button>
+    <div class="field">
+      <div class="lbl">Your first name</div>
+      <input class="inp" id="j-name" maxlength="30" autocomplete="given-name" placeholder="What the TV will call you">
+    </div>
+
+    <div class="field" id="f-code">
+      <div class="lbl">Room code <small>Shown on the TV</small></div>
+      <div id="code-ok" class="picked hidden" style="border-color:rgba(61,220,132,.5)"><span style="font-family:var(--mono);letter-spacing:.3em" id="code-ok-txt"></span><span class="ok" style="padding-right:8px">Got it</span></div>
+      <input class="inp code" id="j-code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="····">
+    </div>
+
+    <div class="field hidden" id="f-team">
+      <div class="lbl">Name your table <small>Optional</small></div>
+      <input class="inp" id="j-team" maxlength="24" placeholder="You're first here — pick a team name">
+    </div>
+
+    <button class="btn btn-main" id="j-go" type="button">Join</button>
+    <p class="fine">Your email is only used to contact winners and to send offers from Screenshot Interactive and Chilitos. Unsubscribe anytime.</p>
   </section>
 
-  <!-- Lobby / waiting -->
-  <section id="s-wait" class="hidden">
-    <div class="card">
-      <span class="pill" id="w-table">Table</span>
-      <div class="big-ico">🎤</div>
-      <h1 id="w-title">You're in!</h1>
-      <p class="sub" id="w-sub">Eyes on the TV — the host is about to start.</p>
-    </div>
+  <!-- Waiting -->
+  <section id="s-wait" class="center hidden">
+    <div class="pulse">🎤</div>
+    <h1 id="w-title">You're in</h1>
+    <p class="lede" id="w-sub">Watch the TV. The host will start the round in a moment.</p>
+    <div class="mates" id="w-mates"><h3 id="w-mates-h">At your table</h3><div class="chips" id="w-chips"></div></div>
   </section>
 
   <!-- Question -->
   <section id="s-q" class="hidden">
-    <div class="q-meta"><span class="q-round" id="q-round">Round 1 · Q1</span><span class="q-timer" id="q-timer">20</span></div>
-    <div class="bonus-tag hidden" id="q-bonus"></div>
-    <div class="q-emoji hidden" id="q-emoji"></div>
-    <img class="q-img hidden" id="q-img" alt="">
-    <div class="q-text" id="q-text"></div>
+    <div class="qmeta"><span id="q-meta">Round 1</span><span class="timer" id="q-timer">20</span></div>
+    <div class="dots" id="q-dots"></div>
+    <div class="bonus hidden" id="q-bonus"></div>
+    <div class="qvis hidden" id="q-vis"><div class="qemoji" id="q-emoji"></div><img class="qimg hidden" id="q-img" alt=""></div>
+    <div class="qtext" id="q-text"></div>
     <div class="opts" id="opts"></div>
-    <div class="locked-note hidden" id="q-locked">Answer locked in ✓ — waiting for the reveal</div>
+    <div class="lockin hidden" id="q-lock"></div>
   </section>
 
   <!-- Reveal -->
-  <section id="s-reveal" class="hidden">
-    <div class="card">
-      <div class="big-ico" id="r-ico">✓</div>
-      <h1 id="r-title">Correct!</h1>
-      <p class="sub" id="r-answer"></p>
-      <div class="stat-row">
-        <div class="stat"><div class="stat-n" id="r-score">0</div><div class="stat-l">Your points</div></div>
-        <div class="stat"><div class="stat-n" id="r-table">—</div><div class="stat-l" id="r-table-l">Table rank</div></div>
-      </div>
+  <section id="s-reveal" class="center hidden">
+    <div class="badge" id="r-badge">✓</div>
+    <h1 id="r-title">Correct</h1>
+    <div><span class="ans" id="r-ans"></span></div>
+    <p class="mine hidden" id="r-mine"></p>
+    <div class="win hidden" id="r-win"></div>
+    <div class="stats">
+      <div class="stat"><b id="r-score">0</b><span>Your points</span></div>
+      <div class="stat"><b id="r-rank">—</b><span id="r-rank-l">Your table</span></div>
     </div>
   </section>
 
   <!-- Round break -->
   <section id="s-break" class="hidden">
-    <div class="card">
-      <span class="pill" id="b-pill">Round 1 complete</span>
-      <h1 id="b-title">Round break</h1>
-      <div class="stat-row">
-        <div class="stat"><div class="stat-n" id="b-score">0</div><div class="stat-l">Your points</div></div>
-        <div class="stat"><div class="stat-n" id="b-rank">—</div><div class="stat-l">Your table</div></div>
-      </div>
-      <p class="sub" id="b-sub">Next round starts soon — good time to order.</p>
-      <div class="sponsor-msg hidden" id="b-sponsor"></div>
+    <div style="text-align:center">
+      <h1 id="b-title">Round 1 done</h1>
+      <p class="lede" id="b-sub">Your table is 2nd</p>
     </div>
+    <div class="board" id="b-board"></div>
+    <div class="stats">
+      <div class="stat"><b id="b-score">0</b><span>Your points</span></div>
+      <div class="stat"><b id="b-prank">—</b><span>Your rank tonight</span></div>
+    </div>
+    <div class="sponsor hidden" id="b-sponsor"></div>
+    <p class="next" id="b-next"></p>
   </section>
 
   <!-- Final -->
-  <section id="s-final" class="hidden">
-    <div class="card">
-      <span class="pill">Final results</span>
-      <div class="big-ico" id="f-ico">🏆</div>
-      <h1 id="f-title">Thanks for playing!</h1>
-      <p class="sub" id="f-sub"></p>
-      <div class="stat-row">
-        <div class="stat"><div class="stat-n" id="f-score">0</div><div class="stat-l">Your points</div></div>
-        <div class="stat"><div class="stat-n" id="f-rank">—</div><div class="stat-l">Your rank</div></div>
-      </div>
-      <button class="btn" id="f-share">Share on WhatsApp</button>
+  <section id="s-final" class="center hidden">
+    <div class="badge good" id="f-badge" style="font-size:44px">🏆</div>
+    <h1 id="f-title">Thanks for playing</h1>
+    <p class="lede" id="f-sub"></p>
+    <div class="stats">
+      <div class="stat"><b id="f-score">0</b><span id="f-score-l">Correct answers</span></div>
+      <div class="stat"><b id="f-rank">—</b><span>Your rank</span></div>
     </div>
+    <button class="btn btn-main" id="f-share" type="button">Share my score on WhatsApp</button>
   </section>
 
   <div class="partner-wrap">
@@ -185,245 +277,333 @@ h1{font-weight:900;font-size:1.9rem;line-height:1.1;margin-bottom:.4rem}
 </main>
 
 <footer class="footer">Powered by Screenshot Interactive</footer>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="branding.js"></script>
 <script src="tt-common.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
 
 const SCREENS = ['s-none','s-join','s-wait','s-q','s-reveal','s-break','s-final'];
-function show(id){ SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); }
-
-const params = new URLSearchParams(location.search);
-let eventId = null, ev = null, names = {}, standings = null;
-let me = null;            // {id, name, table}
-let myPicks = {};         // local: {qIndex: pick}
-let pickedTable = params.get('t') ? String(params.get('t')).toLowerCase() : null;
-let timerIv = null;
-
+let current = null;
+function show(id){ if (current === id) return; current = id; SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); window.scrollTo(0, 0); }
 function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
 function lsSet(k,v){ try { localStorage.setItem(k, v); } catch(e){} }
 
-// ── boot: follow the host's "current" event pointer ──
-if (!db) { show('s-none'); toast('Connection issue — refresh'); }
-else {
-  ttRef('current').on('value', snap => {
-    const cur = snap.val();
-    const id = cur && cur.eventId;
-    if (!id) { eventId = null; show('s-none'); return; }
-    if (id !== eventId) attachEvent(id);
-  });
-}
+const params = new URLSearchParams(location.search);
+let pickedTable = params.get('t') ? String(params.get('t')).toLowerCase() : null;
+let showGrid = !pickedTable;
+const urlCode = (params.get('c') || '').toUpperCase().slice(0, 4);
+if (urlCode) $('j-code').value = urlCode;
 
-let evOff = [];
+let eventId = null, ev = null, names = {}, standings = null, roster = {};
+let me = null, myPicks = {}, timerIv = null;
+
+// ── Connection banner ──
+watchConnection(on => $('b-offline').classList.toggle('hidden', on));
+
+// ── Follow the host's live night ──
+if (!db) { show('s-none'); }
+else ttRef('current').on('value', s => {
+  const c = s.val(); const id = c && c.eventId;
+  if (!id) { eventId = null; ev = null; render(); return; }
+  if (id !== eventId) attachEvent(id);
+});
+
+let offs = [];
 function attachEvent(id){
-  evOff.forEach(f => f()); evOff = [];
-  eventId = id; ev = null; names = {}; standings = null; myPicks = {};
+  offs.forEach(f => f()); offs = [];
+  eventId = id; ev = null; names = {}; standings = null; roster = {};
   const saved = lsGet('tt_me_' + id);
   me = saved ? JSON.parse(saved) : null;
   try { myPicks = JSON.parse(lsGet('tt_picks_' + id) || '{}'); } catch(e){ myPicks = {}; }
-  const r1 = ttRef('events/' + id), r2 = ttRef('tableNames/' + id), r3 = ttRef('standings/' + id);
-  r1.on('value', s => { ev = s.val(); render(); });
-  r2.on('value', s => { names = s.val() || {}; renderTableGrid(); render(); });
-  r3.on('value', s => { standings = s.val(); render(); });
-  evOff.push(() => r1.off(), () => r2.off(), () => r3.off());
+  const L = (p, cb) => { const r = ttRef(p); r.on('value', s => cb(s.val())); offs.push(() => r.off()); };
+  L('events/' + id, v => { ev = v; render(); });
+  L('tableNames/' + id, v => { names = v || {}; render(); });
+  L('standings/' + id, v => { standings = v; render(); });
+  L('roster/' + id, v => { roster = v || {}; if (current === 's-wait' || current === 's-join') render(); });
 }
 
-// ── join form ──
-function renderTableGrid(){
-  if (!ev) return;
+// ── Join form ──
+function renderJoin(){
   const n = ev.tables || 12;
-  const grid = $('table-grid');
-  let html = '';
-  for (let i = 1; i <= n; i++) html += `<button class="tbl ${pickedTable===String(i)?'on':''}" data-t="${i}">${i}</button>`;
-  if (ev.barEnabled !== false) html += `<button class="tbl bar ${pickedTable==='bar'?'on':''}" data-t="bar">🍹 At the bar</button>`;
-  grid.innerHTML = html;
-  grid.querySelectorAll('.tbl').forEach(b => b.onclick = () => { pickedTable = b.dataset.t; renderTableGrid(); });
-  $('team-name-row').classList.toggle('hidden', !pickedTable || !!names[pickedTable]);
+  const showPicked = pickedTable && !showGrid;
+  $('tbl-picked').classList.toggle('hidden', !showPicked);
+  $('tbl-grid').classList.toggle('hidden', !!showPicked);
+  if (showPicked) $('tbl-picked-txt').textContent = tableLabel(pickedTable, names);
+  else {
+    let h = '';
+    for (let i = 1; i <= n; i++) h += `<button class="tbl" type="button" data-t="${i}" aria-pressed="${pickedTable===String(i)}">${i}</button>`;
+    if (ev.barEnabled !== false) h += `<button class="tbl bar" type="button" data-t="bar" aria-pressed="${pickedTable==='bar'}">🍹 I'm at the bar</button>`;
+    if ($('tbl-grid').innerHTML !== h) $('tbl-grid').innerHTML = h;
+    const cols = Math.ceil(n / Math.ceil(n / 5));   // 6 → 3+3, 12 → 4+4+4, 10 → 5+5
+    $('tbl-grid').style.setProperty('--cols', cols);
+  }
+  // Room code: if the QR carried the right code, show it as done
+  const codeOk = !!ev.displayCode && $('j-code').value.trim().toUpperCase() === ev.displayCode;
+  $('code-ok').classList.toggle('hidden', !(codeOk && urlCode));
+  $('j-code').classList.toggle('hidden', !!(codeOk && urlCode));
+  if (codeOk && urlCode) $('code-ok-txt').textContent = ev.displayCode;
+  // Team name only for the first player at an unnamed table
+  const tableTaken = pickedTable && Object.values(roster).some(r => r.table === pickedTable);
+  $('f-team').classList.toggle('hidden', !pickedTable || !!names[pickedTable] || tableTaken);
+  $('j-go').textContent = pickedTable ? `Join ${tableName(pickedTable, names)}` : 'Join';
 }
+$('tbl-grid').addEventListener('click', e => {
+  const b = e.target.closest('.tbl'); if (!b) return;
+  pickedTable = b.dataset.t; showGrid = false; haptic(10); renderJoin();
+});
+$('tbl-change').onclick = () => { showGrid = true; renderJoin(); };
+$('j-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); });
+
+// ── Identity: Google (verified) or typed email ──
+let gUser = null, idMode = 'choose';
+const IN_APP = /FBAN|FBAV|Instagram|WhatsApp|Line\/|; wv\)/i.test(navigator.userAgent);
+if (IN_APP) { $('inapp-note').classList.remove('hidden'); $('j-google').classList.add('hidden'); }
+function setIdMode(m){
+  idMode = m;
+  $('id-choose').classList.toggle('hidden', m !== 'choose');
+  $('id-google').classList.toggle('hidden', m !== 'google');
+  $('id-email').classList.toggle('hidden', m !== 'email');
+  if (m === 'email') setTimeout(() => $('j-email').focus(), 50);
+}
+$('j-use-email').onclick = () => setIdMode('email');
+$('j-back-google').onclick = () => setIdMode('choose');
+$('j-signout').onclick = async () => { try { await firebase.auth().signOut(); } catch(e){} gUser = null; setIdMode('choose'); };
+$('j-google').onclick = async () => {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await firebase.auth().signInWithPopup(provider);
+  } catch (e) {
+    const c = (e && e.code) || '';
+    if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+    console.warn(e);
+    toast(c === 'auth/popup-blocked' ? 'Pop-up blocked. Allow pop-ups or use your email.' : "Google sign-in isn't available here. Use your email.");
+    setIdMode('email');
+  }
+};
+if (db && firebase.auth) firebase.auth().onAuthStateChanged(u => {
+  gUser = (u && u.email && u.emailVerified) ? u : null;
+  if (gUser) {
+    $('g-email').textContent = '✓ ' + gUser.email;
+    if (!$('j-name').value && gUser.displayName) $('j-name').value = gUser.displayName.split(' ')[0].slice(0, 30);
+    setIdMode('google');
+  } else if (idMode === 'google') setIdMode('choose');
+});
 
 $('j-go').onclick = async () => {
   if (!ev) return;
+  if (!pickedTable) return toast('Pick your table first');
+  if (idMode === 'choose') return toast('Continue with Google, or use your email');
+  const verified = idMode === 'google' && !!gUser;
+  const rawEmail = verified ? gUser.email : $('j-email').value.trim();
   const name = $('j-name').value.trim();
-  const rawEmail = $('j-email').value.trim();
   const code = $('j-code').value.trim().toUpperCase();
   const team = $('j-team').value.trim();
-  if (!pickedTable) return toast('Pick your table first');
-  if (name.length < 1) return toast('Enter your name');
-  if (!isValidEmail(rawEmail)) return toast('Enter a valid email');
+  if (!isValidEmail(rawEmail)) { toast('Enter a valid email'); return $('j-email').focus(); }
   const email = normalizeEmail(rawEmail);
-  if (DISPOSABLE_DOMAINS.has(email.split('@')[1] || '')) return toast("Please use a permanent email");
-  if (code.length !== 4) return toast('Enter the 4-letter room code from the TV');
+  if (DISPOSABLE_DOMAINS.has(email.split('@')[1] || '')) return toast('Use a permanent email address');
+  if (!name) { toast('Add your first name'); return $('j-name').focus(); }
+  if (code.length !== 4) { toast('Enter the 4-letter room code from the TV'); return $('j-code').focus(); }
 
   const id = emailToPlayerId(email);
   const btn = $('j-go'); btn.disabled = true; btn.textContent = 'Joining…';
   try {
-    // Private record (email) → then public roster entry (no email)
     await ttRef(`players/${eventId}/${id}`).set({
-      email, originalEmail: rawEmail, name, table: pickedTable, code,
+      email, originalEmail: rawEmail, name, table: pickedTable, code, verified,
+      ...(verified ? { uid: gUser.uid } : {}),
       joinedAt: firebase.database.ServerValue.TIMESTAMP,
     });
     await ttRef(`roster/${eventId}/${id}`).set({ name, table: pickedTable, joinedAt: firebase.database.ServerValue.TIMESTAMP });
-    if (team && !names[pickedTable]) {
-      ttRef(`tableNames/${eventId}/${pickedTable}`).set(team).catch(() => {});
-    }
+    if (team && !names[pickedTable]) ttRef(`tableNames/${eventId}/${pickedTable}`).set(team).catch(() => {});
     me = { id, name, table: pickedTable };
     lsSet('tt_me_' + eventId, JSON.stringify(me));
-    lsSet('tt_email', rawEmail); lsSet('tt_name', name);
+    if (!verified) lsSet('tt_email', rawEmail);
+    lsSet('tt_name', name);
+    haptic(30);
     render();
   } catch (e) {
     console.warn(e);
     const msg = String(e && (e.code || e.message) || '');
     if (/permission/i.test(msg)) {
-      // Same email already joined (e.g. phone died, new device) → resume that player.
-      const back = (await ttRef(`roster/${eventId}/${id}`).once('value').catch(() => null));
+      // Same email already joined (phone died, new device) → resume that player
+      const back = await ttRef(`roster/${eventId}/${id}`).once('value').catch(() => null);
       const rv = back && back.val && back.val();
       if (rv) {
         me = { id, name: rv.name, table: rv.table };
         lsSet('tt_me_' + eventId, JSON.stringify(me));
         toast('Welcome back, ' + rv.name);
-        render();
+        return render();
       }
-      else if (ev.joinClosed) toast('Joining is closed for this game');
-      else toast('Wrong room code — or this email already joined. Check the TV.');
-    } else toast('Could not join — try again');
-  } finally { btn.disabled = false; btn.textContent = 'Join →'; }
+      if (ev.joinClosed) toast('Joining is closed for this game');
+      else if (ev.displayCode && code !== ev.displayCode) { toast("That room code doesn't match the TV"); $('j-code').classList.remove('hidden'); $('code-ok').classList.add('hidden'); $('j-code').focus(); }
+      else toast("Couldn't join. Check the room code on the TV.");
+    } else toast("Couldn't join. Check your connection and try again.");
+  } finally {
+    btn.disabled = false; btn.textContent = pickedTable ? `Join ${tableName(pickedTable, names)}` : 'Join';
+  }
 };
-// ── answering ──
-function pick(qIndex, i){
-  if (!ev || ev.liveSlot !== String(qIndex) || ev.paused) return;
-  if (myPicks[qIndex] !== undefined) return;
-  myPicks[qIndex] = i;
+
+// ── Answering ──
+function pick(qi, i){
+  if (!ev || ev.liveSlot !== String(qi) || ev.paused) return;
+  if (myPicks[qi] !== undefined) return;
+  myPicks[qi] = i;
   lsSet('tt_picks_' + eventId, JSON.stringify(myPicks));
+  haptic(35);
   renderQuestion();
-  ttRef(`answers/${eventId}/${me.id}/${qIndex}`).update({
+  ttRef(`answers/${eventId}/${me.id}/${qi}`).update({
     pick: i, submittedAt: firebase.database.ServerValue.TIMESTAMP,
-  }).catch(e => { console.warn(e); toast("Too late — that answer didn't count"); });
+  }).catch(e => { console.warn(e); delete myPicks[qi]; toast("Time was up — that answer didn't count"); renderQuestion(); });
 }
 
-// ── rendering ──
-function myStanding(){
-  const p = standings && standings.players && me && standings.players[me.id];
-  return p || { score: 0 };
-}
-function tableRank(t){
-  const rows = (standings && standings.tableOrder) || [];
-  const i = rows.indexOf(t);
-  return i >= 0 ? i + 1 : null;
-}
-function playerRank(){
-  const rows = (standings && standings.playerOrder) || [];
-  const i = me ? rows.indexOf(me.id) : -1;
-  return i >= 0 ? i + 1 : null;
-}
-function ordinal(n){ if (!n) return '—'; const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+// ── Helpers ──
+function myScore(){ const p = standings && standings.players && me && standings.players[me.id]; return (p && p.score) || 0; }
+function tableRank(t){ const o = (standings && standings.tableOrder) || []; const i = o.indexOf(t); return i >= 0 ? i + 1 : null; }
+function playerRank(){ const o = (standings && standings.playerOrder) || []; const i = me ? o.indexOf(me.id) : -1; return i >= 0 ? i + 1 : null; }
+function keyChip(i, cls = 'k'){ return `<span class="${cls}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}">${'ABCD'[i]}</span>`; }
+function roundTitle(r){ const x = ev && ev.rounds && ev.rounds[r - 1]; return x ? x.title : ''; }
 
+// ── Render ──
 function render(){
   clearInterval(timerIv); timerIv = null;
-  if (!eventId) return show('s-none');
-  if (!ev) return;
-  $('paused-banner').classList.toggle('hidden', !ev.paused);
-  const tableTxt = me ? tableLabel(me.table, names) : '';
-  $('hdr-tag').textContent = me ? (me.table === 'bar' ? 'The Bar' : 'Table ' + me.table) : 'Table Trivia';
-  const sc = myStanding().score || 0;
-  $('hdr-score').textContent = sc + ' pts';
-  $('hdr-score').classList.toggle('hidden', !me);
+  $('tbar').classList.add('hidden');
+  if (!eventId || !ev) {
+    $('n-title').textContent = 'Trivia starts soon';
+    $('n-sub').textContent = "The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.";
+    $('hdr-me').classList.add('hidden');
+    return show('s-none');
+  }
+  $('b-pause').classList.toggle('hidden', !ev.paused);
+  $('hdr-me').classList.toggle('hidden', !me);
+  if (me) { $('hdr-table').textContent = tableName(me.table, names); $('hdr-pts').textContent = myScore(); }
 
   if (!me) {
     if (ev.joinClosed || ev.status === 'final') {
-      show('s-none');
-      $('s-none').querySelector('h1').textContent = ev.status === 'final' ? 'Game over' : 'Joining is closed';
-      $('s-none').querySelector('.sub').textContent = 'Catch the next game night!';
-      return;
+      $('n-title').textContent = ev.status === 'final' ? "That's a wrap for tonight" : 'Joining is closed';
+      $('n-sub').textContent = ev.status === 'final' ? 'Thanks for coming out. See you at the next game night.' : 'This game is already under way. Catch the next one!';
+      return show('s-none');
     }
-    if ($('s-join').classList.contains('hidden')) {
-      $('j-name').value = $('j-name').value || lsGet('tt_name') || '';
-      $('j-email').value = $('j-email').value || lsGet('tt_email') || '';
+    if (current !== 's-join') {
+      if (!$('j-name').value) $('j-name').value = lsGet('tt_name') || '';
+      if (!$('j-email').value) $('j-email').value = lsGet('tt_email') || '';
     }
-    renderTableGrid();
+    renderJoin();
     return show('s-join');
   }
 
-  const st = ev.status;
-  if (st === 'lobby') {
-    $('w-table').textContent = tableTxt;
-    $('w-title').textContent = "You're in!";
-    $('w-sub').textContent = 'Eyes on the TV — the host is about to start.';
-    return show('s-wait');
+  switch (ev.status) {
+    case 'lobby': return renderWait();
+    case 'question': return renderQuestion();
+    case 'reveal': return renderReveal();
+    case 'break': return renderBreak();
+    case 'final': return renderFinal();
+    default: return renderWait();
   }
-  if (st === 'question') return renderQuestion();
-  if (st === 'reveal') return renderReveal();
-  if (st === 'break') {
-    $('b-pill').textContent = `Round ${ev.round} complete`;
-    $('b-title').textContent = (ev.round || 1) >= (ev.rounds || []).length ? 'Final round done!' : 'Round break';
-    $('b-score').textContent = sc;
-    $('b-rank').textContent = ordinal(tableRank(me.table));
-    $('b-sponsor').textContent = ev.sponsorMsg || '';
-    $('b-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
-    return show('s-break');
-  }
-  if (st === 'final') {
-    const tr = tableRank(me.table), pr = playerRank();
-    const winner = standings && standings.tableOrder && standings.tableOrder[0];
-    $('f-ico').textContent = (tr === 1) ? '🏆' : (pr === 1 ? '⭐' : '🎉');
-    $('f-title').textContent = tr === 1 ? 'Your table won!' : (pr === 1 ? 'Top player tonight!' : 'Thanks for playing!');
-    $('f-sub').textContent = winner ? `Winning table: ${tableLabel(winner, names)}` : '';
-    $('f-score').textContent = sc;
-    $('f-rank').textContent = ordinal(pr);
-    return show('s-final');
-  }
+}
+
+function renderWait(){
+  const mates = Object.entries(roster).filter(([, r]) => r.table === me.table);
+  const total = Object.keys(roster).length;
+  $('w-title').textContent = `You're in, ${me.name}`;
+  $('w-sub').textContent = `Watch the TV — the host starts Round 1 shortly. ${total} ${total === 1 ? 'player' : 'players'} in the room.`;
+  $('w-mates-h').textContent = `${tableName(me.table, names)} · ${mates.length} ${mates.length === 1 ? 'player' : 'players'}`;
+  $('w-chips').innerHTML = mates.map(([id, r]) => `<span class="chip ${id === me.id ? 'me' : ''}">${esc(r.name)}</span>`).join('');
   show('s-wait');
 }
 
 function renderQuestion(){
-  const qi = ev.qIndex;
-  const q = (ev.questions || [])[qi];
-  if (!q) return show('s-wait');
-  const roundTitle = ((ev.rounds || [])[q.round - 1] || {}).title || '';
-  $('q-round').textContent = `R${q.round}${roundTitle ? ' · ' + roundTitle : ''} · Q${(qi % TT.ROUND_SIZE) + 1}`;
+  const qi = ev.qIndex, q = (ev.questions || [])[qi];
+  if (!q) return renderWait();
+  const pos = qi % TT.ROUND_SIZE;
+  $('q-meta').textContent = `Round ${q.round}${roundTitle(q.round) ? ' · ' + roundTitle(q.round) : ''} · Q${pos + 1} of ${TT.ROUND_SIZE}`;
+  $('q-dots').innerHTML = Array.from({ length: TT.ROUND_SIZE }, (_, i) => `<i class="${i < pos ? 'done' : i === pos ? 'now' : ''}"></i>`).join('');
   $('q-bonus').textContent = q.bonus ? '🎁 ' + q.bonus : '';
   $('q-bonus').classList.toggle('hidden', !q.bonus);
+  $('q-vis').classList.toggle('hidden', !q.emoji && !q.img);
   $('q-emoji').textContent = q.emoji || '';
-  $('q-emoji').classList.toggle('hidden', !q.emoji);
   if (q.img) { $('q-img').src = q.img; $('q-img').classList.remove('hidden'); } else $('q-img').classList.add('hidden');
   $('q-text').textContent = q.q;
   const mine = myPicks[qi];
-  const L = ['A','B','C','D'];
-  $('opts').innerHTML = q.o.map((o, i) =>
-    `<button class="opt ${mine===i?'selected':''}" data-i="${i}" ${mine!==undefined||ev.paused?'disabled':''}><span class="opt-letter">${L[i]}</span><span>${esc(o)}</span></button>`).join('');
-  $('opts').querySelectorAll('.opt').forEach(b => b.onclick = () => pick(qi, +b.dataset.i));
-  $('q-locked').classList.toggle('hidden', mine === undefined);
+  const locked = mine !== undefined;
+  const html = q.o.map((o, i) => `<button class="opt" type="button" data-i="${i}" aria-pressed="${mine === i}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}" ${locked || ev.paused ? 'disabled' : ''}>${keyChip(i)}<span>${esc(o)}</span></button>`).join('');
+  if ($('opts').dataset.k !== qi + ':' + mine + ':' + !!ev.paused) { $('opts').innerHTML = html; $('opts').dataset.k = qi + ':' + mine + ':' + !!ev.paused; }
+  $('opts').classList.toggle('locked', locked);
+  $('q-lock').classList.toggle('hidden', !locked);
+  if (locked) $('q-lock').innerHTML = `Locked in: <b>${'ABCD'[mine]}</b> · wait for the reveal`;
+  $('tbar').classList.remove('hidden');
+  const total = questionDurationSec(ev);
   const tick = () => {
     const left = secondsLeft(ev);
     $('q-timer').textContent = left;
-    $('q-timer').classList.toggle('urgent', left <= 5);
+    $('q-timer').classList.toggle('warn', left <= 5);
+    $('tbar-i').style.transform = `scaleX(${Math.max(0, left / total)})`;
+    $('tbar').classList.toggle('warn', left <= 5);
   };
-  tick(); clearInterval(timerIv); timerIv = setInterval(tick, 250);
+  tick(); timerIv = setInterval(tick, 250);
   show('s-q');
 }
+$('opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b && !b.disabled) pick(ev.qIndex, +b.dataset.i); });
 
 function renderReveal(){
-  const rv = ev.reveal || {};
-  const qi = rv.q;
-  const mine = myPicks[qi];
-  const ok = mine !== undefined && mine === rv.correctIdx;
-  $('r-ico').textContent = mine === undefined ? '⏰' : (ok ? '✅' : '❌');
-  $('r-title').textContent = mine === undefined ? "Time's up" : (ok ? 'Correct!' : 'Not quite');
-  $('r-answer').textContent = rv.correctText ? 'Answer: ' + rv.correctText : '';
-  $('r-score').textContent = myStanding().score || 0;
-  $('r-table').textContent = ordinal(tableRank(me.table));
-  $('r-table-l').textContent = me.table === 'bar' ? 'Bar rank' : 'Table rank';
+  const rv = ev.reveal || {}, qi = rv.q, q = (ev.questions || [])[qi] || { o: [] };
+  const mine = myPicks[qi], answered = mine !== undefined, ok = answered && mine === rv.correctIdx;
+  const b = $('r-badge');
+  b.className = 'badge ' + (ok ? 'good' : answered ? 'bad' : 'idle');
+  b.textContent = ok ? '✓' : answered ? '✗' : '⏱';
+  $('r-title').textContent = ok ? 'Correct!' : answered ? 'Not this time' : 'Out of time';
+  $('r-ans').innerHTML = rv.correctIdx != null ? `${keyChip(rv.correctIdx)}${esc(rv.correctText || '')}` : '';
+  $('r-mine').classList.toggle('hidden', !(answered && !ok));
+  if (answered && !ok) $('r-mine').textContent = `You picked ${'ABCD'[mine]} · ${q.o[mine] || ''}`;
+  const bw = rv.bonusWinner;
+  const iWon = bw && me && bw.name === me.name && bw.table === me.table && ok;
+  $('r-win').classList.toggle('hidden', !bw);
+  if (bw) $('r-win').textContent = iWon ? '🎁 You won the bonus! Tell your server.' : `🎁 Bonus won by ${bw.name} at ${tableName(bw.table, names)}`;
+  $('r-score').textContent = myScore();
+  $('r-rank').textContent = ordinal(tableRank(me.table));
+  $('r-rank-l').textContent = me.table === 'bar' ? 'The Bar\'s rank' : 'Your table\'s rank';
   show('s-reveal');
 }
 
+function renderBreak(){
+  const r = ev.round || 1, total = (ev.rounds || []).length, last = r >= total;
+  const tr = tableRank(me.table);
+  $('b-title').textContent = last ? 'Final round done' : `Round ${r} done`;
+  $('b-sub').textContent = tr ? `${tableName(me.table, names)} is ${ordinal(tr)}` : 'Standings are in';
+  const o = (standings && standings.tableOrder) || [];
+  const rows = o.slice(0, 3);
+  if (tr > 3) rows.push(me.table);
+  $('b-board').innerHTML = rows.map(t => `<div class="row ${t === me.table ? 'me' : ''}"><span class="n">${o.indexOf(t) + 1}</span><span>${esc(tableName(t, names))}</span><span class="p">${fmtPts(standings.tables[t].score)}</span></div>`).join('') || '<div class="row"><span></span><span>No scores yet</span><span></span></div>';
+  $('b-score').textContent = myScore();
+  $('b-prank').textContent = ordinal(playerRank());
+  $('b-sponsor').textContent = ev.sponsorMsg || '';
+  $('b-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
+  const nx = (ev.rounds || [])[r];
+  $('b-next').textContent = last ? 'Final results are coming up on the TV.' : `Up next: Round ${r + 1}${nx ? ' · ' + nx.title : ''}. Good time to order.`;
+  show('s-break');
+}
+
+function renderFinal(){
+  const tr = tableRank(me.table), pr = playerRank();
+  const total = (ev.questions || []).length, players = ((standings && standings.playerOrder) || []).length;
+  const w = standings && standings.tableOrder && standings.tableOrder[0];
+  const wonTable = tr === 1, topPlayer = pr === 1;
+  $('f-badge').textContent = wonTable ? '🏆' : topPlayer ? '⭐' : '🎉';
+  $('f-title').textContent = wonTable ? 'Your table won!' : topPlayer ? "You're tonight's top player!" : 'Thanks for playing';
+  $('f-sub').textContent = wonTable ? 'Tell your server — your prize is on the way.' : topPlayer ? 'Show this screen to your server to claim your prize.' : (w ? `${tableName(w, names)} took the table prize tonight.` : '');
+  $('f-score').textContent = `${myScore()}/${total}`;
+  $('f-rank').textContent = pr ? `${ordinal(pr)}` : '—';
+  $('f-score-l').textContent = 'Correct answers';
+  show('s-final');
+}
+
 $('f-share').onclick = () => {
-  const sc = myStanding().score || 0;
-  const pr = playerRank();
-  const total = (ev && ev.questions || []).length;
-  const txt = `🌮 I scored *${sc}/${total}* at Table Trivia${pr ? ` and finished ${ordinal(pr)}` : ''}! Come play next week 👇\n${joinUrl()}`;
+  const total = (ev && ev.questions || []).length, pr = playerRank();
+  const txt = `🌮 I got ${myScore()}/${total} at Table Trivia${pr ? ` and finished ${ordinal(pr)}` : ''} tonight. Come play next time! 👉 screenshotinteractive.com`;
   window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
 };
 </script>

@@ -85,10 +85,31 @@ function secondsLeft(ev){
   return Math.max(0, Math.ceil(questionDurationSec(ev) - (serverNow() - ev.questionStartedAt) / 1000));
 }
 
-// Join URL (same folder as the current page)
-function joinUrl(table){
+// Join URL (same folder as the current page). The TV's QR carries the room
+// code so scanners never type it; table tents carry only the table.
+function joinUrl(table, code){
   const u = new URL('join.html', location.href);
   u.search = ''; u.hash = '';
   if (table) u.searchParams.set('t', table);
+  if (code) u.searchParams.set('c', code);
   return u.toString();
+}
+
+// Answer colours — identical on TV and phones so guests match by colour.
+const OPTION_COLORS = ['#7C6EF6', '#FF5C8A', '#FFB740', '#2EC4D6'];
+const OPTION_INK    = ['#ffffff', '#ffffff', '#1a1300', '#04232a'];
+
+function haptic(ms = 25){ try { navigator.vibrate && navigator.vibrate(ms); } catch(e){} }
+function ordinal(n){ if (!n) return '—'; const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]); }
+function tableName(t, names){ return (names && names[t]) || (t === 'bar' ? 'The Bar' : 'Table ' + t); }
+
+// Connection watcher → calls cb(true|false) after the first connect
+function watchConnection(cb){
+  if (!db) return;
+  let seen = false;
+  db.ref('.info/connected').on('value', s => {
+    const on = s.val() === true;
+    if (on) seen = true;
+    if (seen) cb(on);
+  });
 }

@@ -4,154 +4,203 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#080818">
-<title>Table Trivia — Host Control</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Table Trivia · Host</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080818;--surface:#10102A;--surface2:#181832;--surface3:#20203C;
+  --bg:#080818;--s1:#10102A;--s2:#181832;--s3:#22223F;
   --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--green:#3DDC84;--red:#FF4B5C;
-  --text:#F0F0FF;--text-dim:#8888BB;--text-muted:#4A4A7A;--border:rgba(124,110,246,.18);
-  --font-display:'Outfit',sans-serif;--font-mono:'Space Mono',monospace;
+  --text:#F0F0FF;--dim:#9A9AC8;--muted:#5A5A8A;--line:rgba(124,110,246,.16);
+  --display:'Outfit',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;
 }
-body{background:var(--bg);font-family:var(--font-display);color:var(--text);min-height:100vh;padding:1rem}
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-.hdr-left{display:flex;align-items:center;gap:.85rem}
-.hdr-logo{height:28px}
-.hdr-title{font-weight:900;font-size:1.1rem}
-.hdr-tag{font-family:var(--font-mono);font-size:10px;color:var(--gold);background:rgba(255,183,64,.12);padding:.3rem .6rem;border-radius:6px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1rem;max-width:1500px;margin:0 auto}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.15rem}
-.panel h3{font-size:.8rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.8rem}
-.kv{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid rgba(124,110,246,.06);font-size:.9rem;gap:.5rem}
-.kv:last-child{border-bottom:none}
-.kv-key{color:var(--text-dim);font-family:var(--font-mono);font-size:.78rem}
-.kv-val{font-weight:700;text-align:right}
-.code-big{font-family:var(--font-mono);font-size:2.2rem;font-weight:700;letter-spacing:.35em;color:var(--gold);text-align:center;padding:.4rem 0}
-.status-pill{display:inline-block;padding:.28rem .65rem;border-radius:20px;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-family:var(--font-mono);background:var(--surface3);color:var(--text-dim)}
-.status-question{background:var(--coral);color:#fff}.status-reveal{background:var(--purple);color:#fff}.status-break{background:var(--gold);color:#1a1300}.status-final{background:var(--green);color:#03210f}
-.btn{padding:.8rem 1rem;border:none;border-radius:10px;font-family:var(--font-display);font-weight:700;font-size:.95rem;cursor:pointer;width:100%;margin-bottom:.5rem;min-height:44px}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;font-weight:800}
-.btn-warn{background:var(--gold);color:#1a1300}
-.btn-danger{background:var(--red);color:#fff}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-.timer{font-family:var(--font-mono);font-size:2.6rem;font-weight:700;text-align:center;background:var(--surface2);border-radius:10px;padding:.6rem;margin-bottom:.6rem}
-.timer.urgent{color:var(--red)}
-.q-prev{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.85rem;margin-bottom:.6rem}
-.q-prev-meta{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem}
-.q-prev-text{font-weight:700;margin-bottom:.4rem}
-.q-prev-opt{font-size:.85rem;color:var(--text-dim);padding:.15rem 0}
-.q-prev-opt.ok{color:var(--green);font-weight:700}
-.config-row{display:grid;grid-template-columns:115px 1fr;gap:.5rem;align-items:center;margin-bottom:.5rem}
-.config-row label{font-family:var(--font-mono);font-size:.72rem;color:var(--text-dim);text-transform:uppercase}
-input,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.55rem;color:var(--text);font-family:var(--font-mono);font-size:.85rem;width:100%}
-textarea{font-family:var(--font-display);min-height:60px;resize:vertical}
-.tbl-list{max-height:330px;overflow:auto}
-.tbl-row{display:grid;grid-template-columns:70px 1fr 40px 60px 56px;gap:.4rem;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(124,110,246,.06);font-size:.85rem}
-.tbl-row .n{font-family:var(--font-mono);color:var(--text-dim)}
-.mini{background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;font-size:.7rem;padding:.25rem .4rem;cursor:pointer}
-.links a{color:var(--purple);font-family:var(--font-mono);font-size:.8rem;word-break:break-all}
-.warning-box{background:rgba(255,75,92,.12);border:1px solid var(--red);color:var(--red);padding:.7rem;border-radius:10px;font-size:.8rem;margin-top:.6rem}
+html,body{background:var(--bg);color:var(--text);font-family:var(--display);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:20px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .hidden{display:none !important}
-.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface3);color:var(--text);padding:.85rem 1.25rem;border-radius:8px;border:1px solid var(--border);transform:translateX(130%);transition:transform .25s;z-index:1000}
-.toast.show{transform:translateX(0)}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1360px;margin:0 auto 20px}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-logo{height:28px;display:block}
+.hdr h1{font-size:18px;font-weight:800}
+.hdr-who{color:var(--dim);font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px}
+.hdr-who button{background:none;border:none;color:var(--dim);text-decoration:underline;font-size:13px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;max-width:1360px;margin:0 auto}
+@media (max-width:980px){.layout{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card h2{font-size:15px;font-weight:700;color:var(--dim);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 small{font-weight:600;color:var(--muted);font-size:13px}
+
+/* auth */
+.auth{max-width:420px;margin:8vh auto 0}
+.auth h2{color:var(--text);font-size:22px;font-weight:800;margin-bottom:6px}
+.auth p{color:var(--dim);margin-bottom:18px;line-height:1.45}
+.inp{width:100%;height:46px;background:var(--s2);border:1.5px solid var(--line);border-radius:10px;padding:0 14px;font-size:15px;outline:none;margin-bottom:10px}
+.inp:focus{border-color:var(--purple)}
+textarea.inp{height:auto;min-height:70px;padding:12px 14px;resize:vertical;line-height:1.4}
+.warn{background:rgba(255,75,92,.1);border:1px solid rgba(255,75,92,.6);color:#ff9aa5;border-radius:10px;padding:12px;font-size:13.5px;line-height:1.5;margin-top:12px}
+.warn code{font-family:var(--mono);font-size:12px;color:#fff;word-break:break-all}
+
+/* buttons */
+.btn{min-height:46px;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .08s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.3;cursor:not-allowed;filter:grayscale(1)}
+.btn-main{width:100%;min-height:64px;font-size:19px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;border-radius:14px}
+.btn-soft{background:var(--s2);border:1.5px solid var(--line);color:var(--text)}
+.btn-gold{background:var(--gold);color:#1a1300}
+.btn-danger{background:transparent;border:1.5px solid rgba(255,75,92,.6);color:#ff8f9b}
+.btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);border-radius:4px;padding:1px 5px;margin-left:4px;opacity:.75}
+
+/* stage */
+.stage-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.state{font-size:26px;font-weight:900;line-height:1.1}
+.state-sub{color:var(--dim);font-weight:600;margin-top:4px}
+.clock{font-family:var(--mono);font-size:44px;line-height:1;min-width:3ch;text-align:right}
+.clock.hot{color:var(--red)}
+.meter{height:8px;border-radius:4px;background:var(--s3);overflow:hidden;margin:14px 0 4px}
+.meter i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.meter-l{display:flex;justify-content:space-between;color:var(--dim);font-size:13px;font-weight:600}
+.next-hint{color:var(--muted);font-size:13px;text-align:center;margin-top:10px}
+
+/* question preview */
+.q{background:var(--s2);border-radius:12px;padding:16px}
+.q-meta{color:var(--dim);font-size:13px;font-weight:600;margin-bottom:6px}
+.q-text{font-weight:800;font-size:18px;line-height:1.3;margin-bottom:12px}
+.q-opt{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:6px 0;font-weight:600;font-size:15px}
+.q-opt .k{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;font-weight:900;font-size:13px}
+.q-opt.ok span:nth-child(2){color:var(--green)}
+.q-opt .bar{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.q-up{margin-top:12px;opacity:.6}
+
+/* setup */
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.setup-grid label{display:block;color:var(--dim);font-size:13px;font-weight:600;margin-bottom:6px}
+.check{display:flex;align-items:center;gap:8px;color:var(--dim);font-weight:600;font-size:14px;height:46px}
+.check input{width:18px;height:18px;accent-color:var(--purple)}
+.summary{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.code{font-family:var(--mono);font-size:34px;letter-spacing:.3em;color:var(--gold)}
+.links{display:grid;gap:8px;margin-top:14px}
+.link{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
+.link a{color:var(--text);text-decoration:none}
+.link button{background:none;border:none;color:var(--purple);font-weight:700;font-size:13px}
+
+/* tables */
+.tbl-list{display:grid;gap:2px;max-height:380px;overflow:auto}
+.tbl-row{display:grid;grid-template-columns:26px 1fr 54px 64px 28px;gap:10px;align-items:center;padding:9px 6px;border-radius:8px;font-size:14px;font-weight:600}
+.tbl-row:nth-child(odd){background:rgba(255,255,255,.02)}
+.tbl-row .rk{font-family:var(--mono);color:var(--muted);font-size:12px}
+.tbl-row .nm small{color:var(--muted);font-weight:500;margin-left:6px}
+.tbl-row .pl{color:var(--dim);text-align:right}
+.tbl-row .pt{font-family:var(--mono);color:var(--gold);text-align:right;font-size:13px}
+.tbl-row button{background:none;border:none;color:var(--muted);font-size:14px}
+.tbl-row button:hover{color:var(--text)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kv:first-of-type{border-top:none}
+.kv span:first-child{color:var(--dim);font-weight:600}
+.kv span:last-child{font-weight:700;text-align:right}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--s3);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-weight:600;transition:opacity .2s,transform .2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <div class="hdr-left">
-    <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot" class="hdr-logo"></a>
-    <span class="hdr-title">Table Trivia · Host Control</span>
+    <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="hdr-logo"></a>
+    <h1>Table Trivia · Host</h1>
   </div>
-  <span class="hdr-tag">⚠ Operator Only</span>
+  <div class="hdr-who hidden" id="who"><span id="who-email"></span><button id="btn-signout" type="button">Sign out</button></div>
 </div>
 
-<div class="grid">
-
-  <!-- Sign-in -->
-  <div class="panel" id="auth-panel">
-    <h3>Host Sign-in</h3>
-    <div id="auth-out">
-      <div class="config-row"><label>Email</label><input id="auth-email" type="email" autocomplete="username"></div>
-      <div class="config-row"><label>Password</label><input id="auth-pass" type="password" autocomplete="current-password"></div>
-      <button class="btn btn-primary" id="btn-signin">Sign in</button>
-    </div>
-    <div id="auth-in" class="hidden">
-      <div class="kv"><span class="kv-key">Signed in</span><span class="kv-val" id="auth-who">—</span></div>
-      <div class="kv"><span class="kv-key">Host access</span><span class="kv-val" id="auth-admin">checking…</span></div>
-      <div id="auth-uid-box" class="warning-box hidden">Not an admin yet. In Firebase → Realtime Database → Data, add <code>admins/<span id="auth-uid"></span></code> = <code>true</code>, then reload.</div>
-      <button class="btn btn-ghost" id="btn-signout" style="margin-top:.5rem">Sign out</button>
-    </div>
+<!-- Sign-in -->
+<div class="card auth hidden" id="auth">
+  <h2>Host sign-in</h2>
+  <p>Sign in once on this device. You'll stay signed in for future game nights.</p>
+  <div id="auth-form">
+    <input class="inp" id="auth-email" type="email" autocomplete="username" placeholder="Email">
+    <input class="inp" id="auth-pass" type="password" autocomplete="current-password" placeholder="Password">
+    <button class="btn btn-main" id="btn-signin" type="button" style="min-height:52px;font-size:16px">Sign in</button>
   </div>
-
-  <!-- Night setup -->
-  <div class="panel">
-    <h3>Tonight's Game</h3>
-    <div class="config-row"><label>Event ID</label><input id="cfg-id"></div>
-    <div class="config-row"><label>Tables</label><input id="cfg-tables" type="number" min="1" max="40" value="12"></div>
-    <div class="config-row"><label>Bar team</label><input id="cfg-bar" type="checkbox" checked style="width:auto"></div>
-    <div class="config-row"><label>Q seconds</label><input id="cfg-qsec" type="number" min="10" max="60"></div>
-    <div class="config-row"><label>Reveal sec</label><input id="cfg-rsec" type="number" min="3" max="30"></div>
-    <button class="btn btn-ghost" id="btn-create">Create / Reset Night</button>
-    <div class="kv"><span class="kv-key">Room code</span><span class="kv-val"></span></div>
-    <div class="code-big" id="room-code">····</div>
-    <div class="links">
-      <div class="kv"><span class="kv-key">TV screen</span><a id="lnk-tv" target="_blank">tv.html</a></div>
-      <div class="kv"><span class="kv-key">Players</span><a id="lnk-join" target="_blank">join.html</a></div>
-      <div class="kv"><span class="kv-key">Table tents</span><a id="lnk-tents" target="_blank">tents.html</a></div>
-    </div>
-  </div>
-
-  <!-- Run of show -->
-  <div class="panel">
-    <h3>Run of Show</h3>
-    <div class="kv"><span class="kv-key">Status</span><span class="kv-val"><span class="status-pill" id="i-status">—</span></span></div>
-    <div class="kv"><span class="kv-key">Round</span><span class="kv-val" id="i-round">—</span></div>
-    <div class="kv"><span class="kv-key">Question</span><span class="kv-val" id="i-q">—</span></div>
-    <div class="kv"><span class="kv-key">Answers in</span><span class="kv-val" id="i-answered">0 / 0</span></div>
-    <div class="timer" id="timer">—</div>
-    <button class="btn btn-primary" id="btn-next-round">Start Round 1</button>
-    <div class="row2">
-      <button class="btn btn-warn" id="btn-pause">⏸ Pause</button>
-      <button class="btn btn-ghost" id="btn-extend">+15s</button>
-    </div>
-    <div class="row2">
-      <button class="btn btn-ghost" id="btn-skip">⏭ Reveal / Next</button>
-      <button class="btn btn-ghost" id="btn-join">🔒 Close joining</button>
-    </div>
-    <button class="btn btn-primary" id="btn-final">🏆 Show Final Results</button>
-  </div>
-
-  <!-- Current question -->
-  <div class="panel">
-    <h3>Current Question (host view)</h3>
-    <div class="q-prev" id="q-prev"><div class="q-prev-meta">Waiting</div><div class="q-prev-text">No active question</div></div>
-    <div class="q-prev" id="q-next" style="opacity:.65"></div>
-  </div>
-
-  <!-- Tables -->
-  <div class="panel">
-    <h3>Tables <span id="i-players" style="color:var(--text-muted)"></span></h3>
-    <div class="tbl-list" id="tbl-list"></div>
-  </div>
-
-  <!-- Sponsor + export -->
-  <div class="panel">
-    <h3>Sponsor Message (TV + phones at breaks)</h3>
-    <textarea id="sponsor-msg" maxlength="140" placeholder="e.g. 🌮 Taco Tuesday: 3 tacos for $1,500 — order before Round 3!"></textarea>
-    <button class="btn btn-ghost" id="btn-sponsor" style="margin-top:.5rem">Update message</button>
-    <h3 style="margin-top:1rem">Data</h3>
-    <button class="btn btn-ghost" id="btn-export">📥 Export players + emails (CSV)</button>
-    <div class="kv"><span class="kv-key">Top player</span><span class="kv-val" id="i-top">—</span></div>
-    <div class="kv"><span class="kv-key">Leading table</span><span class="kv-val" id="i-toptable">—</span></div>
-  </div>
-
+  <div id="auth-noadmin" class="warn hidden">Signed in, but this account isn't a host yet. In Firebase → Realtime Database → Data, add <code>admins/<span id="auth-uid"></span></code> = <code>true</code>, then reload.</div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Console -->
+<div class="layout hidden" id="console">
+  <div class="col">
+    <div class="card">
+      <div class="stage-top">
+        <div><div class="state" id="st-title">No game yet</div><div class="state-sub" id="st-sub">Set up tonight's game to begin.</div></div>
+        <div class="clock" id="clock"></div>
+      </div>
+      <button class="btn btn-main" id="btn-main" type="button">Start</button>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="btn-pause" type="button">Pause<kbd>P</kbd></button>
+        <button class="btn btn-soft" id="btn-extend" type="button">+15 sec<kbd>E</kbd></button>
+        <button class="btn btn-soft" id="btn-join" type="button">Close joining</button>
+      </div>
+      <div class="meter" id="meter"><i id="meter-i"></i></div>
+      <div class="meter-l"><span id="meter-l">0 of 0 answered</span><span id="meter-r"></span></div>
+      <p class="next-hint">Press <kbd>Space</kbd> for the main button</p>
+    </div>
+
+    <div class="card">
+      <h2>Question <small id="q-hint">Only you see the answer</small></h2>
+      <div class="q" id="q-now"></div>
+      <div class="q q-up" id="q-next"></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card" id="setup-card">
+      <h2>Tonight's game <button class="btn btn-soft hidden" id="btn-edit" type="button" style="min-height:32px;font-size:13px;padding:0 12px">New game</button></h2>
+      <div id="setup-form">
+        <div class="setup-grid">
+          <div><label for="cfg-id">Game name</label><input class="inp" id="cfg-id"></div>
+          <div><label for="cfg-tables">Tables</label><input class="inp" id="cfg-tables" type="number" min="1" max="40" value="12"></div>
+          <div><label for="cfg-qsec">Seconds per question</label><input class="inp" id="cfg-qsec" type="number" min="10" max="60"></div>
+          <div><label for="cfg-rsec">Seconds on the answer</label><input class="inp" id="cfg-rsec" type="number" min="3" max="30"></div>
+        </div>
+        <label class="check"><input id="cfg-bar" type="checkbox" checked> Bar plays as its own team</label>
+        <button class="btn btn-main" id="btn-create" type="button" style="min-height:52px;font-size:16px">Create game</button>
+      </div>
+      <div id="setup-summary" class="hidden">
+        <div class="summary"><div><div style="color:var(--dim);font-size:13px;font-weight:600">Room code</div><div class="code" id="room-code">····</div></div>
+          <div style="text-align:right;color:var(--dim);font-size:14px;font-weight:600" id="sum-meta"></div></div>
+        <div class="links">
+          <div class="link"><a id="lnk-tv" target="_blank">📺 Open the TV screen</a><button data-copy="tv" type="button">Copy link</button></div>
+          <div class="link"><a id="lnk-join" target="_blank">📱 Player link</a><button data-copy="join" type="button">Copy link</button></div>
+          <div class="link"><a id="lnk-tents" target="_blank" href="tents.html">🖨 Print table cards</a><span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Standings <small id="i-players">0 players</small></h2>
+      <div class="tbl-list" id="tbl-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Sponsor message <small>Shown at round breaks</small></h2>
+      <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="🌮 Taco Tuesday: 3 tacos for $1,500 — order before Round 3"></textarea>
+      <button class="btn btn-soft" id="btn-sponsor" type="button" style="width:100%">Update message</button>
+    </div>
+
+    <div class="card">
+      <h2>Players &amp; prizes</h2>
+      <div class="kv"><span>Top player</span><span id="i-top">—</span></div>
+      <div class="kv"><span>Leading table</span><span id="i-toptable">—</span></div>
+      <div class="kv"><span>Verified emails</span><span id="i-verified">—</span></div>
+      <button class="btn btn-soft" id="btn-export" type="button" style="width:100%;margin-top:12px">Download player list (CSV)</button>
+      <button class="btn btn-danger" id="btn-final-early" type="button" style="width:100%;margin-top:10px">End game now &amp; show results</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -205,21 +254,20 @@ const TOTAL_ROUNDS = ROUNDS.length;
 
 // ============================================================
 let EVENT_ID = null;
-let ev = null, roster = {}, answers = {}, names = {}, standings = null, secretCode = null;
-let isAdmin = false;
-let timer = null;
+let ev = null, roster = {}, answers = {}, names = {}, standings = null, players = {};
+let isAdmin = false, timer = null, lastTableOrder = [];
 const evRef = () => ttRef('events/' + EVENT_ID);
+const revealSec = () => (ev && ev.revealSeconds) || TT.REVEAL_SECONDS;
 
 function defaultEventId(){
-  const d = new Date(); const p = n => String(n).padStart(2,'0');
-  return `chilitos-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return `chilitos-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 $('cfg-id').value = defaultEventId();
 $('cfg-qsec').value = TT.QUESTION_SECONDS;
 $('cfg-rsec').value = TT.REVEAL_SECONDS;
-$('lnk-tv').href = new URL('tv.html', location.href); $('lnk-tv').textContent = new URL('tv.html', location.href).pathname;
-$('lnk-join').href = joinUrl(); $('lnk-join').textContent = joinUrl();
-function revealSec(){ return (ev && ev.revealSeconds) || TT.REVEAL_SECONDS; }
+const TV_URL = new URL('tv.html', location.href).toString();
+$('lnk-tv').href = TV_URL;
 
 // ── Create / reset ──
 function randomCode(){
@@ -228,16 +276,16 @@ function randomCode(){
   return s;
 }
 async function createNight(){
-  if (!isAdmin) return toast('Sign in as host first');
-  const id = $('cfg-id').value.trim().replace(/[^a-zA-Z0-9_-]/g,'-');
-  if (!id) return toast('Enter an event ID');
-  if (!confirm(`Create / reset "${id}"? This wipes players, answers and scores for this ID.`)) return;
+  if (!isAdmin) return;
+  const id = $('cfg-id').value.trim().replace(/[^a-zA-Z0-9_-]/g, '-');
+  if (!id) return toast('Give the game a name');
+  if (ev && ev.status !== 'final' && ev.status !== 'lobby' && !confirm('A game is in progress. Start a new one anyway?')) return;
+  if (id === EVENT_ID && !confirm(`"${id}" already exists. Reset it? Players and scores will be cleared.`)) return;
   const tables = Math.max(1, Math.min(40, parseInt($('cfg-tables').value) || 12));
   const code = randomCode();
   const u = {};
   u[`events/${id}`] = {
-    eventId: id, status: 'lobby', round: 0, qIndex: null, liveSlot: null,
-    displayCode: code,   // shown on the TV; stops casual remote joins (not strong security)
+    eventId: id, status: 'lobby', round: 0, qIndex: null, liveSlot: null, displayCode: code,
     tables, barEnabled: $('cfg-bar').checked, joinClosed: false,
     questionSeconds: parseInt($('cfg-qsec').value) || TT.QUESTION_SECONDS,
     revealSeconds: parseInt($('cfg-rsec').value) || TT.REVEAL_SECONDS,
@@ -250,8 +298,9 @@ async function createNight(){
   u[`standings/${id}`] = null; u[`tableNames/${id}`] = null;
   u['current'] = { eventId: id };
   await ttRef('').update(u);
+  setupOpen = false;
   attach(id);
-  toast('Night created — code ' + code);
+  toast('Game created · room code ' + code);
 }
 
 // ── State machine ──
@@ -259,17 +308,15 @@ function clearTimer(){ if (timer) { clearTimeout(timer); timer = null; } }
 function schedule(sec, fn){ clearTimer(); timer = setTimeout(fn, Math.max(300, sec * 1000)); }
 
 async function goQuestion(qi){
-  const q = QUESTIONS[qi];
   const u = {
-    status: 'question', round: q.round, qIndex: qi, liveSlot: String(qi),
+    status: 'question', round: QUESTIONS[qi].round, qIndex: qi, liveSlot: String(qi),
     questionStartedAt: firebase.database.ServerValue.TIMESTAMP, extraSeconds: 0,
     paused: false, pausedAt: null, reveal: null, answeredCount: 0,
   };
   u['qStarts/' + qi] = firebase.database.ServerValue.TIMESTAMP;
   await evRef().update(u);
-  schedule((ev && ev.questionSeconds) || TT.QUESTION_SECONDS, toReveal); // extraSeconds was just reset
+  schedule((ev && ev.questionSeconds) || TT.QUESTION_SECONDS, toReveal);
 }
-
 async function toReveal(){
   if (!ev || ev.status !== 'question' || ev.paused) return;
   clearTimer();
@@ -278,44 +325,54 @@ async function toReveal(){
     status: 'reveal', liveSlot: null, revealStartedAt: firebase.database.ServerValue.TIMESTAMP,
     reveal: { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]] },
   });
-  try { await scoreAndPublish(qi); } catch (e) { console.warn('scoring', e); toast('Scoring error — see console'); }
+  try { await scoreAndPublish(qi); } catch (e) { console.warn('scoring', e); toast('Scoring problem — check the console'); }
   schedule(revealSec(), advanceFromReveal);
 }
-
+const isRoundEnd = qi => qi + 1 >= QUESTIONS.length || (qi + 1) % TT.ROUND_SIZE === 0;
 async function advanceFromReveal(){
   if (!ev || ev.status !== 'reveal' || ev.paused) return;
   clearTimer();
-  const next = ev.qIndex + 1;
-  if (next >= QUESTIONS.length || next % TT.ROUND_SIZE === 0) {
-    await evRef().update({ status: 'break', liveSlot: null });
-  } else {
-    await goQuestion(next);
-  }
+  if (isRoundEnd(ev.qIndex)) {
+    const u = { status: 'break', liveSlot: null };
+    u['breakOrders/' + ev.round] = lastTableOrder.length ? lastTableOrder : ((standings && standings.tableOrder) || []);
+    await evRef().update(u);
+  } else await goQuestion(ev.qIndex + 1);
 }
-
-async function nextRound(){
-  if (!isAdmin || !ev) return;
-  const r = (ev.status === 'lobby') ? 1 : (ev.round || 0) + 1;
-  if (r > TOTAL_ROUNDS) return toast('All rounds done — show final results');
-  if (!confirm(`Start Round ${r}: ${ROUNDS[r-1].title}?`)) return;
-  await goQuestion((r - 1) * TT.ROUND_SIZE);
-}
-
+async function startRound(r){ await goQuestion((r - 1) * TT.ROUND_SIZE); }
 async function showFinal(){
-  if (!isAdmin || !ev) return;
-  if (!confirm('Show final results on the TV?')) return;
+  if (!confirm('Show the final results on the TV? This ends the game.')) return;
   clearTimer();
-  if (ev.status === 'question') await toReveal();
-  clearTimer();
-  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true });
+  if (ev.status === 'question') { if (ev.paused) await evRef().update({ paused: false }); await toReveal(); clearTimer(); }
+  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true, paused: false });
+}
+
+// The one button that always does the next right thing
+function mainAction(){
+  if (!ev) return { label: 'Create a game to start', fn: null };
+  const st = ev.status, r = ev.round || 0;
+  if (st === 'lobby') return { label: `Start Round 1 · ${ROUNDS[0].title}`, fn: () => startRound(1) };
+  if (st === 'question') return { label: 'Show the answer now', fn: async () => { if (ev.paused) await togglePause(); await toReveal(); } };
+  if (st === 'reveal') return isRoundEnd(ev.qIndex)
+    ? { label: `Show Round ${r} standings`, fn: async () => { if (ev.paused) await evRef().update({ paused: false }); await advanceFromReveal(); } }
+    : { label: 'Next question', fn: async () => { if (ev.paused) await evRef().update({ paused: false }); await advanceFromReveal(); } };
+  if (st === 'break') return r < TOTAL_ROUNDS
+    ? { label: `Start Round ${r + 1} · ${ROUNDS[r].title}`, fn: () => startRound(r + 1) }
+    : { label: '🏆 Show final results', fn: showFinal };
+  return { label: 'Game over · start a new game anytime', fn: null };
+}
+let busy = false;
+async function runMain(){
+  const a = mainAction(); if (!a.fn || busy || !isAdmin) return;
+  busy = true; $('btn-main').disabled = true;
+  try { await a.fn(); } finally { busy = false; render(); }
 }
 
 async function togglePause(){
-  if (!ev) return;
+  if (!ev || !(ev.status === 'question' || ev.status === 'reveal')) return;
   if (!ev.paused) {
     clearTimer();
     await evRef().update({ paused: true, pausedAt: Math.round(serverNow()), liveSlot: null });
-    return toast('Paused');
+    return;
   }
   const u = { paused: false, pausedAt: null };
   if (ev.status === 'question') {
@@ -323,288 +380,281 @@ async function togglePause(){
     u.questionStartedAt = Math.round(ev.questionStartedAt + shift);
     u.liveSlot = String(ev.qIndex);
     await evRef().update(u);
-    const elapsed = (serverNow() - u.questionStartedAt) / 1000;
-    schedule(questionDurationSec(ev) - elapsed, toReveal);
+    schedule(questionDurationSec(ev) - (serverNow() - u.questionStartedAt) / 1000, toReveal);
   } else {
     await evRef().update(u);
-    if (ev.status === 'reveal') schedule(revealSec(), advanceFromReveal);
+    schedule(revealSec(), advanceFromReveal);
   }
-  toast('Resumed');
 }
-
 async function extend(){
   if (!ev || ev.status !== 'question' || ev.paused) return;
   const extra = (ev.extraSeconds || 0) + 15;
   await evRef().update({ extraSeconds: extra });
   const elapsed = (serverNow() - ev.questionStartedAt) / 1000;
   schedule((ev.questionSeconds || TT.QUESTION_SECONDS) + extra - elapsed, toReveal);
-  toast('+15s');
+  toast('Added 15 seconds');
 }
-
-async function skip(){
-  if (!ev) return;
-  if (ev.status === 'question') { if (ev.paused) await togglePause(); await toReveal(); }
-  else if (ev.status === 'reveal') { if (ev.paused) await evRef().update({ paused:false, pausedAt:null }); await advanceFromReveal(); }
-}
-
 async function toggleJoin(){
   if (!ev) return;
-  await evRef().update({ joinClosed: !ev.joinClosed });
-  toast(ev.joinClosed ? 'Joining reopened' : 'Joining closed');
+  const closing = !ev.joinClosed;
+  await evRef().update({ joinClosed: closing });
+  toast(closing ? 'Joining closed' : 'Joining reopened');
 }
 
-// ── Scoring (host is the only scorer; players never see the key) ──
+// ── Scoring (host only; players never see the key) ──
 // Individual: 1 pt per correct; tiebreak = total time on correct answers.
-// Table: per question, (correct ÷ players seated before that question started),
-//        summed across questions → late arrivals never drag a table down.
+// Table: per question, correct ÷ players seated before it started, summed.
 async function scoreAndPublish(qi){
   const [rs, as, es] = await Promise.all([
-    ttRef('roster/' + EVENT_ID).once('value'),
-    ttRef('answers/' + EVENT_ID).once('value'),
-    evRef().child('qStarts').once('value'),
+    ttRef('roster/' + EVENT_ID).once('value'), ttRef('answers/' + EVENT_ID).once('value'), evRef().child('qStarts').once('value'),
   ]);
   const R = rs.val() || {}, A = as.val() || {}, starts = es.val() || {};
-  const u = {};
-  // Persist correctness for this question (audit trail)
+  const u = {}, dist = [0, 0, 0, 0];
   let answered = 0, correctN = 0, bonus = null;
   for (const pid in A) {
     const a = A[pid] && A[pid][qi];
     if (!a || a.pick === undefined) continue;
-    answered++;
+    answered++; dist[a.pick] = (dist[a.pick] || 0) + 1;
     const ok = a.pick === ANSWER_KEY[qi];
-    const ms = Math.max(0, (a.submittedAt || 0) - (starts[qi] || 0));
     u[`answers/${EVENT_ID}/${pid}/${qi}/correct`] = ok;
-    u[`answers/${EVENT_ID}/${pid}/${qi}/ms`] = ms;
+    u[`answers/${EVENT_ID}/${pid}/${qi}/ms`] = Math.max(0, (a.submittedAt || 0) - (starts[qi] || 0));
     if (ok) {
       correctN++;
       if (QUESTIONS[qi].bonus && R[pid] && (!bonus || a.submittedAt < bonus.at)) bonus = { at: a.submittedAt, name: R[pid].name, table: R[pid].table };
     }
   }
-  // Recompute full standings from scratch for every revealed question
-  const players = {}, tables = {};
+  const P = {}, T = {};
   for (const pid in R) {
-    players[pid] = { name: R[pid].name, table: R[pid].table, score: 0, timeMs: 0 };
-    const t = R[pid].table;
-    if (!tables[t]) tables[t] = { score: 0, players: 0, timeMs: 0 };
-    tables[t].players++;
+    P[pid] = { name: R[pid].name, table: R[pid].table, score: 0, timeMs: 0 };
+    const t = R[pid].table; if (!T[t]) T[t] = { score: 0, players: 0, timeMs: 0 }; T[t].players++;
   }
   for (let q = 0; q <= qi; q++) {
     if (starts[q] === undefined) continue;
     const present = {}, correct = {};
     for (const pid in R) {
-      const t = R[pid].table;
-      const a = A[pid] && A[pid][q];
-      const ok = !!(a && a.pick === ANSWER_KEY[q]);
-      if (ok) {
-        players[pid].score++;
-        players[pid].timeMs += Math.max(0, (a.submittedAt || 0) - starts[q]);
-      }
-      if ((R[pid].joinedAt || 0) <= starts[q]) {
-        present[t] = (present[t] || 0) + 1;
-        if (ok) correct[t] = (correct[t] || 0) + 1;
-      }
+      const t = R[pid].table, a = A[pid] && A[pid][q], ok = !!(a && a.pick === ANSWER_KEY[q]);
+      if (ok) { P[pid].score++; P[pid].timeMs += Math.max(0, (a.submittedAt || 0) - starts[q]); }
+      if ((R[pid].joinedAt || 0) <= starts[q]) { present[t] = (present[t] || 0) + 1; if (ok) correct[t] = (correct[t] || 0) + 1; }
     }
-    for (const t in present) tables[t].score += (correct[t] || 0) / present[t];
+    for (const t in present) T[t].score += (correct[t] || 0) / present[t];
   }
-  for (const pid in players) tables[players[pid].table].timeMs += players[pid].timeMs;
-  const playerOrder = Object.keys(players).sort((x, y) =>
-    players[y].score - players[x].score || players[x].timeMs - players[y].timeMs);
-  const tableOrder = Object.keys(tables).filter(t => tables[t].players > 0).sort((x, y) =>
-    tables[y].score - tables[x].score ||
-    (tables[x].timeMs / tables[x].players) - (tables[y].timeMs / tables[y].players));
-  for (const t in tables) tables[t].score = Math.round(tables[t].score * 100) / 100;
-  u[`standings/${EVENT_ID}`] = { players, tables, playerOrder, tableOrder, revealedThrough: qi, updatedAt: firebase.database.ServerValue.TIMESTAMP };
-  const rv = { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]],
-               answered, pct: answered ? Math.round(100 * correctN / answered) : 0 };
+  for (const pid in P) T[P[pid].table].timeMs += P[pid].timeMs;
+  const playerOrder = Object.keys(P).sort((x, y) => P[y].score - P[x].score || P[x].timeMs - P[y].timeMs);
+  const tableOrder = Object.keys(T).filter(t => T[t].players > 0).sort((x, y) =>
+    T[y].score - T[x].score || (T[x].timeMs / T[x].players) - (T[y].timeMs / T[y].players));
+  for (const t in T) T[t].score = Math.round(T[t].score * 100) / 100;
+  lastTableOrder = tableOrder;
+  u[`standings/${EVENT_ID}`] = { players: P, tables: T, playerOrder, tableOrder, revealedThrough: qi, updatedAt: firebase.database.ServerValue.TIMESTAMP };
+  const rv = { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]], answered, dist,
+               pct: answered ? Math.round(100 * correctN / answered) : 0 };
   if (bonus) rv.bonusWinner = { name: bonus.name, table: bonus.table };
   u[`events/${EVENT_ID}/reveal`] = rv;
   await ttRef('').update(u);
 }
 
 // ── Listeners ──
-let offs = [];
+let offs = [], setupOpen = true;
 function attach(id){
   offs.forEach(f => f()); offs = [];
-  EVENT_ID = id; $('cfg-id').value = id;
-  $('lnk-tents').href = 'tents.html'; $('lnk-tents').textContent = 'tents.html (print)';
-  const listen = (path, cb) => { const r = ttRef(path); r.on('value', s => cb(s.val()), e => console.warn(path, e && e.message)); offs.push(() => r.off()); };
-  listen('events/' + id, v => { ev = v; render(); recover(); });
-  listen('roster/' + id, v => { roster = v || {}; renderTables(); renderLiveCount(); });
-  listen('tableNames/' + id, v => { names = v || {}; renderTables(); });
-  listen('standings/' + id, v => { standings = v; renderTables(); renderLeaders(); });
-  listen('secrets/' + id, v => { secretCode = v && v.code; $('room-code').textContent = secretCode || '····'; });
-  listen('answers/' + id, v => { answers = v || {}; renderLiveCount(); });
+  EVENT_ID = id; $('cfg-id').value = id; recovered = false;
+  const L = (path, cb) => { const r = ttRef(path); r.on('value', s => cb(s.val()), e => console.warn(path, e && e.message)); offs.push(() => r.off()); };
+  L('events/' + id, v => { ev = v; if (ev) setupOpen = false; render(); recover(); });
+  L('roster/' + id, v => { roster = v || {}; render(); });
+  L('tableNames/' + id, v => { names = v || {}; renderTables(); });
+  L('standings/' + id, v => { standings = v; if (v && v.tableOrder) lastTableOrder = v.tableOrder; renderTables(); renderLeaders(); });
+  L('answers/' + id, v => { answers = v || {}; renderLive(); });
+  L('players/' + id, v => { players = v || {}; renderLeaders(); });
 }
 
-let lastCountPush = 0, pendingCount = null;
-function renderLiveCount(){
-  const total = Object.keys(roster).length;
-  let n = 0;
-  if (ev && ev.status === 'question') for (const pid in answers) if (answers[pid] && answers[pid][ev.qIndex] && answers[pid][ev.qIndex].pick !== undefined) n++;
-  $('i-answered').textContent = `${n} / ${total}`;
-  $('i-players').textContent = `· ${total} players`;
-  // Mirror the answered count to the TV, throttled
-  if (isAdmin && ev && ev.status === 'question' && ev.answeredCount !== n) {
-    clearTimeout(pendingCount);
-    const wait = Math.max(0, 700 - (Date.now() - lastCountPush));
-    pendingCount = setTimeout(() => { lastCountPush = Date.now(); evRef().update({ answeredCount: n }).catch(()=>{}); }, wait);
-  }
+// ── Render ──
+function answerCounts(qi){
+  const c = [0, 0, 0, 0]; let n = 0;
+  for (const pid in answers) { const a = answers[pid] && answers[pid][qi]; if (a && a.pick !== undefined) { c[a.pick]++; n++; } }
+  return { c, n };
+}
+function qCard(qi, el, label, showCounts){
+  if (qi == null || !QUESTIONS[qi]) { el.innerHTML = `<div class="q-meta">${label}</div><div class="q-text" style="margin:0;color:var(--muted)">—</div>`; return; }
+  const q = QUESTIONS[qi], { c } = showCounts ? answerCounts(qi) : { c: [] };
+  el.innerHTML = `<div class="q-meta">${label} · Round ${q.round} · Q${(qi % TT.ROUND_SIZE) + 1}${q.bonus ? ' · 🎁 Bonus' : ''}</div>
+    <div class="q-text">${q.emoji ? esc(q.emoji) + '  ' : ''}${esc(q.q)}</div>
+    ${q.o.map((o, i) => `<div class="q-opt ${i === q.a ? 'ok' : ''}"><span class="k" style="background:${OPTION_COLORS[i]};color:${OPTION_INK[i]}">${'ABCD'[i]}</span><span>${esc(o)}${i === q.a ? '  ✓' : ''}</span><span class="bar">${showCounts ? c[i] : ''}</span></div>`).join('')}`;
 }
 
 function render(){
-  const st = ev ? ev.status : null;
-  $('i-status').textContent = st ? st.toUpperCase() : 'NO NIGHT';
-  $('i-status').className = 'status-pill status-' + (st || 'none');
-  $('i-round').textContent = ev && ev.round ? `${ev.round} / ${TOTAL_ROUNDS} · ${ROUNDS[ev.round-1].title}` : '—';
-  $('i-q').textContent = ev && ev.qIndex != null ? `${ev.qIndex + 1} / ${QUESTIONS.length}` : '—';
-  if (ev && ev.sponsorMsg && document.activeElement !== $('sponsor-msg')) $('sponsor-msg').value = ev.sponsorMsg;
+  $('setup-form').classList.toggle('hidden', !!ev && !setupOpen);
+  $('setup-summary').classList.toggle('hidden', !ev || setupOpen);
+  $('btn-edit').classList.toggle('hidden', !ev || setupOpen);
+  const st = ev ? ev.status : null, total = Object.keys(roster).length;
+  if (ev) {
+    $('room-code').textContent = ev.displayCode || '····';
+    $('sum-meta').innerHTML = `${esc(ev.eventId)}<br>${ev.tables} tables${ev.barEnabled !== false ? ' + bar' : ''}`;
+    $('lnk-join').href = joinUrl(null, ev.displayCode);
+  }
+  // headline
+  let title = 'No game yet', sub = 'Set up tonight\'s game to begin.';
+  if (st === 'lobby') { title = 'Lobby is open'; sub = `${total} ${total === 1 ? 'player' : 'players'} joined · room code ${ev.displayCode}`; }
+  if (st === 'question') { const q = QUESTIONS[ev.qIndex]; title = `Round ${q.round} · Question ${(ev.qIndex % TT.ROUND_SIZE) + 1} of ${TT.ROUND_SIZE}`; sub = ev.paused ? 'Paused — players can\'t answer' : ROUNDS[q.round - 1].title; }
+  if (st === 'reveal') { title = 'Answer on screen'; sub = ev.reveal ? `${ev.reveal.pct || 0}% got it right · ${ev.paused ? 'paused' : 'moving on automatically'}` : ''; }
+  if (st === 'break') { title = (ev.round || 0) >= TOTAL_ROUNDS ? 'All rounds played' : `Round ${ev.round} standings`; sub = (ev.round || 0) >= TOTAL_ROUNDS ? 'Build the suspense, then show the final results.' : 'Order window. Start the next round when the room is ready.'; }
+  if (st === 'final') { title = 'Final results are up'; sub = 'Download the player list for Chilitos below.'; }
+  $('st-title').textContent = title; $('st-sub').textContent = sub;
+  const a = mainAction();
+  $('btn-main').textContent = a.label; $('btn-main').disabled = !a.fn || busy || !isAdmin;
+  const live = st === 'question' || st === 'reveal';
+  $('btn-pause').disabled = !live;
+  $('btn-pause').innerHTML = (ev && ev.paused ? 'Resume' : 'Pause') + '<kbd>P</kbd>';
+  $('btn-extend').disabled = st !== 'question' || (ev && ev.paused);
+  $('btn-join').disabled = !ev || st === 'final';
+  $('btn-join').textContent = ev && ev.joinClosed ? 'Reopen joining' : 'Close joining';
+  $('btn-final-early').disabled = !ev || st === 'final' || st === 'lobby';
+  $('btn-export').disabled = !ev;
+  if (ev && ev.sponsorMsg != null && document.activeElement !== $('sponsor-msg') && !$('sponsor-msg').dataset.dirty) $('sponsor-msg').value = ev.sponsorMsg || '';
+  $('i-players').textContent = `${total} ${total === 1 ? 'player' : 'players'}`;
+  // question cards
+  const qi = ev && ev.qIndex != null ? ev.qIndex : null;
+  const liveQ = st === 'question' || st === 'reveal';
+  $('q-now').classList.toggle('hidden', !liveQ);
+  $('q-next').classList.toggle('q-up', liveQ);
+  if (liveQ) qCard(qi, $('q-now'), st === 'reveal' ? 'On screen' : 'Live now', true);
+  let nq = null;
+  if (!ev || st === 'lobby') nq = 0; else if (st === 'break') nq = (ev.round || 0) * TT.ROUND_SIZE; else if (qi != null && st !== 'final') nq = qi + 1;
+  qCard(nq != null && nq < QUESTIONS.length ? nq : null, $('q-next'), 'Up next', false);
+  renderLive(); renderTables(); renderLeaders();
+}
 
-  // question preview (host sees the answer)
-  const showQ = ev && ev.qIndex != null ? ev.qIndex : null;
-  const prev = (qi, el, label) => {
-    if (qi == null || !QUESTIONS[qi]) { el.innerHTML = `<div class="q-prev-meta">${label}</div><div class="q-prev-text">—</div>`; return; }
-    const q = QUESTIONS[qi];
-    el.innerHTML = `<div class="q-prev-meta">${label} · R${q.round} · Q${qi+1}${q.bonus ? ' · 🎁 bonus' : ''}</div>
-      <div class="q-prev-text">${q.emoji ? esc(q.emoji) + ' ' : ''}${esc(q.q)}</div>
-      ${q.o.map((o,i) => `<div class="q-prev-opt ${i===q.a?'ok':''}">${'ABCD'[i]}. ${esc(o)}${i===q.a?' ✓':''}</div>`).join('')}`;
-  };
-  prev(showQ, $('q-prev'), st === 'reveal' ? 'Revealing' : 'Live');
-  let nextQi = null;
-  if (!ev || st === 'lobby') nextQi = 0;
-  else if (st === 'break') nextQi = (ev.round || 0) * TT.ROUND_SIZE;
-  else if (showQ != null) nextQi = showQ + 1;
-  prev(nextQi != null && nextQi < QUESTIONS.length ? nextQi : null, $('q-next'), 'Up next');
-
-  // buttons
-  const can = isAdmin && !!ev;
-  const nr = st === 'lobby' ? 1 : (ev ? (ev.round || 0) + 1 : 1);
-  $('btn-create').disabled = !isAdmin;
-  $('btn-next-round').disabled = !can || !(st === 'lobby' || st === 'break') || nr > TOTAL_ROUNDS;
-  $('btn-next-round').textContent = nr <= TOTAL_ROUNDS ? `▶ Start Round ${nr}: ${ROUNDS[nr-1].title}` : 'All rounds played';
-  $('btn-pause').disabled = !can || !(st === 'question' || st === 'reveal');
-  $('btn-pause').textContent = ev && ev.paused ? '▶ Resume' : '⏸ Pause';
-  $('btn-extend').disabled = !can || st !== 'question' || (ev && ev.paused);
-  $('btn-skip').disabled = !can || !(st === 'question' || st === 'reveal');
-  $('btn-skip').textContent = st === 'reveal' ? '⏭ Next' : '⏭ Reveal now';
-  $('btn-join').disabled = !can || st === 'final';
-  $('btn-join').textContent = ev && ev.joinClosed ? '🔓 Reopen joining' : '🔒 Close joining';
-  $('btn-final').disabled = !can || st === 'final' || st === 'lobby';
-  $('btn-sponsor').disabled = !can;
-  $('btn-export').disabled = !isAdmin || !EVENT_ID;
-  renderLiveCount();
+let lastCountPush = 0, pendingCount = null;
+function renderLive(){
+  const total = Object.keys(roster).length;
+  const qi = ev && ev.status === 'question' ? ev.qIndex : (ev && ev.status === 'reveal' && ev.reveal ? ev.reveal.q : null);
+  const { n } = qi != null ? answerCounts(qi) : { n: 0 };
+  $('meter-i').style.width = total ? (100 * n / total) + '%' : '0';
+  $('meter-l').textContent = qi != null ? `${n} of ${total} answered` : `${total} ${total === 1 ? 'player' : 'players'} in the room`;
+  if (ev && (ev.status === 'question' || ev.status === 'reveal')) qCard(qi, $('q-now'), ev.status === 'reveal' ? 'On screen' : 'Live now', true);
+  if (isAdmin && ev && ev.status === 'question' && ev.answeredCount !== n) {
+    clearTimeout(pendingCount);
+    pendingCount = setTimeout(() => { lastCountPush = Date.now(); evRef().update({ answeredCount: n }).catch(() => {}); }, Math.max(0, 700 - (Date.now() - lastCountPush)));
+  }
 }
 
 setInterval(() => {
-  if (!ev || ev.status !== 'question') { $('timer').textContent = ev && ev.paused ? 'PAUSED' : '—'; $('timer').classList.remove('urgent'); return; }
+  if (!ev || ev.status !== 'question') { $('clock').textContent = ev && ev.paused ? '❚❚' : ''; $('clock').classList.remove('hot'); $('meter-r').textContent = ''; return; }
   const left = secondsLeft(ev);
-  $('timer').textContent = ev.paused ? 'PAUSED' : left;
-  $('timer').classList.toggle('urgent', left <= 5);
+  $('clock').textContent = ev.paused ? '❚❚' : left;
+  $('clock').classList.toggle('hot', left <= 5 && !ev.paused);
+  $('meter-r').textContent = ev.paused ? 'Paused' : `${left}s left`;
 }, 250);
 
 function renderTables(){
-  if (!ev) { $('tbl-list').innerHTML = ''; return; }
-  const counts = {};
-  for (const pid in roster) counts[roster[pid].table] = (counts[roster[pid].table] || 0) + 1;
-  const ids = [];
-  for (let i = 1; i <= (ev.tables || 0); i++) ids.push(String(i));
-  if (ev.barEnabled !== false) ids.push('bar');
-  const st = (standings && standings.tables) || {};
-  const order = (standings && standings.tableOrder) || [];
-  $('tbl-list').innerHTML = ids.map(t => `
-    <div class="tbl-row">
-      <span class="n">${t === 'bar' ? '🍹 Bar' : 'Table ' + t}</span>
-      <span>${esc(names[t] || '')}</span>
-      <span title="players">👤${counts[t] || 0}</span>
-      <span title="points">${st[t] ? fmtPts(st[t].score) + ' pts' : '—'}${order.indexOf(t) === 0 ? ' 👑' : ''}</span>
-      <span>${names[t] ? `<button class="mini" data-clear="${t}">Rename</button>` : ''}</span>
-    </div>`).join('');
-  $('tbl-list').querySelectorAll('[data-clear]').forEach(b => b.onclick = async () => {
-    const t = b.dataset.clear;
-    const nn = prompt(`New name for ${t === 'bar' ? 'The Bar' : 'Table ' + t} (blank = remove):`, names[t] || '');
-    if (nn === null) return;
-    await ttRef(`tableNames/${EVENT_ID}/${t}`).set(nn.trim().slice(0, 24) || null);
+  if (!ev) { $('tbl-list').innerHTML = '<div style="color:var(--muted);font-size:14px">Tables appear here once the game is created.</div>'; return; }
+  const counts = {}; for (const pid in roster) counts[roster[pid].table] = (counts[roster[pid].table] || 0) + 1;
+  const ids = []; for (let i = 1; i <= (ev.tables || 0); i++) ids.push(String(i)); if (ev.barEnabled !== false) ids.push('bar');
+  const order = (standings && standings.tableOrder) || [], T = (standings && standings.tables) || {};
+  ids.sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    if (ia >= 0 || ib >= 0) return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+    return (counts[b] || 0) - (counts[a] || 0) || ids.indexOf(a) - ids.indexOf(b);
   });
+  $('tbl-list').innerHTML = ids.map(t => {
+    const rk = order.indexOf(t);
+    return `<div class="tbl-row" style="${counts[t] ? '' : 'opacity:.4'}">
+      <span class="rk">${rk >= 0 ? rk + 1 : ''}</span>
+      <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}</span>
+      <span class="pl">👤 ${counts[t] || 0}</span>
+      <span class="pt">${T[t] ? fmtPts(T[t].score) : ''}</span>
+      <button type="button" data-rename="${t}" title="Rename" aria-label="Rename">✎</button></div>`;
+  }).join('');
 }
+$('tbl-list').addEventListener('click', async e => {
+  const b = e.target.closest('[data-rename]'); if (!b) return;
+  const t = b.dataset.rename;
+  const nn = prompt(`Name for ${t === 'bar' ? 'The Bar' : 'Table ' + t} (leave blank to remove):`, names[t] || '');
+  if (nn === null) return;
+  await ttRef(`tableNames/${EVENT_ID}/${t}`).set(nn.trim().slice(0, 24) || null);
+});
 
 function renderLeaders(){
-  if (!standings) { $('i-top').textContent = '—'; $('i-toptable').textContent = '—'; return; }
-  const p = standings.playerOrder && standings.playerOrder[0];
-  const t = standings.tableOrder && standings.tableOrder[0];
-  $('i-top').textContent = p ? `${standings.players[p].name} (${tableShort(standings.players[p].table)}) · ${standings.players[p].score}` : '—';
-  $('i-toptable').textContent = t ? `${tableLabel(t, names)} · ${fmtPts(standings.tables[t].score)}` : '—';
+  const s = standings;
+  const p = s && s.playerOrder && s.playerOrder[0], t = s && s.tableOrder && s.tableOrder[0];
+  $('i-top').textContent = p ? `${s.players[p].name} · ${tableName(s.players[p].table, names)} · ${s.players[p].score}` : '—';
+  $('i-toptable').textContent = t ? `${tableName(t, names)} · ${fmtPts(s.tables[t].score)}` : '—';
+  const all = Object.values(players), ver = all.filter(x => x.verified).length;
+  $('i-verified').textContent = all.length ? `${ver} of ${all.length}` : '—';
 }
 
-// Host reloaded mid-question → resume the auto-advance from persisted timestamps
+// Host reloaded mid-game → resume auto-advance from saved timestamps
 let recovered = false;
 function recover(){
   if (recovered || !isAdmin || !ev || timer) return;
   recovered = true;
   if (ev.paused) return;
-  if (ev.status === 'question') {
-    const elapsed = (serverNow() - ev.questionStartedAt) / 1000;
-    schedule(questionDurationSec(ev) - elapsed, toReveal);
-    toast('Recovered — timer resumed');
-  } else if (ev.status === 'reveal') {
-    schedule(Math.max(1, revealSec() - (serverNow() - (ev.revealStartedAt || serverNow())) / 1000), advanceFromReveal);
-    toast('Recovered — reveal resumed');
-  }
+  if (ev.status === 'question') { schedule(questionDurationSec(ev) - (serverNow() - ev.questionStartedAt) / 1000, toReveal); toast('Reconnected — timer resumed'); }
+  else if (ev.status === 'reveal') { schedule(Math.max(1, revealSec() - (serverNow() - (ev.revealStartedAt || serverNow())) / 1000), advanceFromReveal); }
 }
 
-// ── Export ──
 async function exportCsv(){
   if (!isAdmin || !EVENT_ID) return;
   const ps = (await ttRef('players/' + EVENT_ID).once('value')).val() || {};
-  const st = standings || {};
-  const rank = {}; (st.playerOrder || []).forEach((pid, i) => rank[pid] = i + 1);
+  const st = standings || {}, rank = {}; (st.playerOrder || []).forEach((pid, i) => rank[pid] = i + 1);
   const q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
-  const rows = Object.keys(ps).map(pid => {
+  const rows = Object.keys(ps).sort((a, b) => (rank[a] || 1e9) - (rank[b] || 1e9)).map(pid => {
     const p = ps[pid], s = (st.players || {})[pid] || {};
-    return [rank[pid] || '', p.name, p.originalEmail || p.email, p.table === 'bar' ? 'Bar' : 'Table ' + p.table, names[p.table] || '', s.score || 0, p.joinedAt ? new Date(p.joinedAt).toLocaleString() : ''].map(q).join(',');
+    return [rank[pid] || '', p.name, p.originalEmail || p.email, p.verified ? 'Yes' : 'No', p.table === 'bar' ? 'Bar' : 'Table ' + p.table, names[p.table] || '', s.score || 0, p.joinedAt ? new Date(p.joinedAt).toLocaleString() : ''].map(q).join(',');
   });
-  const csv = 'Rank,Name,Email,Table,Table Name,Score,Joined\n' + rows.join('\n');
+  const nVer = Object.values(ps).filter(p => p.verified).length;
+  const csv = 'Rank,Name,Email,Verified (Google),Table,Table Name,Score,Joined\n' + rows.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   a.download = `table-trivia-${EVENT_ID}.csv`; a.click();
-  toast(`Exported ${rows.length} players`);
+  toast(`Downloaded ${rows.length} players · ${nVer} Google-verified`);
 }
 
-// ── Buttons ──
+// ── Wiring ──
 $('btn-create').onclick = createNight;
-$('btn-next-round').onclick = nextRound;
+$('btn-edit').onclick = () => { setupOpen = true; $('cfg-id').value = defaultEventId(); render(); };
+$('btn-main').onclick = runMain;
 $('btn-pause').onclick = togglePause;
 $('btn-extend').onclick = extend;
-$('btn-skip').onclick = skip;
 $('btn-join').onclick = toggleJoin;
-$('btn-final').onclick = showFinal;
-$('btn-sponsor').onclick = async () => { if (!ev) return; await evRef().update({ sponsorMsg: $('sponsor-msg').value.trim() || null }); toast('Message updated'); };
+$('btn-final-early').onclick = showFinal;
 $('btn-export').onclick = exportCsv;
+$('sponsor-msg').addEventListener('input', e => e.target.dataset.dirty = '1');
+$('btn-sponsor').onclick = async () => { if (!ev) return; await evRef().update({ sponsorMsg: $('sponsor-msg').value.trim() || null }); delete $('sponsor-msg').dataset.dirty; toast('Sponsor message updated'); };
+document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
+  const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);
+  try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link:', url); }
+});
+document.addEventListener('keydown', e => {
+  if (!isAdmin || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); runMain(); }
+  else if (e.key === 'p' || e.key === 'P') togglePause();
+  else if (e.key === 'e' || e.key === 'E') extend();
+});
 
 // ── Auth ──
-render();
+function showConsole(on){ $('console').classList.toggle('hidden', !on); $('auth').classList.toggle('hidden', on); }
 if (db) {
-  ttRef('current').on('value', s => { const c = s.val(); if (c && c.eventId && c.eventId !== EVENT_ID && isAdmin) attach(c.eventId); });
   firebase.auth().onAuthStateChanged(async user => {
-    $('auth-out').classList.toggle('hidden', !!user);
-    $('auth-in').classList.toggle('hidden', !user);
     isAdmin = false;
-    if (user) {
-      $('auth-who').textContent = user.email || user.uid;
+    $('who').classList.toggle('hidden', !user);
+    if (!user) { $('auth-form').classList.remove('hidden'); $('auth-noadmin').classList.add('hidden'); return showConsole(false); }
+    $('who-email').textContent = user.email || '';
+    try { isAdmin = (await db.ref('admins/' + user.uid).once('value')).val() === true; } catch (e) {}
+    if (!isAdmin) {
       $('auth-uid').textContent = user.uid;
-      try { isAdmin = (await db.ref('admins/' + user.uid).once('value')).val() === true; } catch(e){}
-      $('auth-admin').textContent = isAdmin ? '✓ Admin' : '✗ Not admin';
-      $('auth-uid-box').classList.toggle('hidden', isAdmin);
-      if (isAdmin) {
-        const c = (await ttRef('current').once('value')).val();
-        if (c && c.eventId) attach(c.eventId);
-      }
+      $('auth-form').classList.add('hidden'); $('auth-noadmin').classList.remove('hidden');
+      return showConsole(false);
     }
-    render();
+    showConsole(true);
+    const c = (await ttRef('current').once('value')).val();
+    if (c && c.eventId) attach(c.eventId); else render();
   });
   $('btn-signin').onclick = async () => {
-    const e = $('auth-email').value.trim(), p = $('auth-pass').value;
-    if (!e || !p) return toast('Enter email + password');
-    try { await firebase.auth().signInWithEmailAndPassword(e, p); } catch (err) { toast('Sign-in failed: ' + (err.code || err.message)); }
+    const em = $('auth-email').value.trim(), pw = $('auth-pass').value;
+    if (!em || !pw) return toast('Enter your email and password');
+    try { await firebase.auth().signInWithEmailAndPassword(em, pw); }
+    catch (err) { toast(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' ? 'Email or password is incorrect' : 'Sign-in failed: ' + (err.code || err.message)); }
   };
+  $('auth-pass').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-signin').click(); });
   $('btn-signout').onclick = () => firebase.auth().signOut();
 }
 </script>

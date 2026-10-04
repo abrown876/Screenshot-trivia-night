@@ -179,6 +179,12 @@
             },
             "$other": {
               ".validate": false
+            },
+            "verified": {
+              ".validate": "newData.isBoolean() && (newData.val() === false || (auth != null && auth.token.email_verified === true && auth.token.email.toLowerCase() === newData.parent().child('originalEmail').val().toLowerCase()))"
+            },
+            "uid": {
+              ".validate": "auth != null && newData.val() === auth.uid"
             }
           }
         }
@@ -242,6 +248,26 @@
           }
         }
       }
+    },
+    "game": {
+      ".read": true,
+      ".write": true
+    },
+    "games": {
+      ".read": true,
+      ".write": true
+    },
+    "live_scores": {
+      ".read": true,
+      ".write": true
+    },
+    "questionSets": {
+      ".read": true,
+      ".write": true
+    },
+    "sessions": {
+      ".read": true,
+      ".write": true
     }
   }
 }

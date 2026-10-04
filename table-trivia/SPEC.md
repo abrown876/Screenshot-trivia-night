@@ -4,7 +4,12 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 (self-serve) and Screen Test (weekly online). Same Firebase project, `/restaurant/` namespace.
 
 ## How a night works
-- Everyone plays on their own phone (name + email + room code). No app — QR → browser.
+- Everyone plays on their own phone. No app — QR → browser.
+- **Sign-in:** "Continue with Google" (one tap, verified email, name pre-filled) is the main
+  button; "Use email instead" is the fallback. Players also enter the room code from the TV.
+  Google sign-in is hidden inside WhatsApp/Instagram in-app browsers (Google blocks it there).
+- The export marks each email `Verified (Google)` Yes/No. Rules only allow `verified: true` when
+  the signed-in Google account's verified email matches the record, so it can't be faked.
 - Each player picks their **table** (or **The Bar**). Table tents pre-select the table.
 - Everyone sees the same question on the TV and their phone at the same time.
 - 4 rounds × 5 questions (~60 min). Round breaks show standings + a sponsor message.
@@ -28,6 +33,13 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 | `tents.html` | Print before the night | One QR card per table + bar |
 | `tt-common.js` | All | Shared helpers + Firebase config |
 | `database.rules.json` | Firebase console | Merged rules for Quiz Night + Screen Test + Table Trivia |
+
+## Polish notes
+- The TV's QR carries the room code (`join.html?c=CODE`) so scanners never type it. Table cards carry only the table (`?t=7`); those players type the code from the TV.
+- Answer colours are the same on TV and phones: A purple, B coral, C gold, D teal.
+- Host has one main button that always does the next step (Start round → Show answer → Next question → Round standings → Next round → Final results). Shortcuts: Space = main button, P = pause, E = +15 sec.
+- TV reveal shows how the room voted on each option; round breaks show ▲▼ movement vs the previous round; the final is a top-3 podium.
+- Phones show a "Reconnecting…" banner if the connection drops and buzz when an answer locks in.
 
 ## Run of show
 1. Host signs in on `host.html` → set tables, timings, sponsor message → **Create / Reset Night**.
