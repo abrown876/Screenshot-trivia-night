@@ -139,3 +139,17 @@ async function keepAwake(){
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
 ['click', 'touchend'].forEach(t => document.addEventListener(t, keepAwake, { passive: true }));
+
+// Rounds can hold any number of questions (host can add questions live), so positions are
+// worked out from each question's `round` instead of a fixed size. Questions stay sorted by round.
+function roundIdx(qs, r){ const out = []; (qs || []).forEach((q, i) => { if (q && q.round === r) out.push(i); }); return out; }
+function roundStart(qs, r){ const i = (qs || []).findIndex(q => q && q.round === r); return i; }
+function roundLen(qs, r){ return roundIdx(qs, r).length; }
+function posInRound(qs, qi){ const q = (qs || [])[qi]; return q ? qi - roundStart(qs, q.round) : 0; }
+function isLastInRound(qs, qi){ qs = qs || []; return qi + 1 >= qs.length || !qs[qi + 1] || qs[qi + 1].round !== (qs[qi] || {}).round; }
+
+// One table label everywhere a player's table is shown: "Taco Bout It · Table 3", "Table 3", "The Bar"
+function tableSub(t, names){
+  const num = t === 'bar' ? 'The Bar' : 'Table ' + t, nick = names && names[t];
+  return nick && nick !== num ? `${nick} · ${num}` : num;
+}

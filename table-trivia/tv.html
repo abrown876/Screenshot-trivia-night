@@ -26,7 +26,9 @@ body{display:flex;flex-direction:column;font-size:1.5vw;
 .top-code b{font-family:var(--mono);color:var(--gold);font-size:1.6vw;letter-spacing:.2em}
 .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:1vw 3.2vw 1.5vw}
 .foot{display:flex;align-items:center;justify-content:space-between;gap:2vw;padding:1vw 2.6vw;min-height:4.4vw}
-.foot-msg{font-weight:800;color:var(--gold);font-size:1.4vw;flex:1}
+.foot-msg{font-weight:800;color:var(--gold);font-size:1.4vw;flex:1;display:flex;align-items:center;gap:1vw;min-width:0}
+.foot-msg .tag,.spon small,.push-card small{letter-spacing:.12em;text-transform:uppercase}
+.foot-msg .tag{flex-shrink:0;font-size:.9vw;font-weight:800;color:var(--dim);border:.1vw solid var(--line);border-radius:.4vw;padding:.2vw .6vw}
 .partner-wrap{display:none;width:34vw;flex-shrink:0}
 .partner-link{display:block;line-height:0;border-radius:.5vw;overflow:hidden}
 .partner-link img{width:100%;display:block;height:auto}
@@ -96,7 +98,8 @@ section{animation:in .45s ease-out}
 .st-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:3vw;margin-top:2.2vw;align-items:start}
 .st-h{font-weight:700;color:var(--dim);font-size:1.25vw;margin-bottom:.8vw}
 .row{display:grid;grid-template-columns:3vw 2.4vw 1fr auto;gap:1vw;align-items:center;padding:.8vw 1.2vw;background:var(--s1);border:1px solid var(--line);border-radius:.9vw;margin-bottom:.5vw;font-size:1.7vw;font-weight:800}
-.row.p{grid-template-columns:3vw 1fr auto}
+.row.p{grid-template-columns:3vw 2.4vw 1fr auto}   /* same columns as the table rows so names line up across */
+.row{min-height:4.4vw}
 .row .rk{font-family:var(--mono);color:var(--dim);font-size:1.5vw}
 .row .mv{font-size:1.2vw;font-weight:900;text-align:center}
 .row .mv.up{color:var(--green)}
@@ -116,6 +119,15 @@ section{animation:in .45s ease-out}
 .bigcount.soon b{font-family:var(--display);font-weight:900;font-size:2.6vw;color:var(--text);padding:.9vw 0}
 .bigcount.hot b{color:var(--coral);animation:drum .5s ease-in-out infinite alternate}
 .board-tag{display:inline-block;background:var(--gold);color:#1a1300;border-radius:99vw;padding:.25vw 1vw;font-weight:800;font-size:1.2vw;vertical-align:middle;margin-left:1vw}
+
+.lobby-cd{display:inline-flex;align-items:baseline;gap:1.2vw;margin-top:1.2vw;padding:.7vw 1.6vw;border-radius:1.2vw;background:var(--s1);border:.15vw solid rgba(255,183,64,.55)}
+.lobby-cd span{color:var(--dim);font-weight:700;font-size:1.6vw}
+.lobby-cd b{font-family:var(--mono);color:var(--gold);font-size:4vw;line-height:1}
+.lobby-cd.hot b{color:var(--coral)}
+.lobby-cd.soon b{font-family:var(--display);font-weight:900;font-size:2.4vw;color:var(--text)}
+.q-next{margin-left:auto;text-align:right;flex-shrink:0}
+.q-next small{display:block;color:var(--dim);font-weight:700;font-size:1.2vw}
+.q-next b{font-family:var(--mono);color:var(--gold);font-size:3vw;line-height:1}
 
 /* final reveal */
 .final{text-align:center}
@@ -231,6 +243,7 @@ section{animation:in .45s ease-out}
         <h1>Grab your phone.<br>Your table is your team.</h1>
         <p class="how">Scan the code, pick your table and sign in.<br>Everyone answers. <b>Your table's average wins.</b><span id="lobby-prizes"></span></p>
         <div class="codebox"><span>Room code</span><b id="lobby-code">····</b></div>
+        <div class="lobby-cd hidden" id="lobby-cd"><span>Game starts in</span><b id="lobby-cd-v">5:00</b></div>
         <div class="count" id="lobby-count"><b>0</b> players in</div>
         <div class="arrivals" id="arrivals"></div>
       </div>
@@ -257,6 +270,7 @@ section{animation:in .45s ease-out}
       <div class="pct hidden" id="pct"></div>
       <div class="bonus-win hidden" id="bonus-win"></div>
       <div class="spon hidden" id="q-spon"></div>
+      <div class="q-next hidden" id="q-next"><small id="q-next-l">Next question in</small><b id="q-next-v">6</b></div>
     </div>
   </section>
 
@@ -374,7 +388,8 @@ function render(){
   if (!eventId || !ev) { show('v-none'); $('foot-msg').textContent = ''; $('top-code').classList.add('hidden'); return; }
   $('paused').classList.toggle('hidden', !ev.paused);
   const bigSpon = ev.sponsorMsg && (ev.status === 'reveal' || ev.status === 'break');
-  $('foot-msg').textContent = bigSpon || ev.status === 'final' ? '' : (ev.sponsorMsg || '');
+  const fm = bigSpon || ev.status === 'final' ? '' : (ev.sponsorMsg || '');
+  $('foot-msg').innerHTML = fm ? `<span class="tag">${esc(sponsorName())}</span><span>${esc(fm)}</span>` : '';
   checkPush();
   const r = ev.round ? (ev.rounds || [])[ev.round - 1] : null;
   $('top-mid').textContent = ev.status === 'final' ? 'Final results' : (r ? `Round ${ev.round} · ${r.title}${r.sponsored ? ' · presented by Chilitos' : ''}` : 'Table Trivia');
@@ -419,9 +434,9 @@ function renderQ(){
   const revealing = ev.status === 'reveal' && ev.reveal;
   const qi = revealing ? ev.reveal.q : ev.qIndex, q = (ev.questions || [])[qi];
   if (!q) return;
-  const pos = qi % TT.ROUND_SIZE;
-  $('q-round').textContent = `Round ${q.round} · Question ${pos + 1} of ${TT.ROUND_SIZE}`;
-  $('q-dots').innerHTML = Array.from({ length: TT.ROUND_SIZE }, (_, i) => `<i class="${i < pos ? 'done' : i === pos ? 'now' : ''}"></i>`).join('');
+  const pos = posInRound(ev.questions, qi), rlen = roundLen(ev.questions, q.round);
+  $('q-round').textContent = `Round ${q.round} · Question ${pos + 1} of ${rlen}`;
+  $('q-dots').innerHTML = Array.from({ length: rlen }, (_, i) => `<i class="${i < pos ? 'done' : i === pos ? 'now' : ''}"></i>`).join('');
   $('q-bonus').textContent = q.bonus ? '🎁 ' + q.bonus : '';
   $('q-bonus').classList.toggle('hidden', !q.bonus);
   $('q-emoji').textContent = q.emoji || ''; $('q-emoji').classList.toggle('hidden', !q.emoji);
@@ -487,7 +502,7 @@ function renderBreak(board){
   if (board && !isBreak) {
     const thru = s.revealedThrough;
     $('b-title').innerHTML = 'Leaderboard<span class="board-tag">Live</span>';
-    $('b-sub').textContent = ev.status === 'final' ? 'Final standings' : thru != null ? `After Round ${Math.floor(thru / TT.ROUND_SIZE) + 1} · Question ${(thru % TT.ROUND_SIZE) + 1}` : 'No questions played yet';
+    $('b-sub').textContent = ev.status === 'final' ? 'Final standings' : thru != null ? `After Round ${((ev.questions || [])[thru] || {}).round || 1} · Question ${posInRound(ev.questions, thru) + 1}` : 'No questions played yet';
   } else {
     $('b-title').textContent = last ? 'Standings after the final round' : `Round ${r} standings`;
     $('b-sub').innerHTML = last ? 'Final results coming up…' : 'Time to order 🌮  Grab a drink, the next round is coming.';
@@ -500,15 +515,18 @@ function renderBreak(board){
   $('b-tables').innerHTML = (s.tableOrder || []).slice(0, 9).map((t, i) => `<div class="row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>${move(t) || '<span></span>'}
       <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}<small>👤 ${s.tables[t].players}</small></span>
       <span class="pt">${fmtPts(s.tables[t].score)}</span></div>`).join('') || '<div class="st-sub">No scores yet</div>';
-  $('b-players').innerHTML = (s.playerOrder || []).slice(0, 5).map((p, i) => {
+  // Same number of rows as the tables list (min 5, max 9) so both columns line up
+  const tRows = Math.min(9, (s.tableOrder || []).length), pRows = Math.max(Math.min(5, (s.playerOrder || []).length), Math.min(tRows, (s.playerOrder || []).length));
+  $('b-players').innerHTML = (s.playerOrder || []).slice(0, pRows).map((p, i) => {
     const x = s.players[p];
-    return `<div class="row p ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span><span class="nm">${esc(x.name)}<small>${esc(tableName(x.table, names))}</small></span><span class="pt">${x.score}</span></div>`;
+    return `<div class="row p ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span><span></span><span class="nm">${esc(x.name)}<small>${esc(tableSub(x.table, names))}</small></span><span class="pt">${x.score}</span></div>`;
   }).join('');
   const nx = (ev.rounds || [])[r];
   $('b-next').innerHTML = nx ? `Up next: <b>Round ${r + 1} · ${esc(nx.title)}</b>${nx.sponsored ? ' · presented by Chilitos' : ''}` : '';
 }
 
-function sponsorName(){ try { return 'From ' + BRANDING.sponsor.name; } catch(e){ return 'From our sponsor'; } }
+// Sender line is typed by the host (sponsorFrom); falls back to the branding name
+function sponsorName(){ return (ev && ev.sponsorFrom) || 'SPONSOR'; }
 function tickBig(){
   if (!ev || !ev.breakEndsAt) return;
   const n = Math.ceil(Math.max(0, ev.breakEndsAt - serverNow()) / 1000);
@@ -517,6 +535,30 @@ function tickBig(){
   if (n > 0 && n <= 5 && n !== lastBigTick) { lastBigTick = n; tone(660, .08, 'square', .1); }
 }
 let lastBigTick = -1;
+// Lobby + between-question countdowns (break has its own above)
+function tickCountdowns(){
+  if (!ev) return;
+  const now = serverNow();
+  const lob = ev.status === 'lobby' && ev.startsAt;
+  $('lobby-cd').classList.toggle('hidden', !lob);
+  if (lob) {
+    const n = Math.ceil(Math.max(0, ev.startsAt - now) / 1000);
+    $('lobby-cd').classList.toggle('soon', n <= 0); $('lobby-cd').classList.toggle('hot', n > 0 && n <= 10);
+    $('lobby-cd-v').textContent = n <= 0 ? "Let's go!" : fmtClock(n);
+    if (n > 0 && n <= 5 && n !== lastLobbyTick) { lastLobbyTick = n; tone(660, .08, 'square', .1); }
+  }
+  const rv = ev.status === 'reveal' && ev.revealEndsAt && !ev.paused && !ev.board;
+  $('q-next').classList.toggle('hidden', !rv);
+  if (rv) {
+    const qi = ev.reveal ? ev.reveal.q : ev.qIndex, total = (ev.questions || []).length;
+    const end = isLastInRound(ev.questions, qi);
+    $('q-next-l').textContent = end ? 'Standings in' : 'Next question in';
+    $('q-next-v').textContent = Math.ceil(Math.max(0, ev.revealEndsAt - now) / 1000);
+  }
+}
+let lastLobbyTick = -1;
+function fmtClock(n){ return n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`; }
+setInterval(tickCountdowns, 250);
 function breakLeft(){ const n = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`; }
 setInterval(() => { if (ev && ev.status === 'break' && ev.breakEndsAt && !$('b-big').classList.contains('hidden')) tickBig(); }, 250);
 
@@ -579,7 +621,7 @@ function checkPush(){
   const at = ev && ev.sponsorPushAt, end = at ? at + ((ev.sponsorPushSecs || 10) * 1000) : 0;
   const live = at && ev.sponsorMsg && serverNow() < end;
   if (!live) { if (shownPush !== null) { shownPush = null; hidePush(); } return; }
-  $('push-msg').textContent = ev.sponsorMsg;
+  $('push-msg').textContent = ev.sponsorMsg; $('push-k').textContent = sponsorName();
   if (shownPush === at) return;
   shownPush = at;
   $('push-k').textContent = sponsorName();
