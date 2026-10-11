@@ -216,7 +216,7 @@
           ".read": true,
           ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
           "$t": {
-            ".write": "!data.exists() && root.child('restaurant/events').child($e).exists()",
+            ".write": "$t !== 'bar' && !data.exists() && root.child('restaurant/events').child($e).exists()",
             ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24 && ($t === 'bar' || $t.matches(/^[0-9]{1,2}$/))"
           }
         }

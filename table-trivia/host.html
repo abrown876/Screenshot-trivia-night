@@ -64,6 +64,23 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 .meter{height:8px;border-radius:4px;background:var(--s3);overflow:hidden;margin:14px 0 4px}
 .meter i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
 .meter-l{display:flex;justify-content:space-between;color:var(--dim);font-size:13px;font-weight:600}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--s2);border-radius:12px;padding:4px;gap:4px;margin-bottom:6px}
+.seg button{min-height:42px;border:none;border-radius:9px;background:transparent;color:var(--dim);font-weight:800;font-size:15px}
+.seg button[aria-checked="true"]{background:var(--text);color:var(--bg)}
+.seg button:disabled{opacity:.4}
+.seg-hint{color:var(--dim);font-size:13px;font-weight:500;margin-bottom:14px;line-height:1.4}
+.timing{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.timing label{display:block;color:var(--dim);font-size:12.5px;font-weight:600;line-height:1.3}
+.timing .inp{margin:6px 0 0;text-align:center;font-family:var(--mono);font-size:16px}
+.timing-hint{color:var(--muted);font-size:12.5px;margin-top:8px}
+.mode{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:14px 16px;background:var(--s2);border-radius:12px}
+.mode b{display:block;font-size:15px}
+.mode small{display:block;color:var(--dim);font-size:13px;font-weight:500;margin-top:2px;line-height:1.35}
+.switch{flex-shrink:0;width:54px;height:30px;border-radius:15px;border:none;background:var(--s3);position:relative;transition:background .2s}
+.switch i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--green)}
+.switch[aria-checked="true"] i{transform:translateX(24px)}
+.switch:disabled{opacity:.4}
 .next-hint{color:var(--muted);font-size:13px;text-align:center;margin-top:10px}
 
 /* question preview */
@@ -136,6 +153,11 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
         <div><div class="state" id="st-title">No game yet</div><div class="state-sub" id="st-sub">Set up tonight's game to begin.</div></div>
         <div class="clock" id="clock"></div>
       </div>
+      <div class="seg" role="radiogroup" aria-label="How questions advance">
+        <button type="button" role="radio" data-mode="auto" aria-checked="true">Auto</button>
+        <button type="button" role="radio" data-mode="manual" aria-checked="false">Manual</button>
+      </div>
+      <div class="seg-hint" id="mode-hint">Auto: the answer shows when time runs out, then the next question starts by itself.</div>
       <button class="btn btn-main" id="btn-main" type="button">Start</button>
       <div class="btn-row">
         <button class="btn btn-gold" id="btn-pause" type="button">Pause<kbd>P</kbd></button>
@@ -144,7 +166,14 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       </div>
       <div class="meter" id="meter"><i id="meter-i"></i></div>
       <div class="meter-l"><span id="meter-l">0 of 0 answered</span><span id="meter-r"></span></div>
-      <p class="next-hint">Press <kbd>Space</kbd> for the main button</p>
+      <div class="timing">
+        <label>Seconds per question<input class="inp" id="t-q" type="number" min="5" max="120"></label>
+        <label>Seconds on the answer<input class="inp" id="t-r" type="number" min="2" max="60"></label>
+        <label>Round break (minutes)<input class="inp" id="t-b" type="number" min="0" max="30" step="0.5"></label>
+      </div>
+      <label class="check" style="height:auto;margin-top:10px"><input id="t-intro" type="checkbox"> Round intro animation (9 sec before each round)</label>
+      <div class="timing-hint">Changes apply from the next question. In Auto, the next round starts when the break ends — set the break to 0 to start rounds yourself.</div>
+      <p class="next-hint">Press <kbd>Space</kbd> for the main button · <kbd>A</kbd> switches Auto / Manual</p>
     </div>
 
     <div class="card">
@@ -162,9 +191,16 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
           <div><label for="cfg-id">Game name</label><input class="inp" id="cfg-id"></div>
           <div><label for="cfg-tables">Tables</label><input class="inp" id="cfg-tables" type="number" min="1" max="40" value="12"></div>
           <div><label for="cfg-qsec">Seconds per question</label><input class="inp" id="cfg-qsec" type="number" min="10" max="60"></div>
-          <div><label for="cfg-rsec">Seconds on the answer</label><input class="inp" id="cfg-rsec" type="number" min="3" max="30"></div>
+          <div><label for="cfg-rsec">Seconds on the answer</label><input class="inp" id="cfg-rsec" type="number" min="2" max="60"></div>
+          <div><label for="cfg-break">Round break (minutes)</label><input class="inp" id="cfg-break" type="number" min="0" max="30" step="0.5" value="3"></div>
         </div>
         <label class="check"><input id="cfg-bar" type="checkbox" checked> Bar plays as its own team</label>
+        <label class="check" style="margin-top:-8px"><input id="cfg-auto" type="checkbox" checked> Run questions automatically (you can switch during the game)</label>
+        <label class="check" style="margin-top:-8px"><input id="cfg-intro" type="checkbox" checked> Play the round intro animation before each round</label>
+        <div class="setup-grid" style="margin-top:4px">
+          <div><label for="cfg-tprize">Table prize</label><input class="inp" id="cfg-tprize" maxlength="60" placeholder="e.g. a $5,000 Chilitos voucher"></div>
+          <div><label for="cfg-bprize">Bar prize</label><input class="inp" id="cfg-bprize" maxlength="60" value="a round of shots 🥃"></div>
+        </div>
         <button class="btn btn-main" id="btn-create" type="button" style="min-height:52px;font-size:16px">Create game</button>
       </div>
       <div id="setup-summary" class="hidden">
@@ -184,9 +220,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
     </div>
 
     <div class="card">
-      <h2>Sponsor message <small>Shown at round breaks</small></h2>
+      <h2>Sponsor message <small>Shown on reveals &amp; breaks</small></h2>
       <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="🌮 Taco Tuesday: 3 tacos for $1,500 — order before Round 3"></textarea>
-      <button class="btn btn-soft" id="btn-sponsor" type="button" style="width:100%">Update message</button>
+      <button class="btn btn-soft" id="btn-sponsor" type="button" style="width:100%">Update &amp; show on screens</button>
+      <div class="timing-hint">Pops up on the TV and phones right away (held until the current question ends). Also shows on every answer reveal and round break.</div>
     </div>
 
     <div class="card">
@@ -215,10 +252,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 //   bonus: sponsor bonus — first correct answer in the room wins it
 // ============================================================
 const ROUNDS = [
-  { title: 'Yaad Business' },
-  { title: 'Emoji Movies' },
-  { title: 'The Chilitos Round', sponsored: true },
-  { title: 'Music & Sports' },
+  { title: 'Yaad Business', icon: '🇯🇲', tag: 'How well do you know your yaad?' },
+  { title: 'Emoji Movies', icon: '🎬', tag: 'Read the emojis. Name the film.' },
+  { title: 'The Chilitos Round', sponsored: true, icon: '🌮', tag: 'Know your menu? Free nachos are on the line.' },
+  { title: 'Music & Sports', icon: '🎤', tag: 'Hits, legends and big moments.' },
 ];
 const QUESTIONS = [
   // Round 1 — Yaad Business
@@ -286,9 +323,12 @@ async function createNight(){
   const u = {};
   u[`events/${id}`] = {
     eventId: id, status: 'lobby', round: 0, qIndex: null, liveSlot: null, displayCode: code,
-    tables, barEnabled: $('cfg-bar').checked, joinClosed: false,
+    tables, barEnabled: $('cfg-bar').checked, joinClosed: false, autoAdvance: $('cfg-auto').checked, timeUp: false,
+    tablePrize: $('cfg-tprize').value.trim() || null, barPrize: $('cfg-bprize').value.trim() || null,
     questionSeconds: parseInt($('cfg-qsec').value) || TT.QUESTION_SECONDS,
     revealSeconds: parseInt($('cfg-rsec').value) || TT.REVEAL_SECONDS,
+    breakSeconds: Math.round((parseFloat($('cfg-break').value) || 0) * 60), breakEndsAt: null, finalAt: null,
+    introSeconds: $('cfg-intro').checked ? INTRO_SECONDS : 0, introAt: null,
     extraSeconds: 0, paused: false, sponsorMsg: $('sponsor-msg').value.trim() || null,
     rounds: ROUNDS, questions: QUESTIONS_PUBLIC, createdAt: firebase.database.ServerValue.TIMESTAMP,
   };
@@ -307,58 +347,105 @@ async function createNight(){
 function clearTimer(){ if (timer) { clearTimeout(timer); timer = null; } }
 function schedule(sec, fn){ clearTimer(); timer = setTimeout(fn, Math.max(300, sec * 1000)); }
 
+// Auto: answer shows when time runs out, next question follows.
+// Manual: time running out only locks answers; the host shows the answer and moves on.
+const isAuto = () => !ev || ev.autoAdvance !== false;
+function endOfTimer(){ return isAuto() ? toReveal() : toLock(); }
+async function toLock(){
+  if (!ev || ev.status !== 'question' || ev.paused || ev.timeUp) return;
+  clearTimer();
+  await evRef().update({ liveSlot: null, timeUp: true });
+}
 async function goQuestion(qi){
   const u = {
     status: 'question', round: QUESTIONS[qi].round, qIndex: qi, liveSlot: String(qi),
     questionStartedAt: firebase.database.ServerValue.TIMESTAMP, extraSeconds: 0,
-    paused: false, pausedAt: null, reveal: null, answeredCount: 0,
+    paused: false, pausedAt: null, reveal: null, answeredCount: 0, timeUp: false, breakEndsAt: null,
   };
   u['qStarts/' + qi] = firebase.database.ServerValue.TIMESTAMP;
   await evRef().update(u);
-  schedule((ev && ev.questionSeconds) || TT.QUESTION_SECONDS, toReveal);
+  schedule((ev && ev.questionSeconds) || TT.QUESTION_SECONDS, endOfTimer);
 }
 async function toReveal(){
   if (!ev || ev.status !== 'question' || ev.paused) return;
   clearTimer();
   const qi = ev.qIndex;
   await evRef().update({
-    status: 'reveal', liveSlot: null, revealStartedAt: firebase.database.ServerValue.TIMESTAMP,
+    status: 'reveal', liveSlot: null, timeUp: false, revealStartedAt: firebase.database.ServerValue.TIMESTAMP,
     reveal: { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]] },
   });
   try { await scoreAndPublish(qi); } catch (e) { console.warn('scoring', e); toast('Scoring problem — check the console'); }
-  schedule(revealSec(), advanceFromReveal);
+  if (isAuto()) schedule(revealSec(), advanceFromReveal);
 }
 const isRoundEnd = qi => qi + 1 >= QUESTIONS.length || (qi + 1) % TT.ROUND_SIZE === 0;
 async function advanceFromReveal(){
   if (!ev || ev.status !== 'reveal' || ev.paused) return;
   clearTimer();
   if (isRoundEnd(ev.qIndex)) {
-    const u = { status: 'break', liveSlot: null };
+    const u = { status: 'break', liveSlot: null, breakStartedAt: Math.round(serverNow()), breakEndsAt: null };
     u['breakOrders/' + ev.round] = lastTableOrder.length ? lastTableOrder : ((standings && standings.tableOrder) || []);
     await evRef().update(u);
+    await syncBreak();
   } else await goQuestion(ev.qIndex + 1);
 }
-async function startRound(r){ await goQuestion((r - 1) * TT.ROUND_SIZE); }
+// Round break countdown: in Auto with a break length set, the next round starts itself.
+const breakSec = () => (ev && ev.breakSeconds) || 0;
+async function syncBreak(){
+  if (!ev || ev.status !== 'break') return;
+  const canAuto = isAuto() && breakSec() > 0 && (ev.round || 0) < TOTAL_ROUNDS;
+  if (canAuto) {
+    const ends = (ev.breakStartedAt || Math.round(serverNow())) + breakSec() * 1000;
+    if (ev.breakEndsAt !== ends) await evRef().update({ breakEndsAt: ends });
+    schedule((ends - serverNow()) / 1000, autoNextRound);
+  } else {
+    clearTimer();
+    if (ev.breakEndsAt) await evRef().update({ breakEndsAt: null });
+  }
+}
+async function autoNextRound(){
+  if (!ev || ev.status !== 'break' || !isAuto() || (ev.round || 0) >= TOTAL_ROUNDS) return;
+  await startRound(ev.round + 1);
+}
+// Round intro: a short animated takeover on the TV and phones, then question 1 of the round.
+const INTRO_SECONDS = 9;
+const introSec = () => (ev && ev.introSeconds != null ? ev.introSeconds : INTRO_SECONDS);
+async function startRound(r){
+  const first = (r - 1) * TT.ROUND_SIZE;
+  if (!introSec()) return goQuestion(first);
+  await evRef().update({
+    status: 'intro', round: r, liveSlot: null, reveal: null, timeUp: false, paused: false, pausedAt: null,
+    breakEndsAt: null, introAt: firebase.database.ServerValue.TIMESTAMP,
+  });
+  schedule(introSec(), () => endIntro(r));
+}
+async function endIntro(r){
+  if (!ev || ev.status !== 'intro' || ev.round !== r) return;
+  clearTimer();
+  await goQuestion((r - 1) * TT.ROUND_SIZE);
+}
 async function showFinal(){
   if (!confirm('Show the final results on the TV? This ends the game.')) return;
   clearTimer();
   if (ev.status === 'question') { if (ev.paused) await evRef().update({ paused: false }); await toReveal(); clearTimer(); }
-  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true, paused: false });
+  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true, paused: false, breakEndsAt: null, finalAt: firebase.database.ServerValue.TIMESTAMP });
 }
+async function replayReveal(){ await evRef().update({ finalAt: firebase.database.ServerValue.TIMESTAMP }); toast('Replaying the winners reveal on the TV'); }
 
 // The one button that always does the next right thing
 function mainAction(){
   if (!ev) return { label: 'Create a game to start', fn: null };
   const st = ev.status, r = ev.round || 0;
   if (st === 'lobby') return { label: `Start Round 1 · ${ROUNDS[0].title}`, fn: () => startRound(1) };
-  if (st === 'question') return { label: 'Show the answer now', fn: async () => { if (ev.paused) await togglePause(); await toReveal(); } };
+  if (st === 'question') return { label: ev.timeUp ? 'Show the answer' : 'Show the answer now', fn: async () => { if (ev.paused) await togglePause(); await toReveal(); } };
   if (st === 'reveal') return isRoundEnd(ev.qIndex)
     ? { label: `Show Round ${r} standings`, fn: async () => { if (ev.paused) await evRef().update({ paused: false }); await advanceFromReveal(); } }
     : { label: 'Next question', fn: async () => { if (ev.paused) await evRef().update({ paused: false }); await advanceFromReveal(); } };
+  if (st === 'intro') return { label: `Skip intro · start question 1`, fn: () => endIntro(r) };
   if (st === 'break') return r < TOTAL_ROUNDS
-    ? { label: `Start Round ${r + 1} · ${ROUNDS[r].title}`, fn: () => startRound(r + 1) }
+    ? { label: `Start Round ${r + 1} now · ${ROUNDS[r].title}`, fn: () => startRound(r + 1) }
     : { label: '🏆 Show final results', fn: showFinal };
-  return { label: 'Game over · start a new game anytime', fn: null };
+  if (st === 'final') return { label: '🎉 Replay the winners reveal', fn: replayReveal };
+  return { label: 'Start a new game anytime', fn: null };
 }
 let busy = false;
 async function runMain(){
@@ -378,21 +465,22 @@ async function togglePause(){
   if (ev.status === 'question') {
     const shift = Math.max(0, serverNow() - (ev.pausedAt || serverNow()));
     u.questionStartedAt = Math.round(ev.questionStartedAt + shift);
-    u.liveSlot = String(ev.qIndex);
+    if (!ev.timeUp) u.liveSlot = String(ev.qIndex);
     await evRef().update(u);
-    schedule(questionDurationSec(ev) - (serverNow() - u.questionStartedAt) / 1000, toReveal);
+    if (!ev.timeUp) schedule(questionDurationSec(ev) - (serverNow() - u.questionStartedAt) / 1000, endOfTimer);
   } else {
     await evRef().update(u);
-    schedule(revealSec(), advanceFromReveal);
+    if (isAuto()) schedule(revealSec(), advanceFromReveal);
   }
 }
 async function extend(){
   if (!ev || ev.status !== 'question' || ev.paused) return;
-  const extra = (ev.extraSeconds || 0) + 15;
-  await evRef().update({ extraSeconds: extra });
+  const base = ev.questionSeconds || TT.QUESTION_SECONDS;
   const elapsed = (serverNow() - ev.questionStartedAt) / 1000;
-  schedule((ev.questionSeconds || TT.QUESTION_SECONDS) + extra - elapsed, toReveal);
-  toast('Added 15 seconds');
+  const extra = Math.max((ev.extraSeconds || 0) + 15, Math.ceil(elapsed - base) + 15);
+  await evRef().update({ extraSeconds: extra, timeUp: false, liveSlot: String(ev.qIndex) });
+  schedule(base + extra - elapsed, endOfTimer);
+  toast(ev.timeUp ? 'Answers reopened for 15 seconds' : 'Added 15 seconds');
 }
 async function toggleJoin(){
   if (!ev) return;
@@ -493,10 +581,11 @@ function render(){
   // headline
   let title = 'No game yet', sub = 'Set up tonight\'s game to begin.';
   if (st === 'lobby') { title = 'Lobby is open'; sub = `${total} ${total === 1 ? 'player' : 'players'} joined · room code ${ev.displayCode}`; }
-  if (st === 'question') { const q = QUESTIONS[ev.qIndex]; title = `Round ${q.round} · Question ${(ev.qIndex % TT.ROUND_SIZE) + 1} of ${TT.ROUND_SIZE}`; sub = ev.paused ? 'Paused — players can\'t answer' : ROUNDS[q.round - 1].title; }
-  if (st === 'reveal') { title = 'Answer on screen'; sub = ev.reveal ? `${ev.reveal.pct || 0}% got it right · ${ev.paused ? 'paused' : 'moving on automatically'}` : ''; }
-  if (st === 'break') { title = (ev.round || 0) >= TOTAL_ROUNDS ? 'All rounds played' : `Round ${ev.round} standings`; sub = (ev.round || 0) >= TOTAL_ROUNDS ? 'Build the suspense, then show the final results.' : 'Order window. Start the next round when the room is ready.'; }
-  if (st === 'final') { title = 'Final results are up'; sub = 'Download the player list for Chilitos below.'; }
+  if (st === 'question') { const q = QUESTIONS[ev.qIndex]; title = `Round ${q.round} · Question ${(ev.qIndex % TT.ROUND_SIZE) + 1} of ${TT.ROUND_SIZE}`; sub = ev.paused ? 'Paused — players can\'t answer' : ev.timeUp ? 'Time\'s up — answers are locked. Show the answer when you\'re ready.' : ROUNDS[q.round - 1].title; }
+  if (st === 'reveal') { title = 'Answer on screen'; sub = ev.reveal ? `${ev.reveal.pct || 0}% got it right · ${ev.paused ? 'paused' : isAuto() ? 'moving on automatically' : 'waiting for you'}` : ''; }
+  if (st === 'intro') { title = `Round ${ev.round} intro`; sub = `${ROUNDS[ev.round - 1].title} · question 1 starts automatically`; }
+  if (st === 'break') { title = (ev.round || 0) >= TOTAL_ROUNDS ? 'All rounds played' : `Round ${ev.round} standings`; sub = (ev.round || 0) >= TOTAL_ROUNDS ? 'Build the suspense, then show the final results.' : ev.breakEndsAt ? 'Order window. The next round starts automatically when the countdown ends.' : 'Order window. Start the next round when the room is ready.'; }
+  if (st === 'final') { title = 'Winners revealed 🎉'; sub = 'Replay the reveal anytime. Download the player list for Chilitos below.'; }
   $('st-title').textContent = title; $('st-sub').textContent = sub;
   const a = mainAction();
   $('btn-main').textContent = a.label; $('btn-main').disabled = !a.fn || busy || !isAdmin;
@@ -505,6 +594,15 @@ function render(){
   $('btn-pause').innerHTML = (ev && ev.paused ? 'Resume' : 'Pause') + '<kbd>P</kbd>';
   $('btn-extend').disabled = st !== 'question' || (ev && ev.paused);
   $('btn-join').disabled = !ev || st === 'final';
+  const auto = isAuto();
+  document.querySelectorAll('.seg button').forEach(b => { b.setAttribute('aria-checked', String((b.dataset.mode === 'auto') === auto)); b.disabled = !ev || st === 'final'; });
+  $('mode-hint').textContent = auto
+    ? `Auto: the answer shows when time runs out, then the next question starts by itself${breakSec() ? `. Breaks last ${fmtDur(breakSec())}, then the next round starts.` : '. You start each round.'}`
+    : 'Manual: when time runs out, answers lock. You show each answer, move to the next question and start each round.';
+  [['t-q', ev ? ev.questionSeconds : TT.QUESTION_SECONDS], ['t-r', ev ? ev.revealSeconds : TT.REVEAL_SECONDS], ['t-b', ev ? (ev.breakSeconds || 0) / 60 : 3]]
+    .forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v != null ? v : ''; $(id).disabled = !ev || st === 'final'; });
+  $('t-intro').checked = introSec() > 0; $('t-intro').disabled = !ev || st === 'final';
+  $('btn-extend').innerHTML = (ev && ev.timeUp ? 'Reopen 15 sec' : '+15 sec') + '<kbd>E</kbd>';
   $('btn-join').textContent = ev && ev.joinClosed ? 'Reopen joining' : 'Close joining';
   $('btn-final-early').disabled = !ev || st === 'final' || st === 'lobby';
   $('btn-export').disabled = !ev;
@@ -517,7 +615,7 @@ function render(){
   $('q-next').classList.toggle('q-up', liveQ);
   if (liveQ) qCard(qi, $('q-now'), st === 'reveal' ? 'On screen' : 'Live now', true);
   let nq = null;
-  if (!ev || st === 'lobby') nq = 0; else if (st === 'break') nq = (ev.round || 0) * TT.ROUND_SIZE; else if (qi != null && st !== 'final') nq = qi + 1;
+  if (!ev || st === 'lobby') nq = 0; else if (st === 'intro') nq = ((ev.round || 1) - 1) * TT.ROUND_SIZE; else if (st === 'break') nq = (ev.round || 0) * TT.ROUND_SIZE; else if (qi != null && st !== 'final') nq = qi + 1;
   qCard(nq != null && nq < QUESTIONS.length ? nq : null, $('q-next'), 'Up next', false);
   renderLive(); renderTables(); renderLeaders();
 }
@@ -537,11 +635,16 @@ function renderLive(){
 }
 
 setInterval(() => {
+  if (ev && ev.status === 'break' && ev.breakEndsAt) {
+    const left = Math.max(0, Math.ceil((ev.breakEndsAt - serverNow()) / 1000));
+    $('clock').textContent = fmtDur(left); $('clock').classList.toggle('hot', left <= 10);
+    $('meter-r').textContent = `Next round in ${fmtDur(left)}`; return;
+  }
   if (!ev || ev.status !== 'question') { $('clock').textContent = ev && ev.paused ? '❚❚' : ''; $('clock').classList.remove('hot'); $('meter-r').textContent = ''; return; }
   const left = secondsLeft(ev);
   $('clock').textContent = ev.paused ? '❚❚' : left;
   $('clock').classList.toggle('hot', left <= 5 && !ev.paused);
-  $('meter-r').textContent = ev.paused ? 'Paused' : `${left}s left`;
+  $('meter-r').textContent = ev.paused ? 'Paused' : ev.timeUp ? "Time's up" : `${left}s left`;
 }, 250);
 
 function renderTables(){
@@ -561,7 +664,7 @@ function renderTables(){
       <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}</span>
       <span class="pl">👤 ${counts[t] || 0}</span>
       <span class="pt">${T[t] ? fmtPts(T[t].score) : ''}</span>
-      <button type="button" data-rename="${t}" title="Rename" aria-label="Rename">✎</button></div>`;
+      ${t === 'bar' ? '<span></span>' : `<button type="button" data-rename="${t}" title="Rename" aria-label="Rename">✎</button>`}</div>`;
   }).join('');
 }
 $('tbl-list').addEventListener('click', async e => {
@@ -587,8 +690,10 @@ function recover(){
   if (recovered || !isAdmin || !ev || timer) return;
   recovered = true;
   if (ev.paused) return;
-  if (ev.status === 'question') { schedule(questionDurationSec(ev) - (serverNow() - ev.questionStartedAt) / 1000, toReveal); toast('Reconnected — timer resumed'); }
-  else if (ev.status === 'reveal') { schedule(Math.max(1, revealSec() - (serverNow() - (ev.revealStartedAt || serverNow())) / 1000), advanceFromReveal); }
+  if (ev.status === 'question' && !ev.timeUp) { schedule(questionDurationSec(ev) - (serverNow() - ev.questionStartedAt) / 1000, endOfTimer); toast('Reconnected — timer resumed'); }
+  else if (ev.status === 'break') { syncBreak(); }
+  else if (ev.status === 'intro') { const r = ev.round; schedule(introSec() - (serverNow() - (ev.introAt || serverNow())) / 1000, () => endIntro(r)); }
+  else if (ev.status === 'reveal' && isAuto()) { schedule(Math.max(1, revealSec() - (serverNow() - (ev.revealStartedAt || serverNow())) / 1000), advanceFromReveal); }
 }
 
 async function exportCsv(){
@@ -615,10 +720,46 @@ $('btn-main').onclick = runMain;
 $('btn-pause').onclick = togglePause;
 $('btn-extend').onclick = extend;
 $('btn-join').onclick = toggleJoin;
+async function setAuto(on){
+  if (!ev || ev.status === 'final') return;
+  await evRef().update({ autoAdvance: on });
+  if (on) {
+    if (ev.status === 'question' && !ev.paused) {
+      if (ev.timeUp) await toReveal();
+      else schedule(questionDurationSec(ev) - (serverNow() - ev.questionStartedAt) / 1000, endOfTimer);
+    } else if (ev.status === 'reveal' && !ev.paused) schedule(revealSec(), advanceFromReveal);
+  } else if (ev.status === 'reveal') clearTimer();
+  if (ev.status === 'break') { await new Promise(r => setTimeout(r, 50)); await syncBreak(); }
+  toast(on ? 'Auto mode' : 'Manual mode — you control each step');
+}
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setAuto(b.dataset.mode === 'auto'));
+function fmtDur(s){ s = Math.max(0, Math.round(s)); return s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`; }
+async function saveTiming(){
+  if (!ev || ev.status === 'final') return;
+  const q = Math.max(5, Math.min(120, parseInt($('t-q').value) || TT.QUESTION_SECONDS));
+  const r = Math.max(2, Math.min(60, parseInt($('t-r').value) || TT.REVEAL_SECONDS));
+  const b = Math.max(0, Math.min(1800, Math.round((parseFloat($('t-b').value) || 0) * 60)));
+  if (q === ev.questionSeconds && r === ev.revealSeconds && b === (ev.breakSeconds || 0)) return;
+  await evRef().update({ questionSeconds: q, revealSeconds: r, breakSeconds: b });
+  if (ev.status === 'break') { await new Promise(res => setTimeout(res, 50)); await syncBreak(); }
+  toast('Timing saved — applies from the next question');
+}
+['t-q', 't-r', 't-b'].forEach(id => { $(id).addEventListener('change', saveTiming); $(id).addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); }); });
 $('btn-final-early').onclick = showFinal;
+$('t-intro').addEventListener('change', async e => {
+  if (!ev || ev.status === 'final') return;
+  await evRef().update({ introSeconds: e.target.checked ? INTRO_SECONDS : 0 });
+  toast(e.target.checked ? 'Round intros on' : 'Round intros off — rounds start straight away');
+});
 $('btn-export').onclick = exportCsv;
 $('sponsor-msg').addEventListener('input', e => e.target.dataset.dirty = '1');
-$('btn-sponsor').onclick = async () => { if (!ev) return; await evRef().update({ sponsorMsg: $('sponsor-msg').value.trim() || null }); delete $('sponsor-msg').dataset.dirty; toast('Sponsor message updated'); };
+$('btn-sponsor').onclick = async () => {
+  if (!ev) return;
+  const msg = $('sponsor-msg').value.trim() || null;
+  await evRef().update({ sponsorMsg: msg, sponsorPushAt: msg ? firebase.database.ServerValue.TIMESTAMP : null });
+  delete $('sponsor-msg').dataset.dirty;
+  toast(msg ? (ev.status === 'question' ? 'Saved — it pops up when this question ends' : 'Showing on the TV and phones now') : 'Sponsor message removed');
+};
 document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
   const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link:', url); }
@@ -628,6 +769,7 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); runMain(); }
   else if (e.key === 'p' || e.key === 'P') togglePause();
   else if (e.key === 'e' || e.key === 'E') extend();
+  else if (e.key === 'a' || e.key === 'A') setAuto(!isAuto());
 });
 
 // ── Auth ──

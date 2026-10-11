@@ -109,30 +109,99 @@ section{animation:in .45s ease-out}
 .next{margin-top:1.4vw;color:var(--dim);font-weight:600;font-size:1.5vw}
 .next b{color:var(--text)}
 
-/* final */
+/* final reveal */
 .final{text-align:center}
-.final h1{font-weight:900;font-size:3vw;color:var(--dim)}
-.podium{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:1.6vw;align-items:end;max-width:70vw;margin:2.4vw auto 0}
-.pod{border-radius:1.2vw 1.2vw 0 0;padding:1.6vw 1.2vw;background:var(--s1);border:1px solid var(--line);border-bottom:none}
-.pod .pl{font-family:var(--mono);color:var(--dim);font-size:1.6vw}
-.pod .nm{font-weight:900;font-size:2.2vw;line-height:1.1;margin-top:.5vw;overflow:hidden;text-overflow:ellipsis}
-.pod .sm{color:var(--dim);font-weight:600;font-size:1.2vw;margin-top:.3vw}
-.pod .pt{font-family:var(--mono);color:var(--gold);font-size:1.7vw;margin-top:.6vw}
-.pod.p1{min-height:19vw;background:linear-gradient(160deg,rgba(124,110,246,.45),rgba(255,92,138,.35));border-color:transparent}
-.pod.p1 .nm{font-size:3.4vw}
-.pod.p1 .crown{font-size:4vw;line-height:1}
-.pod.p2{min-height:14vw}
-.pod.p3{min-height:11vw}
-.star{margin-top:2.4vw;font-size:2.1vw;font-weight:800}
+.final h1{font-weight:900;font-size:4.2vw;letter-spacing:-.01em;transition:opacity .4s}
+.final h1.drum{animation:drum .5s ease-in-out infinite alternate}
+@keyframes drum{from{transform:scale(1)}to{transform:scale(1.04)}}
+.podium{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:1.6vw;align-items:end;max-width:76vw;margin:2.2vw auto 0}
+.pod{position:relative;border-radius:1.4vw 1.4vw 0 0;padding:1.8vw 1.2vw;background:var(--s1);border:1px solid var(--line);border-bottom:none;
+  opacity:0;transform:translateY(4vw) scale(.94);transition:opacity .5s,transform .7s cubic-bezier(.2,1.5,.4,1)}
+.pod.in{opacity:1;transform:none}
+.pod .pl{font-weight:900;font-size:2vw;color:var(--dim)}
+.pod .nm{font-weight:900;font-size:2.4vw;line-height:1.08;margin-top:.5vw;overflow:hidden;text-overflow:ellipsis}
+.pod .sm{color:var(--dim);font-weight:600;font-size:1.25vw;margin-top:.3vw}
+.pod .pt{font-family:var(--mono);color:var(--gold);font-size:1.8vw;margin-top:.7vw}
+.pod .mem{color:var(--dim);font-weight:600;font-size:1.2vw;margin-top:.6vw;line-height:1.4}
+.pod.p2{min-height:15vw}
+.pod.p3{min-height:12vw}
+.pod.p1{min-height:22vw;background:linear-gradient(160deg,#5a4fd6,#d9467a 70%,#f2a33a);border:none;color:#fff}
+.pod.p1 .nm{font-size:4.2vw}
+.pod.p1 .pt{color:#fff;font-size:2.2vw}
+.pod.p1 .sm,.pod.p1 .mem{color:rgba(255,255,255,.85)}
+.pod .prize{margin-top:1vw;display:inline-block;background:rgba(255,255,255,.18);border-radius:99vw;padding:.5vw 1.4vw;font-weight:800;font-size:1.5vw}
+.pod.p1 .crown{font-size:5vw;line-height:1;display:inline-block}
+.pod.p1.in{animation:glow 1.6s ease-in-out .7s infinite alternate}
+.pod.p1.in .crown{animation:bounce 1s cubic-bezier(.3,1.8,.5,1) .3s both}
+@keyframes glow{from{box-shadow:0 0 2vw rgba(255,183,64,.35)}to{box-shadow:0 0 6vw rgba(255,183,64,.75)}}
+@keyframes bounce{from{transform:translateY(-3vw) scale(.4) rotate(-20deg)}to{transform:none}}
+.star{margin-top:2.6vw;font-size:2.3vw;font-weight:800;opacity:0;transform:translateY(1vw);transition:opacity .6s,transform .6s}
+.star.in{opacity:1;transform:none}
 .star b{color:var(--gold)}
+.thanks{margin-top:1vw;color:var(--dim);font-weight:600;font-size:1.6vw;opacity:0;transition:opacity .8s}
+.thanks.in{opacity:1}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:31}
+.flash.go{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:.55}100%{opacity:0}}
+#cf{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:32}
+
+/* sponsor */
+.spon{border:.15vw dashed rgba(255,183,64,.7);color:var(--gold);border-radius:1vw;padding:.8vw 1.4vw;font-weight:800;font-size:1.6vw;animation:in .5s ease-out}
+.spon small{display:block;color:var(--dim);font-weight:600;font-size:1.05vw;margin-bottom:.2vw}
+.spon.big{margin-top:1.6vw;font-size:2vw;padding:1.2vw 1.6vw}
+.push{position:fixed;left:0;right:0;bottom:6vw;display:flex;justify-content:center;z-index:45;pointer-events:none}
+.push-card{max-width:70vw;background:linear-gradient(135deg,#2a2150,#3a1f3a);border:.2vw solid var(--gold);border-radius:1.6vw;padding:1.6vw 2.4vw;text-align:center;box-shadow:0 2vw 6vw rgba(0,0,0,.5);animation:pushin .6s cubic-bezier(.2,1.4,.4,1)}
+.push-card small{display:block;color:var(--gold);font-weight:700;font-size:1.3vw;margin-bottom:.4vw}
+.push-card div{font-weight:900;font-size:2.8vw;line-height:1.15}
+@keyframes pushin{from{transform:translateY(6vw) scale(.9);opacity:0}to{transform:none;opacity:1}}
+.pushing #q-spon,.pushing #b-spon{visibility:hidden}
+.countdown{display:inline-block;font-family:var(--mono);color:var(--gold);margin-left:.4vw}
+
+/* round intro */
+#v-intro{position:relative;flex:1;display:flex;align-items:center;justify-content:center;text-align:center}
+.stage:has(#v-intro:not(.hidden)){overflow:hidden}
+.ix-floats{position:absolute;inset:-2vw -3vw;pointer-events:none;overflow:hidden;z-index:0;
+  -webkit-mask:radial-gradient(ellipse 38% 46% at 50% 50%,transparent 70%,#000 100%);mask:radial-gradient(ellipse 38% 46% at 50% 50%,transparent 70%,#000 100%)}
+.ix-f{position:absolute;bottom:-8vw;font-weight:900;line-height:1;opacity:0;animation:ixrise var(--d) linear var(--w) infinite}
+.ix-f.tile{display:grid;place-items:center;width:4.4vw;height:4.4vw;border-radius:1vw;font-size:2.2vw;background:var(--c);color:var(--ink);box-shadow:0 .6vw 2vw rgba(0,0,0,.35)}
+.ix-f.q{font-size:5vw;color:var(--c)}
+.ix-f.e{font-size:3.6vw}
+@keyframes ixrise{0%{transform:translateY(0) rotate(0) scale(.6);opacity:0}12%{opacity:.85}80%{opacity:.6}100%{transform:translateY(-62vw) rotate(var(--r)) scale(1);opacity:0}}
+.ix-burst{position:absolute;left:50%;top:50%;width:70vw;height:70vw;margin:-35vw 0 0 -35vw;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(rgba(124,110,246,.13) 0 6deg,transparent 6deg 18deg);animation:ixspin 30s linear infinite;
+  -webkit-mask:radial-gradient(circle,#000 20%,transparent 68%);mask:radial-gradient(circle,#000 20%,transparent 68%)}
+@keyframes ixspin{to{transform:rotate(360deg)}}
+.ix-core{position:relative;z-index:2}
+.ix-kick{font-weight:800;color:var(--gold);font-size:2vw;opacity:0}
+.ix-round{font-weight:900;font-size:13vw;line-height:.9;letter-spacing:-.03em;margin:.6vw 0 .2vw;opacity:0;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .6vw 2.4vw rgba(124,110,246,.45))}
+.ix-title{font-weight:900;font-size:4.4vw;line-height:1.05;opacity:0}
+.ix-title .ic{display:inline-block;margin-right:1vw}
+.ix-spon{display:inline-block;margin-top:1vw;border:.15vw solid rgba(255,183,64,.75);color:var(--gold);border-radius:99vw;padding:.4vw 1.6vw;font-weight:800;font-size:1.5vw;opacity:0}
+.ix-msg{color:var(--dim);font-weight:700;font-size:2.1vw;margin-top:1.4vw;min-height:2.6vw;opacity:0}
+.ix-msg b{color:var(--text)}
+.ix-count{position:relative;height:9vw;margin-top:1.2vw}
+.ix-count span{position:absolute;left:0;right:0;font-family:var(--mono);font-weight:700;font-size:8vw;line-height:9vw;color:var(--gold);text-shadow:0 0 3vw rgba(255,183,64,.6);opacity:0}
+.ix-count span.go{font-family:var(--display);font-weight:900;color:var(--green);text-shadow:0 0 3vw rgba(61,220,132,.6)}
+.ix-on .ix-kick{animation:ixdrop .5s cubic-bezier(.2,1.4,.4,1) .1s both}
+.ix-on .ix-round{animation:ixslam .7s cubic-bezier(.2,1.6,.4,1) .45s both}
+.ix-on .ix-title{animation:ixup .6s cubic-bezier(.2,1.3,.4,1) 1.5s both}
+.ix-on .ix-spon{animation:ixup .5s ease-out 2s both}
+.ix-on .ix-msg{animation:ixup .6s ease-out 2.6s both}
+.ix-count span.on{animation:ixtick .9s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes ixdrop{from{opacity:0;transform:translateY(-2vw)}to{opacity:1;transform:none}}
+@keyframes ixslam{0%{opacity:0;transform:scale(2.8) rotate(-6deg)}60%{opacity:1;transform:scale(.94) rotate(1deg)}80%{transform:scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes ixup{from{opacity:0;transform:translateY(1.6vw)}to{opacity:1;transform:none}}
+@keyframes ixtick{0%{opacity:0;transform:scale(2)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.7)}}
+.ix-shake{animation:ixshake .4s ease-out}
+@keyframes ixshake{0%,100%{transform:none}20%{transform:translate(-.5vw,.3vw)}40%{transform:translate(.5vw,-.3vw)}60%{transform:translate(-.3vw,-.2vw)}80%{transform:translate(.2vw,.2vw)}}
+@media (prefers-reduced-motion:reduce){.ix-kick,.ix-round,.ix-title,.ix-spon,.ix-msg{opacity:1}.ix-floats,.ix-burst{display:none}}
 
 .overlay{position:fixed;inset:0;background:rgba(8,8,24,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vw;z-index:50;cursor:pointer;text-align:center}
 .overlay h2{font-weight:900;font-size:3.6vw}
 .overlay p{color:var(--dim);font-size:1.6vw}
 .paused{position:fixed;top:5.6vw;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1300;font-weight:900;padding:.7vw 2vw;border-radius:99vw;font-size:1.7vw;z-index:40}
-.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:30}
-.confetti i{position:absolute;top:-3vw;width:.9vw;height:1.6vw;border-radius:.2vw;animation:fall linear forwards}
-@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
@@ -152,7 +221,7 @@ section{animation:in .45s ease-out}
       <div class="qr"><div id="qr"></div><p>Scan to play</p></div>
       <div>
         <h1>Grab your phone.<br>Your table is your team.</h1>
-        <p class="how">Scan the code, pick your table and sign in.<br>Everyone answers. <b>Your table's average wins.</b></p>
+        <p class="how">Scan the code, pick your table and sign in.<br>Everyone answers. <b>Your table's average wins.</b><span id="lobby-prizes"></span></p>
         <div class="codebox"><span>Room code</span><b id="lobby-code">····</b></div>
         <div class="count" id="lobby-count"><b>0</b> players in</div>
         <div class="arrivals" id="arrivals"></div>
@@ -179,6 +248,7 @@ section{animation:in .45s ease-out}
       <div class="meter" id="meter"><div class="meter-bar"><i id="meter-i"></i></div><div class="meter-l" id="meter-l">0 answered</div></div>
       <div class="pct hidden" id="pct"></div>
       <div class="bonus-win hidden" id="bonus-win"></div>
+      <div class="spon hidden" id="q-spon"></div>
     </div>
   </section>
 
@@ -187,15 +257,29 @@ section{animation:in .45s ease-out}
     <div class="st-sub" id="b-sub">Time to order</div>
     <div class="st-grid">
       <div><div class="st-h">Tables</div><div id="b-tables"></div></div>
-      <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next" id="b-next"></div></div>
+      <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next" id="b-next"></div><div class="spon big hidden" id="b-spon"></div></div>
+    </div>
+  </section>
+
+  <section id="v-intro" class="hidden">
+    <div class="ix-burst"></div>
+    <div class="ix-floats" id="ix-floats"></div>
+    <div class="ix-core" id="ix-core">
+      <div class="ix-kick" id="ix-kick">Get ready…</div>
+      <div class="ix-round" id="ix-round">Round 1</div>
+      <div class="ix-title" id="ix-title"></div>
+      <div class="ix-spon hidden" id="ix-spon">Presented by Chilitos</div>
+      <div class="ix-msg" id="ix-msg"></div>
+      <div class="ix-count" id="ix-count"><span>3</span><span>2</span><span>1</span><span class="go">Go!</span></div>
     </div>
   </section>
 
   <section id="v-final" class="hidden">
     <div class="final">
-      <h1>Tonight's winners</h1>
+      <h1 id="f-title">And tonight's winners are…</h1>
       <div class="podium" id="podium"></div>
       <div class="star" id="f-star"></div>
+      <div class="thanks" id="f-thanks">Thanks for playing! See you at the next game night 🌮</div>
     </div>
   </section>
 </div>
@@ -210,7 +294,9 @@ section{animation:in .45s ease-out}
 
 <div class="paused hidden" id="paused">Paused</div>
 <div class="overlay" id="gate"><h2>Click to start the TV</h2><p>Turns on game sounds and full screen</p></div>
-<div class="confetti" id="confetti"></div>
+<div class="flash" id="flash"></div>
+<canvas id="cf"></canvas>
+<div class="push hidden" id="push"><div class="push-card"><small id="push-k">From our sponsor</small><div id="push-msg"></div></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -219,7 +305,7 @@ section{animation:in .45s ease-out}
 <script src="tt-common.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
-const VIEWS = ['v-none','v-lobby','v-q','v-break','v-final'];
+const VIEWS = ['v-none','v-lobby','v-q','v-break','v-intro','v-final'];
 let cur = null;
 function show(id){ if (cur === id) return; cur = id; VIEWS.forEach(v => $(v).classList.toggle('hidden', v !== id)); }
 
@@ -242,7 +328,12 @@ const SFX = {
   start: () => [523, 659, 784].forEach((f, i) => tone(f, .18, 'triangle', .24, i * .09)),
   reveal: () => { tone(784, .12, 'triangle', .28); tone(1047, .35, 'triangle', .28, .12); },
   join: () => tone(1320, .08, 'sine', .08),
-  fanfare: () => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .3, i * .14)),
+  fanfare: () => [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, i === 6 ? .9 : .22, 'triangle', .3, i * .14)),
+  drum: (sec) => { for (let t = 0; t < sec; t += .06) tone(90 + Math.random() * 30, .05, 'triangle', .06 + .22 * (t / sec), t); },
+  ding: () => { tone(988, .25, 'sine', .25); tone(1319, .4, 'sine', .18, .08); },
+  cymbal: () => { if (!ac) return; const n = ac.createBufferSource(), b = ac.createBuffer(1, ac.sampleRate * 1.2, ac.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    const g = ac.createGain(); g.gain.value = .25; n.buffer = b; n.connect(g); g.connect(ac.destination); n.start(); },
 };
 
 // ── State ──
@@ -272,7 +363,9 @@ function attach(id){
 function render(){
   if (!eventId || !ev) { show('v-none'); $('foot-msg').textContent = ''; $('top-code').classList.add('hidden'); return; }
   $('paused').classList.toggle('hidden', !ev.paused);
-  $('foot-msg').textContent = ev.sponsorMsg || '';
+  const bigSpon = ev.sponsorMsg && (ev.status === 'reveal' || ev.status === 'break');
+  $('foot-msg').textContent = bigSpon || ev.status === 'final' ? '' : (ev.sponsorMsg || '');
+  checkPush();
   const r = ev.round ? (ev.rounds || [])[ev.round - 1] : null;
   $('top-mid').textContent = ev.status === 'final' ? 'Final results' : (r ? `Round ${ev.round} · ${r.title}${r.sponsored ? ' · presented by Chilitos' : ''}` : 'Table Trivia');
   $('top-code').classList.toggle('hidden', !!ev.joinClosed || ev.status === 'lobby');
@@ -281,12 +374,13 @@ function render(){
   if (key !== lastKey) {
     if (ev.status === 'question') SFX.start();
     if (ev.status === 'reveal') SFX.reveal();
-    if (ev.status === 'final') { SFX.fanfare(); confetti(); }
+
     lastKey = key;
   }
   if (ev.status === 'lobby') return renderLobby();
   if (ev.status === 'question' || ev.status === 'reveal') return renderQ();
   if (ev.status === 'break') return renderBreak();
+  if (ev.status === 'intro') return renderIntro();
   if (ev.status === 'final') return renderFinal();
   show('v-none');
 }
@@ -300,6 +394,10 @@ function renderLobby(){
     qrFor = url;
   }
   $('lobby-code').textContent = ev.displayCode || '····';
+  const pz = [];
+  if (ev.tablePrize) pz.push(`Winning table gets ${esc(ev.tablePrize)}`);
+  if (ev.barEnabled !== false) pz.push(`At the bar? You're The Bar${ev.barPrize ? ` — win and it's ${esc(ev.barPrize)}` : ''}`);
+  $('lobby-prizes').innerHTML = pz.length ? '<br>' + pz.join('<br>') : '';
   const list = Object.values(roster).sort((a, b) => (b.joinedAt || 0) - (a.joinedAt || 0));
   $('lobby-count').innerHTML = `<b>${list.length}</b> ${list.length === 1 ? 'player' : 'players'} in` + (list.length ? ` · ${new Set(list.map(x => x.table)).size} teams` : '');
   $('arrivals').innerHTML = list.slice(0, 10).map(x => `<span class="arr">${esc(x.name)}<small>${esc(tableName(x.table, names))}</small></span>`).join('');
@@ -340,7 +438,7 @@ function renderQ(){
   if (!revealing) {
     const n = ev.answeredCount || 0, total = Object.keys(roster).length || 0;
     $('meter-i').style.width = total ? (100 * Math.min(n, total) / total) + '%' : '0';
-    $('meter-l').textContent = `${n} of ${total} answered`;
+    $('meter-l').textContent = ev.timeUp ? `Time's up · ${n} of ${total} answered` : `${n} of ${total} answered`;
     $('bonus-win').classList.add('hidden');
   } else {
     $('pct').innerHTML = `<b>${ev.reveal.pct || 0}%</b> of the room got it`;
@@ -348,6 +446,8 @@ function renderQ(){
     $('bonus-win').textContent = bw ? `🎁 Bonus goes to ${bw.name} · ${tableName(bw.table, names)}` : '';
     $('bonus-win').classList.toggle('hidden', !bw);
   }
+  $('q-spon').classList.toggle('hidden', !(revealing && ev.sponsorMsg));
+  if (revealing && ev.sponsorMsg) $('q-spon').innerHTML = `<small>${esc(sponsorName())}</small>${esc(ev.sponsorMsg)}`;
 }
 setInterval(() => {
   if (!ev || ev.status !== 'question') return;
@@ -373,7 +473,11 @@ function renderBreak(){
   show('v-break');
   const r = ev.round || 1, total = (ev.rounds || []).length, last = r >= total, s = standings || {};
   $('b-title').textContent = last ? 'Standings after the final round' : `Round ${r} standings`;
-  $('b-sub').textContent = last ? 'Final results coming up…' : 'Time to order 🌮  The next round starts shortly.';
+  $('b-sub').innerHTML = last ? 'Final results coming up…' : ev.breakEndsAt
+    ? `Time to order 🌮  Round ${r + 1} starts in <span class="countdown" id="b-count">${breakLeft()}</span>`
+    : 'Time to order 🌮  The next round starts shortly.';
+  $('b-spon').classList.toggle('hidden', !ev.sponsorMsg);
+  if (ev.sponsorMsg) $('b-spon').innerHTML = `<small>${esc(sponsorName())}</small>${esc(ev.sponsorMsg)}`;
   $('b-tables').innerHTML = (s.tableOrder || []).slice(0, 9).map((t, i) => `<div class="row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>${move(t) || '<span></span>'}
       <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}<small>👤 ${s.tables[t].players}</small></span>
       <span class="pt">${fmtPts(s.tables[t].score)}</span></div>`).join('') || '<div class="st-sub">No scores yet</div>';
@@ -385,29 +489,158 @@ function renderBreak(){
   $('b-next').innerHTML = nx ? `Up next: <b>Round ${r + 1} · ${esc(nx.title)}</b>${nx.sponsored ? ' · presented by Chilitos' : ''}` : '';
 }
 
+function sponsorName(){ try { return 'From ' + BRANDING.sponsor.name; } catch(e){ return 'From our sponsor'; } }
+function breakLeft(){ const n = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`; }
+setInterval(() => { if (ev && ev.status === 'break' && ev.breakEndsAt && $('b-count')) $('b-count').textContent = breakLeft(); }, 250);
+
+// ── Round intro: slam-in round number, title, hype line, 3-2-1, confetti ──
+// Timed from the host's introAt so every screen (and a reloaded TV) stays in step.
+let introKey = null, introTimers = [];
+function introLine(r, total){
+  const s = standings || {}, o = s.tableOrder || [];
+  if (r === 1) return 'Phones out, heads together. <b>Every answer counts for your table.</b>';
+  const lead = o[0] ? `<b>${esc(tableName(o[0], names))}</b>` : null;
+  if (r >= total) return lead ? `${lead} leads, but it's all still to play for.` : "It's all still to play for.";
+  if (lead && o[1]) return `${lead} is out in front. <b>${esc(tableName(o[1], names))}</b>, time to close the gap!`;
+  return lead ? `${lead} is out in front. Can anyone catch them?` : 'New round, fresh start. Let’s go!';
+}
+function floatsHtml(){
+  const L = ['A','B','C','D'], E = ['💡','🎤','🏆','⭐','🧠','⏱️','🎉','🌮','✨'];
+  let h = '';
+  for (let i = 0; i < 22; i++) {
+    const k = i % 3, c = i % 4, left = (i * 4.6 + (i % 5) * 3) % 100;
+    const st = `left:${left}%;--d:${6 + (i % 5) * 1.3}s;--w:${-(i * .53).toFixed(2)}s;--r:${(i % 2 ? 1 : -1) * (40 + i * 13)}deg;--c:${OPTION_COLORS[c]};--ink:${OPTION_INK[c]}`;
+    h += k === 0 ? `<i class="ix-f tile" style="${st}">${L[c]}</i>` : k === 1 ? `<i class="ix-f q" style="${st}">?</i>` : `<i class="ix-f e" style="${st}">${E[i % E.length]}</i>`;
+  }
+  return h;
+}
+function renderIntro(){
+  const first = cur !== 'v-intro';
+  show('v-intro');
+  const r = ev.round || 1, rounds = ev.rounds || [], rd = rounds[r - 1] || {}, total = rounds.length || 1;
+  const key = r + ':' + (ev.introAt || 'x');
+  if (key === introKey && !first) return;
+  introKey = key;
+  introTimers.forEach(clearTimeout); introTimers = [];
+  if (!$('ix-floats').innerHTML) $('ix-floats').innerHTML = floatsHtml();
+  $('ix-kick').textContent = r >= total && total > 1 ? 'Last round. Make it count…' : r === 1 ? "Let's play!" : 'Get ready…';
+  $('ix-round').textContent = r >= total && total > 1 ? 'Final round' : `Round ${r}`;
+  $('ix-title').innerHTML = (rd.icon ? `<span class="ic">${esc(rd.icon)}</span>` : '') + esc(rd.title || '');
+  $('ix-spon').classList.toggle('hidden', !rd.sponsored);
+  $('ix-msg').innerHTML = (rd.tag ? esc(rd.tag) + '<br>' : '') + introLine(r, total);
+  const spans = [...$('ix-count').children]; spans.forEach(x => x.classList.remove('on'));
+  const core = $('v-intro');
+  core.classList.remove('ix-on'); void core.offsetWidth;
+  const len = ((ev.introSeconds || 9) * 1000), el = serverNow() - (ev.introAt || serverNow());
+  if (el > len - 1200) { core.classList.add('ix-on'); return; }      // joined at the very end: just show it
+  core.classList.add('ix-on');
+  const at = (ms, fn) => { if (ms >= el) introTimers.push(setTimeout(fn, ms - el)); };
+  const C = len - 3800;                                             // 3-2-1-Go lands right as question 1 opens
+  at(0, () => SFX.drum(1.1));
+  at(550, () => { SFX.cymbal(); $('ix-core').classList.remove('ix-shake'); void $('ix-core').offsetWidth; $('ix-core').classList.add('ix-shake'); burst(.5); });
+  at(1500, () => SFX.start());
+  at(2600, () => SFX.join());
+  [0, 1, 2].forEach(i => at(C + i * 1000, () => { spans[i].classList.add('on'); tone(660, .14, 'square', .14); }));
+  at(C + 3000, () => { spans[3].classList.add('on'); tone(1320, .35, 'triangle', .26); cannons(); });
+}
+
+// ── Sponsor push: host "Update & show" pops the message on screen (held during live questions) ──
+let lastPush = null, pushTimer = null;
+function checkPush(){
+  if (!ev || !ev.sponsorPushAt || !ev.sponsorMsg) return;
+  if (lastPush === null) { lastPush = (serverNow() - ev.sponsorPushAt > 15000) ? ev.sponsorPushAt : 0; }
+  if (ev.sponsorPushAt === lastPush || ev.status === 'question' || ev.status === 'intro' || ev.status === 'final') return;
+  lastPush = ev.sponsorPushAt;
+  $('push-k').textContent = sponsorName();
+  $('push-msg').textContent = ev.sponsorMsg;
+  $('push').classList.remove('hidden'); document.body.classList.add('pushing');
+  SFX.ding();
+  clearTimeout(pushTimer); pushTimer = setTimeout(() => { $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }, 8000);
+}
+
+// ── Winners reveal: drumroll → 3rd → drumroll → 2nd → 1st with cannons → top player ──
+// Timed from the host's finalAt, so a reloaded TV picks up where the room is.
+let finalKey = null, finalTimers = [];
 function renderFinal(){
   show('v-final');
   const s = standings || {}, o = s.tableOrder || [];
-  const pod = (t, place) => t ? `<div class="pod p${place}">${place === 1 ? '<div class="crown">🏆</div>' : `<div class="pl">${place === 2 ? '2nd' : '3rd'}</div>`}
+  const members = t => Object.values(roster).filter(r => r.table === t).map(r => r.name).slice(0, 8).join(' · ');
+  const pod = (t, place) => t ? `<div class="pod p${place}" id="pod${place}">${place === 1 ? '<div class="crown">🏆</div>' : `<div class="pl">${place === 2 ? '2nd' : '3rd'}</div>`}
       <div class="nm">${esc(tableName(t, names))}</div>${names[t] ? `<div class="sm">${t === 'bar' ? 'The Bar' : 'Table ' + t}</div>` : ''}
-      <div class="pt">${fmtPts(s.tables[t].score)} pts</div></div>` : '<div></div>';
+      <div class="pt">${fmtPts(s.tables[t].score)} pts</div>${place === 1 && members(t) ? `<div class="mem">${esc(members(t))}</div>` : ''}${place === 1 && prizeFor(t) ? `<div class="prize">Wins ${esc(prizeFor(t))}</div>` : ''}</div>` : '<div></div>';
+  const key = String(ev.finalAt || 'x') + ':' + o.slice(0, 3).join(',');
+  if (key === finalKey) return;
+  const replay = finalKey === null || String(finalKey).split(':')[0] !== String(ev.finalAt || 'x');
+  finalKey = key;
   $('podium').innerHTML = pod(o[1], 2) + pod(o[0], 1) + pod(o[2], 3);
   const p = (s.playerOrder || [])[0];
   $('f-star').innerHTML = p ? `⭐ Top player: <b>${esc(s.players[p].name)}</b> · ${esc(tableName(s.players[p].table, names))} · ${s.players[p].score} correct` : '';
+  if (replay) runReveal(); else applyStage(99, false);
+}
+function prizeFor(t){ return t === 'bar' ? ev.barPrize : ev.tablePrize; }
+function applyStage(n, loud){
+  const on = id => { const el = $(id); if (el) el.classList.add('in'); };
+  if (n >= 1) { $('f-title').classList.toggle('drum', n < 3); }
+  if (n >= 1) on('pod3');
+  if (n >= 2) on('pod2');
+  if (n >= 3) { on('pod1'); $('f-title').textContent = "Tonight's winners"; $('f-title').classList.remove('drum'); }
+  if (n >= 4) { on('f-star'); on('f-thanks'); }
+  if (!loud) return;
+  if (n === 1 || n === 2) SFX.ding();
+  if (n === 3) { SFX.cymbal(); SFX.fanfare(); $('flash').classList.remove('go'); void $('flash').offsetWidth; $('flash').classList.add('go'); cannons(); }
+  if (n === 4) SFX.ding();
+}
+function runReveal(){
+  finalTimers.forEach(clearTimeout); finalTimers = [];
+  ['pod1','pod2','pod3','f-star','f-thanks'].forEach(id => { const el = $(id); if (el) el.classList.remove('in'); });
+  $('f-title').textContent = "And tonight's winners are…";
+  const el = serverNow() - (ev.finalAt || serverNow());
+  if (el > 14000) { applyStage(4, false); burst(0.5); return; }
+  $('f-title').classList.add('drum');
+  const at = (ms, fn) => finalTimers.push(setTimeout(fn, Math.max(0, ms - el)));
+  if (el < 3200) at(0, () => SFX.drum(3.2));
+  at(3500, () => applyStage(1, el < 3500));
+  at(6000, () => applyStage(2, el < 6000));
+  if (el < 8800) at(6400, () => SFX.drum(2.4));
+  at(9000, () => applyStage(3, el < 9000));
+  at(12000, () => applyStage(4, el < 12000));
+  [13500, 16000, 18500].forEach(t => at(t, () => burst(0.6)));
 }
 
-function confetti(){
-  const box = $('confetti'); box.innerHTML = '';
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  for (let i = 0; i < 140; i++) {
-    const c = document.createElement('i');
-    c.style.left = Math.random() * 100 + 'vw';
-    c.style.background = OPTION_COLORS[i % 4];
-    c.style.animationDuration = (2.5 + Math.random() * 3) + 's';
-    c.style.animationDelay = (Math.random() * 1.5) + 's';
-    box.appendChild(c);
+// ── Confetti (canvas, no library) ──
+const cf = $('cf'), cx = cf.getContext('2d'); let parts = [], cfOn = false;
+function sizeCf(){ cf.width = innerWidth * devicePixelRatio; cf.height = innerHeight * devicePixelRatio; }
+addEventListener('resize', sizeCf); sizeCf();
+function spawn(x, y, ang, spread, speed, n){
+  const D = devicePixelRatio, W = cf.width;
+  for (let i = 0; i < n; i++) {
+    const a = ang + (Math.random() - .5) * spread, v = speed * (.6 + Math.random() * .6) * W / 1000;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - .5) * .4,
+      w: (6 + Math.random() * 8) * D, h: (10 + Math.random() * 10) * D, c: OPTION_COLORS[i % 4] === '#2EC4D6' && i % 7 === 0 ? '#ffffff' : OPTION_COLORS[i % 4], life: 1 });
   }
-  setTimeout(() => box.innerHTML = '', 8000);
+  if (!cfOn) { cfOn = true; requestAnimationFrame(tickCf); }
+}
+function cannons(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const W = cf.width, H = cf.height;
+  [0, 350, 700].forEach(d => setTimeout(() => { spawn(0, H, -Math.PI / 3.2, .6, 22, 90); spawn(W, H, -Math.PI + Math.PI / 3.2, .6, 22, 90); }, d));
+  setTimeout(() => burst(1), 900);
+}
+function burst(k){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const W = cf.width;
+  for (let i = 0; i < 5; i++) spawn(W * (.1 + .2 * i), -20, Math.PI / 2, 1.2, 4, Math.round(30 * k));
+}
+function tickCf(){
+  const H = cf.height, g = cf.height / 2600;
+  cx.clearRect(0, 0, cf.width, H);
+  parts = parts.filter(p => p.y < H + 50 && p.life > 0);
+  for (const p of parts) {
+    p.vy += g; p.vx *= .992; p.vy *= .992; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
+    cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); cx.restore();
+  }
+  if (parts.length) requestAnimationFrame(tickCf); else { cfOn = false; cx.clearRect(0, 0, cf.width, H); }
 }
 </script>
 </body>

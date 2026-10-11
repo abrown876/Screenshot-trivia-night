@@ -37,6 +37,12 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 ## Polish notes
 - The TV's QR carries the room code (`join.html?c=CODE`) so scanners never type it. Table cards carry only the table (`?t=7`); those players type the code from the TV.
 - Answer colours are the same on TV and phones: A purple, B coral, C gold, D teal.
+- **Auto / Manual switch** (host panel, or press A): Auto = answer shows when time runs out and the next question follows. Manual = time running out locks answers; the host clicks to show the answer and again for the next question. "Reopen 15 sec" re-opens a locked question. Round breaks are always manual. Default is set when creating the game.
+- **Timing (live, host panel):** seconds per question, seconds on the answer (gap between questions), round break length in minutes. Changes apply from the next question. In Auto with a break > 0, the next round starts itself when the break countdown ends (shown on TV + phones); 0 = host starts rounds. Manual mode always waits.
+- **Sponsor message:** "Update & show on screens" pops it up on the TV and phones immediately (held until a live question ends); it also appears on every answer reveal and round break.
+- **The Bar** is always just "The Bar" — no team naming (rules block it). Its prize is separate from the table prize; both are set when creating the game (Bar prize defaults to "a round of shots 🥃"). Prizes show in the TV lobby and on the winner's card.
+- **Winners reveal:** "Show final results" runs a ~13s sequence on the TV — drumroll, 3rd, drumroll, 2nd, 1st with confetti cannons and fanfare, then the top player. Phones show "Eyes on the TV" until 1st place lands, then winners get confetti + buzz. "Replay the winners reveal" re-runs it.
+- **Round intro:** every round (including Round 1) opens with a 9-second takeover on the TV and phones. "Round N" slams in over floating A/B/C/D tiles, question marks and trivia icons. Then come the round's icon, title and tagline, a live hype line ("Table 4 is out in front…"; phones say where *your* table stands), and a 3-2-1-Go countdown with drumroll, cymbal, ticks and confetti. Question 1 opens right after Go. The last round is billed as "Final round", and the Chilitos Round shows "Presented by Chilitos". The host's main button reads "Skip intro" during it. Turn intros off at creation or live with the "Round intro animation" checkbox. Timed from `introAt`, so a reloaded TV, phone or host stays in step. Sponsor pushes wait until it's over.
 - Host has one main button that always does the next step (Start round → Show answer → Next question → Round standings → Next round → Final results). Shortcuts: Space = main button, P = pause, E = +15 sec.
 - TV reveal shows how the room voted on each option; round breaks show ▲▼ movement vs the previous round; the final is a top-3 podium.
 - Phones show a "Reconnecting…" banner if the connection drops and buzz when an answer locks in.
@@ -52,7 +58,7 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 
 ## Firebase paths (`/restaurant/`)
 - `current` → `{eventId}` — which night is live (host-only write)
-- `events/{e}` — public game state (status, round, qIndex, liveSlot, timings, questions without answers, reveal, displayCode, sponsorMsg)
+- `events/{e}` — public game state (status: lobby → intro → question → reveal → break → … → final; introAt/introSeconds, round, qIndex, liveSlot, timings, questions without answers, reveal, displayCode, sponsorMsg)
 - `answerKeys/{e}`, `secrets/{e}` — host-only
 - `players/{e}/{pid}` — private: email, name, table (write-once, room code required, closes when joining closes)
 - `roster/{e}/{pid}` — public: name, table, joinedAt (no email)
@@ -63,7 +69,7 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 `pid` is a one-way hash of the normalized email (same as Screen Test).
 
 ## Editing questions
-Edit `ROUNDS` and `QUESTIONS` at the top of `host.html`. Fields: `round`, `q`, `o` (4 options),
+Edit `ROUNDS` (title, optional `icon` and `tag` line for the round intro, `sponsored`) and `QUESTIONS` at the top of `host.html`. Question fields: `round`, `q`, `o` (4 options),
 `a` (correct index 0–3), optional `emoji` (picture round clue), `img` (image file in this
 folder), `bonus` (prize text). Round 3 is the sponsored Chilitos Round — swap in menu questions.
 

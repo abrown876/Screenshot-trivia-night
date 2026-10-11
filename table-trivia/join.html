@@ -131,6 +131,15 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
 .sponsor{margin-top:16px;border:1.5px dashed rgba(255,183,64,.6);border-radius:var(--r);padding:14px;color:var(--gold);font-weight:700;line-height:1.4;text-align:center}
 .next{color:var(--dim);font-size:14px;margin-top:16px;text-align:center}
 
+.push{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;background:linear-gradient(135deg,#2a2150,#3a1f3a);border:1.5px solid var(--gold);border-radius:16px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:in .35s ease-out}
+.push small{display:block;color:var(--gold);font-weight:700;font-size:12.5px;margin-bottom:4px}
+.push div{font-weight:800;font-size:16px;line-height:1.35}
+.push button{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--dim);font-size:18px;padding:6px}
+body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
+#cf{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:30}
+.drumroll{font-size:56px;animation:drumr .18s ease-in-out infinite alternate;display:inline-block}
+@keyframes drumr{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.08)}}
+.countdown{font-family:var(--mono);color:var(--gold)}
 .partner-wrap{display:none;width:100%;margin-top:28px}
 .partner-link{display:block;line-height:0;border-radius:10px;overflow:hidden}
 .partner-link img{width:100%;height:auto;display:block}
@@ -140,6 +149,35 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
   background:var(--s3);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600;font-size:14.5px;max-width:calc(100vw - 40px);text-align:center;transition:opacity .2s,transform .2s;z-index:50}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* round intro */
+#s-intro{position:relative;min-height:62vh;justify-content:center;text-align:center;overflow:hidden}
+.ix-floats{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+  -webkit-mask:radial-gradient(ellipse 50% 32% at 50% 50%,transparent 60%,#000 100%);mask:radial-gradient(ellipse 50% 32% at 50% 50%,transparent 60%,#000 100%)}
+.ix-f{position:absolute;bottom:-60px;font-weight:900;line-height:1;opacity:0;animation:ixrise var(--d) linear var(--w) infinite}
+.ix-f.tile{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;font-size:16px;background:var(--c);color:var(--ink)}
+.ix-f.q{font-size:38px;color:var(--c)}
+@keyframes ixrise{0%{transform:translateY(0) rotate(0);opacity:0}15%{opacity:.7}80%{opacity:.45}100%{transform:translateY(-75vh) rotate(var(--r));opacity:0}}
+.ix-core{position:relative;z-index:2}
+.ix-kick{font-weight:800;color:var(--gold);font-size:16px}
+.ix-round{font-weight:900;font-size:76px;line-height:.95;letter-spacing:-.03em;margin:6px 0 4px;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ix-round.small{font-size:58px}
+.ix-title{font-weight:900;font-size:26px;line-height:1.15}
+.ix-spon{display:inline-block;margin-top:10px;border:1.5px solid rgba(255,183,64,.75);color:var(--gold);border-radius:999px;padding:4px 14px;font-weight:800;font-size:13px}
+.ix-msg{color:var(--dim);font-weight:600;font-size:16px;line-height:1.45;margin-top:14px}
+.ix-msg b{color:var(--text)}
+.ix-count{position:relative;height:84px;margin-top:18px}
+.ix-count span{position:absolute;left:0;right:0;font-family:var(--mono);font-weight:700;font-size:70px;line-height:84px;color:var(--gold);text-shadow:0 0 24px rgba(255,183,64,.55);opacity:0}
+.ix-count span.go{font-family:var(--display);font-weight:900;color:var(--green)}
+.ix-count span.on{animation:ixtick .9s cubic-bezier(.2,1.5,.4,1) both}
+#s-intro.ix-on .ix-round{animation:ixslam .65s cubic-bezier(.2,1.6,.4,1) .35s both}
+#s-intro.ix-on .ix-title{animation:ixup .55s ease-out 1.3s both}
+#s-intro.ix-on .ix-spon,#s-intro.ix-on .ix-msg{animation:ixup .55s ease-out 2.2s both}
+@keyframes ixslam{0%{opacity:0;transform:scale(2.4) rotate(-6deg)}60%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
+@keyframes ixup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes ixtick{0%{opacity:0;transform:scale(1.8)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.7)}}
+@media (prefers-reduced-motion:reduce){.ix-floats{display:none}#s-intro *{animation:none !important}.ix-count span.on{opacity:1}}
 </style>
 </head>
 <body>
@@ -170,6 +208,7 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
       <div class="lbl">Where are you sitting?</div>
       <div id="tbl-picked" class="picked hidden"><span id="tbl-picked-txt"></span><button class="ghost" id="tbl-change" type="button">Change</button></div>
       <div id="tbl-grid" class="tables"></div>
+      <p class="note hidden" id="bar-note" style="text-align:left"></p>
     </div>
 
     <div class="field">
@@ -237,6 +276,7 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
     <div><span class="ans" id="r-ans"></span></div>
     <p class="mine hidden" id="r-mine"></p>
     <div class="win hidden" id="r-win"></div>
+    <div class="sponsor hidden" id="r-sponsor"></div>
     <div class="stats">
       <div class="stat"><b id="r-score">0</b><span>Your points</span></div>
       <div class="stat"><b id="r-rank">—</b><span id="r-rank-l">Your table</span></div>
@@ -258,8 +298,27 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
     <p class="next" id="b-next"></p>
   </section>
 
+  <!-- Round intro -->
+  <section id="s-intro" class="center hidden">
+    <div class="ix-floats" id="ix-floats"></div>
+    <div class="ix-core">
+      <div class="ix-kick" id="ix-kick">Get ready…</div>
+      <div class="ix-round" id="ix-round">Round 1</div>
+      <div class="ix-title" id="ix-title"></div>
+      <div class="ix-spon hidden" id="ix-spon">Presented by Chilitos</div>
+      <p class="ix-msg" id="ix-msg"></p>
+      <div class="ix-count" id="ix-count"><span>3</span><span>2</span><span>1</span><span class="go">Go!</span></div>
+    </div>
+  </section>
+
   <!-- Final -->
   <section id="s-final" class="center hidden">
+    <div id="f-wait">
+      <div class="drumroll">🥁</div>
+      <h1 style="margin-top:16px">Eyes on the TV…</h1>
+      <p class="lede">The winners are being revealed right now.</p>
+    </div>
+    <div id="f-done">
     <div class="badge good" id="f-badge" style="font-size:44px">🏆</div>
     <h1 id="f-title">Thanks for playing</h1>
     <p class="lede" id="f-sub"></p>
@@ -268,6 +327,7 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
       <div class="stat"><b id="f-rank">—</b><span>Your rank</span></div>
     </div>
     <button class="btn btn-main" id="f-share" type="button">Share my score on WhatsApp</button>
+    </div>
   </section>
 
   <div class="partner-wrap">
@@ -278,6 +338,8 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
 
 <footer class="footer">Powered by Screenshot Interactive</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="push hidden" id="push" role="status" aria-live="polite"><button type="button" id="push-x" aria-label="Close">×</button><small id="push-k">From our sponsor</small><div id="push-msg"></div></div>
+<canvas id="cf"></canvas>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -287,7 +349,7 @@ h2{font-weight:800;font-size:22px;line-height:1.2}
 <script>
 document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
 
-const SCREENS = ['s-none','s-join','s-wait','s-q','s-reveal','s-break','s-final'];
+const SCREENS = ['s-none','s-join','s-wait','s-q','s-reveal','s-break','s-intro','s-final'];
 let current = null;
 function show(id){ if (current === id) return; current = id; SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); window.scrollTo(0, 0); }
 function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
@@ -349,7 +411,10 @@ function renderJoin(){
   if (codeOk && urlCode) $('code-ok-txt').textContent = ev.displayCode;
   // Team name only for the first player at an unnamed table
   const tableTaken = pickedTable && Object.values(roster).some(r => r.table === pickedTable);
-  $('f-team').classList.toggle('hidden', !pickedTable || !!names[pickedTable] || tableTaken);
+  const atBar = pickedTable === 'bar';
+  $('f-team').classList.toggle('hidden', !pickedTable || atBar || !!names[pickedTable] || tableTaken);
+  $('bar-note').classList.toggle('hidden', !atBar);
+  if (atBar) $('bar-note').textContent = `Everyone at the bar plays as one team: The Bar.${ev.barPrize ? ` If The Bar wins, it's ${ev.barPrize}` : ''}`;
   $('j-go').textContent = pickedTable ? `Join ${tableName(pickedTable, names)}` : 'Join';
 }
 $('tbl-grid').addEventListener('click', e => {
@@ -480,6 +545,7 @@ function render(){
   }
   $('b-pause').classList.toggle('hidden', !ev.paused);
   $('hdr-me').classList.toggle('hidden', !me);
+  checkPush();
   if (me) { $('hdr-table').textContent = tableName(me.table, names); $('hdr-pts').textContent = myScore(); }
 
   if (!me) {
@@ -501,6 +567,7 @@ function render(){
     case 'question': return renderQuestion();
     case 'reveal': return renderReveal();
     case 'break': return renderBreak();
+    case 'intro': return renderIntro();
     case 'final': return renderFinal();
     default: return renderWait();
   }
@@ -530,11 +597,15 @@ function renderQuestion(){
   $('q-text').textContent = q.q;
   const mine = myPicks[qi];
   const locked = mine !== undefined;
-  const html = q.o.map((o, i) => `<button class="opt" type="button" data-i="${i}" aria-pressed="${mine === i}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}" ${locked || ev.paused ? 'disabled' : ''}>${keyChip(i)}<span>${esc(o)}</span></button>`).join('');
-  if ($('opts').dataset.k !== qi + ':' + mine + ':' + !!ev.paused) { $('opts').innerHTML = html; $('opts').dataset.k = qi + ':' + mine + ':' + !!ev.paused; }
-  $('opts').classList.toggle('locked', locked);
-  $('q-lock').classList.toggle('hidden', !locked);
+  const closed = ev.liveSlot !== String(qi);           // time's up (manual mode) or paused
+  const html = q.o.map((o, i) => `<button class="opt" type="button" data-i="${i}" aria-pressed="${mine === i}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}" ${locked || closed ? 'disabled' : ''}>${keyChip(i)}<span>${esc(o)}</span></button>`).join('');
+  const key = qi + ':' + mine + ':' + closed;
+  if ($('opts').dataset.k !== key) { $('opts').innerHTML = html; $('opts').dataset.k = key; }
+  $('opts').classList.toggle('locked', locked || (closed && !ev.paused));
+  const timeUp = closed && !ev.paused;
+  $('q-lock').classList.toggle('hidden', !locked && !timeUp);
   if (locked) $('q-lock').innerHTML = `Locked in: <b>${'ABCD'[mine]}</b> · wait for the reveal`;
+  else if (timeUp) $('q-lock').innerHTML = "Time's up — answers are locked";
   $('tbar').classList.remove('hidden');
   const total = questionDurationSec(ev);
   const tick = () => {
@@ -563,6 +634,8 @@ function renderReveal(){
   const iWon = bw && me && bw.name === me.name && bw.table === me.table && ok;
   $('r-win').classList.toggle('hidden', !bw);
   if (bw) $('r-win').textContent = iWon ? '🎁 You won the bonus! Tell your server.' : `🎁 Bonus won by ${bw.name} at ${tableName(bw.table, names)}`;
+  $('r-sponsor').textContent = ev.sponsorMsg || '';
+  $('r-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
   $('r-score').textContent = myScore();
   $('r-rank').textContent = ordinal(tableRank(me.table));
   $('r-rank-l').textContent = me.table === 'bar' ? 'The Bar\'s rank' : 'Your table\'s rank';
@@ -583,7 +656,10 @@ function renderBreak(){
   $('b-sponsor').textContent = ev.sponsorMsg || '';
   $('b-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
   const nx = (ev.rounds || [])[r];
-  $('b-next').textContent = last ? 'Final results are coming up on the TV.' : `Up next: Round ${r + 1}${nx ? ' · ' + nx.title : ''}. Good time to order.`;
+  $('b-next').innerHTML = last ? 'Final results are coming up on the TV.'
+    : ev.breakEndsAt ? `Round ${r + 1}${nx ? ' · ' + esc(nx.title) : ''} starts in <span class="countdown" id="b-count">${breakLeft()}</span>. Good time to order.`
+    : `Up next: Round ${r + 1}${nx ? ' · ' + esc(nx.title) : ''}. Good time to order.`;
+  clearInterval(timerIv); timerIv = setInterval(() => { const c = $('b-count'); if (c) c.textContent = breakLeft(); }, 500);
   show('s-break');
 }
 
@@ -593,12 +669,102 @@ function renderFinal(){
   const w = standings && standings.tableOrder && standings.tableOrder[0];
   const wonTable = tr === 1, topPlayer = pr === 1;
   $('f-badge').textContent = wonTable ? '🏆' : topPlayer ? '⭐' : '🎉';
-  $('f-title').textContent = wonTable ? 'Your table won!' : topPlayer ? "You're tonight's top player!" : 'Thanks for playing';
-  $('f-sub').textContent = wonTable ? 'Tell your server — your prize is on the way.' : topPlayer ? 'Show this screen to your server to claim your prize.' : (w ? `${tableName(w, names)} took the table prize tonight.` : '');
+  const atBar = me.table === 'bar';
+  const prize = atBar ? ev.barPrize : ev.tablePrize;
+  $('f-title').textContent = wonTable ? (atBar ? 'The Bar wins! 🥃' : 'Your table won!') : topPlayer ? "You're tonight's top player!" : 'Thanks for playing';
+  $('f-sub').textContent = wonTable
+    ? (atBar ? `${prize ? cap(prize) + ' — ' : ''}tell the bartender.` : `${prize ? 'You won ' + prize + '. ' : ''}Tell your server — your prize is on the way.`)
+    : topPlayer ? 'Show this screen to your server to claim your prize.'
+    : (w ? `${tableName(w, names)} won tonight${w === 'bar' && ev.barPrize ? ' — ' + ev.barPrize + ' for the bar' : ''}.` : '');
   $('f-score').textContent = `${myScore()}/${total}`;
   $('f-rank').textContent = pr ? `${ordinal(pr)}` : '—';
   $('f-score-l').textContent = 'Correct answers';
+  // Don't spoil the TV: hold for the drumroll, then reveal (synced to the host's finalAt)
+  const wait = Math.max(0, 9200 - (serverNow() - (ev.finalAt || 0)));
+  const key = String(ev.finalAt);
+  $('f-wait').classList.toggle('hidden', wait <= 0);
+  $('f-done').classList.toggle('hidden', wait > 0);
+  if (wait > 0 && finalKey !== key) {
+    finalKey = key; clearTimeout(finalT);
+    finalT = setTimeout(() => {
+      $('f-wait').classList.add('hidden'); $('f-done').classList.remove('hidden');
+      if (wonTable || topPlayer) { haptic([120, 60, 120, 60, 400]); phoneConfetti(); }
+    }, wait);
+  }
   show('s-final');
+}
+let finalKey = null, finalT = null;
+function cap(s){ s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
+function breakLeft(){ const s = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`; }
+
+// Round intro — mirrors the TV, timed from the host's introAt
+let introKey = null, introTs = [];
+function renderIntro(){
+  const first = current !== 's-intro';
+  const r = ev.round || 1, rounds = ev.rounds || [], rd = rounds[r - 1] || {}, total = rounds.length || 1, last = r >= total && total > 1;
+  const key = r + ':' + (ev.introAt || 'x');
+  show('s-intro');
+  if (key === introKey && !first) return;
+  introKey = key; introTs.forEach(clearTimeout); introTs = [];
+  if (!$('ix-floats').innerHTML) {
+    let h = '';
+    for (let i = 0; i < 12; i++) {
+      const c = i % 4, st = `left:${(i * 8.3 + (i % 3) * 4) % 96}%;--d:${5 + (i % 4) * 1.2}s;--w:${-(i * .6).toFixed(1)}s;--r:${(i % 2 ? 1 : -1) * (50 + i * 15)}deg;--c:${OPTION_COLORS[c]};--ink:${OPTION_INK[c]}`;
+      h += i % 2 ? `<i class="ix-f q" style="${st}">?</i>` : `<i class="ix-f tile" style="${st}">${'ABCD'[c]}</i>`;
+    }
+    $('ix-floats').innerHTML = h;
+  }
+  $('ix-kick').textContent = last ? 'Last round. Make it count…' : r === 1 ? "Let's play!" : 'Get ready…';
+  $('ix-round').textContent = last ? 'Final round' : `Round ${r}`;
+  $('ix-round').classList.toggle('small', last);
+  $('ix-title').innerHTML = (rd.icon ? `<span style="margin-right:8px">${esc(rd.icon)}</span>` : '') + esc(rd.title || '');
+  $('ix-spon').classList.toggle('hidden', !rd.sponsored);
+  const tr = r > 1 ? tableRank(me.table) : 0;
+  const mine = esc(tableName(me.table, names));
+  $('ix-msg').innerHTML = (rd.tag ? esc(rd.tag) + '<br>' : '')
+    + (tr === 1 ? `<b>${mine}</b> is in the lead. Hold on to it!` : tr ? `<b>${mine}</b> is ${ordinal(tr)}. Time to climb!` : `Playing for <b>${mine}</b>. Every answer counts.`);
+  const spans = [...$('ix-count').children]; spans.forEach(x => x.classList.remove('on'));
+  const box = $('s-intro'); box.classList.remove('ix-on'); void box.offsetWidth; box.classList.add('ix-on');
+  const len = (ev.introSeconds || 9) * 1000, el = serverNow() - (ev.introAt || serverNow()), C = len - 3800;
+  const at = (ms, fn) => { if (ms >= el) introTs.push(setTimeout(fn, ms - el)); };
+  at(400, () => haptic(40));
+  [0, 1, 2].forEach(i => at(C + i * 1000, () => { spans[i].classList.add('on'); haptic(25); }));
+  at(C + 3000, () => { spans[3].classList.add('on'); haptic([60, 40, 120]); });
+}
+
+// Sponsor push from the host — shown outside live questions
+let lastPush = null, pushT = null;
+function checkPush(){
+  if (!ev || !ev.sponsorPushAt || !ev.sponsorMsg || !me) return;
+  if (lastPush === null) lastPush = (serverNow() - ev.sponsorPushAt > 15000) ? ev.sponsorPushAt : 0;
+  if (ev.sponsorPushAt === lastPush || ev.status === 'question' || ev.status === 'intro' || ev.status === 'final') return;
+  lastPush = ev.sponsorPushAt;
+  try { $('push-k').textContent = 'From ' + BRANDING.sponsor.name; } catch(e){}
+  $('push-msg').textContent = ev.sponsorMsg;
+  $('push').classList.remove('hidden'); document.body.classList.add('pushing'); haptic(20);
+  clearTimeout(pushT); pushT = setTimeout(hidePush, 8000);
+}
+function hidePush(){ $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
+$('push-x').onclick = hidePush;
+
+// Phone confetti for winners
+function phoneConfetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cf = $('cf'), cx = cf.getContext('2d'), D = devicePixelRatio;
+  cf.width = innerWidth * D; cf.height = innerHeight * D;
+  let ps = [];
+  const shoot = (x, ang) => { for (let i = 0; i < 70; i++) { const a = ang + (Math.random() - .5) * .7, v = (14 + Math.random() * 10) * D;
+    ps.push({ x, y: cf.height, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 7 * D, h: 12 * D, c: OPTION_COLORS[i % 4] }); } };
+  shoot(0, -Math.PI / 3); shoot(cf.width, -Math.PI + Math.PI / 3);
+  setTimeout(() => { shoot(0, -Math.PI / 2.6); shoot(cf.width, -Math.PI + Math.PI / 2.6); }, 500);
+  const tick = () => {
+    cx.clearRect(0, 0, cf.width, cf.height);
+    ps = ps.filter(p => p.y < cf.height + 40);
+    for (const p of ps) { p.vy += .5 * D; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore(); }
+    if (ps.length) requestAnimationFrame(tick); else cx.clearRect(0, 0, cf.width, cf.height);
+  };
+  requestAnimationFrame(tick);
 }
 
 $('f-share').onclick = () => {
