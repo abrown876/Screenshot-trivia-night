@@ -175,6 +175,13 @@ section{animation:in .45s ease-out}
 .push-card div{font-weight:900;font-size:2.8vw;line-height:1.15}
 @keyframes pushin{from{transform:translateY(6vw) scale(.9);opacity:0}to{transform:none;opacity:1}}
 .pushing #q-spon,.pushing #b-spon{visibility:hidden}
+/* image push: full-screen pop-up, square art shown as large as fits */
+.push.img{top:0;bottom:0;align-items:center;background:rgba(5,5,16,.78);backdrop-filter:blur(.4vw);-webkit-backdrop-filter:blur(.4vw)}
+.push.img .push-card{padding:1.2vw 1.2vw 1.4vw;max-width:none}
+.push.img .push-card small{margin-bottom:.8vw;letter-spacing:.16em}
+.push-img{display:block;max-height:72vh;max-width:72vh;width:auto;height:auto;border-radius:1vw;margin:0 auto}
+.push.img #push-msg{font-size:2vw;margin-top:1vw;max-width:72vh}
+.push.img #push-msg:empty{display:none}
 .countdown{display:inline-block;font-family:var(--mono);color:var(--gold);margin-left:.4vw}
 
 /* round intro */
@@ -320,7 +327,7 @@ section{animation:in .45s ease-out}
 <div class="overlay" id="gate"><h2>Click to start the TV</h2><p>Turns on game sounds and full screen</p></div>
 <div class="flash" id="flash"></div>
 <canvas id="cf"></canvas>
-<div class="push hidden" id="push"><div class="push-card"><small id="push-k">From our sponsor</small><div id="push-msg"></div></div></div>
+<div class="push hidden" id="push"><div class="push-card"><small id="push-k">From our sponsor</small><img class="push-img hidden" id="push-img" alt="Sponsor"><div id="push-msg"></div></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -382,6 +389,7 @@ function attach(id){
   });
   L('tableNames/' + id, v => { names = v || {}; render(); });
   L('standings/' + id, v => { standings = v; render(); });
+  L('promo/' + id, v => { promoImg = v && v.img || null; render(); });
 }
 
 function render(){
@@ -617,11 +625,16 @@ function renderIntro(){
 // Pushed any time; stays up for the host's chosen duration (sponsorPushSecs). Taking it down clears sponsorPushAt.
 let shownPush = null, pushTimer = null;
 function hidePush(){ clearTimeout(pushTimer); $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
+let promoImg = null;
 function checkPush(){
   const at = ev && ev.sponsorPushAt, end = at ? at + ((ev.sponsorPushSecs || 10) * 1000) : 0;
-  const live = at && ev.sponsorMsg && serverNow() < end;
+  const isImg = !!(ev && ev.sponsorPushImg), text = ev && (ev.sponsorPushText != null ? ev.sponsorPushText : ev.sponsorMsg);
+  const live = at && (isImg ? !!promoImg : !!text) && serverNow() < end;
   if (!live) { if (shownPush !== null) { shownPush = null; hidePush(); } return; }
-  $('push-msg').textContent = ev.sponsorMsg; $('push-k').textContent = sponsorName();
+  $('push').classList.toggle('img', isImg);
+  $('push-img').classList.toggle('hidden', !isImg);
+  if (isImg && $('push-img').getAttribute('src') !== promoImg) $('push-img').src = promoImg;
+  $('push-msg').textContent = text || ''; $('push-k').textContent = sponsorName();
   if (shownPush === at) return;
   shownPush = at;
   $('push-k').textContent = sponsorName();

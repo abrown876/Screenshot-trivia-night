@@ -82,6 +82,13 @@ textarea.inp{height:auto;min-height:70px;padding:12px 14px;resize:vertical;line-
 .from-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
 .from-row span{color:var(--dim);font-size:13px;font-weight:600;white-space:nowrap}
 .from-row .inp{margin-bottom:10px;height:40px;font-size:14px;color:var(--gold);font-weight:700}
+.img-row{display:flex;gap:10px;align-items:stretch;margin-bottom:10px}
+.img-pick{flex:1;display:flex;align-items:center;min-height:46px;padding:8px 14px;border:1.5px dashed var(--line);border-radius:10px;color:var(--dim);font-weight:700;font-size:14px;cursor:pointer}
+.img-pick:hover{border-color:var(--gold);color:var(--text)}
+.img-pick small{display:block;color:var(--muted);font-weight:600;font-size:12px}
+.img-thumb{position:relative;width:64px;height:64px;flex-shrink:0;border-radius:10px;overflow:hidden;border:1.5px solid var(--gold);background:var(--bg)}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.7);color:#fff;font-size:13px;line-height:20px;cursor:pointer;padding:0}
 .push-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:stretch}
 .secs{display:flex;align-items:center;gap:6px;height:46px;padding:0 12px;background:var(--s2);border:1.5px solid var(--line);border-radius:10px;color:var(--dim);font-size:14px;font-weight:600}
 .secs:focus-within{border-color:var(--purple)}
@@ -92,7 +99,11 @@ textarea.inp{height:auto;min-height:70px;padding:12px 14px;resize:vertical;line-
 .push-live .ghost-btn{margin-left:auto;padding:0}
 /* end of night */
 .wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.wrap-card.done #btn-edit{background:linear-gradient(135deg,var(--purple),var(--coral));border:none;color:#fff}
+.hdr-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.hdr-actions{display:flex;gap:8px}
+.hdr-actions .btn{min-height:38px;font-size:13.5px;padding:0 14px}
+.hdr-actions.done #btn-edit{background:linear-gradient(135deg,var(--purple),var(--coral));border:none;color:#fff}
+@media (max-width:760px){.hdr{flex-wrap:wrap}.hdr-right{width:100%;justify-content:space-between}}
 .ng-actions{display:flex;gap:10px;margin-top:4px}
 .ng-actions .btn-main{flex:1}
 /* modal */
@@ -261,7 +272,13 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
     <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="hdr-logo"></a>
     <h1>Table Trivia · Host</h1>
   </div>
+  <div class="hdr-right">
+  <div class="hdr-actions hidden" id="wrap-card" role="group" aria-label="Game">
+    <button class="btn btn-danger" id="btn-final-early" type="button" title="Runs the winners reveal on the TV">🏁 End game &amp; show results</button>
+    <button class="btn btn-soft" id="btn-edit" type="button" title="Fresh room code; clears tonight's players and scores">＋ New game</button>
+  </div>
   <div class="hdr-who hidden" id="who"><span id="who-email"></span><button id="btn-signout" type="button">Sign out</button></div>
+  </div>
 </div>
 
 <!-- Sign-in -->
@@ -380,6 +397,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       <h2>Sponsor message <small>Also shown on reveals &amp; breaks</small></h2>
       <label class="from-row" for="sponsor-from"><span>Label</span><input class="inp" id="sponsor-from" maxlength="40" value="" placeholder="SPONSOR"></label>
       <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="Type the sponsor message to show on screens…"></textarea>
+      <div class="img-row">
+        <div class="img-thumb hidden" id="sp-thumb"><img id="sp-thumb-img" alt="Sponsor image preview"><button type="button" id="sp-img-x" aria-label="Remove image" title="Remove image">×</button></div>
+        <label class="img-pick" id="sp-pick"><input type="file" id="sp-file" accept="image/*" hidden><span id="sp-pick-t">🖼 Add an image <small>square 1080 × 1080 works best</small></span></label>
+      </div>
       <div class="push-row">
         <button class="btn btn-push" id="btn-sponsor" type="button">📣 Push to screens now</button>
         <label class="secs" title="How long it stays on screen"><span>for</span><input id="sponsor-secs" type="number" min="3" max="300" value="10" aria-label="Seconds on screen"><span>sec</span></label>
@@ -418,14 +439,6 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       <button class="btn btn-soft" id="btn-export" type="button" style="width:100%;margin-top:12px">⬇ Download player list (CSV)</button>
     </div>
 
-    <div class="card wrap-card" id="wrap-card">
-      <h2>End of the night</h2>
-      <div class="wrap-row">
-        <button class="btn btn-danger" id="btn-final-early" type="button">🏁 End game &amp; show results</button>
-        <button class="btn btn-soft" id="btn-edit" type="button">＋ Start a new game</button>
-      </div>
-      <div class="timing-hint" id="wrap-hint">Ending runs the winners reveal on the TV. A new game gets a fresh room code and clears tonight's players and scores.</div>
-    </div>
   </div>
 
   <div class="card qs-card" id="qs-card">
@@ -649,7 +662,7 @@ async function createNight(){
   u[`answerKeys/${id}`] = sortByRound(SET.questions).map(q => q.a);
   u[`secrets/${id}`] = { code };
   u[`players/${id}`] = null; u[`roster/${id}`] = null; u[`answers/${id}`] = null;
-  u[`standings/${id}`] = null; u[`tableNames/${id}`] = null;
+  u[`standings/${id}`] = null; u[`tableNames/${id}`] = null; u[`promo/${id}`] = null;
   u['current'] = { eventId: id };
   await ttRef('').update(u);
   setupOpen = false;
@@ -940,6 +953,7 @@ function attach(id){
   const L = (path, cb) => { const r = ttRef(path); r.on('value', s => cb(s.val()), e => console.warn(path, e && e.message)); offs.push(() => r.off()); };
   L('events/' + id, v => { ev = v; syncQuestions(); render(); recover(); });
   L('answerKeys/' + id, v => { liveKey = v; syncQuestions(); render(); });
+  ttRef('promo/' + id).once('value').then(s => { const p = s.val(); if (p && p.img && !spImg) { spImg = p.img; showThumb(); } }).catch(() => {});
   L('roster/' + id, v => { roster = v || {}; render(); });
   L('tableNames/' + id, v => { names = v || {}; renderTables(); });
   L('standings/' + id, v => { standings = v; if (v && v.tableOrder) lastTableOrder = v.tableOrder; renderTables(); renderPlayers(); renderLeaders(); });
@@ -1441,18 +1455,50 @@ $('ng-modal').addEventListener('click', e => { if (e.target === $('ng-modal')) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (setupOpen && ev) { setupOpen = false; render(); } else if (pendingRestart) { pendingRestart = null; render(); } } });
 $('sponsor-msg').addEventListener('input', e => e.target.dataset.dirty = '1');
 $('sponsor-from').addEventListener('input', e => e.target.dataset.dirty = '1');
+// ── Sponsor image: shrink in the browser (max 1080px, JPEG ≈150–250 KB) and keep it at promo/{e}
+// so the game state stays small; screens fetch it only when it changes.
+let spImg = null;          // data URL ready to push (null = text only)
+function showThumb(){ $('sp-thumb').classList.toggle('hidden', !spImg); if (spImg) $('sp-thumb-img').src = spImg;
+  $('sp-pick-t').innerHTML = spImg ? 'Change image <small>pushes as a full-screen pop-up</small>' : '🖼 Add an image <small>square 1080 × 1080 works best</small>'; }
+function shrinkImage(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 1080 / Math.max(im.width, im.height)), w = Math.round(im.width * k), h = Math.round(im.height * k);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.fillStyle = '#080818'; x.fillRect(0, 0, w, h); x.drawImage(im, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      let q = .86, out = c.toDataURL('image/jpeg', q);
+      while (out.length > 340000 && q > .45) { q -= .08; out = c.toDataURL('image/jpeg', q); }
+      res(out);
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Not an image')); };
+    im.src = url;
+  });
+}
+$('sp-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try { spImg = await shrinkImage(f); showThumb(); toast(`Image ready · ${Math.round(spImg.length * .75 / 1024)} KB`); }
+  catch (err) { toast("That file isn't an image we can use"); }
+});
+$('sp-img-x').onclick = () => { spImg = null; showThumb(); };
+
 $('btn-sponsor').onclick = async () => {
   if (!ev) return;
   const msg = $('sponsor-msg').value.trim();
-  if (!msg) { toast('Type a message first'); $('sponsor-msg').focus(); return; }
+  if (!msg && !spImg) { toast('Type a message or add an image first'); $('sponsor-msg').focus(); return; }
   const secs = Math.max(3, Math.min(300, parseInt($('sponsor-secs').value) || 10));
   $('sponsor-secs').value = secs;
   const from = $('sponsor-from').value.trim();
-  await evRef().update({ sponsorMsg: msg, sponsorFrom: from || null, sponsorPushSecs: secs, sponsorPushAt: msg ? firebase.database.ServerValue.TIMESTAMP : null });
+  if (spImg) await ttRef('promo/' + EVENT_ID).set({ img: spImg, at: firebase.database.ServerValue.TIMESTAMP });
+  const u = { sponsorFrom: from || null, sponsorPushSecs: secs, sponsorPushImg: !!spImg, sponsorPushText: msg, sponsorPushAt: firebase.database.ServerValue.TIMESTAMP };
+  if (msg) u.sponsorMsg = msg;     // text also becomes the standing message on reveals, breaks and the TV footer
+  await evRef().update(u);
   delete $('sponsor-from').dataset.dirty;
-  if (msg) setTimeout(render, secs * 1000 + 300);
+  setTimeout(render, secs * 1000 + 300);
   delete $('sponsor-msg').dataset.dirty;
-  toast(`📣 Showing on the TV and all phones for ${secs} seconds`);
+  toast(`📣 ${spImg ? 'Image' : 'Message'} showing on the TV and all phones for ${secs} seconds`);
 };
 document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
   const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);

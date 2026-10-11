@@ -59,6 +59,7 @@ Host-led, room-wide trivia for restaurants (pilot: Chilitos). Separate from Quiz
 - **Sponsor labels:** Chilitos keeps its banner logo, "Presented by Chilitos" on the Chilitos Round, and the table cards. Every other sponsor slot (pushes, reveal/break cards, TV footer message) is labelled SPONSOR unless the host types a label for a paying sponsor.
 - **Phone header** shows the table name and table number ("Taco Bout It / Table 1").
 - **Standings line up:** TV table and player columns share one row layout, and a player's table reads the same everywhere ("Taco Bout It · Table 1").
+- **Image pushes:** "🖼 Add an image" in the sponsor card picks a picture (square 1080 × 1080 works best). The host shrinks it in the browser (max 1080 px, JPEG about 150–250 KB) and stores it at `restaurant/promo/{e}`, so the game state stays small. Pushing shows it as a full-screen pop-up on the TV and a centred pop-up on phones for the chosen seconds, with the text as an optional caption. During a question, phones show a thumbnail banner so answers stay tappable.
 - Host has one main button that always does the next step (Start round → Show answer → Next question → Round standings → Next round → Final results). Shortcuts: Space = main button, P = pause, E = +15 sec.
 - TV reveal shows how the room voted on each option; round breaks show ▲▼ movement vs the previous round; the final is a top-3 podium.
 - Phones show a "Reconnecting…" banner if the connection drops and buzz when an answer locks in.
