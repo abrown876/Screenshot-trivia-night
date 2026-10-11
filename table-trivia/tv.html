@@ -109,6 +109,14 @@ section{animation:in .45s ease-out}
 .next{margin-top:1.4vw;color:var(--dim);font-weight:600;font-size:1.5vw}
 .next b{color:var(--text)}
 
+.b-head{display:flex;align-items:flex-end;justify-content:space-between;gap:3vw}
+.bigcount{flex-shrink:0;text-align:center;background:var(--s1);border:.15vw solid rgba(255,183,64,.55);border-radius:1.4vw;padding:1vw 2.2vw;min-width:19vw}
+.bigcount small{display:block;color:var(--dim);font-weight:700;font-size:1.3vw}
+.bigcount b{display:block;font-family:var(--mono);color:var(--gold);font-size:5.4vw;line-height:1.05;letter-spacing:.02em}
+.bigcount.soon b{font-family:var(--display);font-weight:900;font-size:2.6vw;color:var(--text);padding:.9vw 0}
+.bigcount.hot b{color:var(--coral);animation:drum .5s ease-in-out infinite alternate}
+.board-tag{display:inline-block;background:var(--gold);color:#1a1300;border-radius:99vw;padding:.25vw 1vw;font-weight:800;font-size:1.2vw;vertical-align:middle;margin-left:1vw}
+
 /* final reveal */
 .final{text-align:center}
 .final h1{font-weight:900;font-size:4.2vw;letter-spacing:-.01em;transition:opacity .4s}
@@ -253,8 +261,10 @@ section{animation:in .45s ease-out}
   </section>
 
   <section id="v-break" class="hidden">
-    <div class="st-title" id="b-title">Round 1 standings</div>
-    <div class="st-sub" id="b-sub">Time to order</div>
+    <div class="b-head">
+      <div><div class="st-title" id="b-title">Round 1 standings</div><div class="st-sub" id="b-sub">Time to order</div></div>
+      <div class="bigcount hidden" id="b-big"><small id="b-big-l">Round 2 starts in</small><b id="b-big-v">3:00</b></div>
+    </div>
     <div class="st-grid">
       <div><div class="st-h">Tables</div><div id="b-tables"></div></div>
       <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next" id="b-next"></div><div class="spon big hidden" id="b-spon"></div></div>
@@ -377,6 +387,7 @@ function render(){
 
     lastKey = key;
   }
+  if (ev.board && ev.status !== 'question' && ev.status !== 'intro') return renderBreak(true);
   if (ev.status === 'lobby') return renderLobby();
   if (ev.status === 'question' || ev.status === 'reveal') return renderQ();
   if (ev.status === 'break') return renderBreak();
@@ -469,13 +480,21 @@ function move(t){
   if (was < now) return `<span class="mv down">▼${now - was}</span>`;
   return '<span class="mv same">–</span>';
 }
-function renderBreak(){
+function renderBreak(board){
   show('v-break');
   const r = ev.round || 1, total = (ev.rounds || []).length, last = r >= total, s = standings || {};
-  $('b-title').textContent = last ? 'Standings after the final round' : `Round ${r} standings`;
-  $('b-sub').innerHTML = last ? 'Final results coming up…' : ev.breakEndsAt
-    ? `Time to order 🌮  Round ${r + 1} starts in <span class="countdown" id="b-count">${breakLeft()}</span>`
-    : 'Time to order 🌮  The next round starts shortly.';
+  const isBreak = ev.status === 'break';
+  if (board && !isBreak) {
+    const thru = s.revealedThrough;
+    $('b-title').innerHTML = 'Leaderboard<span class="board-tag">Live</span>';
+    $('b-sub').textContent = ev.status === 'final' ? 'Final standings' : thru != null ? `After Round ${Math.floor(thru / TT.ROUND_SIZE) + 1} · Question ${(thru % TT.ROUND_SIZE) + 1}` : 'No questions played yet';
+  } else {
+    $('b-title').textContent = last ? 'Standings after the final round' : `Round ${r} standings`;
+    $('b-sub').innerHTML = last ? 'Final results coming up…' : 'Time to order 🌮  Grab a drink, the next round is coming.';
+  }
+  const timed = isBreak && !last && ev.breakEndsAt;
+  $('b-big').classList.toggle('hidden', !timed);
+  if (timed) { $('b-big-l').textContent = `Round ${r + 1} starts in`; tickBig(); }
   $('b-spon').classList.toggle('hidden', !ev.sponsorMsg);
   if (ev.sponsorMsg) $('b-spon').innerHTML = `<small>${esc(sponsorName())}</small>${esc(ev.sponsorMsg)}`;
   $('b-tables').innerHTML = (s.tableOrder || []).slice(0, 9).map((t, i) => `<div class="row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>${move(t) || '<span></span>'}
@@ -490,8 +509,16 @@ function renderBreak(){
 }
 
 function sponsorName(){ try { return 'From ' + BRANDING.sponsor.name; } catch(e){ return 'From our sponsor'; } }
+function tickBig(){
+  if (!ev || !ev.breakEndsAt) return;
+  const n = Math.ceil(Math.max(0, ev.breakEndsAt - serverNow()) / 1000);
+  $('b-big').classList.toggle('soon', n <= 0); $('b-big').classList.toggle('hot', n > 0 && n <= 10);
+  $('b-big-v').textContent = n <= 0 ? 'Starting any moment…' : breakLeft();
+  if (n > 0 && n <= 5 && n !== lastBigTick) { lastBigTick = n; tone(660, .08, 'square', .1); }
+}
+let lastBigTick = -1;
 function breakLeft(){ const n = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`; }
-setInterval(() => { if (ev && ev.status === 'break' && ev.breakEndsAt && $('b-count')) $('b-count').textContent = breakLeft(); }, 250);
+setInterval(() => { if (ev && ev.status === 'break' && ev.breakEndsAt && !$('b-big').classList.contains('hidden')) tickBig(); }, 250);
 
 // ── Round intro: slam-in round number, title, hype line, 3-2-1, confetti ──
 // Timed from the host's introAt so every screen (and a reloaded TV) stays in step.
@@ -537,25 +564,29 @@ function renderIntro(){
   const at = (ms, fn) => { if (ms >= el) introTimers.push(setTimeout(fn, ms - el)); };
   const C = len - 3800;                                             // 3-2-1-Go lands right as question 1 opens
   at(0, () => SFX.drum(1.1));
-  at(550, () => { SFX.cymbal(); $('ix-core').classList.remove('ix-shake'); void $('ix-core').offsetWidth; $('ix-core').classList.add('ix-shake'); burst(.5); });
+  at(550, () => { SFX.cymbal(); $('ix-core').classList.remove('ix-shake'); void $('ix-core').offsetWidth; $('ix-core').classList.add('ix-shake'); rain(1600, 8); });
   at(1500, () => SFX.start());
   at(2600, () => SFX.join());
   [0, 1, 2].forEach(i => at(C + i * 1000, () => { spans[i].classList.add('on'); tone(660, .14, 'square', .14); }));
-  at(C + 3000, () => { spans[3].classList.add('on'); tone(1320, .35, 'triangle', .26); cannons(); });
+  at(C + 3000, () => { spans[3].classList.add('on'); tone(1320, .35, 'triangle', .26); $('flash').classList.remove('go'); void $('flash').offsetWidth; $('flash').classList.add('go'); });
 }
 
 // ── Sponsor push: host "Update & show" pops the message on screen (held during live questions) ──
-let lastPush = null, pushTimer = null;
+// Pushed any time; stays up for the host's chosen duration (sponsorPushSecs). Taking it down clears sponsorPushAt.
+let shownPush = null, pushTimer = null;
+function hidePush(){ clearTimeout(pushTimer); $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
 function checkPush(){
-  if (!ev || !ev.sponsorPushAt || !ev.sponsorMsg) return;
-  if (lastPush === null) { lastPush = (serverNow() - ev.sponsorPushAt > 15000) ? ev.sponsorPushAt : 0; }
-  if (ev.sponsorPushAt === lastPush || ev.status === 'question' || ev.status === 'intro' || ev.status === 'final') return;
-  lastPush = ev.sponsorPushAt;
-  $('push-k').textContent = sponsorName();
+  const at = ev && ev.sponsorPushAt, end = at ? at + ((ev.sponsorPushSecs || 10) * 1000) : 0;
+  const live = at && ev.sponsorMsg && serverNow() < end;
+  if (!live) { if (shownPush !== null) { shownPush = null; hidePush(); } return; }
   $('push-msg').textContent = ev.sponsorMsg;
+  if (shownPush === at) return;
+  shownPush = at;
+  $('push-k').textContent = sponsorName();
   $('push').classList.remove('hidden'); document.body.classList.add('pushing');
+  $('push').querySelector('.push-card').style.animation = 'none'; void $('push').offsetWidth; $('push').querySelector('.push-card').style.animation = '';
   SFX.ding();
-  clearTimeout(pushTimer); pushTimer = setTimeout(() => { $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }, 8000);
+  clearTimeout(pushTimer); pushTimer = setTimeout(() => { shownPush = null; hidePush(); }, end - serverNow());
 }
 
 // ── Winners reveal: drumroll → 3rd → drumroll → 2nd → 1st with cannons → top player ──
@@ -611,36 +642,52 @@ function runReveal(){
 const cf = $('cf'), cx = cf.getContext('2d'); let parts = [], cfOn = false;
 function sizeCf(){ cf.width = innerWidth * devicePixelRatio; cf.height = innerHeight * devicePixelRatio; }
 addEventListener('resize', sizeCf); sizeCf();
+// Particles flutter: drag + a slow terminal fall speed + side-to-side sway, so confetti
+// drifts down over ~4–6 seconds and covers the whole screen.
+const CF_COLORS = OPTION_COLORS.concat(['#ffffff', '#3DDC84']);
+const noMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 function spawn(x, y, ang, spread, speed, n){
-  const D = devicePixelRatio, W = cf.width;
+  const D = devicePixelRatio, W = cf.width, H = cf.height;
   for (let i = 0; i < n; i++) {
     const a = ang + (Math.random() - .5) * spread, v = speed * (.6 + Math.random() * .6) * W / 1000;
-    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - .5) * .4,
-      w: (6 + Math.random() * 8) * D, h: (10 + Math.random() * 10) * D, c: OPTION_COLORS[i % 4] === '#2EC4D6' && i % 7 === 0 ? '#ffffff' : OPTION_COLORS[i % 4], life: 1 });
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - .5) * .12,
+      ph: Math.random() * 6.28, f: .02 + Math.random() * .03, sw: (.6 + Math.random() * 1.4) * D,
+      term: H / (250 + Math.random() * 190),
+      w: (7 + Math.random() * 8) * D, h: (11 + Math.random() * 10) * D, c: CF_COLORS[(Math.random() * CF_COLORS.length) | 0] });
   }
   if (!cfOn) { cfOn = true; requestAnimationFrame(tickCf); }
 }
+// Curtain of confetti from above, spread across the full width for ms milliseconds.
+function rain(ms, perTick){
+  if (noMotion()) return;
+  const W = cf.width, start = performance.now();
+  const step = () => {
+    for (let i = 0; i < perTick; i++) spawn(Math.random() * W, -30 * devicePixelRatio - Math.random() * 60, Math.PI / 2, .6, .6, 1);
+    if (performance.now() - start < ms) setTimeout(step, 90);
+  };
+  step();
+}
 function cannons(){
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (noMotion()) return;
   const W = cf.width, H = cf.height;
-  [0, 350, 700].forEach(d => setTimeout(() => { spawn(0, H, -Math.PI / 3.2, .6, 22, 90); spawn(W, H, -Math.PI + Math.PI / 3.2, .6, 22, 90); }, d));
-  setTimeout(() => burst(1), 900);
+  [0, 450].forEach(d => setTimeout(() => { spawn(0, H, -Math.PI / 2.8, .5, 15, 70); spawn(W, H, -Math.PI + Math.PI / 2.8, .5, 15, 70); }, d));
+  setTimeout(() => rain(3200, 10), 300);
 }
 function burst(k){
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const W = cf.width;
-  for (let i = 0; i < 5; i++) spawn(W * (.1 + .2 * i), -20, Math.PI / 2, 1.2, 4, Math.round(30 * k));
+  if (noMotion()) return;
+  rain(1800 + 1600 * k, Math.max(3, Math.round(7 * k)));
 }
 function tickCf(){
-  const H = cf.height, g = cf.height / 2600;
-  cx.clearRect(0, 0, cf.width, H);
-  parts = parts.filter(p => p.y < H + 50 && p.life > 0);
+  const W = cf.width, H = cf.height, g = H / 6000;
+  cx.clearRect(0, 0, W, H);
+  parts = parts.filter(p => p.y < H + 60 && p.x > -80 && p.x < W + 80);
   for (const p of parts) {
-    p.vy += g; p.vx *= .992; p.vy *= .992; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+    p.vx *= .975; p.vy = p.vy < p.term ? Math.min(p.term, p.vy * .985 + g) : p.term;
+    p.ph += p.f; p.x += p.vx + Math.sin(p.ph) * p.sw; p.y += p.vy; p.r += p.vr;
     cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
-    cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); cx.restore();
+    cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.ph))); cx.restore();
   }
-  if (parts.length) requestAnimationFrame(tickCf); else { cfOn = false; cx.clearRect(0, 0, cf.width, H); }
+  if (parts.length) requestAnimationFrame(tickCf); else { cfOn = false; cx.clearRect(0, 0, W, H); }
 }
 </script>
 </body>

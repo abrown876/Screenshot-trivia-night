@@ -140,6 +140,14 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
 .drumroll{font-size:56px;animation:drumr .18s ease-in-out infinite alternate;display:inline-block}
 @keyframes drumr{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.08)}}
 .countdown{font-family:var(--mono);color:var(--gold)}
+.bigcount{margin-top:18px;text-align:center;background:var(--s1);border:1.5px solid rgba(255,183,64,.5);border-radius:var(--r);padding:12px 16px}
+.bigcount small{display:block;color:var(--dim);font-weight:700;font-size:13px}
+.bigcount b{display:block;font-family:var(--mono);color:var(--gold);font-size:44px;line-height:1.1}
+.bigcount.soon b{font-family:var(--display);font-weight:800;font-size:20px;color:var(--text);padding:8px 0}
+.lb-h{font-weight:700;font-size:14px;color:var(--dim);margin:22px 0 -10px;text-align:left}
+.row .nm small{display:block;color:var(--dim);font-weight:600;font-size:12.5px}
+.push.top{top:calc(58px + env(safe-area-inset-top));bottom:auto;padding:10px 40px 10px 14px}
+.push.top div{font-size:14.5px}
 .partner-wrap{display:none;width:100%;margin-top:28px}
 .partner-link{display:block;line-height:0;border-radius:10px;overflow:hidden}
 .partner-link img{width:100%;height:auto;display:block}
@@ -289,6 +297,7 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
       <h1 id="b-title">Round 1 done</h1>
       <p class="lede" id="b-sub">Your table is 2nd</p>
     </div>
+    <div class="bigcount hidden" id="b-big"><small id="b-big-l">Next round in</small><b id="b-count">3:00</b></div>
     <div class="board" id="b-board"></div>
     <div class="stats">
       <div class="stat"><b id="b-score">0</b><span>Your points</span></div>
@@ -326,6 +335,10 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
       <div class="stat"><b id="f-score">0</b><span id="f-score-l">Correct answers</span></div>
       <div class="stat"><b id="f-rank">—</b><span>Your rank</span></div>
     </div>
+    <div class="lb-h">Table standings</div>
+    <div class="board" id="f-tables"></div>
+    <div class="lb-h">Top players</div>
+    <div class="board" id="f-players"></div>
     <button class="btn btn-main" id="f-share" type="button">Share my score on WhatsApp</button>
     </div>
   </section>
@@ -383,10 +396,36 @@ function attachEvent(id){
   me = saved ? JSON.parse(saved) : null;
   try { myPicks = JSON.parse(lsGet('tt_picks_' + id) || '{}'); } catch(e){ myPicks = {}; }
   const L = (p, cb) => { const r = ttRef(p); r.on('value', s => cb(s.val())); offs.push(() => r.off()); };
-  L('events/' + id, v => { ev = v; render(); });
+  L('events/' + id, v => { ev = v; checkNewGame(); applyReset(); render(); });
   L('tableNames/' + id, v => { names = v || {}; render(); });
   L('standings/' + id, v => { standings = v; render(); });
   L('roster/' + id, v => { roster = v || {}; if (current === 's-wait' || current === 's-join') render(); });
+}
+
+// A brand-new game can reuse the same name (e.g. today's date). Each game has its own
+// gameId, so a phone that remembers an older game drops its old join + locked answers.
+function checkNewGame(){
+  if (!ev || !eventId) return;
+  const gid = String(ev.gameId || ev.createdAt || ''); if (!gid) return;
+  const k = 'tt_game_' + eventId, was = lsGet(k);
+  if (was === gid) return;
+  lsSet(k, gid);
+  if (was === null && !me && !Object.keys(myPicks).length) return;   // first visit, nothing stale
+  me = null; myPicks = {};
+  ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
+  if ($('opts')) $('opts').dataset.k = '';
+  if (was !== null) toast('New game started — join again to play');
+}
+
+// Host restarted a round → forget local picks from that round on, so guests can answer again
+function applyReset(){
+  if (!ev || !ev.resetSeq || !eventId) return;
+  const k = 'tt_reset_' + eventId;
+  if (lsGet(k) === String(ev.resetSeq)) return;
+  const from = ev.resetFrom || 0;
+  for (const q in myPicks) if (+q >= from) delete myPicks[q];
+  lsSet('tt_picks_' + eventId, JSON.stringify(myPicks)); lsSet(k, String(ev.resetSeq));
+  if ($('opts')) $('opts').dataset.k = '';
 }
 
 // ── Join form ──
@@ -562,6 +601,7 @@ function render(){
     return show('s-join');
   }
 
+  if (ev.board && ev.status !== 'question' && ev.status !== 'intro' && ev.status !== 'final') return renderBreak(true);
   switch (ev.status) {
     case 'lobby': return renderWait();
     case 'question': return renderQuestion();
@@ -642,10 +682,10 @@ function renderReveal(){
   show('s-reveal');
 }
 
-function renderBreak(){
+function renderBreak(board){
   const r = ev.round || 1, total = (ev.rounds || []).length, last = r >= total;
-  const tr = tableRank(me.table);
-  $('b-title').textContent = last ? 'Final round done' : `Round ${r} done`;
+  const tr = tableRank(me.table), isBreak = ev.status === 'break';
+  $('b-title').textContent = board && !isBreak ? '🏆 Leaderboard' : last ? 'Final round done' : `Round ${r} done`;
   $('b-sub').textContent = tr ? `${tableName(me.table, names)} is ${ordinal(tr)}` : 'Standings are in';
   const o = (standings && standings.tableOrder) || [];
   const rows = o.slice(0, 3);
@@ -656,10 +696,16 @@ function renderBreak(){
   $('b-sponsor').textContent = ev.sponsorMsg || '';
   $('b-sponsor').classList.toggle('hidden', !ev.sponsorMsg);
   const nx = (ev.rounds || [])[r];
-  $('b-next').innerHTML = last ? 'Final results are coming up on the TV.'
-    : ev.breakEndsAt ? `Round ${r + 1}${nx ? ' · ' + esc(nx.title) : ''} starts in <span class="countdown" id="b-count">${breakLeft()}</span>. Good time to order.`
+  const timed = isBreak && !last && !!ev.breakEndsAt;
+  $('b-big').classList.toggle('hidden', !timed);
+  $('b-big-l').textContent = `Round ${r + 1}${nx ? ' · ' + nx.title : ''} starts in`;
+  $('b-next').innerHTML = !isBreak ? 'The game carries on in a moment.' : last ? 'Final results are coming up on the TV.'
+    : timed ? 'Good time to order 🌮'
     : `Up next: Round ${r + 1}${nx ? ' · ' + esc(nx.title) : ''}. Good time to order.`;
-  clearInterval(timerIv); timerIv = setInterval(() => { const c = $('b-count'); if (c) c.textContent = breakLeft(); }, 500);
+  const tickB = () => { const n = Math.ceil(Math.max(0, (ev.breakEndsAt || 0) - serverNow()) / 1000);
+    $('b-big').classList.toggle('soon', n <= 0); $('b-count').textContent = n <= 0 ? 'Starting any moment…' : breakLeft(); };
+  if (timed) tickB();
+  clearInterval(timerIv); timerIv = timed ? setInterval(tickB, 500) : null;
   show('s-break');
 }
 
@@ -679,6 +725,11 @@ function renderFinal(){
   $('f-score').textContent = `${myScore()}/${total}`;
   $('f-rank').textContent = pr ? `${ordinal(pr)}` : '—';
   $('f-score-l').textContent = 'Correct answers';
+  const S = standings || {}, to = S.tableOrder || [], po = S.playerOrder || [];
+  $('f-tables').innerHTML = to.map((t, i) => `<div class="row ${t === me.table ? 'me' : ''}"><span class="n">${i + 1}</span><span class="nm">${esc(tableName(t, names))}<small>👤 ${S.tables[t].players}</small></span><span class="p">${fmtPts(S.tables[t].score)}</span></div>`).join('') || '<div class="row"><span></span><span>No scores</span><span></span></div>';
+  const pRows = po.slice(0, 10); const myI = po.indexOf(me.id); if (myI >= 10) pRows.push(me.id);
+  $('f-players').innerHTML = pRows.map(pid => { const x = S.players[pid], i = po.indexOf(pid);
+    return `<div class="row ${pid === me.id ? 'me' : ''}"><span class="n">${i + 1}</span><span class="nm">${esc(x.name)}${pid === me.id ? ' (you)' : ''}<small>${esc(tableName(x.table, names))}</small></span><span class="p">${x.score}</span></div>`; }).join('');
   // Don't spoil the TV: hold for the drumroll, then reveal (synced to the host's finalAt)
   const wait = Math.max(0, 9200 - (serverNow() - (ev.finalAt || 0)));
   const key = String(ev.finalAt);
@@ -733,19 +784,22 @@ function renderIntro(){
 }
 
 // Sponsor push from the host — shown outside live questions
-let lastPush = null, pushT = null;
+// Pushed any time for the host's chosen duration. During a question it's a slim top banner so answers stay tappable.
+let shownPush = null, dismissed = null, pushT = null;
 function checkPush(){
-  if (!ev || !ev.sponsorPushAt || !ev.sponsorMsg || !me) return;
-  if (lastPush === null) lastPush = (serverNow() - ev.sponsorPushAt > 15000) ? ev.sponsorPushAt : 0;
-  if (ev.sponsorPushAt === lastPush || ev.status === 'question' || ev.status === 'intro' || ev.status === 'final') return;
-  lastPush = ev.sponsorPushAt;
-  try { $('push-k').textContent = 'From ' + BRANDING.sponsor.name; } catch(e){}
+  const at = ev && ev.sponsorPushAt, end = at ? at + ((ev.sponsorPushSecs || 10) * 1000) : 0;
+  const live = at && ev.sponsorMsg && serverNow() < end && dismissed !== at;
+  if (!live) { if (shownPush !== null) { shownPush = null; hidePush(); } return; }
+  $('push').classList.toggle('top', ev.status === 'question');
   $('push-msg').textContent = ev.sponsorMsg;
+  if (shownPush === at) return;
+  shownPush = at;
+  try { $('push-k').textContent = 'From ' + BRANDING.sponsor.name; } catch(e){}
   $('push').classList.remove('hidden'); document.body.classList.add('pushing'); haptic(20);
-  clearTimeout(pushT); pushT = setTimeout(hidePush, 8000);
+  clearTimeout(pushT); pushT = setTimeout(() => { shownPush = null; hidePush(); }, end - serverNow());
 }
-function hidePush(){ $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
-$('push-x').onclick = hidePush;
+function hidePush(){ clearTimeout(pushT); $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
+$('push-x').onclick = () => { dismissed = shownPush; shownPush = null; hidePush(); };
 
 // Phone confetti for winners
 function phoneConfetti(){
@@ -753,16 +807,21 @@ function phoneConfetti(){
   const cf = $('cf'), cx = cf.getContext('2d'), D = devicePixelRatio;
   cf.width = innerWidth * D; cf.height = innerHeight * D;
   let ps = [];
-  const shoot = (x, ang) => { for (let i = 0; i < 70; i++) { const a = ang + (Math.random() - .5) * .7, v = (14 + Math.random() * 10) * D;
-    ps.push({ x, y: cf.height, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 7 * D, h: 12 * D, c: OPTION_COLORS[i % 4] }); } };
-  shoot(0, -Math.PI / 3); shoot(cf.width, -Math.PI + Math.PI / 3);
-  setTimeout(() => { shoot(0, -Math.PI / 2.6); shoot(cf.width, -Math.PI + Math.PI / 2.6); }, 500);
+  const C = OPTION_COLORS.concat(['#ffffff', '#3DDC84']), H = cf.height, W = cf.width;
+  const add = (x, y, vx, vy) => ps.push({ x, y, vx, vy, r: Math.random() * 6, vr: (Math.random() - .5) * .12, ph: Math.random() * 6.28,
+    f: .03 + Math.random() * .04, sw: (.5 + Math.random()) * D, term: H / (230 + Math.random() * 160), w: (6 + Math.random() * 4) * D, h: (10 + Math.random() * 6) * D, c: C[(Math.random() * C.length) | 0] });
+  const shoot = (x, ang) => { for (let i = 0; i < 45; i++) { const a = ang + (Math.random() - .5) * .6, v = (9 + Math.random() * 7) * D; add(x, H, Math.cos(a) * v, Math.sin(a) * v); } };
+  shoot(0, -Math.PI / 2.8); shoot(W, -Math.PI + Math.PI / 2.8);
+  const t0 = performance.now();
+  const drizzle = () => { for (let i = 0; i < 5; i++) add(Math.random() * W, -20 * D - Math.random() * 40, 0, 1); if (performance.now() - t0 < 3000) setTimeout(drizzle, 100); };
+  setTimeout(drizzle, 200);
   const tick = () => {
-    cx.clearRect(0, 0, cf.width, cf.height);
-    ps = ps.filter(p => p.y < cf.height + 40);
-    for (const p of ps) { p.vy += .5 * D; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
-      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore(); }
-    if (ps.length) requestAnimationFrame(tick); else cx.clearRect(0, 0, cf.width, cf.height);
+    cx.clearRect(0, 0, W, H);
+    ps = ps.filter(p => p.y < H + 40);
+    for (const p of ps) { p.vx *= .97; p.vy = p.vy < p.term ? Math.min(p.term, p.vy * .985 + H / 5000) : p.term;
+      p.ph += p.f; p.x += p.vx + Math.sin(p.ph) * p.sw; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.ph))); cx.restore(); }
+    if (ps.length || performance.now() - t0 < 4500) requestAnimationFrame(tick); else cx.clearRect(0, 0, W, H);
   };
   requestAnimationFrame(tick);
 }

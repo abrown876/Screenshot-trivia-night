@@ -53,6 +53,54 @@ textarea.inp{height:auto;min-height:70px;padding:12px 14px;resize:vertical;line-
 .btn-gold{background:var(--gold);color:#1a1300}
 .btn-danger{background:transparent;border:1.5px solid rgba(255,75,92,.6);color:#ff8f9b}
 .btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.btn-board{width:100%;margin-top:10px}
+.btn-warn{background:var(--coral);color:#fff}
+.btn-push{background:linear-gradient(135deg,rgba(255,183,64,.22),rgba(255,92,138,.18));border:1.5px solid rgba(255,183,64,.6);color:var(--text)}
+/* rounds timeline */
+.rtrack{display:grid;grid-template-columns:repeat(var(--n,4),1fr);gap:10px}
+.rchip{position:relative;display:flex;flex-direction:column;gap:3px;background:var(--s2);border:1.5px solid var(--line);border-radius:12px;padding:12px 12px 10px;min-height:118px}
+.rchip .rn,.rchip .rt{padding-right:30px}
+.rchip .rn{font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px}
+.rchip .rt{font-size:14px;font-weight:800;line-height:1.25;color:var(--text)}
+.rchip .rs{font-size:12px;font-weight:600;color:var(--dim);margin-top:auto}
+.rchip.done .rn{color:var(--green)}
+.rchip.live{border-color:var(--purple);background:linear-gradient(160deg,rgba(124,110,246,.22),rgba(255,92,138,.12))}
+.rchip.live .rn{color:#b9b0ff}
+.rchip.live .rn::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 3px rgba(255,92,138,.25);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}}
+.rchip.next{opacity:.55}
+.rchip.sel{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,92,138,.18)}
+.rchip .rr{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);background:var(--s1);color:var(--dim);font-size:15px;font-weight:800;display:grid;place-items:center;cursor:pointer}
+.rchip .rr:hover{color:var(--text);border-color:var(--coral)}
+.rconfirm{display:grid;grid-template-columns:auto 1fr;gap:12px 14px;align-items:start;margin-top:12px;padding:14px 16px;border-radius:12px;background:rgba(255,92,138,.08);border:1.5px solid rgba(255,92,138,.45);animation:in .2s ease-out}
+.rconfirm .rc-ic{width:36px;height:36px;border-radius:50%;background:rgba(255,92,138,.18);color:var(--coral);display:grid;place-items:center;font-weight:900;font-size:18px}
+.rc-title{font-weight:800;font-size:15px}
+.rc-text{color:var(--dim);font-size:13px;line-height:1.4;margin-top:2px}
+.rc-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}
+.rc-actions .btn{min-height:42px}
+/* sponsor */
+.push-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:stretch}
+.secs{display:flex;align-items:center;gap:6px;height:46px;padding:0 12px;background:var(--s2);border:1.5px solid var(--line);border-radius:10px;color:var(--dim);font-size:14px;font-weight:600}
+.secs:focus-within{border-color:var(--purple)}
+.secs input{width:44px;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:15px;text-align:center;-moz-appearance:textfield}
+.secs input::-webkit-inner-spin-button{opacity:.5}
+.push-live{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:700;color:var(--gold)}
+.push-live .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:blink 1.2s infinite}
+.push-live .ghost-btn{margin-left:auto;padding:0}
+/* end of night */
+.wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wrap-card.done #btn-edit{background:linear-gradient(135deg,var(--purple),var(--coral));border:none;color:#fff}
+.ng-actions{display:flex;gap:10px;margin-top:4px}
+.ng-actions .btn-main{flex:1}
+/* modal */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(5,5,16,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:24px;animation:in .2s ease-out}
+.modal-card{width:min(560px,100%);max-height:calc(100vh - 48px);overflow:auto;background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.modal-h{font-size:20px;font-weight:800;margin-bottom:6px}
+.modal-warn{display:flex;gap:10px;align-items:flex-start;margin:10px 0 16px;padding:12px 14px;border-radius:12px;background:rgba(255,183,64,.1);border:1.5px solid rgba(255,183,64,.45);color:var(--text);font-size:14px;line-height:1.45}
+.modal-warn b{color:var(--gold)}
+.ghost-btn{background:none;border:none;color:var(--coral);font-weight:700;font-size:13px;padding:10px 0 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.btn-board.on{background:var(--gold);color:#1a1300;border-color:var(--gold)}
+
 kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);border-radius:4px;padding:1px 5px;margin-left:4px;opacity:.75}
 
 /* stage */
@@ -107,7 +155,21 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 
 /* tables */
 .tbl-list{display:grid;gap:2px;max-height:380px;overflow:auto}
-.tbl-row{display:grid;grid-template-columns:26px 1fr 54px 64px 28px;gap:10px;align-items:center;padding:9px 6px;border-radius:8px;font-size:14px;font-weight:600}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--s2);border-radius:10px;margin-bottom:10px}
+.tabs button{height:34px;border:none;border-radius:7px;background:none;color:var(--dim);font-weight:700;font-size:14px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--s3);color:var(--text)}
+.tbl-row .pt-btn{justify-self:end;background:none;border:1.5px dashed transparent;border-radius:6px;padding:3px 6px;font-family:var(--mono);color:var(--gold);font-size:13px;cursor:pointer}
+.tbl-row .pt-btn:hover{border-color:rgba(255,183,64,.5)}
+.pt-btn .adj{font-size:10px;color:var(--coral);margin-left:3px}
+.pt-edit{justify-self:end;display:flex;gap:4px;align-items:center}
+.pt-edit input{width:62px;height:30px;background:var(--bg);border:1.5px solid var(--gold);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;text-align:right;padding:0 6px;outline:none}
+.pt-edit button{width:28px;height:30px;border-radius:6px;border:none;font-weight:800;cursor:pointer}
+.pt-edit .ok{background:var(--gold);color:#1a1300}
+.pt-edit .no{background:var(--s3);color:var(--dim)}
+.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.sc-foot .ghost-btn{padding:0}
+.ply-row{grid-template-columns:26px 1fr 76px 28px !important}
+.tbl-row{display:grid;grid-template-columns:26px 1fr 54px 76px 28px;gap:10px;align-items:center;padding:9px 6px;border-radius:8px;font-size:14px;font-weight:600}
 .tbl-row:nth-child(odd){background:rgba(255,255,255,.02)}
 .tbl-row .rk{font-family:var(--mono);color:var(--muted);font-size:12px}
 .tbl-row .nm small{color:var(--muted);font-weight:500;margin-left:6px}
@@ -164,6 +226,7 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
         <button class="btn btn-soft" id="btn-extend" type="button">+15 sec<kbd>E</kbd></button>
         <button class="btn btn-soft" id="btn-join" type="button">Close joining</button>
       </div>
+      <button class="btn btn-soft btn-board" id="btn-board" type="button">🏆 Show leaderboard on screens<kbd>L</kbd></button>
       <div class="meter" id="meter"><i id="meter-i"></i></div>
       <div class="meter-l"><span id="meter-l">0 of 0 answered</span><span id="meter-r"></span></div>
       <div class="timing">
@@ -173,7 +236,23 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       </div>
       <label class="check" style="height:auto;margin-top:10px"><input id="t-intro" type="checkbox"> Round intro animation (9 sec before each round)</label>
       <div class="timing-hint">Changes apply from the next question. In Auto, the next round starts when the break ends — set the break to 0 to start rounds yourself.</div>
-      <p class="next-hint">Press <kbd>Space</kbd> for the main button · <kbd>A</kbd> switches Auto / Manual</p>
+      <p class="next-hint">Press <kbd>Space</kbd> for the main button · <kbd>A</kbd> switches Auto / Manual · <kbd>L</kbd> leaderboard</p>
+    </div>
+
+    <div class="card" id="rounds-card">
+      <h2>Rounds <small id="rounds-hint">Something went wrong? Replay a round with ↺</small></h2>
+      <div class="rtrack" id="rtrack"></div>
+      <div class="rconfirm hidden" id="rconfirm" role="alertdialog" aria-labelledby="rc-title">
+        <div class="rc-ic">↺</div>
+        <div class="rc-body">
+          <div class="rc-title" id="rc-title">Restart Round 2?</div>
+          <div class="rc-text" id="rc-text"></div>
+        </div>
+        <div class="rc-actions">
+          <button class="btn btn-soft" id="rc-cancel" type="button">Cancel</button>
+          <button class="btn btn-warn" id="rc-go" type="button">Restart round</button>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -185,7 +264,7 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 
   <div class="col">
     <div class="card" id="setup-card">
-      <h2>Tonight's game <button class="btn btn-soft hidden" id="btn-edit" type="button" style="min-height:32px;font-size:13px;padding:0 12px">New game</button></h2>
+      <h2 id="setup-h">Tonight's game</h2>
       <div id="setup-form">
         <div class="setup-grid">
           <div><label for="cfg-id">Game name</label><input class="inp" id="cfg-id"></div>
@@ -201,7 +280,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
           <div><label for="cfg-tprize">Table prize</label><input class="inp" id="cfg-tprize" maxlength="60" placeholder="e.g. a $5,000 Chilitos voucher"></div>
           <div><label for="cfg-bprize">Bar prize</label><input class="inp" id="cfg-bprize" maxlength="60" value="a round of shots 🥃"></div>
         </div>
-        <button class="btn btn-main" id="btn-create" type="button" style="min-height:52px;font-size:16px">Create game</button>
+        <div class="ng-actions">
+          <button class="btn btn-soft hidden" id="btn-ng-cancel" type="button">Cancel</button>
+          <button class="btn btn-main" id="btn-create" type="button" style="min-height:52px;font-size:16px">Create game</button>
+        </div>
       </div>
       <div id="setup-summary" class="hidden">
         <div class="summary"><div><div style="color:var(--dim);font-size:13px;font-weight:600">Room code</div><div class="code" id="room-code">····</div></div>
@@ -214,29 +296,65 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       </div>
     </div>
 
-    <div class="card">
-      <h2>Standings <small id="i-players">0 players</small></h2>
-      <div class="tbl-list" id="tbl-list"></div>
+    <div class="card" id="sponsor-card">
+      <h2>Sponsor message <small>Also shown on reveals &amp; breaks</small></h2>
+      <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="Type the sponsor message to show on screens…"></textarea>
+      <div class="push-row">
+        <button class="btn btn-push" id="btn-sponsor" type="button">📣 Push to screens now</button>
+        <label class="secs" title="How long it stays on screen"><span>for</span><input id="sponsor-secs" type="number" min="3" max="300" value="10" aria-label="Seconds on screen"><span>sec</span></label>
+      </div>
+      <div class="push-live hidden" id="push-live"><span class="dot"></span><span id="push-live-t">On screens now</span><button class="ghost-btn" id="btn-sponsor-stop" type="button">Take it down</button></div>
+      <button class="ghost-btn" id="btn-sponsor-clear" type="button" style="color:var(--muted)">Clear message from screens</button>
+      <div class="timing-hint" id="sponsor-hint">Shows on the TV and every phone straight away, even mid-question (phones get a slim banner so guests can still answer).</div>
     </div>
 
     <div class="card">
-      <h2>Sponsor message <small>Shown on reveals &amp; breaks</small></h2>
-      <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="🌮 Taco Tuesday: 3 tacos for $1,500 — order before Round 3"></textarea>
-      <button class="btn btn-soft" id="btn-sponsor" type="button" style="width:100%">Update &amp; show on screens</button>
-      <div class="timing-hint">Pops up on the TV and phones right away (held until the current question ends). Also shows on every answer reveal and round break.</div>
+      <h2>Standings <small id="i-players">0 players</small></h2>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="tables" aria-selected="true">Tables</button>
+        <button type="button" role="tab" data-tab="players" aria-selected="false">Players</button>
+      </div>
+      <div class="tbl-list" id="tbl-list"></div>
+      <div class="tbl-list hidden" id="ply-list"></div>
+      <div class="sc-foot">
+        <span class="sc-hint">Tap a score to correct it</span>
+        <button class="ghost-btn" id="btn-reset-scores" type="button">Reset all scores</button>
+      </div>
+      <div class="rconfirm hidden" id="sc-confirm" role="alertdialog">
+        <div class="rc-ic">0</div>
+        <div class="rc-body"><div class="rc-title">Reset every score to zero?</div>
+          <div class="rc-text">Clears all answers, scores and corrections and sends everyone back to the lobby. Players stay joined at their tables.</div></div>
+        <div class="rc-actions"><button class="btn btn-soft" id="sc-cancel" type="button">Cancel</button><button class="btn btn-warn" id="sc-go" type="button">Yes, reset scores</button></div>
+      </div>
     </div>
+
 
     <div class="card">
       <h2>Players &amp; prizes</h2>
       <div class="kv"><span>Top player</span><span id="i-top">—</span></div>
       <div class="kv"><span>Leading table</span><span id="i-toptable">—</span></div>
       <div class="kv"><span>Verified emails</span><span id="i-verified">—</span></div>
-      <button class="btn btn-soft" id="btn-export" type="button" style="width:100%;margin-top:12px">Download player list (CSV)</button>
-      <button class="btn btn-danger" id="btn-final-early" type="button" style="width:100%;margin-top:10px">End game now &amp; show results</button>
+      <button class="btn btn-soft" id="btn-export" type="button" style="width:100%;margin-top:12px">⬇ Download player list (CSV)</button>
+    </div>
+
+    <div class="card wrap-card" id="wrap-card">
+      <h2>End of the night</h2>
+      <div class="wrap-row">
+        <button class="btn btn-danger" id="btn-final-early" type="button">🏁 End game &amp; show results</button>
+        <button class="btn btn-soft" id="btn-edit" type="button">＋ Start a new game</button>
+      </div>
+      <div class="timing-hint" id="wrap-hint">Ending runs the winners reveal on the TV. A new game gets a fresh room code and clears tonight's players and scores.</div>
     </div>
   </div>
 </div>
 
+<div class="modal hidden" id="ng-modal" role="dialog" aria-modal="true" aria-labelledby="ng-title">
+  <div class="modal-card">
+    <h2 class="modal-h" id="ng-title">Start a new game</h2>
+    <div class="modal-warn hidden" id="ng-warn"></div>
+    <div id="ng-slot"></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -316,13 +434,13 @@ async function createNight(){
   if (!isAdmin) return;
   const id = $('cfg-id').value.trim().replace(/[^a-zA-Z0-9_-]/g, '-');
   if (!id) return toast('Give the game a name');
-  if (ev && ev.status !== 'final' && ev.status !== 'lobby' && !confirm('A game is in progress. Start a new one anyway?')) return;
-  if (id === EVENT_ID && !confirm(`"${id}" already exists. Reset it? Players and scores will be cleared.`)) return;
+  // The new-game dialog already spells out what gets replaced, so no extra pop-ups here.
+  clearTimer();
   const tables = Math.max(1, Math.min(40, parseInt($('cfg-tables').value) || 12));
   const code = randomCode();
   const u = {};
   u[`events/${id}`] = {
-    eventId: id, status: 'lobby', round: 0, qIndex: null, liveSlot: null, displayCode: code,
+    eventId: id, gameId: randomCode() + Date.now().toString(36), status: 'lobby', round: 0, qIndex: null, liveSlot: null, displayCode: code,
     tables, barEnabled: $('cfg-bar').checked, joinClosed: false, autoAdvance: $('cfg-auto').checked, timeUp: false,
     tablePrize: $('cfg-tprize').value.trim() || null, barPrize: $('cfg-bprize').value.trim() || null,
     questionSeconds: parseInt($('cfg-qsec').value) || TT.QUESTION_SECONDS,
@@ -360,7 +478,7 @@ async function goQuestion(qi){
   const u = {
     status: 'question', round: QUESTIONS[qi].round, qIndex: qi, liveSlot: String(qi),
     questionStartedAt: firebase.database.ServerValue.TIMESTAMP, extraSeconds: 0,
-    paused: false, pausedAt: null, reveal: null, answeredCount: 0, timeUp: false, breakEndsAt: null,
+    paused: false, pausedAt: null, reveal: null, answeredCount: 0, timeUp: false, breakEndsAt: null, board: false,
   };
   u['qStarts/' + qi] = firebase.database.ServerValue.TIMESTAMP;
   await evRef().update(u);
@@ -377,6 +495,73 @@ async function toReveal(){
   try { await scoreAndPublish(qi); } catch (e) { console.warn('scoring', e); toast('Scoring problem — check the console'); }
   if (isAuto()) schedule(revealSec(), advanceFromReveal);
 }
+// ── Restart a round: wipe its answers (and any later ones), roll scores back, replay it ──
+async function restartRound(r){
+  if (!ev || !isAdmin) return;
+  const first = (r - 1) * TT.ROUND_SIZE;
+  clearTimer();
+  const [rs, as] = await Promise.all([ttRef('roster/' + EVENT_ID).once('value'), ttRef('answers/' + EVENT_ID).once('value')]);
+  const R = rs.val() || {}, A = as.val() || {}, starts = Object.assign({}, ev.qStarts || {});
+  const u = {};
+  for (const pid in A) for (const q in (A[pid] || {})) if (+q >= first) { u[`answers/${EVENT_ID}/${pid}/${q}`] = null; delete A[pid][q]; }
+  for (let q = first; q < QUESTIONS.length; q++) { u[`events/${EVENT_ID}/qStarts/${q}`] = null; delete starts[q]; }
+  for (let k = r; k <= TOTAL_ROUNDS; k++) u[`events/${EVENT_ID}/breakOrders/${k}`] = null;
+  if (first > 0) {
+    const st = computeStandings(R, A, starts, first - 1, ev.adjust);
+    lastTableOrder = st.tableOrder;
+    u[`standings/${EVENT_ID}`] = Object.assign(st, { revealedThrough: first - 1, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+  } else { u[`standings/${EVENT_ID}`] = null; lastTableOrder = []; }
+  Object.assign(u, {
+    [`events/${EVENT_ID}/resetSeq`]: (ev.resetSeq || 0) + 1, [`events/${EVENT_ID}/resetFrom`]: first,
+    [`events/${EVENT_ID}/reveal`]: null, [`events/${EVENT_ID}/finalAt`]: null, [`events/${EVENT_ID}/board`]: false,
+  });
+  if (ev.status === 'final') u[`events/${EVENT_ID}/joinClosed`] = false;
+  await ttRef('').update(u);
+  await new Promise(res => setTimeout(res, 60));
+  await startRound(r);
+  toast(`Round ${r} restarted`);
+}
+
+// ── Manual score edits + full score reset ──
+async function republishStandings(adj){
+  const [rs, as] = await Promise.all([ttRef('roster/' + EVENT_ID).once('value'), ttRef('answers/' + EVENT_ID).once('value')]);
+  const thru = standings && standings.revealedThrough != null ? standings.revealedThrough : -1;
+  const st = computeStandings(rs.val() || {}, as.val() || {}, ev.qStarts || {}, thru, adj);
+  lastTableOrder = st.tableOrder;
+  await ttRef('standings/' + EVENT_ID).set(Object.assign(st, { revealedThrough: thru, updatedAt: firebase.database.ServerValue.TIMESTAMP }));
+}
+async function setScore(kind, id, value){
+  if (!ev || !isAdmin || !isFinite(value)) return;
+  const S = standings || {}, row = kind === 'tables' ? (S.tables || {})[id] : (S.players || {})[id];
+  const adj = JSON.parse(JSON.stringify(ev.adjust || {})); adj[kind] = adj[kind] || {};
+  const cur = row ? row.score : 0, curAdj = adj[kind][id] || 0, base = cur - curAdj;
+  const next = Math.round((value - base) * 100) / 100;
+  if (next) adj[kind][id] = next; else delete adj[kind][id];
+  await evRef().child('adjust').set(adj);
+  await republishStandings(adj);
+  toast(`${kind === 'tables' ? tableName(id, names) : (roster[id] || {}).name || 'Player'} set to ${kind === 'tables' ? fmtPts(value) : value}`);
+}
+async function resetAllScores(){
+  if (!ev || !isAdmin) return;
+  clearTimer();
+  const u = {};
+  u[`answers/${EVENT_ID}`] = null; u[`standings/${EVENT_ID}`] = null;
+  Object.assign(u, Object.fromEntries(Object.entries({
+    status: 'lobby', round: 0, qIndex: null, liveSlot: null, reveal: null, qStarts: null, breakOrders: null, adjust: null,
+    board: false, finalAt: null, joinClosed: false, paused: false, timeUp: false, breakEndsAt: null, introAt: null,
+    resetSeq: (ev.resetSeq || 0) + 1, resetFrom: 0,
+  }).map(([k, v]) => [`events/${EVENT_ID}/${k}`, v])));
+  await ttRef('').update(u);
+  lastTableOrder = [];
+  toast('All scores cleared · back to the lobby (players stay joined)');
+}
+
+// ── Leaderboard on demand (TV + phones). Not during a live question. ──
+async function toggleBoard(){
+  if (!ev || !isAdmin || ev.status === 'question') return;
+  await evRef().update({ board: !ev.board });
+}
+
 const isRoundEnd = qi => qi + 1 >= QUESTIONS.length || (qi + 1) % TT.ROUND_SIZE === 0;
 async function advanceFromReveal(){
   if (!ev || ev.status !== 'reveal' || ev.paused) return;
@@ -392,11 +577,13 @@ async function advanceFromReveal(){
 const breakSec = () => (ev && ev.breakSeconds) || 0;
 async function syncBreak(){
   if (!ev || ev.status !== 'break') return;
-  const canAuto = isAuto() && breakSec() > 0 && (ev.round || 0) < TOTAL_ROUNDS;
-  if (canAuto) {
+  // A break length > 0 always shows a countdown on the TV and phones.
+  // Auto starts the next round when it hits zero; Manual waits for you.
+  const timed = breakSec() > 0 && (ev.round || 0) < TOTAL_ROUNDS;
+  if (timed) {
     const ends = (ev.breakStartedAt || Math.round(serverNow())) + breakSec() * 1000;
     if (ev.breakEndsAt !== ends) await evRef().update({ breakEndsAt: ends });
-    schedule((ends - serverNow()) / 1000, autoNextRound);
+    if (isAuto()) schedule((ends - serverNow()) / 1000, autoNextRound); else clearTimer();
   } else {
     clearTimer();
     if (ev.breakEndsAt) await evRef().update({ breakEndsAt: null });
@@ -414,7 +601,7 @@ async function startRound(r){
   if (!introSec()) return goQuestion(first);
   await evRef().update({
     status: 'intro', round: r, liveSlot: null, reveal: null, timeUp: false, paused: false, pausedAt: null,
-    breakEndsAt: null, introAt: firebase.database.ServerValue.TIMESTAMP,
+    breakEndsAt: null, board: false, introAt: firebase.database.ServerValue.TIMESTAMP,
   });
   schedule(introSec(), () => endIntro(r));
 }
@@ -427,7 +614,7 @@ async function showFinal(){
   if (!confirm('Show the final results on the TV? This ends the game.')) return;
   clearTimer();
   if (ev.status === 'question') { if (ev.paused) await evRef().update({ paused: false }); await toReveal(); clearTimer(); }
-  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true, paused: false, breakEndsAt: null, finalAt: firebase.database.ServerValue.TIMESTAMP });
+  await evRef().update({ status: 'final', liveSlot: null, joinClosed: true, paused: false, breakEndsAt: null, board: false, finalAt: firebase.database.ServerValue.TIMESTAMP });
 }
 async function replayReveal(){ await evRef().update({ finalAt: firebase.database.ServerValue.TIMESTAMP }); toast('Replaying the winners reveal on the TV'); }
 
@@ -511,6 +698,16 @@ async function scoreAndPublish(qi){
       if (QUESTIONS[qi].bonus && R[pid] && (!bonus || a.submittedAt < bonus.at)) bonus = { at: a.submittedAt, name: R[pid].name, table: R[pid].table };
     }
   }
+  const st = computeStandings(R, A, starts, qi, ev && ev.adjust);
+  lastTableOrder = st.tableOrder;
+  u[`standings/${EVENT_ID}`] = Object.assign(st, { revealedThrough: qi, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+  const rv = { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]], answered, dist,
+               pct: answered ? Math.round(100 * correctN / answered) : 0 };
+  if (bonus) rv.bonusWinner = { name: bonus.name, table: bonus.table };
+  u[`events/${EVENT_ID}/reveal`] = rv;
+  await ttRef('').update(u);
+}
+function computeStandings(R, A, starts, qi, adj){
   const P = {}, T = {};
   for (const pid in R) {
     P[pid] = { name: R[pid].name, table: R[pid].table, score: 0, timeMs: 0 };
@@ -527,29 +724,27 @@ async function scoreAndPublish(qi){
     for (const t in present) T[t].score += (correct[t] || 0) / present[t];
   }
   for (const pid in P) T[P[pid].table].timeMs += P[pid].timeMs;
+  // Host's manual corrections (events/{e}/adjust) sit on top of the calculated scores
+  const aP = (adj && adj.players) || {}, aT = (adj && adj.tables) || {};
+  for (const pid in P) if (aP[pid]) { P[pid].score = Math.round((P[pid].score + aP[pid]) * 100) / 100; P[pid].adj = aP[pid]; }
+  for (const t in T) if (aT[t]) { T[t].score += aT[t]; T[t].adj = aT[t]; }
   const playerOrder = Object.keys(P).sort((x, y) => P[y].score - P[x].score || P[x].timeMs - P[y].timeMs);
   const tableOrder = Object.keys(T).filter(t => T[t].players > 0).sort((x, y) =>
     T[y].score - T[x].score || (T[x].timeMs / T[x].players) - (T[y].timeMs / T[y].players));
   for (const t in T) T[t].score = Math.round(T[t].score * 100) / 100;
-  lastTableOrder = tableOrder;
-  u[`standings/${EVENT_ID}`] = { players: P, tables: T, playerOrder, tableOrder, revealedThrough: qi, updatedAt: firebase.database.ServerValue.TIMESTAMP };
-  const rv = { q: qi, correctIdx: ANSWER_KEY[qi], correctText: QUESTIONS[qi].o[ANSWER_KEY[qi]], answered, dist,
-               pct: answered ? Math.round(100 * correctN / answered) : 0 };
-  if (bonus) rv.bonusWinner = { name: bonus.name, table: bonus.table };
-  u[`events/${EVENT_ID}/reveal`] = rv;
-  await ttRef('').update(u);
+  return { players: P, tables: T, playerOrder, tableOrder };
 }
 
 // ── Listeners ──
 let offs = [], setupOpen = true;
 function attach(id){
   offs.forEach(f => f()); offs = [];
-  EVENT_ID = id; $('cfg-id').value = id; recovered = false;
+  EVENT_ID = id; $('cfg-id').value = id; recovered = false; setupOpen = false;
   const L = (path, cb) => { const r = ttRef(path); r.on('value', s => cb(s.val()), e => console.warn(path, e && e.message)); offs.push(() => r.off()); };
-  L('events/' + id, v => { ev = v; if (ev) setupOpen = false; render(); recover(); });
+  L('events/' + id, v => { ev = v; render(); recover(); });
   L('roster/' + id, v => { roster = v || {}; render(); });
   L('tableNames/' + id, v => { names = v || {}; renderTables(); });
-  L('standings/' + id, v => { standings = v; if (v && v.tableOrder) lastTableOrder = v.tableOrder; renderTables(); renderLeaders(); });
+  L('standings/' + id, v => { standings = v; if (v && v.tableOrder) lastTableOrder = v.tableOrder; renderTables(); renderPlayers(); renderLeaders(); });
   L('answers/' + id, v => { answers = v || {}; renderLive(); });
   L('players/' + id, v => { players = v || {}; renderLeaders(); });
 }
@@ -569,9 +764,25 @@ function qCard(qi, el, label, showCounts){
 }
 
 function render(){
-  $('setup-form').classList.toggle('hidden', !!ev && !setupOpen);
-  $('setup-summary').classList.toggle('hidden', !ev || setupOpen);
-  $('btn-edit').classList.toggle('hidden', !ev || setupOpen);
+  // First game of the night: the form lives in the card. After that, "Start a new game" opens it in a dialog.
+  const inModal = !!ev && setupOpen;
+  const form = $('setup-form');
+  if (inModal && form.parentElement !== $('ng-slot')) $('ng-slot').appendChild(form);
+  if (!inModal && form.parentElement !== $('setup-card')) $('setup-card').insertBefore(form, $('setup-summary'));
+  form.classList.toggle('hidden', !!ev && !setupOpen);
+  $('ng-modal').classList.toggle('hidden', !inModal);
+  $('setup-summary').classList.toggle('hidden', !ev);
+  $('btn-ng-cancel').classList.toggle('hidden', !ev);
+  if (inModal) {
+    const running = ev.status !== 'final' && ev.status !== 'lobby', n = Object.keys(roster).length;
+    $('ng-warn').classList.toggle('hidden', !running && !n);
+    $('ng-warn').innerHTML = running
+      ? `⚠️ <span><b>A game is running right now</b> (${n} ${n === 1 ? 'player' : 'players'}, Round ${ev.round || 1}). Creating a new one ends it for everyone and clears its players and scores. Download the player list first if you need it.</span>`
+      : `⚠️ <span>This replaces <b>${esc(ev.eventId)}</b> and clears its ${n} ${n === 1 ? 'player' : 'players'} and scores.</span>`;
+    $('btn-create').textContent = running ? 'End this game & create a new one' : 'Create new game';
+  } else $('btn-create').textContent = 'Create game';
+  $('wrap-card').classList.toggle('hidden', !ev);
+  $('wrap-card').classList.toggle('done', !!ev && ev.status === 'final');
   const st = ev ? ev.status : null, total = Object.keys(roster).length;
   if (ev) {
     $('room-code').textContent = ev.displayCode || '····';
@@ -584,7 +795,7 @@ function render(){
   if (st === 'question') { const q = QUESTIONS[ev.qIndex]; title = `Round ${q.round} · Question ${(ev.qIndex % TT.ROUND_SIZE) + 1} of ${TT.ROUND_SIZE}`; sub = ev.paused ? 'Paused — players can\'t answer' : ev.timeUp ? 'Time\'s up — answers are locked. Show the answer when you\'re ready.' : ROUNDS[q.round - 1].title; }
   if (st === 'reveal') { title = 'Answer on screen'; sub = ev.reveal ? `${ev.reveal.pct || 0}% got it right · ${ev.paused ? 'paused' : isAuto() ? 'moving on automatically' : 'waiting for you'}` : ''; }
   if (st === 'intro') { title = `Round ${ev.round} intro`; sub = `${ROUNDS[ev.round - 1].title} · question 1 starts automatically`; }
-  if (st === 'break') { title = (ev.round || 0) >= TOTAL_ROUNDS ? 'All rounds played' : `Round ${ev.round} standings`; sub = (ev.round || 0) >= TOTAL_ROUNDS ? 'Build the suspense, then show the final results.' : ev.breakEndsAt ? 'Order window. The next round starts automatically when the countdown ends.' : 'Order window. Start the next round when the room is ready.'; }
+  if (st === 'break') { title = (ev.round || 0) >= TOTAL_ROUNDS ? 'All rounds played' : `Round ${ev.round} standings`; sub = (ev.round || 0) >= TOTAL_ROUNDS ? 'Build the suspense, then show the final results.' : ev.breakEndsAt ? (isAuto() ? 'Order window. The next round starts automatically when the countdown ends.' : (ev.breakEndsAt > serverNow() ? 'Order window. Countdown is on screen — you start the next round (Manual).' : 'Countdown finished — start the next round when ready.')) : 'Order window. Start the next round when the room is ready.'; }
   if (st === 'final') { title = 'Winners revealed 🎉'; sub = 'Replay the reveal anytime. Download the player list for Chilitos below.'; }
   $('st-title').textContent = title; $('st-sub').textContent = sub;
   const a = mainAction();
@@ -598,13 +809,20 @@ function render(){
   document.querySelectorAll('.seg button').forEach(b => { b.setAttribute('aria-checked', String((b.dataset.mode === 'auto') === auto)); b.disabled = !ev || st === 'final'; });
   $('mode-hint').textContent = auto
     ? `Auto: the answer shows when time runs out, then the next question starts by itself${breakSec() ? `. Breaks last ${fmtDur(breakSec())}, then the next round starts.` : '. You start each round.'}`
-    : 'Manual: when time runs out, answers lock. You show each answer, move to the next question and start each round.';
+    : `Manual: when time runs out, answers lock. You show each answer, move to the next question and start each round${breakSec() ? ` (screens still count down the ${fmtDur(breakSec())} break)` : ''}.`;
   [['t-q', ev ? ev.questionSeconds : TT.QUESTION_SECONDS], ['t-r', ev ? ev.revealSeconds : TT.REVEAL_SECONDS], ['t-b', ev ? (ev.breakSeconds || 0) / 60 : 3]]
     .forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v != null ? v : ''; $(id).disabled = !ev || st === 'final'; });
   $('t-intro').checked = introSec() > 0; $('t-intro').disabled = !ev || st === 'final';
   $('btn-extend').innerHTML = (ev && ev.timeUp ? 'Reopen 15 sec' : '+15 sec') + '<kbd>E</kbd>';
   $('btn-join').textContent = ev && ev.joinClosed ? 'Reopen joining' : 'Close joining';
   $('btn-final-early').disabled = !ev || st === 'final' || st === 'lobby';
+  $('btn-board').disabled = !ev || st === 'question' || !isAdmin;
+  $('btn-board').classList.toggle('on', !!(ev && ev.board));
+  $('btn-board').innerHTML = (ev && ev.board ? 'Hide leaderboard' : st === 'question' ? '🏆 Leaderboard (after this question)' : '🏆 Show leaderboard on screens') + '<kbd>L</kbd>';
+  renderRounds(st);
+  const pushLive = ev && ev.sponsorPushAt && serverNow() < ev.sponsorPushAt + (ev.sponsorPushSecs || 10) * 1000;
+  $('push-live').classList.toggle('hidden', !pushLive);
+  if (pushLive) $('push-live-t').textContent = `On screens now · ${Math.ceil((ev.sponsorPushAt + (ev.sponsorPushSecs || 10) * 1000 - serverNow()) / 1000)}s left`;
   $('btn-export').disabled = !ev;
   if (ev && ev.sponsorMsg != null && document.activeElement !== $('sponsor-msg') && !$('sponsor-msg').dataset.dirty) $('sponsor-msg').value = ev.sponsorMsg || '';
   $('i-players').textContent = `${total} ${total === 1 ? 'player' : 'players'}`;
@@ -617,7 +835,8 @@ function render(){
   let nq = null;
   if (!ev || st === 'lobby') nq = 0; else if (st === 'intro') nq = ((ev.round || 1) - 1) * TT.ROUND_SIZE; else if (st === 'break') nq = (ev.round || 0) * TT.ROUND_SIZE; else if (qi != null && st !== 'final') nq = qi + 1;
   qCard(nq != null && nq < QUESTIONS.length ? nq : null, $('q-next'), 'Up next', false);
-  renderLive(); renderTables(); renderLeaders();
+  renderLive(); renderTables(); if (!(editing && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.edit)) renderPlayers(); renderLeaders();
+  $('btn-reset-scores').disabled = !ev || !isAdmin;
 }
 
 let lastCountPush = 0, pendingCount = null;
@@ -648,6 +867,7 @@ setInterval(() => {
 }, 250);
 
 function renderTables(){
+  if (editing && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.edit) return;
   if (!ev) { $('tbl-list').innerHTML = '<div style="color:var(--muted);font-size:14px">Tables appear here once the game is created.</div>'; return; }
   const counts = {}; for (const pid in roster) counts[roster[pid].table] = (counts[roster[pid].table] || 0) + 1;
   const ids = []; for (let i = 1; i <= (ev.tables || 0); i++) ids.push(String(i)); if (ev.barEnabled !== false) ids.push('bar');
@@ -663,10 +883,57 @@ function renderTables(){
       <span class="rk">${rk >= 0 ? rk + 1 : ''}</span>
       <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}</span>
       <span class="pl">👤 ${counts[t] || 0}</span>
-      <span class="pt">${T[t] ? fmtPts(T[t].score) : ''}</span>
+      ${ptCell('tables', t, T[t] ? T[t].score : (counts[t] ? 0 : null), T[t] && T[t].adj)}
       ${t === 'bar' ? '<span></span>' : `<button type="button" data-rename="${t}" title="Rename" aria-label="Rename">✎</button>`}</div>`;
   }).join('');
 }
+// Score cell: tap to edit inline (Enter saves, Esc cancels)
+let editing = null; // 'tables:3' | 'players:pid'
+function ptCell(kind, id, score, adj){
+  if (score == null) return '<span></span>';
+  const key = kind + ':' + id, shown = kind === 'tables' ? fmtPts(score) : String(score);
+  if (editing === key) return `<span class="pt-edit"><input type="number" step="${kind === 'tables' ? '0.1' : '1'}" value="${shown}" data-edit="${key}" aria-label="New score"><button class="ok" type="button" data-save="${key}" aria-label="Save">✓</button><button class="no" type="button" data-cancel aria-label="Cancel">✕</button></span>`;
+  return `<button class="pt-btn" type="button" data-pt="${key}" title="Tap to correct this score" ${isAdmin ? '' : 'disabled'}>${shown}${adj ? `<span class="adj">${adj > 0 ? '+' : ''}${kind === 'tables' ? fmtPts(adj) : adj}</span>` : ''}</button>`;
+}
+function renderPlayers(){
+  const S = standings || {}, P = S.players || {}, order = (S.playerOrder || []).filter(id => roster[id]);
+  const rest = Object.keys(roster).filter(id => !order.includes(id)).sort((a, b) => (roster[a].name || '').localeCompare(roster[b].name || ''));
+  $('ply-list').innerHTML = order.concat(rest).map((pid, i) => {
+    const r = roster[pid], x = P[pid];
+    return `<div class="tbl-row ply-row"><span class="rk">${x ? i + 1 : ''}</span><span class="nm">${esc(r.name)}<small>${esc(tableName(r.table, names))}</small></span>${ptCell('players', pid, x ? x.score : 0, x && x.adj)}<span></span></div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:14px;padding:8px 6px">Players appear here as they join.</div>';
+}
+let scoreTab = 'tables';
+document.querySelectorAll('.tabs [data-tab]').forEach(b => b.onclick = () => {
+  scoreTab = b.dataset.tab; editing = null;
+  document.querySelectorAll('.tabs [data-tab]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  $('tbl-list').classList.toggle('hidden', scoreTab !== 'tables'); $('ply-list').classList.toggle('hidden', scoreTab !== 'players');
+  renderTables(); renderPlayers();
+});
+function startEdit(key){ editing = key; renderTables(); renderPlayers(); const i = document.querySelector(`[data-edit="${key}"]`); if (i) { i.focus(); i.select(); } }
+async function saveEdit(key){
+  const i = document.querySelector(`[data-edit="${key}"]`); if (!i) return;
+  const v = parseFloat(i.value), [kind, id] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)];
+  editing = null; renderTables(); renderPlayers();
+  if (isFinite(v)) await setScore(kind, id, v);
+}
+['tbl-list', 'ply-list'].forEach(L => {
+  $(L).addEventListener('click', e => {
+    const p = e.target.closest('[data-pt]'); if (p && isAdmin) return startEdit(p.dataset.pt);
+    const sv = e.target.closest('[data-save]'); if (sv) return saveEdit(sv.dataset.save);
+    if (e.target.closest('[data-cancel]')) { editing = null; renderTables(); renderPlayers(); }
+  });
+  $(L).addEventListener('keydown', e => {
+    const i = e.target.closest('[data-edit]'); if (!i) return;
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();   // never let it reach the Space/Enter = main button shortcut
+    if (e.key === 'Enter') { e.preventDefault(); saveEdit(i.dataset.edit); }
+    if (e.key === 'Escape') { e.stopPropagation(); editing = null; renderTables(); renderPlayers(); }
+  });
+});
+$('btn-reset-scores').onclick = () => $('sc-confirm').classList.toggle('hidden');
+$('sc-cancel').onclick = () => $('sc-confirm').classList.add('hidden');
+$('sc-go').onclick = async () => { $('sc-go').disabled = true; try { await resetAllScores(); } finally { $('sc-go').disabled = false; $('sc-confirm').classList.add('hidden'); } };
+
 $('tbl-list').addEventListener('click', async e => {
   const b = e.target.closest('[data-rename]'); if (!b) return;
   const t = b.dataset.rename;
@@ -695,6 +962,47 @@ function recover(){
   else if (ev.status === 'intro') { const r = ev.round; schedule(introSec() - (serverNow() - (ev.introAt || serverNow())) / 1000, () => endIntro(r)); }
   else if (ev.status === 'reveal' && isAuto()) { schedule(Math.max(1, revealSec() - (serverNow() - (ev.revealStartedAt || serverNow())) / 1000), advanceFromReveal); }
 }
+
+// ── Rounds timeline: done / live / up next, each played round has its own ↺ ──
+let pendingRestart = null;
+function roundState(r, st){
+  const cur = (ev && ev.round) || 0;
+  if (!ev || st === 'lobby' || r > cur) return 'next';
+  if (r < cur || st === 'break' || st === 'final') return 'done';
+  return 'live';
+}
+function renderRounds(st){
+  const track = $('rtrack');
+  track.style.setProperty('--n', TOTAL_ROUNDS);
+  const qOf = r => { if (!ev || ev.qIndex == null || ev.round !== r) return null; return (ev.qIndex % TT.ROUND_SIZE) + 1; };
+  track.innerHTML = ROUNDS.map((x, i) => {
+    const r = i + 1, state = roundState(r, st);
+    const label = state === 'done' ? '✓ Round ' + r : state === 'live' ? 'Round ' + r + ' · live' : 'Round ' + r;
+    const sub = state === 'done' ? 'Played' : state === 'live' ? (st === 'intro' ? 'Intro on screen' : `Question ${qOf(r) || 1} of ${TT.ROUND_SIZE}`) : (r === ((ev && ev.round) || 0) + 1 && ev && st !== 'lobby' ? 'Up next' : x.sponsored ? 'Sponsored round' : 'Not played yet');
+    const canRestart = isAdmin && state !== 'next';
+    return `<div class="rchip ${state} ${pendingRestart === r ? 'sel' : ''}">
+      <div class="rn">${label}</div><div class="rt">${esc(x.icon || '')} ${esc(x.title)}</div><div class="rs">${sub}</div>
+      ${canRestart ? `<button class="rr" type="button" data-restart="${r}" title="Restart Round ${r}" aria-label="Restart Round ${r}">↺</button>` : ''}</div>`;
+  }).join('');
+  const show = pendingRestart != null;
+  $('rconfirm').classList.toggle('hidden', !show);
+  if (show) {
+    const r = pendingRestart, later = r < TOTAL_ROUNDS && roundState(r + 1, st) !== 'next';
+    $('rc-title').textContent = `Restart Round ${r} · ${ROUNDS[r - 1].title}?`;
+    $('rc-text').textContent = `Clears ${later ? `answers from Round ${r} onward` : `Round ${r}'s answers`} and rolls scores back to ${r === 1 ? 'zero' : `the end of Round ${r - 1}`}. The round replays from its intro and everyone can answer again.`;
+    $('rc-go').textContent = `Yes, restart Round ${r}`;
+  }
+}
+$('rtrack').addEventListener('click', e => {
+  const b = e.target.closest('[data-restart]'); if (!b) return;
+  const r = +b.dataset.restart; pendingRestart = pendingRestart === r ? null : r; render();
+});
+$('rc-cancel').onclick = () => { pendingRestart = null; render(); };
+$('rc-go').onclick = async () => {
+  const r = pendingRestart; if (!r) return;
+  $('rc-go').disabled = true;
+  try { await restartRound(r); } finally { pendingRestart = null; $('rc-go').disabled = false; render(); }
+};
 
 async function exportCsv(){
   if (!isAdmin || !EVENT_ID) return;
@@ -752,24 +1060,42 @@ $('t-intro').addEventListener('change', async e => {
   toast(e.target.checked ? 'Round intros on' : 'Round intros off — rounds start straight away');
 });
 $('btn-export').onclick = exportCsv;
+$('btn-sponsor-clear').onclick = async () => { if (!ev) return; await evRef().update({ sponsorMsg: null, sponsorPushAt: null }); $('sponsor-msg').value = ''; delete $('sponsor-msg').dataset.dirty; toast('Sponsor message cleared from all screens'); };
+$('btn-sponsor-stop').onclick = async () => { await evRef().update({ sponsorPushAt: null }); toast('Taken down'); render(); };
+$('btn-board').onclick = toggleBoard;
+setInterval(() => {
+  const live = ev && ev.sponsorPushAt && serverNow() < ev.sponsorPushAt + (ev.sponsorPushSecs || 10) * 1000;
+  if (live !== !$('push-live').classList.contains('hidden') || live) {
+    $('push-live').classList.toggle('hidden', !live);
+    if (live) $('push-live-t').textContent = `On screens now · ${Math.ceil((ev.sponsorPushAt + (ev.sponsorPushSecs || 10) * 1000 - serverNow()) / 1000)}s left`;
+  }
+}, 500);
+$('btn-ng-cancel').onclick = () => { setupOpen = false; render(); };
+$('ng-modal').addEventListener('click', e => { if (e.target === $('ng-modal')) { setupOpen = false; render(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (setupOpen && ev) { setupOpen = false; render(); } else if (pendingRestart) { pendingRestart = null; render(); } } });
 $('sponsor-msg').addEventListener('input', e => e.target.dataset.dirty = '1');
 $('btn-sponsor').onclick = async () => {
   if (!ev) return;
-  const msg = $('sponsor-msg').value.trim() || null;
-  await evRef().update({ sponsorMsg: msg, sponsorPushAt: msg ? firebase.database.ServerValue.TIMESTAMP : null });
+  const msg = $('sponsor-msg').value.trim();
+  if (!msg) { toast('Type a message first'); $('sponsor-msg').focus(); return; }
+  const secs = Math.max(3, Math.min(300, parseInt($('sponsor-secs').value) || 10));
+  $('sponsor-secs').value = secs;
+  await evRef().update({ sponsorMsg: msg, sponsorPushSecs: secs, sponsorPushAt: msg ? firebase.database.ServerValue.TIMESTAMP : null });
+  if (msg) setTimeout(render, secs * 1000 + 300);
   delete $('sponsor-msg').dataset.dirty;
-  toast(msg ? (ev.status === 'question' ? 'Saved — it pops up when this question ends' : 'Showing on the TV and phones now') : 'Sponsor message removed');
+  toast(`📣 Showing on the TV and all phones for ${secs} seconds`);
 };
 document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
   const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link:', url); }
 });
 document.addEventListener('keydown', e => {
-  if (!isAdmin || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (!isAdmin || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || (setupOpen && ev)) return;
   if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); runMain(); }
   else if (e.key === 'p' || e.key === 'P') togglePause();
   else if (e.key === 'e' || e.key === 'E') extend();
   else if (e.key === 'a' || e.key === 'A') setAuto(!isAuto());
+  else if (e.key === 'l' || e.key === 'L') toggleBoard();
 });
 
 // ── Auth ──
