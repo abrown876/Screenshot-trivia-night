@@ -139,6 +139,24 @@ textarea.inp{height:auto;min-height:70px;padding:12px 14px;resize:vertical;line-
 .qi .acts button.arm{width:auto;padding:0 8px;background:var(--red);border-color:var(--red);color:#fff;font-weight:800}
 .qs-addr{border:1.5px dashed var(--line);background:none;color:var(--dim);border-radius:10px;min-height:38px;font-weight:700;font-size:13px;cursor:pointer}
 .qs-addr:hover{color:var(--text);border-color:var(--purple)}
+.im-card{width:min(760px,100%)}
+.im-sum{font-size:14px;color:var(--dim);margin:2px 0 12px}
+.im-sum b{color:var(--text)}
+.im-errs{margin-bottom:12px;padding:10px 12px;border-radius:10px;background:rgba(255,183,64,.1);border:1px solid rgba(255,183,64,.45);font-size:13px;line-height:1.5;max-height:120px;overflow:auto}
+.im-errs b{color:var(--gold)}
+.im-prev{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;max-height:280px;overflow:auto;margin-bottom:12px}
+.im-r{background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.im-r h4{font-size:13px;font-weight:800;margin-bottom:6px}
+.im-r h4 small{color:var(--muted);font-weight:600}
+.im-r li{font-size:12px;color:var(--dim);line-height:1.35;margin:0 0 5px 16px}
+.im-r li b{color:var(--green);font-weight:700}
+.im-opts{display:grid;gap:8px;margin-bottom:12px}
+.im-o{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer}
+.im-o:has(input:checked){border-color:var(--purple);background:rgba(124,110,246,.08)}
+.im-o.off{opacity:.4;pointer-events:none}
+.im-o input{margin-top:3px;accent-color:var(--purple)}
+.im-o b{display:block;font-size:14px}
+.im-o small{color:var(--muted);font-size:12.5px}
 .qe-card{width:min(640px,100%)}
 .qe-card label{display:block;color:var(--dim);font-size:13px;font-weight:600}
 .qe-card .inp{margin-top:6px}
@@ -405,7 +423,7 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       <textarea class="inp" id="sponsor-msg" maxlength="140" placeholder="Type the sponsor message to show on screens…"></textarea>
       <div class="img-row">
         <div class="img-thumb hidden" id="sp-thumb"><img id="sp-thumb-img" alt="Sponsor image preview"><button type="button" id="sp-img-x" aria-label="Remove image" title="Remove image">×</button></div>
-        <label class="img-pick" id="sp-pick"><input type="file" id="sp-file" accept="image/*" hidden><span id="sp-pick-t">🖼 Add an image <small>square 1080 × 1080 works best</small></span></label>
+        <label class="img-pick" id="sp-pick"><input type="file" id="sp-file" accept="image/*" hidden><span id="sp-pick-t">🖼 Add an image <small>square 1080×1080 · portrait 1080×1350 · story 1080×1920</small></span></label>
       </div>
       <div class="push-row">
         <button class="btn btn-push" id="btn-sponsor" type="button">📣 Push to screens now</button>
@@ -453,10 +471,31 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
       <div class="qs-tools">
         <button class="btn btn-push" id="qs-next" type="button">⚡ Add a question to play next</button>
         <button class="btn btn-soft" id="qs-add" type="button">＋ Add question</button>
+        <button class="btn btn-soft" id="qs-import" type="button">⬆ Import spreadsheet</button>
+        <button class="btn btn-soft" id="qs-export" type="button">⬇ Export</button>
         <button class="btn btn-soft" id="qs-save" type="button">💾 Save set for future games</button>
+        <input type="file" id="qs-file" accept=".csv,text/csv,.tsv,.txt" hidden>
       </div>
     </div>
     <div class="qs-grid" id="qs-list"></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="im-modal" role="dialog" aria-modal="true" aria-labelledby="im-title">
+  <div class="modal-card im-card">
+    <h2 class="modal-h" id="im-title">Import questions</h2>
+    <div class="im-sum" id="im-sum"></div>
+    <div class="im-errs hidden" id="im-errs"></div>
+    <div class="im-prev" id="im-prev"></div>
+    <div class="im-opts">
+      <label class="im-o"><input type="radio" name="im-mode" value="replace" checked><span><b>Replace the question set</b><small>Use only the questions in this file</small></span></label>
+      <label class="im-o"><input type="radio" name="im-mode" value="add"><span><b>Add to the current set</b><small>Questions go to the end of their round</small></span></label>
+      <label class="check" style="height:auto;margin-top:6px"><input type="checkbox" id="im-save" checked> Also save as my set for future games</label>
+    </div>
+    <div class="qe-actions">
+      <button class="btn btn-soft" id="im-cancel" type="button">Cancel</button>
+      <button class="btn btn-main" id="im-go" type="button">Import</button>
+    </div>
   </div>
 </div>
 
@@ -1285,13 +1324,131 @@ function renderQSet(){
     </div>`;
   }).join('');
 }
-async function writeQuestions(list){
+async function writeQuestions(list, rounds){
   list = sortByRound(list);
-  if (editingSet()) { SET = Object.assign({}, SET, { questions: list }); syncQuestions(); render(); return; }
+  if (editingSet()) { SET = Object.assign({}, SET, { questions: list }, rounds ? { rounds } : {}); syncQuestions(); render(); return; }
   const keys = list.map(q => q.a);
-  await ttRef('').update({ [`events/${EVENT_ID}/questions`]: list.map(toPublic), [`answerKeys/${EVENT_ID}`]: keys });
+  const u = { [`events/${EVENT_ID}/questions`]: list.map(toPublic), [`answerKeys/${EVENT_ID}`]: keys };
+  if (rounds) u[`events/${EVENT_ID}/rounds`] = rounds;
+  await ttRef('').update(u);
   liveKey = keys; syncQuestions();
 }
+
+// ── Spreadsheet import / export (CSV — Excel and Google Sheets both save it in one click) ──
+const CSV_COLS = ['Round', 'Round title', 'Question', 'A', 'B', 'C', 'D', 'Correct', 'Category', 'Emoji', 'Bonus'];
+function parseCSV(text){
+  text = String(text || '').replace(/^\uFEFF/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const delim = [',', ';', '\t'].map(d => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; continue; }
+    if (c === '"') q = true;
+    else if (c === delim) { row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+    else f += c;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim() !== ''));
+}
+const HEAD_ALIASES = {
+  round: ['round', 'round #', 'round number', 'rnd'], title: ['round title', 'round name', 'title', 'theme'],
+  q: ['question', 'q', 'question text'], a: ['a', 'option a', 'answer a'], b: ['b', 'option b', 'answer b'],
+  c: ['c', 'option c', 'answer c'], d: ['d', 'option d', 'answer d'], correct: ['correct', 'correct answer', 'answer', 'right answer', 'key'],
+  cat: ['category', 'cat', 'topic'], emoji: ['emoji', 'emoji clue', 'clue'], bonus: ['bonus', 'bonus prize', 'prize'],
+};
+function readQuestionSheet(text){
+  const rows = parseCSV(text); if (!rows.length) return { error: 'The file is empty.' };
+  const head = rows[0].map(h => String(h).trim().toLowerCase()), col = {};
+  for (const k in HEAD_ALIASES) col[k] = head.findIndex(h => HEAD_ALIASES[k].includes(h));
+  const missing = ['round', 'q', 'a', 'b', 'c', 'd', 'correct'].filter(k => col[k] < 0);
+  if (missing.length) return { error: `Missing column${missing.length > 1 ? 's' : ''}: ${missing.map(k => ({ round: 'Round', q: 'Question', a: 'A', b: 'B', c: 'C', d: 'D', correct: 'Correct' })[k]).join(', ')}. Download the template to see the layout.` };
+  const get = (r, k) => col[k] >= 0 ? String(r[col[k]] == null ? '' : r[col[k]]).trim() : '';
+  const qs = [], errs = [], titles = {};
+  rows.slice(1).forEach((r, i) => {
+    const line = i + 2, round = parseInt(get(r, 'round')), q = get(r, 'q'), o = ['a', 'b', 'c', 'd'].map(k => get(r, k)), cor = get(r, 'correct');
+    if (!q && o.every(x => !x)) return;                                   // blank row
+    if (!(round >= 1 && round <= 12)) return errs.push(`Row ${line}: Round must be a number (1, 2, 3…)`);
+    if (!q) return errs.push(`Row ${line}: question is empty`);
+    const gap = o.findIndex(x => !x); if (gap >= 0) return errs.push(`Row ${line}: answer ${'ABCD'[gap]} is empty`);
+    if (!cor) return errs.push(`Row ${line}: Correct is empty — put A, B, C or D`);
+    let a = cor.length === 1 ? 'ABCD'.indexOf(cor.toUpperCase()) : -1;
+    if (a < 0 && /^[1-4]$/.test(cor)) a = +cor - 1;
+    if (a < 0) a = o.findIndex(x => x.toLowerCase() === cor.toLowerCase());
+    if (a < 0) return errs.push(`Row ${line}: Correct should be A, B, C or D (got "${cor || 'blank'}")`);
+    const item = { round, q, o, a }; ['cat', 'emoji', 'bonus'].forEach(k => { const v = get(r, k); if (v) item[k] = v; });
+    const t = get(r, 'title'); if (t && !titles[round]) titles[round] = t;
+    qs.push(item);
+  });
+  // Renumber rounds 1..N in order (so "1, 2, 5" becomes 1, 2, 3)
+  const nums = [...new Set(qs.map(x => x.round))].sort((x, y) => x - y), map = {}; nums.forEach((n, i) => map[n] = i + 1);
+  qs.forEach(x => x.round = map[x.round]);
+  const rTitles = {}; for (const n in titles) rTitles[map[n]] = titles[n];
+  return { questions: qs, errs, roundCount: nums.length, titles: rTitles };
+}
+function buildRounds(count, titles){
+  return Array.from({ length: count }, (_, i) => {
+    const old = ROUNDS[i] || {}, t = titles[i + 1];
+    if (!t || t === old.title) return Object.assign({}, old.title ? old : { title: `Round ${i + 1}` });
+    const r = { title: t }; if (/chilitos/i.test(t)) r.sponsored = true; return r;
+  });
+}
+let imData = null;
+function canImport(){ return editingSet() || (ev && (ev.status === 'lobby' || ev.status === 'final')); }
+$('qs-import').onclick = () => { if (!canImport()) return toast('Import before the game starts — or add questions with ＋ during the game'); $('qs-file').click(); };
+$('qs-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (/\.xlsx?$/i.test(f.name)) return toast('Save it as CSV first: Excel → File → Save As → CSV');
+  const res = readQuestionSheet(await f.text());
+  if (res.error) return toast(res.error, 6000);
+  if (!res.questions.length) return toast('No questions found in that file', 5000);
+  imData = res;
+  const R = buildRounds(res.roundCount, res.titles);
+  $('im-sum').innerHTML = `<b>${res.questions.length} questions</b> in <b>${res.roundCount} round${res.roundCount > 1 ? 's' : ''}</b> from ${esc(f.name)}`;
+  $('im-errs').classList.toggle('hidden', !res.errs.length);
+  $('im-errs').innerHTML = res.errs.length ? `<b>${res.errs.length} row${res.errs.length > 1 ? 's' : ''} skipped</b> — fix ${res.errs.length > 1 ? 'them' : 'it'} in the sheet and import again, or carry on without:<br>${res.errs.slice(0, 12).map(esc).join('<br>')}${res.errs.length > 12 ? '<br>…' : ''}` : '';
+  $('im-prev').innerHTML = R.map((r, i) => {
+    const list = res.questions.filter(x => x.round === i + 1);
+    return `<div class="im-r"><h4>${esc(r.title)} <small>· ${list.length}</small></h4><ol>${list.slice(0, 6).map(x => `<li>${x.emoji ? esc(x.emoji) + ' ' : ''}${esc(x.q)} <b>${esc(x.o[x.a])}</b></li>`).join('')}${list.length > 6 ? '<li>…</li>' : ''}</ol></div>`;
+  }).join('');
+  $('im-go').textContent = `Import ${res.questions.length} questions`;
+  $('im-modal').classList.remove('hidden');
+});
+$('im-cancel').onclick = () => { $('im-modal').classList.add('hidden'); imData = null; };
+$('im-modal').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') $('im-cancel').click(); });
+$('im-go').onclick = async () => {
+  if (!imData) return;
+  const mode = document.querySelector('input[name="im-mode"]:checked').value;
+  let list, rounds;
+  if (mode === 'replace') { list = imData.questions; rounds = buildRounds(imData.roundCount, imData.titles); }
+  else {
+    const n = Math.max(TOTAL_ROUNDS, imData.roundCount);
+    rounds = Array.from({ length: n }, (_, i) => ROUNDS[i] || buildRounds(imData.roundCount, imData.titles)[i] || { title: `Round ${i + 1}` });
+    list = QUESTIONS.map(x => Object.assign({}, x)).concat(imData.questions);
+  }
+  $('im-go').disabled = true;
+  try {
+    await writeQuestions(list, rounds);
+    if ($('im-save').checked) {
+      const clean = sortByRound(list).map(q => { const c = Object.assign({}, q); delete c.added; return c; });
+      try { await ttRef('bank').set({ rounds, questions: clean, savedAt: firebase.database.ServerValue.TIMESTAMP }); SET = { rounds, questions: clean, saved: true }; }
+      catch (e) { toast('Imported for tonight — saving for future games needs the latest database rules', 6000); }
+    }
+    $('im-modal').classList.add('hidden'); imData = null;
+    toast(`⬆ Imported · ${sortByRound(list).length} questions in ${rounds.length} rounds`);
+    render();
+  } catch (e) { console.warn(e); toast("Import didn't go through — try again"); }
+  finally { $('im-go').disabled = false; }
+};
+function csvCell(v){ v = v == null ? '' : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function questionsToCSV(list, rounds){
+  return '\uFEFF' + [CSV_COLS.join(',')].concat(sortByRound(list).map(q => [q.round, (rounds[q.round - 1] || {}).title || '', q.q, q.o[0], q.o[1], q.o[2], q.o[3], 'ABCD'[q.a], q.cat || '', q.emoji || '', q.bonus || ''].map(csvCell).join(','))).join('\r\n');
+}
+function downloadText(name, text){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' })); a.download = name; a.click();
+}
+$('qs-export').onclick = () => { downloadText(`table-trivia-questions-${new Date().toISOString().slice(0, 10)}.csv`, questionsToCSV(QUESTIONS, ROUNDS)); toast(`⬇ Exported ${QUESTIONS.length} questions`); };
 // Editor
 let qeMode = null, qeIdx = null, qeAns = 0;
 function qeOptsHtml(vals){
@@ -1465,17 +1622,24 @@ $('sponsor-from').addEventListener('input', e => e.target.dataset.dirty = '1');
 // so the game state stays small; screens fetch it only when it changes.
 let spImg = null;          // data URL ready to push (null = text only)
 function showThumb(){ $('sp-thumb').classList.toggle('hidden', !spImg); if (spImg) $('sp-thumb-img').src = spImg;
-  $('sp-pick-t').innerHTML = spImg ? 'Change image <small>pushes as a full-screen pop-up</small>' : '🖼 Add an image <small>square 1080 × 1080 works best</small>'; }
+  $('sp-pick-t').innerHTML = spImg ? 'Change image <small>shows at its own shape — square, portrait or story</small>' : '🖼 Add an image <small>square 1080×1080 · portrait 1080×1350 · story 1080×1920</small>'; }
 function shrinkImage(file){
   return new Promise((res, rej) => {
     const url = URL.createObjectURL(file), im = new Image();
     im.onload = () => {
-      const k = Math.min(1, 1080 / Math.max(im.width, im.height)), w = Math.round(im.width * k), h = Math.round(im.height * k);
-      const c = document.createElement('canvas'); c.width = w; c.height = h;
-      const x = c.getContext('2d'); x.fillStyle = '#080818'; x.fillRect(0, 0, w, h); x.drawImage(im, 0, 0, w, h);
+      // Keep full social sizes: short side up to 1080, long side up to 1920 (1080×1080, 1080×1350, 1080×1920, 1920×1080…)
+      const short = Math.min(im.width, im.height), long = Math.max(im.width, im.height);
+      let k = Math.min(1, 1080 / short, 1920 / long), out = '';
       URL.revokeObjectURL(url);
-      let q = .86, out = c.toDataURL('image/jpeg', q);
-      while (out.length > 340000 && q > .45) { q -= .08; out = c.toDataURL('image/jpeg', q); }
+      for (let tries = 0; tries < 6; tries++) {          // stay under ~400 KB so it loads fast on restaurant Wi-Fi
+        const w = Math.round(im.width * k), h = Math.round(im.height * k);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const x = c.getContext('2d'); x.fillStyle = '#080818'; x.fillRect(0, 0, w, h); x.drawImage(im, 0, 0, w, h);
+        let q = .86; out = c.toDataURL('image/jpeg', q);
+        while (out.length > 540000 && q > .5) { q -= .08; out = c.toDataURL('image/jpeg', q); }
+        if (out.length <= 540000) break;
+        k *= .85;
+      }
       res(out);
     };
     im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Not an image')); };
@@ -1485,7 +1649,7 @@ function shrinkImage(file){
 $('sp-file').addEventListener('change', async e => {
   const f = e.target.files && e.target.files[0]; e.target.value = '';
   if (!f) return;
-  try { spImg = await shrinkImage(f); showThumb(); toast(`Image ready · ${Math.round(spImg.length * .75 / 1024)} KB`); }
+  try { spImg = await shrinkImage(f); showThumb(); { const t = new Image(); t.onload = () => toast(`Image ready · ${t.naturalWidth}×${t.naturalHeight} · ${Math.round(spImg.length * .75 / 1024)} KB`); t.src = spImg; } }
   catch (err) { toast("That file isn't an image we can use"); }
 });
 $('sp-img-x').onclick = () => { spImg = null; showThumb(); };
@@ -1526,7 +1690,7 @@ document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
 document.addEventListener('keydown', e => {
   // Check where the key came from (not what's focused now — an input may blur itself on Enter first)
   const from = e.target || {};
-  if (!isAdmin || /INPUT|TEXTAREA|SELECT/.test(from.tagName || '') || from.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || (setupOpen && ev) || qeMode) return;
+  if (!isAdmin || /INPUT|TEXTAREA|SELECT/.test(from.tagName || '') || from.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || (setupOpen && ev) || qeMode || imData) return;
   if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); runMain(); }
   else if (e.key === 'p' || e.key === 'P') togglePause();
   else if (e.key === 'e' || e.key === 'E') adjustTime(15);
