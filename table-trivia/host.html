@@ -231,7 +231,13 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 .links{display:grid;gap:8px;margin-top:14px}
 .link{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
 .link a{color:var(--text);text-decoration:none}
-.link button{background:none;border:none;color:var(--purple);font-weight:700;font-size:13px}
+.link a small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:1px}
+.lk-btns{display:flex;gap:6px;flex-shrink:0}
+.lk-btns button{height:32px;padding:0 12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
+.lk-open{background:var(--purple);border:none;color:#fff}
+.lk-open:hover{filter:brightness(1.12)}
+.lk-copy{background:none;border:1.5px solid var(--line);color:var(--dim)}
+.lk-copy:hover{color:var(--text);border-color:var(--purple)}
 
 /* tables */
 .tbl-list{display:grid;gap:2px;max-height:380px;overflow:auto}
@@ -386,9 +392,9 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
         <div class="summary"><div><div style="color:var(--dim);font-size:13px;font-weight:600">Room code</div><div class="code" id="room-code">····</div></div>
           <div style="text-align:right;color:var(--dim);font-size:14px;font-weight:600" id="sum-meta"></div></div>
         <div class="links">
-          <div class="link"><a id="lnk-tv" target="_blank">📺 Open the TV screen</a><button data-copy="tv" type="button">Copy link</button></div>
-          <div class="link"><a id="lnk-join" target="_blank">📱 Player link</a><button data-copy="join" type="button">Copy link</button></div>
-          <div class="link"><a id="lnk-tents" target="_blank" href="tents.html">🖨 Print table cards</a><span></span></div>
+          <div class="link"><a id="lnk-tv" target="_blank" data-open="tv">📺 TV screen <small>opens in its own window — drag it to the TV</small></a><span class="lk-btns"><button class="lk-open" data-open="tv" type="button">Open ↗</button><button class="lk-copy" data-copy="tv" type="button">Copy</button></span></div>
+          <div class="link"><a id="lnk-join" target="_blank" data-open="join">📱 Player page <small>what guests see on their phones</small></a><span class="lk-btns"><button class="lk-open" data-open="join" type="button">Open ↗</button><button class="lk-copy" data-copy="join" type="button">Copy</button></span></div>
+          <div class="link"><a id="lnk-tents" target="_blank" href="tents.html" data-open="tents">🖨 Table cards <small>printable QR cards for each table</small></a><span class="lk-btns"><button class="lk-open" data-open="tents" type="button">Open ↗</button></span></div>
         </div>
       </div>
     </div>
@@ -1500,6 +1506,19 @@ $('btn-sponsor').onclick = async () => {
   delete $('sponsor-msg').dataset.dirty;
   toast(`📣 ${spImg ? 'Image' : 'Message'} showing on the TV and all phones for ${secs} seconds`);
 };
+// Open in a separate window: TV as a 16:9 window you can drag to the TV display, player page phone-sized.
+// Named windows, so clicking again brings the same window forward instead of piling up tabs.
+const OPEN = {
+  tv: () => [TV_URL, 'tt-tv', 'popup,width=1280,height=720'],
+  join: () => [joinUrl(null, ev && ev.displayCode), 'tt-player', 'popup,width=420,height=860'],
+  tents: () => [new URL('tents.html', location.href).toString(), 'tt-tents', 'popup,width=1000,height=900'],
+};
+document.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', e => {
+  e.preventDefault();
+  const [url, name, feat] = OPEN[el.dataset.open]();
+  const w = window.open(url, name, feat);
+  if (w) { try { w.focus(); } catch (x) {} } else window.open(url, '_blank');   // popup blocked → plain new tab
+}));
 document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
   const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link:', url); }
