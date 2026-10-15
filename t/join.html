@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080818">
+<title>Table Trivia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080818;--s1:#10102A;--s2:#181832;--s3:#22223F;
+  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--green:#3DDC84;--red:#FF4B5C;
+  --text:#F0F0FF;--dim:#9A9AC8;--muted:#5A5A8A;--line:rgba(124,110,246,.16);
+  --display:'Outfit',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;
+  --r:14px;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--display);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+  background:radial-gradient(120% 60% at 10% -10%,rgba(124,110,246,.16),transparent 60%),radial-gradient(90% 50% at 100% 110%,rgba(255,92,138,.10),transparent 60%),var(--bg)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hidden{display:none !important}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 20px;padding-top:calc(10px + env(safe-area-inset-top));background:rgba(8,8,24,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hdr-logo{height:28px;width:auto;display:block}
+.hdr-me{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.hdr-table{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;max-width:52vw;min-width:0}
+.hdr-table b,.hdr-table small{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-table b{color:var(--text);font-weight:800;font-size:14px}
+.hdr-table small{color:var(--dim);font-weight:600;font-size:11.5px}
+.hdr-pts{font-family:var(--mono);font-size:13px;color:var(--bg);background:var(--gold);border-radius:999px;padding:3px 10px}
+.banner{position:sticky;top:49px;z-index:19;text-align:center;font-weight:700;font-size:14px;padding:8px 16px}
+.banner.pause{background:var(--gold);color:#1a1300}
+.banner.offline{background:var(--red);color:#fff}
+.tbar{height:4px;background:var(--s2);overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--purple);transform-origin:left;transition:transform .25s linear,background .3s}
+.tbar.warn i{background:var(--red)}
+
+main{flex:1;width:100%;max-width:460px;margin:0 auto;padding:24px 20px 16px;display:flex;flex-direction:column}
+section{display:flex;flex-direction:column;flex:1;animation:in .28s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.center{justify-content:center;text-align:center}
+
+h1{font-weight:900;font-size:30px;line-height:1.08;letter-spacing:-.01em}
+h2{font-weight:800;font-size:22px;line-height:1.2}
+.lede{color:var(--dim);font-size:16px;line-height:1.45;margin-top:8px}
+.fine{color:var(--muted);font-size:12.5px;line-height:1.45;text-align:center;margin-top:14px}
+
+/* form */
+.field{margin-top:24px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:15px;margin-bottom:10px}
+.lbl small{font-weight:500;font-size:13px;color:var(--dim)}
+.inp{width:100%;height:54px;background:var(--s2);border:1.5px solid var(--line);border-radius:var(--r);padding:0 16px;font-size:17px;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--purple)}
+.inp::placeholder{color:var(--muted)}
+.inp.code{font-family:var(--mono);font-size:24px;letter-spacing:.5em;text-align:center;text-transform:uppercase;padding-left:calc(16px + .5em)}
+.tables{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}
+.tbl{height:50px;border-radius:12px;background:var(--s2);border:1.5px solid var(--line);font-weight:800;font-size:17px}
+.tbl.bar{grid-column:1/-1;font-size:16px}
+.tbl[aria-pressed="true"]{background:var(--purple);border-color:var(--purple)}
+.picked{display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 8px 0 16px;background:var(--s2);border:1.5px solid var(--purple);border-radius:var(--r);font-weight:800;font-size:18px}
+.ghost{background:none;border:none;color:var(--dim);font-weight:600;font-size:14px;padding:10px 12px;text-decoration:underline;text-underline-offset:3px}
+.ok{color:var(--green);font-weight:700;font-size:14px}
+.btn{width:100%;min-height:56px;border:none;border-radius:var(--r);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .08s,opacity .15s}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.5}
+.btn-main{background:linear-gradient(135deg,var(--purple),var(--coral));color:#fff;margin-top:28px}
+.btn-google{background:#fff;color:#1f1f1f}
+.btn-google svg{width:20px;height:20px}
+.btn-soft{background:var(--s2);border:1.5px solid var(--line);color:var(--text);margin-top:12px}
+.signed{display:flex;align-items:center;justify-content:space-between;gap:10px;height:54px;padding:0 8px 0 16px;background:var(--s2);border:1.5px solid rgba(61,220,132,.5);border-radius:var(--r);font-size:15px;font-weight:600}
+.signed span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:10px;text-align:center}
+
+/* waiting */
+.pulse{width:72px;height:72px;margin:0 auto 20px;border-radius:50%;background:rgba(124,110,246,.15);display:grid;place-items:center;font-size:34px;position:relative}
+.pulse::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--purple);animation:ring 1.8s ease-out infinite}
+@keyframes ring{from{transform:scale(1);opacity:.8}to{transform:scale(1.45);opacity:0}}
+.mates{margin-top:24px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left}
+.mates h3{font-size:14px;font-weight:700;color:var(--dim);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--s3);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+.chip.me{background:var(--purple)}
+
+/* question */
+.qmeta{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-weight:600;font-size:14px}
+.timer{font-family:var(--mono);font-size:22px;color:var(--text);min-width:2ch;text-align:right}
+.timer.warn{color:var(--red)}
+.dots{display:flex;gap:5px;margin-top:10px}
+.dots i{flex:1;height:4px;border-radius:2px;background:var(--s3)}
+.dots i.done{background:var(--muted)}
+.dots i.now{background:var(--purple)}
+.bonus{margin-top:16px;background:rgba(255,183,64,.1);border:1.5px solid rgba(255,183,64,.6);color:var(--gold);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;line-height:1.35}
+.qvis{text-align:center;margin-top:20px}
+.qemoji{font-size:56px;letter-spacing:.08em;line-height:1.1}
+.qimg{max-width:100%;max-height:200px;border-radius:12px}
+.qtext{font-weight:800;font-size:23px;line-height:1.25;margin-top:18px}
+.opts{display:grid;gap:10px;margin-top:22px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;text-align:left;background:var(--s2);border:2px solid transparent;border-radius:var(--r);padding:10px 14px;font-weight:700;font-size:17px;line-height:1.25;transition:opacity .2s,border-color .2s,transform .08s}
+.opt:active{transform:scale(.985)}
+.opt .k{flex-shrink:0;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:16px;background:var(--c);color:var(--ink)}
+.opt[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--s2))}
+.opts.locked .opt:not([aria-pressed="true"]){opacity:.35}
+.opt:disabled{cursor:default}
+.lockin{margin-top:16px;text-align:center;font-weight:700;font-size:15px;color:var(--dim)}
+.lockin b{color:var(--text)}
+
+/* result cards */
+.badge{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;font-size:46px;font-weight:900;animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.badge.good{background:rgba(61,220,132,.16);color:var(--green);border:3px solid var(--green)}
+.badge.bad{background:rgba(255,75,92,.14);color:var(--red);border:3px solid var(--red)}
+.badge.idle{background:var(--s2);color:var(--dim);border:3px solid var(--s3)}
+.ans{display:inline-flex;align-items:center;gap:10px;margin-top:14px;background:var(--s2);border-radius:12px;padding:8px 14px 8px 8px;font-weight:700;font-size:17px}
+.ans .k{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:14px;background:var(--c);color:var(--ink)}
+.mine{color:var(--dim);font-size:14px;margin-top:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px 10px;text-align:center}
+.stat b{display:block;font-family:var(--mono);font-size:26px;line-height:1.1}
+.stat span{display:block;color:var(--dim);font-size:13px;font-weight:600;margin-top:4px}
+.win{margin-top:16px;background:var(--gold);color:#1a1300;border-radius:12px;padding:12px 14px;font-weight:800;text-align:center}
+.board{margin-top:20px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-align:left}
+.row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);font-weight:700;font-size:15px}
+.row:first-child{border-top:none}
+.row .n{font-family:var(--mono);color:var(--dim);font-size:14px}
+.row .p{font-family:var(--mono);color:var(--gold)}
+.row.me{background:rgba(124,110,246,.16)}
+.sponsor small,.push small{letter-spacing:.12em;text-transform:uppercase}
+.sponsor small{display:block;color:var(--dim);font-size:11px;font-weight:800;margin-bottom:4px}
+.sponsor{margin-top:16px;border:1.5px dashed rgba(255,183,64,.6);border-radius:var(--r);padding:14px;color:var(--gold);font-weight:700;line-height:1.4;text-align:center}
+.next{color:var(--dim);font-size:14px;margin-top:16px;text-align:center}
+
+.push{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;background:linear-gradient(135deg,#2a2150,#3a1f3a);border:1.5px solid var(--gold);border-radius:16px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:in .35s ease-out}
+.push small{display:block;color:var(--gold);font-weight:700;font-size:12.5px;margin-bottom:4px}
+.push div{font-weight:800;font-size:16px;line-height:1.35}
+.push button{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--dim);font-size:18px;padding:6px}
+body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
+#cf{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:30}
+.drumroll{font-size:56px;animation:drumr .18s ease-in-out infinite alternate;display:inline-block}
+@keyframes drumr{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.08)}}
+.countdown{font-family:var(--mono);color:var(--gold)}
+.r-next{margin-top:14px;color:var(--dim);font-weight:700;font-size:14px}
+.r-next b{font-family:var(--mono);color:var(--gold);font-size:18px}
+.bigcount{margin-top:18px;text-align:center;background:var(--s1);border:1.5px solid rgba(255,183,64,.5);border-radius:var(--r);padding:12px 16px}
+.bigcount small{display:block;color:var(--dim);font-weight:700;font-size:13px}
+.bigcount b{display:block;font-family:var(--mono);color:var(--gold);font-size:44px;line-height:1.1}
+.bigcount.soon b{font-family:var(--display);font-weight:800;font-size:20px;color:var(--text);padding:8px 0}
+.lb-h{font-weight:700;font-size:14px;color:var(--dim);margin:22px 0 -10px;text-align:left}
+.row .nm small{display:block;color:var(--dim);font-weight:600;font-size:12.5px}
+.push.top{top:calc(58px + env(safe-area-inset-top));bottom:auto;padding:10px 40px 10px 14px}
+.push.top div{font-size:14.5px}
+/* image push: centred pop-up; during a question it shrinks to a thumbnail banner so answers stay tappable */
+.push.img:not(.top){top:calc(70px + env(safe-area-inset-top));bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:min(92vw,440px);padding:12px;text-align:center;box-shadow:0 0 0 100vmax rgba(5,5,16,.72),0 12px 40px rgba(0,0,0,.5)}
+.push-img{display:block;width:100%;height:auto;max-height:62vh;object-fit:contain;border-radius:12px;margin:2px 0 0}
+.push.img:not(.top) #push-msg{margin-top:10px}
+.push.img #push-msg:empty{display:none}
+.push.img.top{display:grid;grid-template-columns:52px 1fr;column-gap:12px;align-items:center}
+.push.img.top .push-img{width:52px;height:52px;object-fit:cover;border-radius:8px;grid-row:1 / span 2;margin:0}
+.push.img.top small{grid-column:2}
+.push.img.top #push-msg{grid-column:2}
+.partner-wrap{display:none;width:100%;margin-top:28px}
+.partner-link{display:block;line-height:0;border-radius:10px;overflow:hidden}
+.partner-link img{width:100%;height:auto;display:block}
+.partner-label{display:block;text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin-top:8px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  background:var(--s3);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600;font-size:14.5px;max-width:calc(100vw - 40px);text-align:center;transition:opacity .2s,transform .2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* round intro */
+#s-intro{position:relative;min-height:62vh;justify-content:center;text-align:center;overflow:hidden}
+.ix-floats{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+  -webkit-mask:radial-gradient(ellipse 50% 32% at 50% 50%,transparent 60%,#000 100%);mask:radial-gradient(ellipse 50% 32% at 50% 50%,transparent 60%,#000 100%)}
+.ix-f{position:absolute;bottom:-60px;font-weight:900;line-height:1;opacity:0;animation:ixrise var(--d) linear var(--w) infinite}
+.ix-f.tile{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;font-size:16px;background:var(--c);color:var(--ink)}
+.ix-f.q{font-size:38px;color:var(--c)}
+@keyframes ixrise{0%{transform:translateY(0) rotate(0);opacity:0}15%{opacity:.7}80%{opacity:.45}100%{transform:translateY(-75vh) rotate(var(--r));opacity:0}}
+.ix-core{position:relative;z-index:2}
+.ix-kick{font-weight:800;color:var(--gold);font-size:16px}
+.ix-round{font-weight:900;font-size:76px;line-height:.95;letter-spacing:-.03em;margin:6px 0 4px;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ix-round.small{font-size:58px}
+.ix-title{font-weight:900;font-size:26px;line-height:1.15}
+.ix-spon{display:inline-block;margin-top:10px;border:1.5px solid rgba(255,183,64,.75);color:var(--gold);border-radius:999px;padding:4px 14px;font-weight:800;font-size:13px}
+.ix-msg{color:var(--dim);font-weight:600;font-size:16px;line-height:1.45;margin-top:14px}
+.ix-msg b{color:var(--text)}
+.ix-count{position:relative;height:84px;margin-top:18px}
+.ix-count span{position:absolute;left:0;right:0;font-family:var(--mono);font-weight:700;font-size:70px;line-height:84px;color:var(--gold);text-shadow:0 0 24px rgba(255,183,64,.55);opacity:0}
+.ix-count span.go{font-family:var(--display);font-weight:900;color:var(--green)}
+.ix-count span.on{animation:ixtick .9s cubic-bezier(.2,1.5,.4,1) both}
+#s-intro.ix-on .ix-round{animation:ixslam .65s cubic-bezier(.2,1.6,.4,1) .35s both}
+#s-intro.ix-on .ix-title{animation:ixup .55s ease-out 1.3s both}
+#s-intro.ix-on .ix-spon,#s-intro.ix-on .ix-msg{animation:ixup .55s ease-out 2.2s both}
+@keyframes ixslam{0%{opacity:0;transform:scale(2.4) rotate(-6deg)}60%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
+@keyframes ixup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes ixtick{0%{opacity:0;transform:scale(1.8)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.7)}}
+@media (prefers-reduced-motion:reduce){.ix-floats{display:none}#s-intro *{animation:none !important}.ix-count span.on{opacity:1}}
+
+/* push messages sit at the bottom of the screen */
+.push.top{top:auto;bottom:calc(12px + env(safe-area-inset-bottom));padding:10px 40px 10px 14px}
+.push.img:not(.top){top:auto;bottom:calc(12px + env(safe-area-inset-bottom))}
+.push.img:not(.top) .push-img{max-height:55vh}
+body.pushing main{padding-bottom:110px}
+/* break: countdown + offer up front */
+.bigcount{background:linear-gradient(160deg,rgba(255,183,64,.14),rgba(255,92,138,.08));border-width:2px}
+.bigcount b{font-size:52px}
+.sponsor.offer{margin-top:12px;border:2px solid var(--gold);border-style:solid;background:linear-gradient(120deg,#2a2150,#3a1f3a 60%,#4a2a1a);color:var(--text);font-size:18px;font-weight:800;padding:14px}
+.sponsor.offer small{color:var(--gold)}
+.sponsor.offer img{display:block;width:100%;max-height:46vh;object-fit:contain;border-radius:10px;margin-bottom:10px}
+
+/* ===== table tablet (tab mode) ===== */
+#s-tab{gap:0}
+.tab-k{font-weight:800;color:var(--gold);font-size:15px}
+.tab-t{font-size:52px;font-weight:900;line-height:1;margin-top:6px;letter-spacing:-.02em;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tab-sub{color:var(--dim);font-weight:700;font-size:17px;margin-top:4px;min-height:4px}
+.tab-status{margin-top:12px;font-weight:700;font-size:15px;color:var(--text);background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:7px 16px;display:inline-block}
+.tab-qr{margin:18px auto 0;background:#fff;border-radius:18px;padding:14px;width:min(330px, calc(30vh / var(--z,1)))}
+.tab-qr #tab-qr img,.tab-qr #tab-qr canvas{width:100% !important;height:auto !important;display:block}
+.tab-qr #tab-qr{aspect-ratio:1;width:100%}
+body.tab #tbl-change{display:none}
+.tab-qr p{color:#080818;font-weight:800;font-size:13.5px;margin-top:8px}
+.tab-code{margin-top:14px;color:var(--dim);font-weight:700;font-size:14px}
+.tab-code b{font-family:var(--mono);color:var(--gold);font-size:24px;letter-spacing:.2em;margin-left:6px}
+#tab-play{margin-top:16px}
+body.tab #id-choose,body.tab #j-back-google,body.tab #id-google{display:none !important}
+body.tab{min-height:calc(100vh / var(--z,1))}
+body.tab #s-tab{min-height:calc((100vh / var(--z,1)) - 120px);justify-content:center}
+body.tab #cf{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
+.tab-switch{align-self:center;margin:18px auto 8px;white-space:nowrap;flex-shrink:0;background:rgba(16,16,42,.85);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px}
+.tab-switch.arm{background:var(--coral);border-color:var(--coral);color:#fff}
+.tab-back{display:none;margin:-8px 0 8px -12px;align-self:flex-start}
+body.tab .tab-back{display:inline-block}
+
+/* ===== tablet sizing pass: fill the screen, keep a margin, roomier spacing ===== */
+body.tab main{max-width:none;width:100%;padding:22px 6% 16px}
+body.tab .hdr{padding-left:6%;padding-right:6%}
+body.tab .hdr-me{gap:16px}
+body.tab .hdr-me{min-width:0;flex-shrink:1}
+body.tab .hdr-table{max-width:calc(68vw / var(--z,1));min-width:0}
+body.tab .hdr-pts{flex-shrink:0}
+body.tab .hdr-table b{font-size:18px}
+body.tab .hdr-table small{font-size:14px;margin-top:2px}
+body.tab .hdr-pts{font-size:17px;padding:5px 14px}
+body.tab .footer{font-size:14px;padding-top:6px}
+body.tab .partner-label{font-size:14px}
+/* question screen fills the height */
+body.tab #s-q{min-height:calc((100vh / var(--z,1)) - 250px)}
+body.tab .qmeta{font-size:17px}
+body.tab .timer{font-size:34px}
+body.tab .dots{gap:7px;margin-top:12px}
+body.tab .dots i{height:6px;border-radius:3px}
+body.tab .bonus{font-size:16px;padding:12px 16px}
+body.tab .qemoji{font-size:72px}
+body.tab .qimg{max-height:300px}
+body.tab .qtext{font-size:30px;line-height:1.22;margin-top:22px}
+body.tab .opts{flex:1;grid-auto-rows:minmax(84px,1fr);gap:16px;margin-top:26px;max-height:640px}
+body.tab .opt{font-size:23px;gap:22px;padding:14px 22px;border-radius:18px;line-height:1.2}
+body.tab .opt .k{width:50px;height:50px;border-radius:13px;font-size:21px}
+body.tab .lockin{font-size:18px;margin-top:18px}
+/* other screens a notch bigger */
+body.tab h1{font-size:34px}
+body.tab .lede{font-size:18px}
+body.tab .stat b{font-size:32px}
+body.tab .stat span{font-size:14px}
+body.tab .row{font-size:17px;padding:14px 18px}
+body.tab .bigcount b{font-size:60px}
+body.tab .ans{font-size:20px}
+body.tab .badge{width:120px;height:120px;font-size:56px}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive" class="hdr-logo"></a>
+  <div class="hdr-me hidden" id="hdr-me"><span class="hdr-table" id="hdr-table"></span><span class="hdr-pts" id="hdr-pts">0</span></div>
+</header>
+<div class="banner offline hidden" id="b-offline">Reconnecting… your answers are safe</div>
+<div class="banner pause hidden" id="b-pause">Paused by the host</div>
+<div class="tbar hidden" id="tbar"><i id="tbar-i"></i></div>
+
+<main>
+
+  <!-- Empty / closed -->
+  <section id="s-none" class="center hidden">
+    <div class="pulse">🌮</div>
+    <h1 id="n-title">Trivia starts soon</h1>
+    <p class="lede" id="n-sub">The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.</p>
+  </section>
+
+  <!-- Table tablet home (tab mode, nobody playing on this tablet yet) -->
+  <section id="s-tab" class="center hidden">
+    <div class="tab-k" id="tab-k">Table Trivia</div>
+    <h1 class="tab-t" id="tab-t">Table 1</h1>
+    <div class="tab-sub" id="tab-sub"></div>
+    <div class="tab-status" id="tab-status"></div>
+    <div class="tab-qr"><div id="tab-qr"></div><p>Scan with your phone to play for this table</p></div>
+    <div class="tab-code">Room code <b id="tab-code">····</b></div>
+    <button class="btn btn-main" id="tab-play" type="button">▶ Play on this tablet</button>
+    <p class="fine">One player per tablet — everyone else at the table scans the code.</p>
+  </section>
+
+  <!-- Join -->
+  <section id="s-join" class="hidden">
+    <h1>Join tonight's trivia</h1>
+    <p class="lede" id="j-lede">Answer on your phone. Everyone at your table plays as one team.</p>
+
+    <div class="field">
+      <div class="lbl">Where are you sitting?</div>
+      <div id="tbl-picked" class="picked hidden"><span id="tbl-picked-txt"></span><button class="ghost" id="tbl-change" type="button">Change</button></div>
+      <div id="tbl-grid" class="tables"></div>
+      <p class="note hidden" id="bar-note" style="text-align:left"></p>
+    </div>
+
+    <div class="field">
+      <div class="lbl">Sign in <small>To win prizes</small></div>
+      <div id="id-choose">
+        <button class="btn btn-google" id="j-google" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.9-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-10l-7.9 6C6.5 42.6 14.6 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <p class="note hidden" id="inapp-note">Google sign-in is blocked inside WhatsApp and Instagram. Open this page in Safari or Chrome, or use your email.</p>
+        <button class="btn btn-soft" id="j-use-email" type="button">Use my email instead</button>
+      </div>
+      <div id="id-google" class="hidden">
+        <div class="signed"><span id="g-email"></span><button class="ghost" id="j-signout" type="button">Switch</button></div>
+      </div>
+      <div id="id-email" class="hidden">
+        <input class="inp" id="j-email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com">
+        <button class="ghost" id="j-back-google" type="button" style="padding-left:0">Use Google instead</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="lbl">Your first name</div>
+      <input class="inp" id="j-name" maxlength="30" autocomplete="given-name" placeholder="What the TV will call you">
+    </div>
+
+    <div class="field" id="f-code">
+      <div class="lbl">Room code <small>Shown on the TV</small></div>
+      <div id="code-ok" class="picked hidden" style="border-color:rgba(61,220,132,.5)"><span style="font-family:var(--mono);letter-spacing:.3em" id="code-ok-txt"></span><span class="ok" style="padding-right:8px">Got it</span></div>
+      <input class="inp code" id="j-code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="····">
+    </div>
+
+    <div class="field hidden" id="f-team">
+      <div class="lbl">Name your table <small>Optional</small></div>
+      <input class="inp" id="j-team" maxlength="24" placeholder="You're first here — pick a team name">
+    </div>
+
+    <button class="btn btn-main" id="j-go" type="button">Join</button>
+    <p class="fine">Your email is only used to contact winners and to send offers from Screenshot Interactive and Chilitos. Unsubscribe anytime.</p>
+  </section>
+
+  <!-- Waiting -->
+  <section id="s-wait" class="center hidden">
+    <div class="pulse">🎤</div>
+    <h1 id="w-title">You're in</h1>
+    <p class="lede" id="w-sub">Watch the TV. The host will start the round in a moment.</p>
+    <div class="bigcount hidden" id="w-cd"><small>Game starts in</small><b id="w-cd-v">5:00</b></div>
+    <div class="mates" id="w-mates"><h3 id="w-mates-h">At your table</h3><div class="chips" id="w-chips"></div></div>
+  </section>
+
+  <!-- Question -->
+  <section id="s-q" class="hidden">
+    <div class="qmeta"><span id="q-meta">Round 1</span><span class="timer" id="q-timer">20</span></div>
+    <div class="dots" id="q-dots"></div>
+    <div class="bonus hidden" id="q-bonus"></div>
+    <div class="qvis hidden" id="q-vis"><div class="qemoji" id="q-emoji"></div><img class="qimg hidden" id="q-img" alt=""></div>
+    <div class="qtext" id="q-text"></div>
+    <div class="opts" id="opts"></div>
+    <div class="lockin hidden" id="q-lock"></div>
+  </section>
+
+  <!-- Reveal -->
+  <section id="s-reveal" class="center hidden">
+    <div class="badge" id="r-badge">✓</div>
+    <h1 id="r-title">Correct</h1>
+    <div><span class="ans" id="r-ans"></span></div>
+    <p class="mine hidden" id="r-mine"></p>
+    <div class="win hidden" id="r-win"></div>
+    <div class="sponsor hidden" id="r-sponsor"></div>
+    <p class="r-next hidden" id="r-next"></p>
+    <div class="stats">
+      <div class="stat"><b id="r-score">0</b><span>Your points</span></div>
+      <div class="stat"><b id="r-rank">—</b><span id="r-rank-l">Your table</span></div>
+    </div>
+  </section>
+
+  <!-- Round break -->
+  <section id="s-break" class="hidden">
+    <div style="text-align:center">
+      <h1 id="b-title">Round 1 done</h1>
+      <p class="lede" id="b-sub">Your table is 2nd</p>
+    </div>
+    <div class="bigcount hidden" id="b-big"><small id="b-big-l">Next round in</small><b id="b-count">3:00</b></div>
+    <div class="sponsor offer hidden" id="b-sponsor"></div>
+    <div class="board" id="b-board"></div>
+    <div class="stats">
+      <div class="stat"><b id="b-score">0</b><span>Your points</span></div>
+      <div class="stat"><b id="b-prank">—</b><span>Your rank tonight</span></div>
+    </div>
+    <p class="next" id="b-next"></p>
+  </section>
+
+  <!-- Round intro -->
+  <section id="s-intro" class="center hidden">
+    <div class="ix-floats" id="ix-floats"></div>
+    <div class="ix-core">
+      <div class="ix-kick" id="ix-kick">Get ready…</div>
+      <div class="ix-round" id="ix-round">Round 1</div>
+      <div class="ix-title" id="ix-title"></div>
+      <div class="ix-spon hidden" id="ix-spon">Presented by Chilitos</div>
+      <p class="ix-msg" id="ix-msg"></p>
+      <div class="ix-count" id="ix-count"><span>3</span><span>2</span><span>1</span><span class="go">Go!</span></div>
+    </div>
+  </section>
+
+  <!-- Final -->
+  <section id="s-final" class="center hidden">
+    <div id="f-wait">
+      <div class="drumroll">🥁</div>
+      <h1 style="margin-top:16px">Eyes on the TV…</h1>
+      <p class="lede">The winners are being revealed right now.</p>
+    </div>
+    <div id="f-done">
+    <div class="badge good" id="f-badge" style="font-size:44px">🏆</div>
+    <h1 id="f-title">Thanks for playing</h1>
+    <p class="lede" id="f-sub"></p>
+    <div class="stats">
+      <div class="stat"><b id="f-score">0</b><span id="f-score-l">Correct answers</span></div>
+      <div class="stat"><b id="f-rank">—</b><span>Your rank</span></div>
+    </div>
+    <div class="lb-h">Table standings</div>
+    <div class="board" id="f-tables"></div>
+    <div class="lb-h">Top players</div>
+    <div class="board" id="f-players"></div>
+    <button class="btn btn-main" id="f-share" type="button">Share my score on WhatsApp</button>
+    </div>
+  </section>
+
+  <div class="partner-wrap">
+    <a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos"></a>
+    <span class="partner-label"></span>
+  </div>
+</main>
+
+<footer class="footer">Powered by Screenshot Interactive</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="push hidden" id="push" role="status" aria-live="polite"><button type="button" id="push-x" aria-label="Close">×</button><small id="push-k">From our sponsor</small><img class="push-img hidden" id="push-img" alt="Sponsor"><div id="push-msg"></div></div>
+<canvas id="cf"></canvas>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="branding.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tt-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
+
+const SCREENS = ['s-none','s-tab','s-join','s-wait','s-q','s-reveal','s-break','s-intro','s-final'];
+let current = null;
+function show(id){ if (current === id) return; current = id; SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); window.scrollTo(0, 0); }
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function lsSet(k,v){ try { localStorage.setItem(k, v); } catch(e){} }
+
+const params = new URLSearchParams(location.search);
+let pickedTable = params.get('t') ? String(params.get('t')).toLowerCase() : null;
+let showGrid = !pickedTable;
+const urlCode = (params.get('c') || '').toUpperCase().slice(0, 4);
+// Tablet mode (join.html?t=3&tab=1): the table's own screen. Shows a big QR for phones,
+// and one guest can play on the tablet itself. Shared device → no remembered email, no Google.
+const tabMode = params.has('tab') && !!pickedTable;
+let tabJoining = false;
+if (tabMode) {
+  document.body.classList.add('tab');
+  // Scale the phone layout up for the tablet. Zoom also scales vh units, so heights are divided back by the zoom.
+  const fit = () => { const z = Math.max(1, Math.min(2.4, innerWidth / 430)); document.documentElement.style.zoom = z.toFixed(2); document.documentElement.style.setProperty('--z', z.toFixed(2)); };
+  fit(); addEventListener('resize', fit);
+}
+if (urlCode) $('j-code').value = urlCode;
+
+let eventId = null, ev = null, names = {}, standings = null, roster = {};
+let me = null, myPicks = {}, timerIv = null;
+
+// ── Connection banner ──
+watchConnection(on => $('b-offline').classList.toggle('hidden', on));
+
+// ── Follow the host's live night ──
+if (!db) { show('s-none'); }
+else ttRef('current').on('value', s => {
+  const c = s.val(); const id = c && c.eventId;
+  if (!id) { eventId = null; ev = null; render(); return; }
+  if (id !== eventId) attachEvent(id);
+});
+
+let offs = [];
+function attachEvent(id){
+  offs.forEach(f => f()); offs = [];
+  eventId = id; ev = null; names = {}; standings = null; roster = {};
+  const saved = lsGet('tt_me_' + id);
+  me = saved ? JSON.parse(saved) : null;
+  try { myPicks = JSON.parse(lsGet('tt_picks_' + id) || '{}'); } catch(e){ myPicks = {}; }
+  const L = (p, cb) => { const r = ttRef(p); r.on('value', s => cb(s.val())); offs.push(() => r.off()); };
+  L('events/' + id, v => { ev = v; checkNewGame(); applyReset(); render(); });
+  L('tableNames/' + id, v => { names = v || {}; render(); });
+  L('standings/' + id, v => { standings = v; render(); });
+  L('promo/' + id, v => { promoImg = v && v.img || null; checkPush(); if (current === 's-break') render(); });
+  L('roster/' + id, v => { roster = v || {}; if (current === 's-wait' || current === 's-join') render(); });
+}
+
+// A brand-new game can reuse the same name (e.g. today's date). Each game has its own
+// gameId, so a phone that remembers an older game drops its old join + locked answers.
+function checkNewGame(){
+  if (!ev || !eventId) return;
+  const gid = String(ev.gameId || ev.createdAt || ''); if (!gid) return;
+  const k = 'tt_game_' + eventId, was = lsGet(k);
+  if (was === gid) return;
+  lsSet(k, gid);
+  if (was === null && !me && !Object.keys(myPicks).length) return;   // first visit, nothing stale
+  me = null; myPicks = {};
+  ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
+  if ($('opts')) $('opts').dataset.k = '';
+  if (was !== null) toast('New game started — join again to play');
+}
+
+// ── Table tablet ──
+let tabQrFor = null;
+function renderTab(){
+  const t = pickedTable, nick = names[t], num = t === 'bar' ? 'The Bar' : 'Table ' + t;
+  $('tab-t').textContent = nick || num;
+  $('tab-sub').textContent = nick ? num : '';
+  $('tab-k').textContent = t === 'bar' ? 'Table Trivia · at the bar' : 'Table Trivia · your table is your team';
+  const st = ev.status, r = ev.round || 0, mates = Object.values(roster).filter(x => x.table === t).length;
+  let msg = mates ? `${mates} ${mates === 1 ? 'player' : 'players'} on this team so far` : 'Be the first at this table to join';
+  if (st === 'question' || st === 'reveal') msg = `Round ${r} is live — scan or tap Play to jump in`;
+  else if (st === 'intro') msg = `Round ${r} is starting!`;
+  else if (st === 'break') msg = ev.breakEndsAt ? `Round ${r + 1} starts in ${breakLeft()} — join now` : `Round ${r + 1} is up next — join now`;
+  else if (st === 'lobby' && ev.startsAt) msg = 'The game starts soon — join now';
+  $('tab-status').textContent = msg;
+  $('tab-code').textContent = ev.displayCode || '····';
+  const url = joinUrl(t, ev.displayCode);
+  if (tabQrFor !== url && window.QRCode) { $('tab-qr').innerHTML = ''; new QRCode($('tab-qr'), { text: url, width: 480, height: 480, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); tabQrFor = url; }
+}
+$('tab-play').onclick = () => {
+  tabJoining = true; $('j-email').value = ''; $('j-name').value = '';
+  $('j-email').setAttribute('autocomplete', 'off'); $('j-name').setAttribute('autocomplete', 'off');   // shared device: no remembered emails
+  setIdMode('email'); $('j-lede').textContent = 'Play on this tablet for your table. Your answers count toward the team score.'; render(); setTimeout(() => $('j-email').focus(), 60);
+};
+if (tabMode) {
+  setInterval(() => { if (current === 's-tab' && ev) renderTab(); }, 1000);
+  // Switch player: clears this tablet for the next guest (their score stays on the board)
+  const sw = document.createElement('button');
+  sw.className = 'tab-switch hidden'; sw.type = 'button'; sw.textContent = '⇄ Switch player'; sw.id = 'tab-switch';
+  { const pw = document.querySelector('main .partner-wrap'); pw ? pw.parentNode.insertBefore(sw, pw) : document.querySelector('main').appendChild(sw); }   // quiet spot above the sponsor banner
+  let armed = 0;
+  sw.onclick = async () => {
+    if (Date.now() - armed > 3000) { armed = Date.now(); sw.textContent = 'Tap again to switch'; sw.classList.add('arm'); setTimeout(() => { sw.textContent = '⇄ Switch player'; sw.classList.remove('arm'); }, 3000); return; }
+    ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
+    try { await firebase.auth().signOut(); } catch(e){}
+    me = null; myPicks = {}; tabJoining = false; armed = 0; sw.textContent = '⇄ Switch player'; sw.classList.remove('arm');
+    if ($('opts')) $('opts').dataset.k = '';
+    render(); toast('Ready for the next player');
+  };
+  // Back from the sign-in form to the table screen
+  const back = document.createElement('button');
+  back.className = 'ghost tab-back'; back.type = 'button'; back.textContent = '← Back to the table screen';
+  back.onclick = () => { tabJoining = false; render(); };
+  $('s-join').insertBefore(back, $('s-join').firstChild);
+  setInterval(() => { $('tab-switch').classList.toggle('hidden', !me); }, 500);
+}
+
+// Host restarted a round → forget local picks from that round on, so guests can answer again
+function applyReset(){
+  if (!ev || !ev.resetSeq || !eventId) return;
+  const k = 'tt_reset_' + eventId;
+  if (lsGet(k) === String(ev.resetSeq)) return;
+  const from = ev.resetFrom || 0;
+  for (const q in myPicks) if (+q >= from) delete myPicks[q];
+  lsSet('tt_picks_' + eventId, JSON.stringify(myPicks)); lsSet(k, String(ev.resetSeq));
+  if ($('opts')) $('opts').dataset.k = '';
+}
+
+// ── Join form ──
+function renderJoin(){
+  const n = ev.tables || 12;
+  const showPicked = pickedTable && !showGrid;
+  $('tbl-picked').classList.toggle('hidden', !showPicked);
+  $('tbl-grid').classList.toggle('hidden', !!showPicked);
+  if (showPicked) $('tbl-picked-txt').textContent = tableLabel(pickedTable, names);
+  else {
+    let h = '';
+    for (let i = 1; i <= n; i++) h += `<button class="tbl" type="button" data-t="${i}" aria-pressed="${pickedTable===String(i)}">${i}</button>`;
+    if (ev.barEnabled !== false) h += `<button class="tbl bar" type="button" data-t="bar" aria-pressed="${pickedTable==='bar'}">🍹 I'm at the bar</button>`;
+    if ($('tbl-grid').innerHTML !== h) $('tbl-grid').innerHTML = h;
+    const cols = Math.ceil(n / Math.ceil(n / 5));   // 6 → 3+3, 12 → 4+4+4, 10 → 5+5
+    $('tbl-grid').style.setProperty('--cols', cols);
+  }
+  // Room code: if the QR carried the right code, show it as done
+  if (tabMode && ev.displayCode) $('j-code').value = ev.displayCode;     // the tablet sits at the table — no need to type the code
+  const codeOk = !!ev.displayCode && $('j-code').value.trim().toUpperCase() === ev.displayCode, codeKnown = !!(urlCode || tabMode);
+  $('code-ok').classList.toggle('hidden', !(codeOk && codeKnown));
+  $('j-code').classList.toggle('hidden', !!(codeOk && codeKnown));
+  if (codeOk && codeKnown) $('code-ok-txt').textContent = ev.displayCode;
+  // Team name only for the first player at an unnamed table
+  const tableTaken = pickedTable && Object.values(roster).some(r => r.table === pickedTable);
+  const atBar = pickedTable === 'bar';
+  $('f-team').classList.toggle('hidden', !pickedTable || atBar || !!names[pickedTable] || tableTaken);
+  $('bar-note').classList.toggle('hidden', !atBar);
+  if (atBar) $('bar-note').textContent = `Everyone at the bar plays as one team: The Bar.${ev.barPrize ? ` If The Bar wins, it's ${ev.barPrize}` : ''}`;
+  $('j-go').textContent = pickedTable ? `Join ${tableName(pickedTable, names)}` : 'Join';
+}
+$('tbl-grid').addEventListener('click', e => {
+  const b = e.target.closest('.tbl'); if (!b) return;
+  pickedTable = b.dataset.t; showGrid = false; haptic(10); renderJoin();
+});
+$('tbl-change').onclick = () => { showGrid = true; renderJoin(); };
+$('j-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); });
+
+// ── Identity: Google (verified) or typed email ──
+let gUser = null, idMode = 'choose';
+const IN_APP = /FBAN|FBAV|Instagram|WhatsApp|Line\/|; wv\)/i.test(navigator.userAgent);
+if (IN_APP) { $('inapp-note').classList.remove('hidden'); $('j-google').classList.add('hidden'); }
+function setIdMode(m){
+  idMode = m;
+  $('id-choose').classList.toggle('hidden', m !== 'choose');
+  $('id-google').classList.toggle('hidden', m !== 'google');
+  $('id-email').classList.toggle('hidden', m !== 'email');
+  if (m === 'email') setTimeout(() => $('j-email').focus(), 50);
+}
+$('j-use-email').onclick = () => setIdMode('email');
+$('j-back-google').onclick = () => setIdMode('choose');
+$('j-signout').onclick = async () => { try { await firebase.auth().signOut(); } catch(e){} gUser = null; setIdMode('choose'); };
+$('j-google').onclick = async () => {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await firebase.auth().signInWithPopup(provider);
+  } catch (e) {
+    const c = (e && e.code) || '';
+    if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+    console.warn(e);
+    toast(c === 'auth/popup-blocked' ? 'Pop-up blocked. Allow pop-ups or use your email.' : "Google sign-in isn't available here. Use your email.");
+    setIdMode('email');
+  }
+};
+if (db && firebase.auth) firebase.auth().onAuthStateChanged(u => {
+  gUser = (u && u.email && u.emailVerified) ? u : null;
+  if (gUser) {
+    $('g-email').textContent = '✓ ' + gUser.email;
+    if (!$('j-name').value && gUser.displayName) $('j-name').value = gUser.displayName.split(' ')[0].slice(0, 30);
+    setIdMode('google');
+  } else if (idMode === 'google') setIdMode('choose');
+});
+
+$('j-go').onclick = async () => {
+  if (!ev) return;
+  if (!pickedTable) return toast('Pick your table first');
+  if (idMode === 'choose') return toast('Continue with Google, or use your email');
+  const verified = idMode === 'google' && !!gUser;
+  const rawEmail = verified ? gUser.email : $('j-email').value.trim();
+  const name = $('j-name').value.trim();
+  const code = $('j-code').value.trim().toUpperCase();
+  const team = $('j-team').value.trim();
+  if (!isValidEmail(rawEmail)) { toast('Enter a valid email'); return $('j-email').focus(); }
+  const email = normalizeEmail(rawEmail);
+  if (DISPOSABLE_DOMAINS.has(email.split('@')[1] || '')) return toast('Use a permanent email address');
+  if (!name) { toast('Add your first name'); return $('j-name').focus(); }
+  if (code.length !== 4) { toast('Enter the 4-letter room code from the TV'); return $('j-code').focus(); }
+
+  const id = emailToPlayerId(email);
+  const btn = $('j-go'); btn.disabled = true; btn.textContent = 'Joining…';
+  try {
+    await ttRef(`players/${eventId}/${id}`).set({
+      email, originalEmail: rawEmail, name, table: pickedTable, code, verified,
+      ...(verified ? { uid: gUser.uid } : {}),
+      joinedAt: firebase.database.ServerValue.TIMESTAMP,
+    });
+    await ttRef(`roster/${eventId}/${id}`).set({ name, table: pickedTable, joinedAt: firebase.database.ServerValue.TIMESTAMP });
+    if (team && !names[pickedTable]) ttRef(`tableNames/${eventId}/${pickedTable}`).set(team).catch(() => {});
+    me = { id, name, table: pickedTable };
+    lsSet('tt_me_' + eventId, JSON.stringify(me));
+    if (!tabMode) { if (!verified) lsSet('tt_email', rawEmail); lsSet('tt_name', name); }
+    haptic(30);
+    render();
+  } catch (e) {
+    console.warn(e);
+    const msg = String(e && (e.code || e.message) || '');
+    if (/permission/i.test(msg)) {
+      // Same email already joined (phone died, new device) → resume that player
+      const back = await ttRef(`roster/${eventId}/${id}`).once('value').catch(() => null);
+      const rv = back && back.val && back.val();
+      if (rv) {
+        me = { id, name: rv.name, table: rv.table };
+        lsSet('tt_me_' + eventId, JSON.stringify(me));
+        toast('Welcome back, ' + rv.name);
+        return render();
+      }
+      if (ev.joinClosed) toast('Joining is closed for this game');
+      else if (ev.displayCode && code !== ev.displayCode) { toast("That room code doesn't match the TV"); $('j-code').classList.remove('hidden'); $('code-ok').classList.add('hidden'); $('j-code').focus(); }
+      else toast("Couldn't join. Check the room code on the TV.");
+    } else toast("Couldn't join. Check your connection and try again.");
+  } finally {
+    btn.disabled = false; btn.textContent = pickedTable ? `Join ${tableName(pickedTable, names)}` : 'Join';
+  }
+};
+
+// ── Answering ──
+function pick(qi, i){
+  if (!ev || ev.liveSlot !== String(qi) || ev.paused) return;
+  if (myPicks[qi] !== undefined) return;
+  myPicks[qi] = i;
+  lsSet('tt_picks_' + eventId, JSON.stringify(myPicks));
+  haptic(35);
+  renderQuestion();
+  ttRef(`answers/${eventId}/${me.id}/${qi}`).update({
+    pick: i, submittedAt: firebase.database.ServerValue.TIMESTAMP,
+  }).catch(e => { console.warn(e); delete myPicks[qi]; toast("Time was up — that answer didn't count"); renderQuestion(); });
+}
+
+// ── Helpers ──
+function myScore(){ const p = standings && standings.players && me && standings.players[me.id]; return (p && p.score) || 0; }
+function tableRank(t){ const o = (standings && standings.tableOrder) || []; const i = o.indexOf(t); return i >= 0 ? i + 1 : null; }
+function playerRank(){ const o = (standings && standings.playerOrder) || []; const i = me ? o.indexOf(me.id) : -1; return i >= 0 ? i + 1 : null; }
+function keyChip(i, cls = 'k'){ return `<span class="${cls}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}">${'ABCD'[i]}</span>`; }
+function roundTitle(r){ const x = ev && ev.rounds && ev.rounds[r - 1]; return x ? x.title : ''; }
+
+// ── Render ──
+function render(){
+  clearInterval(timerIv); timerIv = null;
+  $('tbar').classList.add('hidden');
+  if (!eventId || !ev) {
+    $('n-title').textContent = 'Trivia starts soon';
+    $('n-sub').textContent = "The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.";
+    $('hdr-me').classList.add('hidden');
+    return show('s-none');
+  }
+  $('b-pause').classList.toggle('hidden', !ev.paused);
+  $('hdr-me').classList.toggle('hidden', !me);
+  checkPush();
+  if (me) {
+    // Header: table name (if the table has one) + table number, e.g. "Taco Bout It / Table 3"
+    const num = me.table === 'bar' ? 'The Bar' : 'Table ' + me.table, nick = names && names[me.table];
+    $('hdr-table').innerHTML = nick ? `<b>${esc(nick)}</b><small>${esc(num)}</small>` : `<b>${esc(num)}</b>`;
+    $('hdr-pts').textContent = myScore();
+  }
+
+  if (!me) {
+    if (ev.joinClosed || ev.status === 'final') {
+      $('n-title').textContent = ev.status === 'final' ? "That's a wrap for tonight" : 'Joining is closed';
+      $('n-sub').textContent = ev.status === 'final' ? 'Thanks for coming out. See you at the next game night.' : 'This game is already under way. Catch the next one!';
+      return show('s-none');
+    }
+    if (tabMode && !tabJoining) { renderTab(); return show('s-tab'); }
+    if (current !== 's-join' && !tabMode) {
+      if (!$('j-name').value) $('j-name').value = lsGet('tt_name') || '';
+      if (!$('j-email').value) $('j-email').value = lsGet('tt_email') || '';
+    }
+    renderJoin();
+    return show('s-join');
+  }
+
+  if (ev.board && ev.status !== 'question' && ev.status !== 'intro' && ev.status !== 'final') return renderBreak(true);
+  switch (ev.status) {
+    case 'lobby': return renderWait();
+    case 'question': return renderQuestion();
+    case 'reveal': return renderReveal();
+    case 'break': return renderBreak();
+    case 'intro': return renderIntro();
+    case 'final': return renderFinal();
+    default: return renderWait();
+  }
+}
+
+// Lobby + between-question countdowns (break countdown lives in renderBreak)
+setInterval(() => {
+  if (!ev || !me) return;
+  const now = serverNow();
+  if (current === 's-wait') {
+    const on = ev.status === 'lobby' && !!ev.startsAt;
+    $('w-cd').classList.toggle('hidden', !on);
+    if (on) { const n = Math.ceil(Math.max(0, ev.startsAt - now) / 1000);
+      $('w-cd').classList.toggle('soon', n <= 0); $('w-cd-v').textContent = n <= 0 ? 'Starting any moment…' : breakFmt(n); }
+  }
+  if (current === 's-reveal') {
+    const on = ev.status === 'reveal' && !!ev.revealEndsAt && !ev.paused;
+    $('r-next').classList.toggle('hidden', !on);
+    if (on) { const qi = ev.reveal ? ev.reveal.q : ev.qIndex, total = (ev.questions || []).length;
+      const end = isLastInRound(ev.questions, qi);
+      $('r-next').innerHTML = `${end ? 'Standings' : 'Next question'} in <b>${Math.ceil(Math.max(0, ev.revealEndsAt - now) / 1000)}s</b>`; }
+  }
+}, 250);
+function breakFmt(n){ return n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`; }
+
+function renderWait(){
+  const mates = Object.entries(roster).filter(([, r]) => r.table === me.table);
+  const total = Object.keys(roster).length;
+  $('w-title').textContent = `You're in, ${me.name}`;
+  $('w-sub').textContent = `${ev.startsAt ? 'Round 1 starts when the countdown ends.' : 'Watch the TV — the host starts Round 1 shortly.'} ${total} ${total === 1 ? 'player' : 'players'} in the room.`;
+  $('w-mates-h').textContent = `${tableName(me.table, names)} · ${mates.length} ${mates.length === 1 ? 'player' : 'players'}`;
+  $('w-chips').innerHTML = mates.map(([id, r]) => `<span class="chip ${id === me.id ? 'me' : ''}">${esc(r.name)}</span>`).join('');
+  show('s-wait');
+}
+
+function renderQuestion(){
+  const qi = ev.qIndex, q = (ev.questions || [])[qi];
+  if (!q) return renderWait();
+  const pos = posInRound(ev.questions, qi), rlen = roundLen(ev.questions, q.round);
+  $('q-meta').textContent = `Round ${q.round}${roundTitle(q.round) ? ' · ' + roundTitle(q.round) : ''} · Q${pos + 1} of ${rlen}`;
+  $('q-dots').innerHTML = Array.from({ length: rlen }, (_, i) => `<i class="${i < pos ? 'done' : i === pos ? 'now' : ''}"></i>`).join('');
+  $('q-bonus').textContent = q.bonus ? '🎁 ' + q.bonus : '';
+  $('q-bonus').classList.toggle('hidden', !q.bonus);
+  $('q-vis').classList.toggle('hidden', !q.emoji && !q.img);
+  $('q-emoji').textContent = q.emoji || '';
+  if (q.img) { $('q-img').src = q.img; $('q-img').classList.remove('hidden'); } else $('q-img').classList.add('hidden');
+  $('q-text').textContent = q.q;
+  const mine = myPicks[qi];
+  const locked = mine !== undefined;
+  const closed = ev.liveSlot !== String(qi);           // time's up (manual mode) or paused
+  const html = q.o.map((o, i) => `<button class="opt" type="button" data-i="${i}" aria-pressed="${mine === i}" style="--c:${OPTION_COLORS[i]};--ink:${OPTION_INK[i]}" ${locked || closed ? 'disabled' : ''}>${keyChip(i)}<span>${esc(o)}</span></button>`).join('');
+  const key = qi + ':' + mine + ':' + closed;
+  if ($('opts').dataset.k !== key) { $('opts').innerHTML = html; $('opts').dataset.k = key; }
+  $('opts').classList.toggle('locked', locked || (closed && !ev.paused));
+  const timeUp = closed && !ev.paused;
+  $('q-lock').classList.toggle('hidden', !locked && !timeUp);
+  if (locked) $('q-lock').innerHTML = `Locked in: <b>${'ABCD'[mine]}</b> · wait for the reveal`;
+  else if (timeUp) $('q-lock').innerHTML = "Time's up — answers are locked";
+  $('tbar').classList.remove('hidden');
+  const total = questionDurationSec(ev);
+  const tick = () => {
+    const left = secondsLeft(ev);
+    $('q-timer').textContent = left;
+    $('q-timer').classList.toggle('warn', left <= 5);
+    $('tbar-i').style.transform = `scaleX(${Math.max(0, left / total)})`;
+    $('tbar').classList.toggle('warn', left <= 5);
+  };
+  tick(); timerIv = setInterval(tick, 250);
+  show('s-q');
+}
+$('opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b && !b.disabled) pick(ev.qIndex, +b.dataset.i); });
+
+function renderReveal(){
+  const rv = ev.reveal || {}, qi = rv.q, q = (ev.questions || [])[qi] || { o: [] };
+  const mine = myPicks[qi], answered = mine !== undefined, ok = answered && mine === rv.correctIdx;
+  const b = $('r-badge');
+  b.className = 'badge ' + (ok ? 'good' : answered ? 'bad' : 'idle');
+  b.textContent = ok ? '✓' : answered ? '✗' : '⏱';
+  $('r-title').textContent = ok ? 'Correct!' : answered ? 'Not this time' : 'Out of time';
+  $('r-ans').innerHTML = rv.correctIdx != null ? `${keyChip(rv.correctIdx)}${esc(rv.correctText || '')}` : '';
+  $('r-mine').classList.toggle('hidden', !(answered && !ok));
+  if (answered && !ok) $('r-mine').textContent = `You picked ${'ABCD'[mine]} · ${q.o[mine] || ''}`;
+  const bw = rv.bonusWinner;
+  const iWon = bw && me && bw.name === me.name && bw.table === me.table && ok;
+  $('r-win').classList.toggle('hidden', !bw);
+  if (bw) $('r-win').textContent = iWon ? '🎁 You won the bonus! Tell your server.' : `🎁 Bonus won by ${bw.name} at ${tableName(bw.table, names)}`;
+  sponsorCard($('r-sponsor'));
+  $('r-score').textContent = myScore();
+  $('r-rank').textContent = ordinal(tableRank(me.table));
+  $('r-rank-l').textContent = me.table === 'bar' ? 'The Bar\'s rank' : 'Your table\'s rank';
+  show('s-reveal');
+}
+
+function renderBreak(board){
+  const r = ev.round || 1, total = (ev.rounds || []).length, last = r >= total;
+  const tr = tableRank(me.table), isBreak = ev.status === 'break';
+  $('b-title').textContent = board && !isBreak ? '🏆 Leaderboard' : last ? 'Final round done' : `Round ${r} done`;
+  $('b-sub').textContent = tr ? `${tableName(me.table, names)} is ${ordinal(tr)}` : 'Standings are in';
+  const o = (standings && standings.tableOrder) || [];
+  const rows = o.slice(0, 3);
+  if (tr > 3) rows.push(me.table);
+  $('b-board').innerHTML = rows.map(t => `<div class="row ${t === me.table ? 'me' : ''}"><span class="n">${o.indexOf(t) + 1}</span><span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'The Bar' : 'Table ' + t} · 👤 ${standings.tables[t].players}</small>` : `<small>👤 ${standings.tables[t].players}</small>`}</span><span class="p">${fmtPts(standings.tables[t].score)}</span></div>`).join('') || '<div class="row"><span></span><span>No scores yet</span><span></span></div>';
+  $('b-score').textContent = myScore();
+  $('b-prank').textContent = ordinal(playerRank());
+  // Break offer: image (if loaded) + sponsor line, shown right under the countdown
+  { const el = $('b-sponsor'), has = !!(ev.sponsorMsg || promoImg);
+    el.innerHTML = has ? `${promoImg ? `<img src="${promoImg}" alt="">` : ''}<small>${esc(sponsorLine())}</small>${ev.sponsorMsg ? `<div>${esc(ev.sponsorMsg)}</div>` : ''}` : '';
+    el.classList.toggle('hidden', !has); }
+  const nx = (ev.rounds || [])[r];
+  const timed = isBreak && !last && !!ev.breakEndsAt;
+  $('b-big').classList.toggle('hidden', !timed);
+  $('b-big-l').textContent = `Round ${r + 1}${nx ? ' · ' + nx.title : ''} starts in`;
+  $('b-next').innerHTML = !isBreak ? 'The game carries on in a moment.' : last ? 'Final results are coming up on the TV.'
+    : timed ? 'Good time to order 🌮'
+    : `Up next: Round ${r + 1}${nx ? ' · ' + esc(nx.title) : ''}. Good time to order.`;
+  const tickB = () => { const n = Math.ceil(Math.max(0, (ev.breakEndsAt || 0) - serverNow()) / 1000);
+    $('b-big').classList.toggle('soon', n <= 0); $('b-count').textContent = n <= 0 ? 'Starting any moment…' : breakLeft(); };
+  if (timed) tickB();
+  clearInterval(timerIv); timerIv = timed ? setInterval(tickB, 500) : null;
+  show('s-break');
+}
+
+function renderFinal(){
+  const tr = tableRank(me.table), pr = playerRank();
+  const total = (ev.questions || []).length, players = ((standings && standings.playerOrder) || []).length;
+  const w = standings && standings.tableOrder && standings.tableOrder[0];
+  const wonTable = tr === 1, topPlayer = pr === 1;
+  $('f-badge').textContent = wonTable ? '🏆' : topPlayer ? '⭐' : '🎉';
+  const atBar = me.table === 'bar';
+  const prize = atBar ? ev.barPrize : ev.tablePrize;
+  $('f-title').textContent = wonTable ? (atBar ? 'The Bar wins! 🥃' : 'Your table won!') : topPlayer ? "You're tonight's top player!" : 'Thanks for playing';
+  $('f-sub').textContent = wonTable
+    ? (atBar ? `${prize ? cap(prize) + ' — ' : ''}tell the bartender.` : `${prize ? 'You won ' + prize + '. ' : ''}Tell your server — your prize is on the way.`)
+    : topPlayer ? 'Show this screen to your server to claim your prize.'
+    : (w ? `${tableName(w, names)} won tonight${w === 'bar' && ev.barPrize ? ' — ' + ev.barPrize + ' for the bar' : ''}.` : '');
+  $('f-score').textContent = `${myScore()}/${total}`;
+  $('f-rank').textContent = pr ? `${ordinal(pr)}` : '—';
+  $('f-score-l').textContent = 'Correct answers';
+  const S = standings || {}, to = S.tableOrder || [], po = S.playerOrder || [];
+  $('f-tables').innerHTML = to.map((t, i) => `<div class="row ${t === me.table ? 'me' : ''}"><span class="n">${i + 1}</span><span class="nm">${esc(tableName(t, names))}<small>${names[t] ? (t === 'bar' ? 'The Bar' : 'Table ' + t) + ' · ' : ''}👤 ${S.tables[t].players}</small></span><span class="p">${fmtPts(S.tables[t].score)}</span></div>`).join('') || '<div class="row"><span></span><span>No scores</span><span></span></div>';
+  const pRows = po.slice(0, 10); const myI = po.indexOf(me.id); if (myI >= 10) pRows.push(me.id);
+  $('f-players').innerHTML = pRows.map(pid => { const x = S.players[pid], i = po.indexOf(pid);
+    return `<div class="row ${pid === me.id ? 'me' : ''}"><span class="n">${i + 1}</span><span class="nm">${esc(x.name)}${pid === me.id ? ' (you)' : ''}<small>${esc(tableSub(x.table, names))}</small></span><span class="p">${x.score}</span></div>`; }).join('');
+  // Don't spoil the TV: hold for the drumroll, then reveal (synced to the host's finalAt)
+  const wait = Math.max(0, 9200 - (serverNow() - (ev.finalAt || 0)));
+  const key = String(ev.finalAt);
+  $('f-wait').classList.toggle('hidden', wait <= 0);
+  $('f-done').classList.toggle('hidden', wait > 0);
+  if (wait > 0 && finalKey !== key) {
+    finalKey = key; clearTimeout(finalT);
+    finalT = setTimeout(() => {
+      $('f-wait').classList.add('hidden'); $('f-done').classList.remove('hidden');
+      if (wonTable || topPlayer) { haptic([120, 60, 120, 60, 400]); phoneConfetti(); }
+    }, wait);
+  }
+  show('s-final');
+}
+let finalKey = null, finalT = null;
+function cap(s){ s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
+function breakLeft(){ const s = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`; }
+
+// Round intro — mirrors the TV, timed from the host's introAt
+let introKey = null, introTs = [];
+function renderIntro(){
+  const first = current !== 's-intro';
+  const r = ev.round || 1, rounds = ev.rounds || [], rd = rounds[r - 1] || {}, total = rounds.length || 1, last = r >= total && total > 1;
+  const key = r + ':' + (ev.introAt || 'x');
+  show('s-intro');
+  if (key === introKey && !first) return;
+  introKey = key; introTs.forEach(clearTimeout); introTs = [];
+  if (!$('ix-floats').innerHTML) {
+    let h = '';
+    for (let i = 0; i < 12; i++) {
+      const c = i % 4, st = `left:${(i * 8.3 + (i % 3) * 4) % 96}%;--d:${5 + (i % 4) * 1.2}s;--w:${-(i * .6).toFixed(1)}s;--r:${(i % 2 ? 1 : -1) * (50 + i * 15)}deg;--c:${OPTION_COLORS[c]};--ink:${OPTION_INK[c]}`;
+      h += i % 2 ? `<i class="ix-f q" style="${st}">?</i>` : `<i class="ix-f tile" style="${st}">${'ABCD'[c]}</i>`;
+    }
+    $('ix-floats').innerHTML = h;
+  }
+  $('ix-kick').textContent = last ? 'Last round. Make it count…' : r === 1 ? "Let's play!" : 'Get ready…';
+  $('ix-round').textContent = last ? 'Final round' : `Round ${r}`;
+  $('ix-round').classList.toggle('small', last);
+  $('ix-title').innerHTML = (rd.icon ? `<span style="margin-right:8px">${esc(rd.icon)}</span>` : '') + esc(rd.title || '');
+  $('ix-spon').classList.toggle('hidden', !rd.sponsored);
+  const tr = r > 1 ? tableRank(me.table) : 0;
+  const mine = esc(tableName(me.table, names));
+  $('ix-msg').innerHTML = (rd.tag ? esc(rd.tag) + '<br>' : '')
+    + (tr === 1 ? `<b>${mine}</b> is in the lead. Hold on to it!` : tr ? `<b>${mine}</b> is ${ordinal(tr)}. Time to climb!` : `Playing for <b>${mine}</b>. Every answer counts.`);
+  const spans = [...$('ix-count').children]; spans.forEach(x => x.classList.remove('on'));
+  const box = $('s-intro'); box.classList.remove('ix-on'); void box.offsetWidth; box.classList.add('ix-on');
+  const len = (ev.introSeconds || 9) * 1000, el = serverNow() - (ev.introAt || serverNow()), C = len - 3800;
+  const at = (ms, fn) => { if (ms >= el) introTs.push(setTimeout(fn, ms - el)); };
+  at(400, () => haptic(40));
+  [0, 1, 2].forEach(i => at(C + i * 1000, () => { spans[i].classList.add('on'); haptic(25); }));
+  at(C + 3000, () => { spans[3].classList.add('on'); haptic([60, 40, 120]); });
+}
+
+// Sponsor push from the host — shown outside live questions
+// Pushed any time for the host's chosen duration. During a question it's a slim top banner so answers stay tappable.
+let shownPush = null, dismissed = null, pushT = null;
+let promoImg = null;
+function checkPush(){
+  const at = ev && ev.sponsorPushAt, end = at ? at + ((ev.sponsorPushSecs || 10) * 1000) : 0;
+  const isImg = !!(ev && ev.sponsorPushImg), text = ev && (ev.sponsorPushText != null ? ev.sponsorPushText : ev.sponsorMsg);
+  const live = at && (isImg ? !!promoImg : !!text) && serverNow() < end && dismissed !== at;
+  if (!live) { if (shownPush !== null) { shownPush = null; hidePush(); } return; }
+  $('push').classList.toggle('top', ev.status === 'question');
+  $('push').classList.toggle('img', isImg);
+  $('push-img').classList.toggle('hidden', !isImg);
+  if (isImg && $('push-img').getAttribute('src') !== promoImg) $('push-img').src = promoImg;
+  $('push-msg').textContent = text || (isImg && ev.status === 'question' ? 'Check the TV 📺' : ''); $('push-k').textContent = sponsorLine();
+  if (shownPush === at) return;
+  shownPush = at;
+  $('push-k').textContent = sponsorLine();
+  $('push').classList.remove('hidden'); document.body.classList.add('pushing'); haptic(20);
+  clearTimeout(pushT); pushT = setTimeout(() => { shownPush = null; hidePush(); }, end - serverNow());
+}
+function sponsorLine(){ return (ev && ev.sponsorFrom) || 'SPONSOR'; }
+function sponsorCard(el){ el.innerHTML = ev.sponsorMsg ? `<small>${esc(sponsorLine())}</small>${esc(ev.sponsorMsg)}` : ''; el.classList.toggle('hidden', !ev.sponsorMsg); }
+function hidePush(){ clearTimeout(pushT); $('push').classList.add('hidden'); document.body.classList.remove('pushing'); }
+$('push-x').onclick = () => { dismissed = shownPush; shownPush = null; hidePush(); };
+
+// Phone confetti for winners
+function phoneConfetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cf = $('cf'), cx = cf.getContext('2d'), D = devicePixelRatio;
+  cf.width = innerWidth * D; cf.height = innerHeight * D;
+  let ps = [];
+  const C = OPTION_COLORS.concat(['#ffffff', '#3DDC84']), H = cf.height, W = cf.width;
+  const add = (x, y, vx, vy) => ps.push({ x, y, vx, vy, r: Math.random() * 6, vr: (Math.random() - .5) * .12, ph: Math.random() * 6.28,
+    f: .03 + Math.random() * .04, sw: (.5 + Math.random()) * D, term: H / (230 + Math.random() * 160), w: (6 + Math.random() * 4) * D, h: (10 + Math.random() * 6) * D, c: C[(Math.random() * C.length) | 0] });
+  const shoot = (x, ang) => { for (let i = 0; i < 45; i++) { const a = ang + (Math.random() - .5) * .6, v = (9 + Math.random() * 7) * D; add(x, H, Math.cos(a) * v, Math.sin(a) * v); } };
+  shoot(0, -Math.PI / 2.8); shoot(W, -Math.PI + Math.PI / 2.8);
+  const t0 = performance.now();
+  const drizzle = () => { for (let i = 0; i < 5; i++) add(Math.random() * W, -20 * D - Math.random() * 40, 0, 1); if (performance.now() - t0 < 3000) setTimeout(drizzle, 100); };
+  setTimeout(drizzle, 200);
+  const tick = () => {
+    cx.clearRect(0, 0, W, H);
+    ps = ps.filter(p => p.y < H + 40);
+    for (const p of ps) { p.vx *= .97; p.vy = p.vy < p.term ? Math.min(p.term, p.vy * .985 + H / 5000) : p.term;
+      p.ph += p.f; p.x += p.vx + Math.sin(p.ph) * p.sw; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.ph))); cx.restore(); }
+    if (ps.length || performance.now() - t0 < 4500) requestAnimationFrame(tick); else cx.clearRect(0, 0, W, H);
+  };
+  requestAnimationFrame(tick);
+}
+
+$('f-share').onclick = () => {
+  const total = (ev && ev.questions || []).length, pr = playerRank();
+  const txt = `🌮 I got ${myScore()}/${total} at Table Trivia${pr ? ` and finished ${ordinal(pr)}` : ''} tonight. Come play next time! 👉 screenshotinteractive.com`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+};
+</script>
+</body>
+</html>
