@@ -202,6 +202,42 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
 @keyframes ixup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes ixtick{0%{opacity:0;transform:scale(1.8)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.7)}}
 @media (prefers-reduced-motion:reduce){.ix-floats{display:none}#s-intro *{animation:none !important}.ix-count span.on{opacity:1}}
+
+/* push messages sit at the bottom of the screen */
+.push.top{top:auto;bottom:calc(12px + env(safe-area-inset-bottom));padding:10px 40px 10px 14px}
+.push.img:not(.top){top:auto;bottom:calc(12px + env(safe-area-inset-bottom))}
+.push.img:not(.top) .push-img{max-height:55vh}
+body.pushing main{padding-bottom:110px}
+/* break: countdown + offer up front */
+.bigcount{background:linear-gradient(160deg,rgba(255,183,64,.14),rgba(255,92,138,.08));border-width:2px}
+.bigcount b{font-size:52px}
+.sponsor.offer{margin-top:12px;border:2px solid var(--gold);border-style:solid;background:linear-gradient(120deg,#2a2150,#3a1f3a 60%,#4a2a1a);color:var(--text);font-size:18px;font-weight:800;padding:14px}
+.sponsor.offer small{color:var(--gold)}
+.sponsor.offer img{display:block;width:100%;max-height:46vh;object-fit:contain;border-radius:10px;margin-bottom:10px}
+
+/* ===== table tablet (tab mode) ===== */
+#s-tab{gap:0}
+.tab-k{font-weight:800;color:var(--gold);font-size:15px}
+.tab-t{font-size:52px;font-weight:900;line-height:1;margin-top:6px;letter-spacing:-.02em;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tab-sub{color:var(--dim);font-weight:700;font-size:17px;margin-top:4px;min-height:4px}
+.tab-status{margin-top:12px;font-weight:700;font-size:15px;color:var(--text);background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:7px 16px;display:inline-block}
+.tab-qr{margin:18px auto 0;background:#fff;border-radius:18px;padding:14px;width:min(78vw,330px)}
+.tab-qr #tab-qr img,.tab-qr #tab-qr canvas{width:100% !important;height:auto !important;display:block}
+.tab-qr #tab-qr{aspect-ratio:1;width:100%}
+body.tab #tbl-change{display:none}
+.tab-qr p{color:#080818;font-weight:800;font-size:13.5px;margin-top:8px}
+.tab-code{margin-top:14px;color:var(--dim);font-weight:700;font-size:14px}
+.tab-code b{font-family:var(--mono);color:var(--gold);font-size:24px;letter-spacing:.2em;margin-left:6px}
+#tab-play{margin-top:16px}
+body.tab #id-choose,body.tab #j-back-google,body.tab #id-google{display:none !important}
+body.tab{min-height:calc(100vh / var(--z,1))}
+body.tab #s-tab{min-height:calc((100vh / var(--z,1)) - 120px);justify-content:center}
+body.tab #cf{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
+.tab-switch{position:fixed;left:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:30;background:rgba(16,16,42,.85);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px}
+.tab-switch.arm{background:var(--coral);border-color:var(--coral);color:#fff}
+.tab-back{display:none;margin:-8px 0 8px -12px;align-self:flex-start}
+body.tab .tab-back{display:inline-block}
 </style>
 </head>
 <body>
@@ -223,10 +259,22 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
     <p class="lede" id="n-sub">The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.</p>
   </section>
 
+  <!-- Table tablet home (tab mode, nobody playing on this tablet yet) -->
+  <section id="s-tab" class="center hidden">
+    <div class="tab-k" id="tab-k">Table Trivia</div>
+    <h1 class="tab-t" id="tab-t">Table 1</h1>
+    <div class="tab-sub" id="tab-sub"></div>
+    <div class="tab-status" id="tab-status"></div>
+    <div class="tab-qr"><div id="tab-qr"></div><p>Scan with your phone to play for this table</p></div>
+    <div class="tab-code">Room code <b id="tab-code">····</b></div>
+    <button class="btn btn-main" id="tab-play" type="button">▶ Play on this tablet</button>
+    <p class="fine">One player per tablet — everyone else at the table scans the code.</p>
+  </section>
+
   <!-- Join -->
   <section id="s-join" class="hidden">
     <h1>Join tonight's trivia</h1>
-    <p class="lede">Answer on your phone. Everyone at your table plays as one team.</p>
+    <p class="lede" id="j-lede">Answer on your phone. Everyone at your table plays as one team.</p>
 
     <div class="field">
       <div class="lbl">Where are you sitting?</div>
@@ -316,12 +364,12 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
       <p class="lede" id="b-sub">Your table is 2nd</p>
     </div>
     <div class="bigcount hidden" id="b-big"><small id="b-big-l">Next round in</small><b id="b-count">3:00</b></div>
+    <div class="sponsor offer hidden" id="b-sponsor"></div>
     <div class="board" id="b-board"></div>
     <div class="stats">
       <div class="stat"><b id="b-score">0</b><span>Your points</span></div>
       <div class="stat"><b id="b-prank">—</b><span>Your rank tonight</span></div>
     </div>
-    <div class="sponsor hidden" id="b-sponsor"></div>
     <p class="next" id="b-next"></p>
   </section>
 
@@ -376,11 +424,12 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="branding.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="tt-common.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
 
-const SCREENS = ['s-none','s-join','s-wait','s-q','s-reveal','s-break','s-intro','s-final'];
+const SCREENS = ['s-none','s-tab','s-join','s-wait','s-q','s-reveal','s-break','s-intro','s-final'];
 let current = null;
 function show(id){ if (current === id) return; current = id; SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); window.scrollTo(0, 0); }
 function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
@@ -390,6 +439,16 @@ const params = new URLSearchParams(location.search);
 let pickedTable = params.get('t') ? String(params.get('t')).toLowerCase() : null;
 let showGrid = !pickedTable;
 const urlCode = (params.get('c') || '').toUpperCase().slice(0, 4);
+// Tablet mode (join.html?t=3&tab=1): the table's own screen. Shows a big QR for phones,
+// and one guest can play on the tablet itself. Shared device → no remembered email, no Google.
+const tabMode = params.has('tab') && !!pickedTable;
+let tabJoining = false;
+if (tabMode) {
+  document.body.classList.add('tab');
+  // Scale the phone layout up for the tablet. Zoom also scales vh units, so heights are divided back by the zoom.
+  const fit = () => { const z = Math.max(1, Math.min(2.3, innerWidth / 470)); document.documentElement.style.zoom = z.toFixed(2); document.documentElement.style.setProperty('--z', z.toFixed(2)); };
+  fit(); addEventListener('resize', fit);
+}
 if (urlCode) $('j-code').value = urlCode;
 
 let eventId = null, ev = null, names = {}, standings = null, roster = {};
@@ -417,7 +476,7 @@ function attachEvent(id){
   L('events/' + id, v => { ev = v; checkNewGame(); applyReset(); render(); });
   L('tableNames/' + id, v => { names = v || {}; render(); });
   L('standings/' + id, v => { standings = v; render(); });
-  L('promo/' + id, v => { promoImg = v && v.img || null; checkPush(); });
+  L('promo/' + id, v => { promoImg = v && v.img || null; checkPush(); if (current === 's-break') render(); });
   L('roster/' + id, v => { roster = v || {}; if (current === 's-wait' || current === 's-join') render(); });
 }
 
@@ -434,6 +493,52 @@ function checkNewGame(){
   ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
   if ($('opts')) $('opts').dataset.k = '';
   if (was !== null) toast('New game started — join again to play');
+}
+
+// ── Table tablet ──
+let tabQrFor = null;
+function renderTab(){
+  const t = pickedTable, nick = names[t], num = t === 'bar' ? 'The Bar' : 'Table ' + t;
+  $('tab-t').textContent = nick || num;
+  $('tab-sub').textContent = nick ? num : '';
+  $('tab-k').textContent = t === 'bar' ? 'Table Trivia · at the bar' : 'Table Trivia · your table is your team';
+  const st = ev.status, r = ev.round || 0, mates = Object.values(roster).filter(x => x.table === t).length;
+  let msg = mates ? `${mates} ${mates === 1 ? 'player' : 'players'} on this team so far` : 'Be the first at this table to join';
+  if (st === 'question' || st === 'reveal') msg = `Round ${r} is live — scan or tap Play to jump in`;
+  else if (st === 'intro') msg = `Round ${r} is starting!`;
+  else if (st === 'break') msg = ev.breakEndsAt ? `Round ${r + 1} starts in ${breakLeft()} — join now` : `Round ${r + 1} is up next — join now`;
+  else if (st === 'lobby' && ev.startsAt) msg = 'The game starts soon — join now';
+  $('tab-status').textContent = msg;
+  $('tab-code').textContent = ev.displayCode || '····';
+  const url = joinUrl(t, ev.displayCode);
+  if (tabQrFor !== url && window.QRCode) { $('tab-qr').innerHTML = ''; new QRCode($('tab-qr'), { text: url, width: 480, height: 480, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); tabQrFor = url; }
+}
+$('tab-play').onclick = () => {
+  tabJoining = true; $('j-email').value = ''; $('j-name').value = '';
+  $('j-email').setAttribute('autocomplete', 'off'); $('j-name').setAttribute('autocomplete', 'off');   // shared device: no remembered emails
+  setIdMode('email'); $('j-lede').textContent = 'Play on this tablet for your table. Your answers count toward the team score.'; render(); setTimeout(() => $('j-email').focus(), 60);
+};
+if (tabMode) {
+  setInterval(() => { if (current === 's-tab' && ev) renderTab(); }, 1000);
+  // Switch player: clears this tablet for the next guest (their score stays on the board)
+  const sw = document.createElement('button');
+  sw.className = 'tab-switch hidden'; sw.type = 'button'; sw.textContent = 'Switch player'; sw.id = 'tab-switch';
+  document.body.appendChild(sw);
+  let armed = 0;
+  sw.onclick = async () => {
+    if (Date.now() - armed > 3000) { armed = Date.now(); sw.textContent = 'Tap again to switch'; sw.classList.add('arm'); setTimeout(() => { sw.textContent = 'Switch player'; sw.classList.remove('arm'); }, 3000); return; }
+    ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
+    try { await firebase.auth().signOut(); } catch(e){}
+    me = null; myPicks = {}; tabJoining = false; armed = 0; sw.textContent = 'Switch player'; sw.classList.remove('arm');
+    if ($('opts')) $('opts').dataset.k = '';
+    render(); toast('Ready for the next player');
+  };
+  // Back from the sign-in form to the table screen
+  const back = document.createElement('button');
+  back.className = 'ghost tab-back'; back.type = 'button'; back.textContent = '← Back to the table screen';
+  back.onclick = () => { tabJoining = false; render(); };
+  $('s-join').insertBefore(back, $('s-join').firstChild);
+  setInterval(() => { $('tab-switch').classList.toggle('hidden', !me); }, 500);
 }
 
 // Host restarted a round → forget local picks from that round on, so guests can answer again
@@ -463,10 +568,11 @@ function renderJoin(){
     $('tbl-grid').style.setProperty('--cols', cols);
   }
   // Room code: if the QR carried the right code, show it as done
-  const codeOk = !!ev.displayCode && $('j-code').value.trim().toUpperCase() === ev.displayCode;
-  $('code-ok').classList.toggle('hidden', !(codeOk && urlCode));
-  $('j-code').classList.toggle('hidden', !!(codeOk && urlCode));
-  if (codeOk && urlCode) $('code-ok-txt').textContent = ev.displayCode;
+  if (tabMode && ev.displayCode) $('j-code').value = ev.displayCode;     // the tablet sits at the table — no need to type the code
+  const codeOk = !!ev.displayCode && $('j-code').value.trim().toUpperCase() === ev.displayCode, codeKnown = !!(urlCode || tabMode);
+  $('code-ok').classList.toggle('hidden', !(codeOk && codeKnown));
+  $('j-code').classList.toggle('hidden', !!(codeOk && codeKnown));
+  if (codeOk && codeKnown) $('code-ok-txt').textContent = ev.displayCode;
   // Team name only for the first player at an unnamed table
   const tableTaken = pickedTable && Object.values(roster).some(r => r.table === pickedTable);
   const atBar = pickedTable === 'bar';
@@ -545,8 +651,7 @@ $('j-go').onclick = async () => {
     if (team && !names[pickedTable]) ttRef(`tableNames/${eventId}/${pickedTable}`).set(team).catch(() => {});
     me = { id, name, table: pickedTable };
     lsSet('tt_me_' + eventId, JSON.stringify(me));
-    if (!verified) lsSet('tt_email', rawEmail);
-    lsSet('tt_name', name);
+    if (!tabMode) { if (!verified) lsSet('tt_email', rawEmail); lsSet('tt_name', name); }
     haptic(30);
     render();
   } catch (e) {
@@ -617,7 +722,8 @@ function render(){
       $('n-sub').textContent = ev.status === 'final' ? 'Thanks for coming out. See you at the next game night.' : 'This game is already under way. Catch the next one!';
       return show('s-none');
     }
-    if (current !== 's-join') {
+    if (tabMode && !tabJoining) { renderTab(); return show('s-tab'); }
+    if (current !== 's-join' && !tabMode) {
       if (!$('j-name').value) $('j-name').value = lsGet('tt_name') || '';
       if (!$('j-email').value) $('j-email').value = lsGet('tt_email') || '';
     }
@@ -736,7 +842,10 @@ function renderBreak(board){
   $('b-board').innerHTML = rows.map(t => `<div class="row ${t === me.table ? 'me' : ''}"><span class="n">${o.indexOf(t) + 1}</span><span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'The Bar' : 'Table ' + t} · 👤 ${standings.tables[t].players}</small>` : `<small>👤 ${standings.tables[t].players}</small>`}</span><span class="p">${fmtPts(standings.tables[t].score)}</span></div>`).join('') || '<div class="row"><span></span><span>No scores yet</span><span></span></div>';
   $('b-score').textContent = myScore();
   $('b-prank').textContent = ordinal(playerRank());
-  sponsorCard($('b-sponsor'));
+  // Break offer: image (if loaded) + sponsor line, shown right under the countdown
+  { const el = $('b-sponsor'), has = !!(ev.sponsorMsg || promoImg);
+    el.innerHTML = has ? `${promoImg ? `<img src="${promoImg}" alt="">` : ''}<small>${esc(sponsorLine())}</small>${ev.sponsorMsg ? `<div>${esc(ev.sponsorMsg)}</div>` : ''}` : '';
+    el.classList.toggle('hidden', !has); }
   const nx = (ev.rounds || [])[r];
   const timed = isBreak && !last && !!ev.breakEndsAt;
   $('b-big').classList.toggle('hidden', !timed);

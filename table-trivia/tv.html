@@ -179,8 +179,8 @@ section{animation:in .45s ease-out}
 .push.img{top:0;bottom:0;align-items:center;background:rgba(5,5,16,.78);backdrop-filter:blur(.4vw);-webkit-backdrop-filter:blur(.4vw)}
 .push.img .push-card{padding:1.2vw 1.2vw 1.4vw;max-width:none}
 .push.img .push-card small{margin-bottom:.8vw;letter-spacing:.16em}
-.push-img{display:block;max-height:72vh;max-width:72vh;width:auto;height:auto;border-radius:1vw;margin:0 auto}
-.push.img #push-msg{font-size:2vw;margin-top:1vw;max-width:72vh}
+.push-img{display:block;max-height:74vh;max-width:84vw;width:auto;height:auto;border-radius:1vw;margin:0 auto}   /* keeps the image's own shape: square, 4:5 portrait, 9:16 story or landscape */
+.push.img #push-msg{font-size:2vw;margin-top:1vw;max-width:60vw;margin-left:auto;margin-right:auto}
 .push.img #push-msg:empty{display:none}
 .countdown{display:inline-block;font-family:var(--mono);color:var(--gold);margin-left:.4vw}
 
@@ -230,6 +230,49 @@ section{animation:in .45s ease-out}
 .overlay p{color:var(--dim);font-size:1.6vw}
 .paused{position:fixed;top:5.6vw;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1300;font-weight:900;padding:.7vw 2vw;border-radius:99vw;font-size:1.7vw;z-index:40}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* ===== TV readability pass ===== */
+/* footer: Chilitos banner full width + bigger; sponsor line on its own strip above it */
+.foot{flex-direction:column;align-items:stretch;gap:.6vw;padding:.6vw 2.6vw 1vw;min-height:0}
+.foot-msg:empty{display:none}
+.foot-msg{justify-content:center;font-size:1.6vw}
+.partner-wrap{width:100%}
+.partner-link{border-radius:.7vw}
+/* question + answers fill the stage */
+#v-q{display:flex;flex-direction:column;flex:1;min-height:0}
+.stage:has(#v-q:not(.hidden)),.stage:has(#v-break:not(.hidden)){justify-content:stretch}
+.qhead{margin-bottom:1.2vw}
+.qround{font-size:1.7vw}
+.ring{width:9.5vw;height:9.5vw}
+.ring .num{font-size:3.8vw}
+.qbody{margin-bottom:1.6vw;gap:3vw}
+.qtext{font-size:4.4vw;line-height:1.08}
+.qemoji{font-size:9vw}
+.opts{flex:1;min-height:0;grid-auto-rows:minmax(0,1fr);gap:1.4vw;max-height:28vw}
+.opt{font-size:3vw;padding:1.2vw 1.8vw;gap:1.6vw;border-width:.25vw;border-radius:1.4vw;line-height:1.1}
+.opt .k{width:5vw;height:5vw;font-size:2.6vw;border-radius:1.1vw}
+.opt .pc{font-size:2.2vw}
+.qfoot{margin-top:1.2vw}
+.meter-l{font-size:1.5vw}
+.pct{font-size:2.4vw}
+.q-next b{font-size:3.6vw}
+/* break: countdown + offer up front */
+#v-break{display:flex;flex-direction:column;flex:1;min-height:0;gap:1.2vw}
+.b-head{align-items:center}
+.st-title{font-size:3.4vw}
+.bigcount{min-width:26vw;padding:1.2vw 2.6vw;border-width:.25vw;background:linear-gradient(160deg,rgba(255,183,64,.14),rgba(255,92,138,.1));box-shadow:0 0 3vw rgba(255,183,64,.18)}
+.bigcount small{font-size:1.7vw;color:var(--text)}
+.bigcount b{font-size:7.6vw}
+.bigcount.soon b{font-size:3.2vw}
+.b-offer{display:flex;align-items:center;gap:2vw;padding:1.2vw 2vw;border-radius:1.4vw;border:.25vw solid var(--gold);background:linear-gradient(120deg,#2a2150,#3a1f3a 60%,#4a2a1a);box-shadow:0 0 0 0 rgba(255,183,64,.5);animation:offerglow 2.4s ease-in-out infinite}
+.b-offer img{height:13vw;max-width:26vw;border-radius:1vw;object-fit:contain;flex-shrink:0}
+.b-offer .o-txt small{display:block;color:var(--gold);font-weight:800;font-size:1.3vw;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.4vw}
+.b-offer .o-txt div{font-weight:900;font-size:3vw;line-height:1.12;color:var(--text)}
+.b-offer .o-txt div:empty{display:none}
+@keyframes offerglow{50%{box-shadow:0 0 3vw .3vw rgba(255,183,64,.35)}}
+#v-break .st-grid{margin-top:0;flex:1;min-height:0}
+#v-break .row{min-height:3.6vw;padding:.55vw 1.2vw;font-size:1.6vw;margin-bottom:.4vw}
+.pushing #b-spon{visibility:hidden}
 </style>
 </head>
 <body>
@@ -286,9 +329,10 @@ section{animation:in .45s ease-out}
       <div><div class="st-title" id="b-title">Round 1 standings</div><div class="st-sub" id="b-sub">Time to order</div></div>
       <div class="bigcount hidden" id="b-big"><small id="b-big-l">Round 2 starts in</small><b id="b-big-v">3:00</b></div>
     </div>
+    <div class="b-offer hidden" id="b-spon"></div>
     <div class="st-grid">
       <div><div class="st-h">Tables</div><div id="b-tables"></div></div>
-      <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next" id="b-next"></div><div class="spon big hidden" id="b-spon"></div></div>
+      <div><div class="st-h">Top players</div><div id="b-players"></div><div class="next" id="b-next"></div></div>
     </div>
   </section>
 
@@ -518,13 +562,17 @@ function renderBreak(board){
   const timed = isBreak && !last && ev.breakEndsAt;
   $('b-big').classList.toggle('hidden', !timed);
   if (timed) { $('b-big-l').textContent = `Round ${r + 1} starts in`; tickBig(); }
-  $('b-spon').classList.toggle('hidden', !ev.sponsorMsg);
-  if (ev.sponsorMsg) $('b-spon').innerHTML = `<small>${esc(sponsorName())}</small>${esc(ev.sponsorMsg)}`;
-  $('b-tables').innerHTML = (s.tableOrder || []).slice(0, 9).map((t, i) => `<div class="row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>${move(t) || '<span></span>'}
+  // Featured offer during the break: sponsor image (if one is loaded) + the sponsor line, big
+  const hasOffer = !!(ev.sponsorMsg || promoImg);
+  $('b-spon').classList.toggle('hidden', !hasOffer);
+  $('b-spon').classList.toggle('has-img', !!promoImg);
+  if (hasOffer) $('b-spon').innerHTML = `${promoImg ? `<img src="${promoImg}" alt="">` : ''}<div class="o-txt"><small>${esc(sponsorName())}</small><div>${esc(ev.sponsorMsg || '')}</div></div>`;
+  const tShow = Math.min(hasOffer ? 5 : 7, (s.tableOrder || []).length);
+  $('b-tables').innerHTML = (s.tableOrder || []).slice(0, tShow).map((t, i) => `<div class="row ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span>${move(t) || '<span></span>'}
       <span class="nm">${esc(tableName(t, names))}${names[t] ? `<small>${t === 'bar' ? 'Bar' : 'Table ' + t}</small>` : ''}<small>👤 ${s.tables[t].players}</small></span>
       <span class="pt">${fmtPts(s.tables[t].score)}</span></div>`).join('') || '<div class="st-sub">No scores yet</div>';
   // Same number of rows as the tables list (min 5, max 9) so both columns line up
-  const tRows = Math.min(9, (s.tableOrder || []).length), pRows = Math.max(Math.min(5, (s.playerOrder || []).length), Math.min(tRows, (s.playerOrder || []).length));
+  const tRows = tShow, pRows = Math.max(Math.min(hasOffer ? 4 : 5, (s.playerOrder || []).length), Math.min(tRows, (s.playerOrder || []).length));
   $('b-players').innerHTML = (s.playerOrder || []).slice(0, pRows).map((p, i) => {
     const x = s.players[p];
     return `<div class="row p ${i === 0 ? 'first' : ''}"><span class="rk">${i + 1}</span><span></span><span class="nm">${esc(x.name)}<small>${esc(tableSub(x.table, names))}</small></span><span class="pt">${x.score}</span></div>`;

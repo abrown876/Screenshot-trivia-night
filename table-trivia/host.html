@@ -251,6 +251,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
 .link a{color:var(--text);text-decoration:none}
 .link a small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:1px}
 .lk-btns{display:flex;gap:6px;flex-shrink:0}
+.link-tab{flex-wrap:wrap}
+.link-tab .lk-l small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:1px}
+.link-tab .lk-btns{width:100%;justify-content:flex-end}
+.lk-sel{height:32px;border-radius:8px;border:1.5px solid var(--line);background:var(--s1);color:var(--text);font:700 13px 'Outfit',sans-serif;padding:0 8px;margin-right:auto}
 .lk-btns button{height:32px;padding:0 12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
 .lk-open{background:var(--purple);border:none;color:#fff}
 .lk-open:hover{filter:brightness(1.12)}
@@ -410,9 +414,10 @@ kbd{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.12);bord
         <div class="summary"><div><div style="color:var(--dim);font-size:13px;font-weight:600">Room code</div><div class="code" id="room-code">····</div></div>
           <div style="text-align:right;color:var(--dim);font-size:14px;font-weight:600" id="sum-meta"></div></div>
         <div class="links">
-          <div class="link"><a id="lnk-tv" target="_blank" data-open="tv">📺 TV screen <small>opens in its own window — drag it to the TV</small></a><span class="lk-btns"><button class="lk-open" data-open="tv" type="button">Open ↗</button><button class="lk-copy" data-copy="tv" type="button">Copy</button></span></div>
-          <div class="link"><a id="lnk-join" target="_blank" data-open="join">📱 Player page <small>what guests see on their phones</small></a><span class="lk-btns"><button class="lk-open" data-open="join" type="button">Open ↗</button><button class="lk-copy" data-copy="join" type="button">Copy</button></span></div>
-          <div class="link"><a id="lnk-tents" target="_blank" href="tents.html" data-open="tents">🖨 Table cards <small>printable QR cards for each table</small></a><span class="lk-btns"><button class="lk-open" data-open="tents" type="button">Open ↗</button></span></div>
+          <div class="link"><a id="lnk-tv" target="_blank" data-open="tv">📺 TV screen <small>the game — open it, drag it to the TV, go full screen</small></a><span class="lk-btns"><button class="lk-open" data-open="tv" type="button">Open ↗</button><button class="lk-copy" data-copy="tv" type="button">Copy</button></span></div>
+          <div class="link"><a id="lnk-qr" target="_blank" data-open="qr">🔳 QR slideshow <small>big join QR, then one for every table — for a second screen or the TV before the game</small></a><span class="lk-btns"><button class="lk-open" data-open="qr" type="button">Open ↗</button><button class="lk-copy" data-copy="qr" type="button">Copy</button></span></div>
+          <div class="link link-tab"><span class="lk-l">📟 Table tablets <small>open on each table's tablet — shows that table's QR, and one guest can play on it. Links never change, so set them up once.</small></span><span class="lk-btns"><select id="tab-sel" class="lk-sel" aria-label="Table"></select><button class="lk-open" data-open="tab" type="button">Open ↗</button><button class="lk-copy" data-copy="tab" type="button">Copy</button><button class="lk-copy" id="tab-all" type="button">Copy all</button></span></div>
+          <div class="link"><a id="lnk-join" target="_blank" data-open="join">📱 Join link <small>any table, room code built in — same as the TV's QR · share on WhatsApp/socials</small></a><span class="lk-btns"><button class="lk-open" data-open="join" type="button">Open ↗</button><button class="lk-copy" data-copy="join" type="button">Copy</button></span></div>
         </div>
       </div>
     </div>
@@ -1080,7 +1085,7 @@ function render(){
   $('btn-board').disabled = !ev || st === 'question' || !isAdmin;
   $('btn-board').classList.toggle('on', !!(ev && ev.board));
   $('btn-board').innerHTML = (ev && ev.board ? 'Hide leaderboard' : st === 'question' ? '🏆 Leaderboard (after this question)' : '🏆 Show leaderboard on screens') + '<kbd>L</kbd>';
-  renderRounds(st);
+  renderRounds(st); fillTabSel();
   if (!document.activeElement || !$('qs-card').contains(document.activeElement)) renderQSet();
   const pushLive = ev && ev.sponsorPushAt && serverNow() < ev.sponsorPushAt + (ev.sponsorPushSecs || 10) * 1000;
   $('push-live').classList.toggle('hidden', !pushLive);
@@ -1652,7 +1657,17 @@ $('sp-file').addEventListener('change', async e => {
   try { spImg = await shrinkImage(f); showThumb(); { const t = new Image(); t.onload = () => toast(`Image ready · ${t.naturalWidth}×${t.naturalHeight} · ${Math.round(spImg.length * .75 / 1024)} KB`); t.src = spImg; } }
   catch (err) { toast("That file isn't an image we can use"); }
 });
-$('sp-img-x').onclick = () => { spImg = null; showThumb(); };
+// Removing the image deletes it for good: off the screens, out of the database, and it won't come back on reload
+$('sp-img-x').onclick = async () => {
+  spImg = null; showThumb();
+  if (!ev) return;
+  try {
+    const u = { [`promo/${EVENT_ID}`]: null };
+    if (ev.sponsorPushImg) Object.assign(u, { [`events/${EVENT_ID}/sponsorPushImg`]: false, [`events/${EVENT_ID}/sponsorPushAt`]: null });
+    await ttRef('').update(u);
+    toast('Image removed from all screens');
+  } catch (e) { toast("Couldn't remove the image — try again"); }
+};
 
 $('btn-sponsor').onclick = async () => {
   if (!ev) return;
@@ -1675,7 +1690,21 @@ $('btn-sponsor').onclick = async () => {
 const OPEN = {
   tv: () => [TV_URL, 'tt-tv', 'popup,width=1280,height=720'],
   join: () => [joinUrl(null, ev && ev.displayCode), 'tt-player', 'popup,width=420,height=860'],
-  tents: () => [new URL('tents.html', location.href).toString(), 'tt-tents', 'popup,width=1000,height=900'],
+  qr: () => [new URL('qr.html', location.href).toString(), 'tt-qr', 'popup,width=1280,height=720'],
+  tab: () => [tabletUrl($('tab-sel').value), 'tt-tab', 'popup,width=600,height=960'],
+};
+// Table tablet links: join.html?t=N&tab=1 — no room code in them, so they work for every game
+function tabletUrl(t){ const u = new URL('join.html', location.href); u.search = ''; u.searchParams.set('t', t || '1'); u.searchParams.set('tab', '1'); return u.toString(); }
+function tableIds(){ const n = (ev && ev.tables) || parseInt($('cfg-tables').value) || 12, ids = []; for (let i = 1; i <= n; i++) ids.push(String(i)); if (!ev || ev.barEnabled !== false) ids.push('bar'); return ids; }
+function fillTabSel(){
+  const ids = tableIds(), sel = $('tab-sel'), key = ids.join(',') + JSON.stringify(names || {});
+  if (sel.dataset.k === key) return; const keep = sel.value; sel.dataset.k = key;
+  sel.innerHTML = ids.map(t => `<option value="${t}">${esc(t === 'bar' ? 'The Bar' : 'Table ' + t)}${names && names[t] ? ' · ' + esc(names[t]) : ''}</option>`).join('');
+  if (ids.includes(keep)) sel.value = keep;
+}
+$('tab-all').onclick = async () => {
+  const txt = tableIds().map(t => `${t === 'bar' ? 'The Bar' : 'Table ' + t}: ${tabletUrl(t)}`).join('\n');
+  try { await navigator.clipboard.writeText(txt); toast(`Copied ${tableIds().length} tablet links`); } catch (e) { prompt('Tablet links:', txt); }
 };
 document.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', e => {
   e.preventDefault();
@@ -1684,7 +1713,7 @@ document.querySelectorAll('[data-open]').forEach(el => el.addEventListener('clic
   if (w) { try { w.focus(); } catch (x) {} } else window.open(url, '_blank');   // popup blocked → plain new tab
 }));
 document.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
-  const url = b.dataset.copy === 'tv' ? TV_URL : joinUrl(null, ev && ev.displayCode);
+  const url = b.dataset.copy === 'tab' ? tabletUrl($('tab-sel').value) : b.dataset.copy === 'tv' ? TV_URL : b.dataset.copy === 'qr' ? new URL('qr.html', location.href).toString() : joinUrl(null, ev && ev.displayCode);
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link:', url); }
 });
 document.addEventListener('keydown', e => {

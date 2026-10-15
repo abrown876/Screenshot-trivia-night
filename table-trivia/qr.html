@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#080818">
+<title>Table Trivia · Join QR slideshow</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080818;--s1:#10102A;--s2:#181832;--s3:#22223F;--purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--green:#3DDC84;
+  --text:#F0F0FF;--dim:#9A9AC8;--muted:#5A5A8A;--line:rgba(124,110,246,.18);--mono:'Space Mono',ui-monospace,monospace}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;
+  background:radial-gradient(70% 60% at 0% 0%,rgba(124,110,246,.22),transparent 60%),radial-gradient(60% 60% at 100% 100%,rgba(255,92,138,.14),transparent 60%),var(--bg)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:1.3vw 2.6vw}
+.top img{height:2.6vw;display:block}
+.top-r{font-weight:700;color:var(--dim);font-size:1.3vw}
+.stage{flex:1;min-height:0;position:relative}
+.slide{position:absolute;inset:0;display:grid;grid-template-columns:auto 1fr;gap:5vw;align-items:center;padding:0 6vw;opacity:0;transform:translateX(3vw);transition:opacity .6s,transform .6s;pointer-events:none}
+.slide.on{opacity:1;transform:none}
+.qr{background:#fff;border-radius:2vw;padding:2vw;box-shadow:0 2vw 6vw rgba(0,0,0,.45)}
+.qr .code{width:min(58vh,38vw);height:min(58vh,38vw)}
+.qr .code img,.qr .code canvas{width:100% !important;height:100% !important;display:block}
+.qr p{color:#080818;font-weight:900;font-size:2vw;text-align:center;margin-top:1.2vw}
+.k{font-weight:800;color:var(--gold);font-size:2vw;letter-spacing:.02em}
+.t{font-weight:900;font-size:8vw;line-height:.95;letter-spacing:-.02em;margin:.6vw 0 1.2vw;
+  background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.t.gen{font-size:6.4vw}
+.sub{font-weight:700;color:var(--dim);font-size:2.2vw;margin-top:-.6vw;margin-bottom:1.4vw}
+.steps{display:grid;gap:1vw;margin-top:.6vw}
+.step{display:flex;align-items:center;gap:1.2vw;font-weight:700;font-size:2.1vw}
+.step b{width:3.2vw;height:3.2vw;border-radius:50%;display:grid;place-items:center;background:var(--s3);font-size:1.6vw;flex-shrink:0}
+.room{display:inline-flex;align-items:baseline;gap:1.2vw;margin-top:2vw;padding:.8vw 1.8vw;border-radius:1.2vw;background:var(--s1);border:.15vw solid rgba(255,183,64,.5)}
+.room span{color:var(--dim);font-weight:700;font-size:1.6vw}
+.room strong{font-family:var(--mono);color:var(--gold);font-size:4vw;letter-spacing:.22em;line-height:1}
+.prize{margin-top:1.4vw;color:var(--dim);font-weight:700;font-size:1.7vw}
+.prize b{color:var(--text)}
+.dots{display:flex;gap:.5vw;justify-content:center;padding:.6vw 0}
+.dots i{width:.7vw;height:.7vw;border-radius:50%;background:var(--s3)}
+.dots i.on{background:var(--gold);width:2vw;border-radius:.4vw}
+.foot{padding:.4vw 2.6vw 1vw}
+.partner-wrap{display:none;width:100%}
+.partner-link{display:block;line-height:0;border-radius:.7vw;overflow:hidden}
+.partner-link img{width:100%;display:block;height:auto}
+.partner-label{display:none}
+.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--dim);font-size:2.4vw;font-weight:700}
+/* controls: appear when the mouse moves */
+.ctl{position:fixed;left:50%;top:1vw;transform:translateX(-50%);display:flex;gap:.6vw;align-items:center;background:rgba(16,16,42,.92);border:1px solid var(--line);border-radius:99px;padding:.5vw .7vw;opacity:0;transition:opacity .3s;z-index:5}
+body.awake .ctl{opacity:1}
+.ctl button,.ctl select{height:2.8vw;min-width:2.8vw;padding:0 1vw;border-radius:99px;border:1px solid var(--line);background:var(--s2);color:var(--text);font:700 1.1vw 'Outfit',sans-serif;cursor:pointer}
+.ctl button.on{background:var(--purple);border-color:var(--purple)}
+.ctl .lbl{color:var(--dim);font-weight:700;font-size:1.05vw;padding:0 .4vw}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style>
+</head>
+<body>
+<div class="top">
+  <a class="hdr-logo-link" href="https://www.screenshotinteractive.com/" target="_blank" rel="noopener"><img src="screenshot-logo.png" alt="Screenshot Interactive"></a>
+  <div class="top-r" id="top-r">Table Trivia</div>
+</div>
+<div class="stage" id="stage"><div class="empty" id="empty">Waiting for tonight's game…</div></div>
+<div class="dots" id="dots"></div>
+<div class="foot">
+  <div class="partner-wrap">
+    <a class="partner-link" target="_blank" rel="noopener"><img src="chilitos.jpg" class="partner-logo" alt="Chilitos"></a>
+    <span class="partner-label"></span>
+  </div>
+</div>
+<div class="ctl" id="ctl" role="toolbar" aria-label="Slideshow controls">
+  <button id="c-prev" type="button" aria-label="Previous">◀</button>
+  <button id="c-play" type="button" aria-label="Pause">❚❚</button>
+  <button id="c-next" type="button" aria-label="Next">▶</button>
+  <span class="lbl">every</span>
+  <select id="c-speed" aria-label="Seconds per slide"><option value="5">5s</option><option value="8" selected>8s</option><option value="12">12s</option><option value="20">20s</option></select>
+  <button id="c-gen" type="button" title="Show only the general join QR">Join QR only</button>
+  <button id="c-fs" type="button" title="Full screen">⛶ Full screen</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="branding.js"></script>
+<script src="tt-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { try { applyBranding(); } catch(e){} });
+// Slides: the general join QR (any table), then one per table + the bar.
+// The general slide comes back every 4 tables so walk-ins always see it.
+let ev = null, names = {}, eventId = null, offs = [], slides = [], idx = 0, timer = null, playing = true, genOnly = false, builtFor = '';
+const secs = () => parseInt($('c-speed').value) || 8;
+if (db) ttRef('current').on('value', s => {
+  const c = s.val(), id = c && c.eventId;
+  if (id === eventId) return;
+  offs.forEach(f => f()); offs = []; eventId = id; ev = null; names = {};
+  if (!id) return build();
+  const L = (p, cb) => { const r = ttRef(p); r.on('value', x => cb(x.val())); offs.push(() => r.off()); };
+  L('events/' + id, v => { ev = v; build(); });
+  L('tableNames/' + id, v => { names = v || {}; build(); });
+});
+function slideList(){
+  if (!ev) return [];
+  const tables = []; for (let i = 1; i <= (ev.tables || 0); i++) tables.push(String(i)); if (ev.barEnabled !== false) tables.push('bar');
+  if (genOnly) return [null];
+  const out = [null];
+  tables.forEach((t, i) => { out.push(t); if ((i + 1) % 4 === 0 && i + 1 < tables.length) out.push(null); });
+  return out;
+}
+function build(){
+  const list = ev ? slideList() : [];
+  const key = JSON.stringify([eventId, ev && ev.displayCode, ev && ev.tables, ev && ev.barEnabled, names, genOnly, ev && ev.tablePrize, ev && ev.barPrize]);
+  if (key === builtFor) return; builtFor = key;
+  $('empty').classList.toggle('hidden', !!(ev && list.length));
+  $('empty').style.display = ev && list.length ? 'none' : '';
+  $('stage').querySelectorAll('.slide').forEach(n => n.remove());
+  $('top-r').textContent = ev ? `Room code ${ev.displayCode || ''}` : 'Table Trivia';
+  slides = list.map((t, i) => {
+    const el = document.createElement('div'); el.className = 'slide';
+    const isGen = t === null, nick = !isGen && names[t], label = isGen ? '' : (t === 'bar' ? 'The Bar' : 'Table ' + t);
+    const prize = isGen ? ev.tablePrize : (t === 'bar' ? ev.barPrize : ev.tablePrize);
+    el.innerHTML = `
+      <div class="qr"><div class="code"></div><p>${isGen ? 'Scan to play' : 'Scan to join ' + esc(label)}</p></div>
+      <div>
+        <div class="k">${isGen ? 'Table Trivia · everyone plays' : 'Sitting here? This is your team'}</div>
+        <div class="t ${isGen ? 'gen' : ''}">${isGen ? 'Join the game' : esc(nick || label)}</div>
+        ${nick ? `<div class="sub">${esc(label)}</div>` : ''}
+        <div class="steps">
+          <div class="step"><b>1</b>Scan the code with your camera</div>
+          <div class="step"><b>2</b>${isGen ? 'Pick your table and sign in' : 'Sign in with Google or your email'}</div>
+          <div class="step"><b>3</b>${t === 'bar' ? 'Play for The Bar' : isGen ? 'Every answer counts for your table' : 'Every answer counts for ' + esc(nick || label)}</div>
+        </div>
+        <div class="room"><span>Room code</span><strong>${esc(ev.displayCode || '····')}</strong></div>
+        ${prize ? `<div class="prize">${t === 'bar' ? 'Bar wins' : 'Winning table gets'} <b>${esc(prize)}</b></div>` : ''}
+      </div>`;
+    $('stage').appendChild(el);
+    if (window.QRCode) new QRCode(el.querySelector('.code'), { text: joinUrl(isGen ? null : t, ev.displayCode), width: 600, height: 600, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    return el;
+  });
+  $('dots').innerHTML = slides.map(() => '<i></i>').join('');
+  idx = Math.min(idx, Math.max(0, slides.length - 1));
+  go(idx, true);
+}
+function go(i, keep){
+  if (!slides.length) return;
+  idx = (i + slides.length) % slides.length;
+  slides.forEach((s, k) => s.classList.toggle('on', k === idx));
+  [...$('dots').children].forEach((d, k) => d.classList.toggle('on', k === idx));
+  clearTimeout(timer);
+  if (playing && slides.length > 1) timer = setTimeout(() => go(idx + 1), secs() * 1000);
+}
+$('c-prev').onclick = () => go(idx - 1);
+$('c-next').onclick = () => go(idx + 1);
+$('c-play').onclick = () => { playing = !playing; $('c-play').textContent = playing ? '❚❚' : '▶︎ Play'; $('c-play').classList.toggle('on', !playing); go(idx); };
+$('c-speed').onchange = () => go(idx);
+$('c-gen').onclick = () => { genOnly = !genOnly; $('c-gen').classList.toggle('on', genOnly); idx = 0; build(); };
+$('c-fs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch(e){} };
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') go(idx + 1); else if (e.key === 'ArrowLeft') go(idx - 1);
+  else if (e.key === ' ') { e.preventDefault(); $('c-play').click(); } else if (e.key === 'f' || e.key === 'F') $('c-fs').click();
+});
+let wake; const awake = () => { document.body.classList.add('awake'); clearTimeout(wake); wake = setTimeout(() => document.body.classList.remove('awake'), 2500); };
+['mousemove', 'touchstart', 'keydown'].forEach(t => document.addEventListener(t, awake, { passive: true }));
+build();
+</script>
+</body>
+</html>
