@@ -222,7 +222,7 @@ body.pushing main{padding-bottom:110px}
   background:linear-gradient(135deg,#9d92ff 10%,var(--coral) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 .tab-sub{color:var(--dim);font-weight:700;font-size:17px;margin-top:4px;min-height:4px}
 .tab-status{margin-top:12px;font-weight:700;font-size:15px;color:var(--text);background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:7px 16px;display:inline-block}
-.tab-qr{margin:18px auto 0;background:#fff;border-radius:18px;padding:14px;width:min(78vw,330px)}
+.tab-qr{margin:18px auto 0;background:#fff;border-radius:18px;padding:14px;width:min(330px, calc(30vh / var(--z,1)))}
 .tab-qr #tab-qr img,.tab-qr #tab-qr canvas{width:100% !important;height:auto !important;display:block}
 .tab-qr #tab-qr{aspect-ratio:1;width:100%}
 body.tab #tbl-change{display:none}
@@ -234,10 +234,46 @@ body.tab #id-choose,body.tab #j-back-google,body.tab #id-google{display:none !im
 body.tab{min-height:calc(100vh / var(--z,1))}
 body.tab #s-tab{min-height:calc((100vh / var(--z,1)) - 120px);justify-content:center}
 body.tab #cf{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
-.tab-switch{position:fixed;left:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:30;background:rgba(16,16,42,.85);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px}
+.tab-switch{align-self:center;margin:18px auto 8px;white-space:nowrap;flex-shrink:0;background:rgba(16,16,42,.85);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px}
 .tab-switch.arm{background:var(--coral);border-color:var(--coral);color:#fff}
 .tab-back{display:none;margin:-8px 0 8px -12px;align-self:flex-start}
 body.tab .tab-back{display:inline-block}
+
+/* ===== tablet sizing pass: fill the screen, keep a margin, roomier spacing ===== */
+body.tab main{max-width:none;width:100%;padding:22px 6% 16px}
+body.tab .hdr{padding-left:6%;padding-right:6%}
+body.tab .hdr-me{gap:16px}
+body.tab .hdr-me{min-width:0;flex-shrink:1}
+body.tab .hdr-table{max-width:calc(68vw / var(--z,1));min-width:0}
+body.tab .hdr-pts{flex-shrink:0}
+body.tab .hdr-table b{font-size:18px}
+body.tab .hdr-table small{font-size:14px;margin-top:2px}
+body.tab .hdr-pts{font-size:17px;padding:5px 14px}
+body.tab .footer{font-size:14px;padding-top:6px}
+body.tab .partner-label{font-size:14px}
+/* question screen fills the height */
+body.tab #s-q{min-height:calc((100vh / var(--z,1)) - 250px)}
+body.tab .qmeta{font-size:17px}
+body.tab .timer{font-size:34px}
+body.tab .dots{gap:7px;margin-top:12px}
+body.tab .dots i{height:6px;border-radius:3px}
+body.tab .bonus{font-size:16px;padding:12px 16px}
+body.tab .qemoji{font-size:72px}
+body.tab .qimg{max-height:300px}
+body.tab .qtext{font-size:30px;line-height:1.22;margin-top:22px}
+body.tab .opts{flex:1;grid-auto-rows:minmax(84px,1fr);gap:16px;margin-top:26px;max-height:640px}
+body.tab .opt{font-size:23px;gap:22px;padding:14px 22px;border-radius:18px;line-height:1.2}
+body.tab .opt .k{width:50px;height:50px;border-radius:13px;font-size:21px}
+body.tab .lockin{font-size:18px;margin-top:18px}
+/* other screens a notch bigger */
+body.tab h1{font-size:34px}
+body.tab .lede{font-size:18px}
+body.tab .stat b{font-size:32px}
+body.tab .stat span{font-size:14px}
+body.tab .row{font-size:17px;padding:14px 18px}
+body.tab .bigcount b{font-size:60px}
+body.tab .ans{font-size:20px}
+body.tab .badge{width:120px;height:120px;font-size:56px}
 </style>
 </head>
 <body>
@@ -446,7 +482,7 @@ let tabJoining = false;
 if (tabMode) {
   document.body.classList.add('tab');
   // Scale the phone layout up for the tablet. Zoom also scales vh units, so heights are divided back by the zoom.
-  const fit = () => { const z = Math.max(1, Math.min(2.3, innerWidth / 470)); document.documentElement.style.zoom = z.toFixed(2); document.documentElement.style.setProperty('--z', z.toFixed(2)); };
+  const fit = () => { const z = Math.max(1, Math.min(2.4, innerWidth / 430)); document.documentElement.style.zoom = z.toFixed(2); document.documentElement.style.setProperty('--z', z.toFixed(2)); };
   fit(); addEventListener('resize', fit);
 }
 if (urlCode) $('j-code').value = urlCode;
@@ -522,14 +558,14 @@ if (tabMode) {
   setInterval(() => { if (current === 's-tab' && ev) renderTab(); }, 1000);
   // Switch player: clears this tablet for the next guest (their score stays on the board)
   const sw = document.createElement('button');
-  sw.className = 'tab-switch hidden'; sw.type = 'button'; sw.textContent = 'Switch player'; sw.id = 'tab-switch';
-  document.body.appendChild(sw);
+  sw.className = 'tab-switch hidden'; sw.type = 'button'; sw.textContent = '⇄ Switch player'; sw.id = 'tab-switch';
+  { const pw = document.querySelector('main .partner-wrap'); pw ? pw.parentNode.insertBefore(sw, pw) : document.querySelector('main').appendChild(sw); }   // quiet spot above the sponsor banner
   let armed = 0;
   sw.onclick = async () => {
-    if (Date.now() - armed > 3000) { armed = Date.now(); sw.textContent = 'Tap again to switch'; sw.classList.add('arm'); setTimeout(() => { sw.textContent = 'Switch player'; sw.classList.remove('arm'); }, 3000); return; }
+    if (Date.now() - armed > 3000) { armed = Date.now(); sw.textContent = 'Tap again to switch'; sw.classList.add('arm'); setTimeout(() => { sw.textContent = '⇄ Switch player'; sw.classList.remove('arm'); }, 3000); return; }
     ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
     try { await firebase.auth().signOut(); } catch(e){}
-    me = null; myPicks = {}; tabJoining = false; armed = 0; sw.textContent = 'Switch player'; sw.classList.remove('arm');
+    me = null; myPicks = {}; tabJoining = false; armed = 0; sw.textContent = '⇄ Switch player'; sw.classList.remove('arm');
     if ($('opts')) $('opts').dataset.k = '';
     render(); toast('Ready for the next player');
   };
