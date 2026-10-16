@@ -53,7 +53,7 @@ function build(){
   const n = Math.max(1, Math.min(40, parseInt($('n').value) || 12));
   const ids = []; for (let i = 1; i <= n; i++) ids.push(String(i));
   if ($('bar').checked) ids.push('bar');
-  const sponsorLogo = (window.BRANDING && BRANDING.sponsor && BRANDING.sponsor.logo) || 'chilitos.jpg';
+  const sponsorLogo = (window.BRANDING && BRANDING.sponsor && BRANDING.sponsor.logo) || 'chilitos.png';
   $('sheet').innerHTML = ids.map(t => `
     <div class="tent">
       <img class="logo" src="screenshot-logo.png" alt="Screenshot Interactive">
@@ -62,7 +62,7 @@ function build(){
       <div class="qr" id="qr-${t}"></div>
       <div class="cap">Scan to join this table</div>
       <div class="sub">Everyone plays on their own phone · room code is on the TV</div>
-      <div class="sponsor"><img src="${sponsorLogo}" alt="Chilitos"></div>
+      <div class="sponsor"><img src="${sponsorLogo}" alt="Chilitos" onerror="if(/\.png$/.test(this.src))this.src='chilitos.jpg'"></div>
     </div>`).join('');
   ids.forEach(t => new QRCode($('qr-' + t), { text: joinUrl(t), width: 400, height: 400, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }));
 }
