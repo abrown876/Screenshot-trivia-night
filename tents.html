@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Table Trivia — Table Tents</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#eee;color:#080818}
+.bar{background:#080818;color:#F0F0FF;padding:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.bar input{width:5rem;padding:.4rem;border-radius:6px;border:0;font-family:'Space Mono',monospace}
+.bar button{background:linear-gradient(135deg,#7C6EF6,#FF5C8A);color:#fff;border:0;border-radius:8px;padding:.6rem 1rem;font-weight:800;cursor:pointer}
+.bar span{font-size:.85rem;color:#8888BB}
+.sheet{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;max-width:8.5in;margin:1rem auto;background:#fff}
+.tent{border:1px dashed #bbb;height:5.4in;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.35in;text-align:center;break-inside:avoid;background:#080818;color:#F0F0FF;position:relative}
+.tent .logo{height:.32in;position:absolute;top:.25in;left:.25in}
+.tent .k{font-weight:700;font-size:11pt;color:#9A9AC8}
+.tent .t{font-weight:900;font-size:42pt;letter-spacing:-.01em;line-height:1;margin:.08in 0 .16in;background:linear-gradient(135deg,#7C6EF6,#FF5C8A);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.tent .qr{background:#fff;padding:.12in;border-radius:.12in}
+.tent .qr img,.tent .qr canvas{width:2in !important;height:2in !important;display:block}
+.tent .cap{font-weight:800;font-size:14pt;margin-top:.14in}
+.tent .sub{font-size:9pt;color:#8888BB;margin-top:.05in}
+.tent .sponsor{position:absolute;bottom:.22in;left:50%;transform:translateX(-50%);width:2.4in}
+.tent .sponsor img{width:100%;display:block;border-radius:.06in}
+@media print{
+  body{background:#fff}
+  .bar{display:none}
+  .sheet{margin:0;max-width:none}
+  .tent{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:letter;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <strong>Table tents</strong>
+  <label>Tables <input id="n" type="number" min="1" max="40" value="12"></label>
+  <label><input id="bar" type="checkbox" checked> Bar card</label>
+  <button id="make">Update</button>
+  <button onclick="window.print()">🖨 Print</button>
+  <span>Each card's QR opens the game with that table already picked. Print on cardstock and slot into stands.</span>
+</div>
+<div class="sheet" id="sheet"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="branding.js"></script>
+<script src="tt-common.js"></script>
+<script>
+function build(){
+  const n = Math.max(1, Math.min(40, parseInt($('n').value) || 12));
+  const ids = []; for (let i = 1; i <= n; i++) ids.push(String(i));
+  if ($('bar').checked) ids.push('bar');
+  const sponsorLogo = (window.BRANDING && BRANDING.sponsor && BRANDING.sponsor.logo) || 'chilitos.jpg';
+  $('sheet').innerHTML = ids.map(t => `
+    <div class="tent">
+      <img class="logo" src="screenshot-logo.png" alt="Screenshot Interactive">
+      <div class="k">Table Trivia</div>
+      <div class="t">${t === 'bar' ? 'The Bar' : 'Table ' + t}</div>
+      <div class="qr" id="qr-${t}"></div>
+      <div class="cap">Scan to join this table</div>
+      <div class="sub">Everyone plays on their own phone · room code is on the TV</div>
+      <div class="sponsor"><img src="${sponsorLogo}" alt="Chilitos"></div>
+    </div>`).join('');
+  ids.forEach(t => new QRCode($('qr-' + t), { text: joinUrl(t), width: 400, height: 400, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }));
+}
+$('make').onclick = build;
+// Default table count from tonight's game, if one exists
+if (db) ttRef('current').once('value').then(s => {
+  const c = s.val();
+  if (!c || !c.eventId) return build();
+  return ttRef('events/' + c.eventId).once('value').then(e => {
+    const v = e.val();
+    if (v && v.tables) $('n').value = v.tables;
+    if (v && v.barEnabled === false) $('bar').checked = false;
+    build();
+  });
+}).catch(build); else build();
+</script>
+</body>
+</html>
