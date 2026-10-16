@@ -167,7 +167,7 @@ body.pushing #r-sponsor,body.pushing #b-sponsor{display:none}
 .partner-wrap{display:none;width:100%;margin-top:28px}
 .partner-link{display:block;line-height:0;border-radius:10px;overflow:hidden}
 .partner-link img{width:100%;height:auto;display:block}
-.partner-label{display:block;text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin-top:8px}
+.partner-label{display:none;text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin-top:8px}
 .footer{text-align:center;color:var(--muted);font-size:12px;padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;
   background:var(--s3);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600;font-size:14.5px;max-width:calc(100vw - 40px);text-align:center;transition:opacity .2s,transform .2s;z-index:50}
@@ -292,7 +292,7 @@ body:is(.tab,.big) #f-done > .lb-h:has(+ #f-tables){grid-column:1;grid-row:5}
 body:is(.tab,.big) #f-done > #f-tables{grid-column:1;grid-row:6;align-self:start}
 body:is(.tab,.big) #f-done > .lb-h:has(+ #f-players){grid-column:2;grid-row:5}
 body:is(.tab,.big) #f-done > #f-players{grid-column:2;grid-row:6;align-self:start}
-body:is(.tab,.big) #f-done > #f-share{grid-row:7}
+body:is(.tab,.big) #f-done > #f-next{grid-row:7}
 
 /* ===== TableTab: bigger type, tighter spacing so less shrinking is needed ===== */
 body:is(.tab,.big) main{padding:14px 5% 8px}
@@ -348,6 +348,7 @@ body:is(.tab,.big) .hdr-pts::after{content:' pts';font-family:var(--display);fon
     <div class="pulse">🌮</div>
     <h1 id="n-title">Trivia starts soon</h1>
     <p class="lede" id="n-sub">The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.</p>
+    <button class="btn btn-soft hidden" id="n-results" type="button" style="margin-top:22px">See tonight's results</button>
   </section>
 
   <!-- Table tablet home (tab mode, nobody playing on this tablet yet) -->
@@ -496,7 +497,7 @@ body:is(.tab,.big) .hdr-pts::after{content:' pts';font-family:var(--display);fon
     <div class="board" id="f-tables"></div>
     <div class="lb-h">Top players</div>
     <div class="board" id="f-players"></div>
-    <button class="btn btn-main" id="f-share" type="button">Share my score on WhatsApp</button>
+    <button class="btn btn-main" id="f-next" type="button">Back to start</button>
     </div>
   </section>
 
@@ -628,7 +629,9 @@ function renderTab(){
   else if (st === 'intro') msg = `Round ${r} is starting!`;
   else if (st === 'break') msg = ev.breakEndsAt ? `Round ${r + 1} starts in ${breakLeft()} — join now` : `Round ${r + 1} is up next — join now`;
   else if (st === 'lobby' && ev.startsAt) msg = 'The game starts soon — join now';
+  else if (st === 'final') msg = "Tonight's game is over — see you next Thursday!";
   $('tab-status').textContent = msg;
+  $('tab-play').classList.toggle('hidden', st === 'final');
   $('tab-code').textContent = ev.displayCode || '····';
   const url = joinUrl(t, ev.displayCode);
   if (tabQrFor !== url && window.QRCode) { $('tab-qr').innerHTML = ''; new QRCode($('tab-qr'), { text: url, width: 480, height: 480, colorDark: '#080818', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); tabQrFor = url; }
@@ -658,7 +661,7 @@ if (tabMode) {
   back.className = 'ghost tab-back'; back.type = 'button'; back.textContent = '← Back to the table screen';
   back.onclick = () => { tabJoining = false; render(); };
   $('s-join').insertBefore(back, $('s-join').firstChild);
-  setInterval(() => { $('tab-switch').classList.toggle('hidden', !me); }, 500);
+  setInterval(() => { $('tab-switch').classList.toggle('hidden', !me || current === 's-final'); }, 500);   // results screen has its own 'Done — next player'
 }
 
 // Host restarted a round → forget local picks from that round on, so guests can answer again
@@ -820,6 +823,7 @@ function roundTitle(r){ const x = ev && ev.rounds && ev.rounds[r - 1]; return x 
 function render(){
   clearInterval(timerIv); timerIv = null;
   $('tbar').classList.add('hidden');
+  $('n-results').classList.add('hidden');
   if (!eventId || !ev) {
     $('n-title').textContent = 'Trivia starts soon';
     $('n-sub').textContent = "The host hasn't opened tonight's game yet. Keep this page open — it updates by itself.";
@@ -837,6 +841,7 @@ function render(){
   }
 
   if (!me) {
+    if (tabMode && ev.status === 'final') { renderTab(); return show('s-tab'); }   // tablet home between games
     if (ev.joinClosed || ev.status === 'final') {
       $('n-title').textContent = ev.status === 'final' ? "That's a wrap for tonight" : 'Joining is closed';
       $('n-sub').textContent = ev.status === 'final' ? 'Thanks for coming out. See you at the next game night.' : 'This game is already under way. Catch the next one!';
@@ -851,6 +856,14 @@ function render(){
     return show('s-join');
   }
 
+  // Player left the results screen: wait here; sign-up opens by itself when the host starts the next game
+  if (!tabMode && ev.status === 'final' && lsGet('tt_done_' + eventId)) {
+    $('hdr-me').classList.add('hidden');
+    $('n-title').textContent = "You're set for the next game";
+    $('n-sub').textContent = 'When the host opens the next game, sign-up opens right here. Your name and email are saved.';
+    $('n-results').classList.remove('hidden');
+    return show('s-none');
+  }
   if (ev.board && ev.status !== 'question' && ev.status !== 'intro' && ev.status !== 'final') return renderBreak(true);
   switch (ev.status) {
     case 'lobby': return renderWait();
@@ -1016,6 +1029,18 @@ function renderFinal(){
   show('s-final');
 }
 let finalKey = null, finalT = null;
+// Leave the results screen: tablets clear for the next guest, phones wait for the next game's sign-up
+$('f-next').textContent = tabMode ? '✓ Done — next player' : 'Back to start';
+$('f-next').onclick = async () => {
+  if (tabMode) {
+    ['tt_me_', 'tt_picks_', 'tt_reset_'].forEach(p => { try { localStorage.removeItem(p + eventId); } catch(e){} });
+    try { await firebase.auth().signOut(); } catch(e){}
+    me = null; myPicks = {}; tabJoining = false;
+    if ($('opts')) $('opts').dataset.k = '';
+    render(); toast('Ready for the next player');
+  } else { lsSet('tt_done_' + eventId, '1'); render(); }
+};
+$('n-results').onclick = () => { try { localStorage.removeItem('tt_done_' + eventId); } catch(e){} render(); };
 function cap(s){ s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
 function breakLeft(){ const s = Math.ceil(Math.max(0, ((ev && ev.breakEndsAt) || 0) - serverNow()) / 1000); return s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`; }
 
@@ -1104,7 +1129,7 @@ function phoneConfetti(){
   requestAnimationFrame(tick);
 }
 
-$('f-share').onclick = () => {
+if ($('f-share')) $('f-share').onclick = () => {
   const total = (ev && ev.questions || []).length, pr = playerRank();
   const txt = `🌮 I got ${myScore()}/${total} at Table Trivia${pr ? ` and finished ${ordinal(pr)}` : ''} tonight. Come play next time! 👉 screenshotinteractive.com`;
   window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
