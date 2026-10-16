@@ -231,49 +231,104 @@ body.tab #tbl-change{display:none}
 .tab-code b{font-family:var(--mono);color:var(--gold);font-size:24px;letter-spacing:.2em;margin-left:6px}
 #tab-play{margin-top:16px}
 body.tab #id-choose,body.tab #j-back-google,body.tab #id-google{display:none !important}
-body.tab{min-height:calc(100vh / var(--z,1))}
-body.tab #s-tab{min-height:calc((100vh / var(--z,1)) - 120px);justify-content:center}
-body.tab #cf{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
+body:is(.tab,.big){min-height:calc(100vh / var(--z,1))}
+body:is(.tab,.big) #s-tab{min-height:calc((100vh / var(--z,1)) - 120px);justify-content:center}
+body:is(.tab,.big) #cf{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
 .tab-switch{align-self:center;margin:18px auto 8px;white-space:nowrap;flex-shrink:0;background:rgba(16,16,42,.85);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 14px;font-weight:700;font-size:12.5px}
 .tab-switch.arm{background:var(--coral);border-color:var(--coral);color:#fff}
 .tab-back{display:none;margin:-8px 0 8px -12px;align-self:flex-start}
 body.tab .tab-back{display:inline-block}
 
 /* ===== tablet sizing pass: fill the screen, keep a margin, roomier spacing ===== */
-body.tab main{max-width:none;width:100%;padding:22px 6% 16px}
-body.tab .hdr{padding-left:6%;padding-right:6%}
-body.tab .hdr-me{gap:16px}
-body.tab .hdr-me{min-width:0;flex-shrink:1}
-body.tab .hdr-table{max-width:calc(68vw / var(--z,1));min-width:0}
-body.tab .hdr-pts{flex-shrink:0}
-body.tab .hdr-table b{font-size:18px}
-body.tab .hdr-table small{font-size:14px;margin-top:2px}
-body.tab .hdr-pts{font-size:17px;padding:5px 14px}
-body.tab .footer{font-size:14px;padding-top:6px}
-body.tab .partner-label{font-size:14px}
+body:is(.tab,.big) main{max-width:none;width:100%;padding:22px 6% 16px}
+body:is(.tab,.big) .hdr{padding-left:6%;padding-right:6%}
+body:is(.tab,.big) .hdr-me{gap:16px}
+body:is(.tab,.big) .hdr-me{min-width:0;flex-shrink:1}
+body:is(.tab,.big) .hdr-table{max-width:calc(68vw / var(--z,1));min-width:0}
+body:is(.tab,.big) .hdr-pts{flex-shrink:0}
+body:is(.tab,.big) .hdr-table b{font-size:18px}
+body:is(.tab,.big) .hdr-table small{font-size:14px;margin-top:2px}
+body:is(.tab,.big) .hdr-pts{font-size:17px;padding:5px 14px}
+body:is(.tab,.big) .footer{font-size:14px;padding-top:6px}
+body:is(.tab,.big) .partner-label{font-size:14px}
 /* question screen fills the height */
-body.tab #s-q{min-height:calc((100vh / var(--z,1)) - 250px)}
-body.tab .qmeta{font-size:17px}
-body.tab .timer{font-size:34px}
-body.tab .dots{gap:7px;margin-top:12px}
-body.tab .dots i{height:6px;border-radius:3px}
-body.tab .bonus{font-size:16px;padding:12px 16px}
-body.tab .qemoji{font-size:72px}
-body.tab .qimg{max-height:300px}
-body.tab .qtext{font-size:30px;line-height:1.22;margin-top:22px}
-body.tab .opts{flex:1;grid-auto-rows:minmax(84px,1fr);gap:16px;margin-top:26px;max-height:640px}
-body.tab .opt{font-size:23px;gap:22px;padding:14px 22px;border-radius:18px;line-height:1.2}
-body.tab .opt .k{width:50px;height:50px;border-radius:13px;font-size:21px}
-body.tab .lockin{font-size:18px;margin-top:18px}
+body:is(.tab,.big) #s-q{min-height:calc((100vh / var(--z,1)) - 250px)}
+body:is(.tab,.big) .qmeta{font-size:17px}
+body:is(.tab,.big) .timer{font-size:34px}
+body:is(.tab,.big) .dots{gap:7px;margin-top:12px}
+body:is(.tab,.big) .dots i{height:6px;border-radius:3px}
+body:is(.tab,.big) .bonus{font-size:16px;padding:12px 16px}
+body:is(.tab,.big) .qemoji{font-size:72px}
+body:is(.tab,.big) .qimg{max-height:300px}
+body:is(.tab,.big) .qtext{font-size:30px;line-height:1.22;margin-top:22px}
+body:is(.tab,.big) .opts{flex:1;grid-auto-rows:minmax(84px,1fr);gap:16px;margin-top:26px;max-height:640px}
+body:is(.tab,.big) .opt{font-size:23px;gap:22px;padding:14px 22px;border-radius:18px;line-height:1.2}
+body:is(.tab,.big) .opt .k{width:50px;height:50px;border-radius:13px;font-size:21px}
+body:is(.tab,.big) .lockin{font-size:18px;margin-top:18px}
 /* other screens a notch bigger */
-body.tab h1{font-size:34px}
-body.tab .lede{font-size:18px}
-body.tab .stat b{font-size:32px}
-body.tab .stat span{font-size:14px}
-body.tab .row{font-size:17px;padding:14px 18px}
-body.tab .bigcount b{font-size:60px}
-body.tab .ans{font-size:20px}
-body.tab .badge{width:120px;height:120px;font-size:56px}
+body:is(.tab,.big) h1{font-size:34px}
+body:is(.tab,.big) .lede{font-size:18px}
+body:is(.tab,.big) .stat b{font-size:32px}
+body:is(.tab,.big) .stat span{font-size:14px}
+body:is(.tab,.big) .row{font-size:17px;padding:14px 18px}
+body:is(.tab,.big) .bigcount b{font-size:60px}
+body:is(.tab,.big) .ans{font-size:20px}
+body:is(.tab,.big) .badge{width:120px;height:120px;font-size:56px}
+
+/* ===== tablet: every screen fits on one page (no scrolling) ===== */
+body:is(.tab,.big) #s-intro{min-height:calc(62vh / var(--z,1))}
+body:is(.tab,.big) .push-img{max-height:calc(62vh / var(--z,1))}
+body:is(.tab,.big) .push.img:not(.top) .push-img{max-height:calc(55vh / var(--z,1))}
+body:is(.tab,.big) .sponsor.offer img{max-height:calc(30vh / var(--z,1))}
+/* while measuring, screens take only the room their content needs */
+body:is(.tab,.big).tab-measure,body:is(.tab,.big).tab-measure #s-tab,body:is(.tab,.big).tab-measure #s-q,body:is(.tab,.big).tab-measure #s-intro{min-height:0 !important}
+body:is(.tab,.big).tab-measure main,body:is(.tab,.big).tab-measure section,body:is(.tab,.big).tab-measure .opts{flex:0 0 auto !important}
+/* screens fill the page by flexing, not by fixed heights that can push past the bottom */
+body:is(.tab,.big) #s-tab,body:is(.tab,.big) #s-q,body:is(.tab,.big) #s-intro{min-height:0}
+/* final results: table standings and top players side by side */
+body:is(.tab,.big) #f-done{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-content:start}
+body:is(.tab,.big) #f-done > *{grid-column:1 / -1}
+body:is(.tab,.big) #f-done > .lb-h:has(+ #f-tables){grid-column:1;grid-row:5}
+body:is(.tab,.big) #f-done > #f-tables{grid-column:1;grid-row:6;align-self:start}
+body:is(.tab,.big) #f-done > .lb-h:has(+ #f-players){grid-column:2;grid-row:5}
+body:is(.tab,.big) #f-done > #f-players{grid-column:2;grid-row:6;align-self:start}
+body:is(.tab,.big) #f-done > #f-share{grid-row:7}
+
+/* ===== TableTab: bigger type, tighter spacing so less shrinking is needed ===== */
+body:is(.tab,.big) main{padding:14px 5% 8px}
+body:is(.tab,.big) .field{margin-top:14px}
+body:is(.tab,.big) .lbl{margin-bottom:7px}
+body:is(.tab,.big) .btn-main{margin-top:16px}
+body:is(.tab,.big) .fine{margin-top:8px}
+body:is(.tab,.big) .note{margin-top:6px}
+body:is(.tab,.big) .pulse{margin-bottom:12px}
+body:is(.tab,.big) .mates{margin-top:14px;padding:12px 14px}
+body:is(.tab,.big) .bigcount{margin-top:12px;padding:8px 14px}
+body:is(.tab,.big) .stats{margin-top:14px}
+body:is(.tab,.big) .stat{padding:10px 8px}
+body:is(.tab,.big) .board{margin-top:10px}
+body:is(.tab,.big) .row{padding:9px 16px}
+body:is(.tab,.big) .lb-h{margin:12px 0 -4px}
+body:is(.tab,.big) .badge{width:96px;height:96px;font-size:46px;margin-bottom:12px}
+body:is(.tab,.big) .qtext{margin-top:14px}
+body:is(.tab,.big) .opts{margin-top:16px;gap:12px;grid-auto-rows:minmax(70px,1fr)}
+body:is(.tab,.big) .lockin{margin-top:10px}
+body:is(.tab,.big) .sponsor{margin-top:10px;padding:10px 14px}
+body:is(.tab,.big) .win{margin-top:10px}
+body:is(.tab,.big) .partner-wrap{margin-top:12px}
+body:is(.tab,.big) .partner-label{font-size:12px;margin-top:4px}
+body:is(.tab,.big) .footer{font-size:12px;padding:4px 20px calc(8px + env(safe-area-inset-bottom))}
+body:is(.tab,.big) .tab-qr{margin-top:12px}
+body:is(.tab,.big) #tab-play{margin-top:12px}
+
+/* ===== TableTab header: logo + one tidy team/points badge ===== */
+body:is(.tab,.big) .hdr{padding:12px 5%;gap:16px}
+body:is(.tab,.big) .hdr-me{gap:12px;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:5px 5px 5px 18px;min-width:0}
+body:is(.tab,.big) .hdr-table{align-items:flex-end;gap:1px;line-height:1.1}
+body:is(.tab,.big) .hdr-table b{font-size:16px;letter-spacing:-.01em}
+body:is(.tab,.big) .hdr-table small{font-size:12px;margin-top:0;color:var(--dim)}
+body:is(.tab,.big) .hdr-pts{font-size:16px;padding:6px 13px;min-width:44px;text-align:center;line-height:1.2}
+body:is(.tab,.big) .hdr-pts::after{content:' pts';font-family:var(--display);font-weight:700;font-size:12px;opacity:.75}
 </style>
 </head>
 <body>
@@ -479,11 +534,40 @@ const urlCode = (params.get('c') || '').toUpperCase().slice(0, 4);
 // and one guest can play on the tablet itself. Shared device → no remembered email, no Google.
 const tabMode = params.has('tab') && !!pickedTable;
 let tabJoining = false;
-if (tabMode) {
-  document.body.classList.add('tab');
-  // Scale the phone layout up for the tablet. Zoom also scales vh units, so heights are divided back by the zoom.
-  const fit = () => { const z = Math.max(1, Math.min(2.4, innerWidth / 430)); document.documentElement.style.zoom = z.toFixed(2); document.documentElement.style.setProperty('--z', z.toFixed(2)); };
-  fit(); addEventListener('resize', fit);
+const bigScreen = Math.min(screen.width, screen.height) >= 600;   // tablets (TableTabs, iPads), never phones
+if (tabMode || bigScreen) {
+  document.body.classList.add(tabMode ? 'tab' : 'big');
+  // Scale the phone layout up for the tablet, then shrink it if needed so each screen fits on one page with no scrolling.
+  // Zoom also scales vh units, so heights are divided back by the zoom (--z).
+  const root = document.documentElement;
+  const setZ = z => { root.style.zoom = z.toFixed(3); root.style.setProperty('--z', z.toFixed(3)); };
+  const overflows = () => root.scrollHeight > root.clientHeight + 1;
+  let fitting = false;
+  const fit = () => {
+    if (fitting) return; fitting = true;
+    const zMax = Math.max(1, Math.min(2.6, innerWidth / 360));   // bigger on TableTabs
+    document.body.classList.add('tab-measure');
+    setZ(zMax);
+    let z = zMax;
+    if (overflows()) {                       // too tall: find the largest zoom that fits the height
+      let lo = 0.55, hi = zMax;
+      for (let i = 0; i < 9; i++) { const mid = (lo + hi) / 2; setZ(mid); if (overflows()) hi = mid; else lo = mid; }
+      z = lo * 0.995;
+    }
+    setZ(z);
+    document.body.classList.remove('tab-measure');
+    fitting = false;
+  };
+  let fitQ = false;
+  const refit = () => { if (fitQ) return; fitQ = true; requestAnimationFrame(() => { fitQ = false; fit(); }); };
+  fit();
+  // don't resize while a guest is typing (the on-screen keyboard shrinks the window)
+  addEventListener('resize', () => { const a = document.activeElement; if (a && a.tagName === 'INPUT') return; refit(); });
+  addEventListener('orientationchange', () => setTimeout(refit, 300));
+  addEventListener('load', refit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+  // re-fit whenever a screen changes or its content grows (standings, sponsor offers, banners)
+  if (window.ResizeObserver) { const ro = new ResizeObserver(refit); ro.observe(document.querySelector('main')); ro.observe(document.querySelector('.hdr')); ['b-offline','b-pause','tbar'].forEach(id => { const el = $(id); if (el) ro.observe(el); }); }
 }
 if (urlCode) $('j-code').value = urlCode;
 
