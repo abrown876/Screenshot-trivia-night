@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#080818">
+<title>Screen Test · Sponsor Demo</title>
+<meta name="description" content="Play a 2-minute demo of Screen Test Thursdays at Chilitos and see every sponsor spot.">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080818;--s1:#10102A;--s2:#181832;--s3:#22223F;
+  --purple:#7C6EF6;--coral:#FF5C8A;--gold:#FFB740;--teal:#2EC4B6;--green:#3DDC84;--red:#FF4B5C;
+  --text:#F0F0FF;--dim:#9A9AC8;--muted:#5A5A8A;--line:rgba(124,110,246,.22);
+  --brand:#FFB740;--brand-ink:#1a1300;
+  --display:'Outfit',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;
+}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--text);font-family:var(--display);-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(80% 50% at 0% 0%,rgba(124,110,246,.22),transparent 60%),radial-gradient(70% 50% at 100% 100%,rgba(255,92,138,.14),transparent 60%),var(--bg);background-attachment:fixed;display:flex;align-items:center;justify-content:center}
+.app{width:460px;flex-shrink:0;display:flex;flex-direction:column;padding:0 18px;transform-origin:center center}
+.hidden{display:none !important}
+
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 10px}
+.top-logo{height:34px;display:block}
+.top-tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
+.presented{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;font-size:13px;color:var(--dim);padding:6px 0 4px;text-align:center}
+.brand-chip{display:inline-block;white-space:nowrap;background:var(--brand);color:var(--brand-ink);font-weight:800;border-radius:6px;padding:3px 9px;font-size:13px;letter-spacing:.01em}
+.progress{display:flex;gap:4px;padding:8px 0 4px}
+.progress i{flex:1;height:4px;border-radius:4px;background:var(--s3);transition:background .3s}
+.progress i.on{background:var(--purple)}
+
+/* stage */
+.stage{display:flex;flex-direction:column;padding:12px 0 12px}
+section{display:flex;flex-direction:column;gap:14px;animation:in .4s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+h1{font-size:34px;line-height:1.05;font-weight:900;letter-spacing:-.02em}
+h2{font-size:24px;line-height:1.2;font-weight:800}
+p.lead{font-size:17px;line-height:1.45;color:var(--dim)}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:18px}
+
+/* sponsor spot callout */
+.spot{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,183,64,.14),rgba(255,92,138,.10));border:1px dashed rgba(255,183,64,.55);border-radius:14px;padding:12px 14px}
+.spot-star{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1a1300;font-weight:900;display:grid;place-items:center;font-size:14px}
+.spot b{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.spot span{font-size:14px;line-height:1.4;color:#E8E2F0}
+
+/* buttons */
+.btn{appearance:none;border:0;border-radius:14px;padding:17px 18px;font:800 18px var(--display);color:#fff;background:var(--purple);cursor:pointer;width:100%;transition:transform .1s,filter .2s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--text);font-weight:700}
+.btn.brand{background:var(--brand);color:var(--brand-ink)}
+.btn-row{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+
+/* lobby */
+.you{display:flex;align-items:center;gap:14px}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--coral);display:grid;place-items:center;font-weight:900;font-size:22px}
+.mates{display:flex;flex-wrap:wrap;gap:8px}
+.mates span{background:var(--s2);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600}
+.tabletab{display:flex;gap:14px;align-items:center}
+.tt-screen{width:74px;height:120px;border-radius:10px;background:#000;border:5px solid #1b1b1b;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:6px;flex-shrink:0;box-shadow:0 0 24px rgba(124,110,246,.55)}
+.tt-screen .tt-brand{background:var(--brand);color:var(--brand-ink);font-weight:900;font-size:10px;border-radius:4px;padding:3px 4px;text-align:center;line-height:1.1;word-break:break-word}
+.tt-screen small{font-size:8px;color:#bbb;text-align:center}
+
+/* question */
+.qhead{display:flex;justify-content:space-between;align-items:center}
+.qnum{font-family:var(--mono);font-size:13px;color:var(--dim)}
+.timer{font-family:var(--mono);font-size:22px;color:var(--gold)}
+.tbar{height:6px;background:var(--s3);border-radius:6px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--gold);width:100%;transition:width 1s linear}
+.round-banner{border-radius:14px;padding:12px 14px;font-weight:900;font-size:18px;background:var(--brand);color:var(--brand-ink);display:flex;justify-content:space-between;align-items:center}
+.round-banner small{font-weight:700;font-size:12px;opacity:.75;letter-spacing:.08em;text-transform:uppercase}
+.question{font-size:24px;line-height:1.25;font-weight:800}
+.opts{display:grid;gap:10px}
+.opt{appearance:none;border:0;text-align:left;display:flex;align-items:center;gap:14px;border-radius:14px;padding:15px 16px;font:700 18px var(--display);color:#fff;cursor:pointer;transition:opacity .2s,transform .1s,box-shadow .2s}
+.opt:active{transform:scale(.98)}
+.opt .k{width:32px;height:32px;border-radius:9px;background:rgba(0,0,0,.22);display:grid;place-items:center;font-family:var(--mono);font-size:15px;flex-shrink:0}
+.opt[data-i="0"]{background:var(--purple)}.opt[data-i="1"]{background:var(--coral)}
+.opt[data-i="2"]{background:#E09A1E}.opt[data-i="3"]{background:#1FA89B}
+.opts.locked .opt{opacity:.35;pointer-events:none}
+.opts.locked .opt.picked{opacity:1;box-shadow:0 0 0 3px #fff}
+.locked-msg{text-align:center;font-weight:700;color:var(--dim);min-height:22px}
+
+/* reveal */
+.verdict{display:flex;align-items:center;gap:14px}
+.verdict .mark{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:30px;font-weight:900;flex-shrink:0}
+.mark.ok{background:var(--green);color:#06210f}.mark.no{background:var(--red);color:#2a0007}
+.split{display:grid;gap:8px}
+.split-row{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:center;font-size:14px;font-weight:600}
+.split-bar{position:relative;height:30px;border-radius:8px;background:var(--s2);overflow:hidden}
+.split-bar i{position:absolute;inset:0 auto 0 0;width:0;transition:width .9s ease-out}
+.split-bar span{position:relative;z-index:1;display:flex;align-items:center;height:100%;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.split-row.correct span{font-weight:900}
+.split-row em{font-style:normal;font-family:var(--mono);text-align:right;color:var(--dim)}
+
+/* standings */
+.stand{display:grid;gap:8px}
+.stand-row{display:flex;align-items:center;gap:12px;background:var(--s1);border-radius:12px;padding:12px 14px;font-weight:700}
+.stand-row.me{background:rgba(124,110,246,.25);border:1px solid var(--purple)}
+.stand-row .pos{font-family:var(--mono);color:var(--gold);width:22px}
+.stand-row .nm{flex:1}
+.stand-row .pts{font-family:var(--mono);color:var(--dim)}
+
+/* push message */
+.push{position:relative;border-radius:18px;padding:18px;background:var(--brand);color:var(--brand-ink);box-shadow:0 12px 40px rgba(0,0,0,.45);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:none}}
+.push small{font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:11px;opacity:.75}
+.push h3{font-size:22px;font-weight:900;line-height:1.15;margin:4px 0 4px}
+.push p{font-size:15px;font-weight:600;opacity:.85}
+
+/* final */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:8px;padding-top:6px}
+.pod{border-radius:12px 12px 4px 4px;text-align:center;padding:10px 6px;font-weight:800;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
+.pod b{font-family:var(--mono);font-size:22px}
+.pod span{font-size:13px;line-height:1.2}
+.pod.p1{height:120px;background:linear-gradient(180deg,var(--gold),#b87a12);color:#1a1300}
+.pod.p2{height:96px;background:linear-gradient(180deg,#cfd3e6,#8d92ad);color:#141428}
+.pod.p3{height:78px;background:linear-gradient(180deg,#e39a6a,#a35f35);color:#2a1206}
+.pod.me{outline:3px solid #fff}
+.sharecard{border-radius:18px;padding:18px;background:linear-gradient(140deg,#2a2373,#0E0D1F 70%);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.sharecard .big{font-size:40px;font-weight:900;line-height:1}
+.sharecard .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--dim)}
+.sharecard img{height:22px}
+
+.foot{padding:6px 0 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.partner-wrap{display:none;width:100%}
+.partner-link{display:block;line-height:0;border-radius:8px;overflow:hidden}
+.partner-link img{width:100%;height:auto;display:block}
+.partner-label{display:none}
+.footer-text{font-size:12px;color:var(--muted)}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a href="https://screenshotinteractive.com" target="_blank" rel="noopener"><img class="top-logo" src="screenshot-logo.png" alt="Screenshot Interactive"></a>
+    <span class="top-tag">Sponsor demo</span>
+  </header>
+  <div class="presented">Screen Test Thursdays · presented by <span class="brand-chip js-brand">Your Brand</span></div>
+  <div class="progress" id="progress"></div>
+
+  <main class="stage" id="stage"></main>
+
+  <footer class="foot">
+    <div class="partner-wrap"><a class="partner-link" target="_blank" rel="noopener"><img class="partner-logo" alt="Chilitos Jamexican Food"></a><span class="partner-label"></span></div>
+    <span class="footer-text">© Screenshot Interactive</span>
+  </footer>
+</div>
+<div class="confetti" id="confetti"></div>
+
+<script src="branding.js"></script>
+<script>
+/* ---------- Brand personalisation: ?brand=Appleton%20Estate&color=F2A900 ---------- */
+const params = new URLSearchParams(location.search);
+const BRAND = (params.get('brand') || 'Your Brand').trim().slice(0, 28) || 'Your Brand';
+const rawColor = (params.get('color') || '').replace('#', '');
+const BRAND_COLOR = /^[0-9a-fA-F]{6}$/.test(rawColor) ? '#' + rawColor : '#FFB740';
+(function setBrandColor(hex) {
+  const r = parseInt(hex.substr(1, 2), 16), g = parseInt(hex.substr(3, 2), 16), b = parseInt(hex.substr(5, 2), 16);
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  document.documentElement.style.setProperty('--brand', hex);
+  document.documentElement.style.setProperty('--brand-ink', lum > 0.55 ? '#1a1300' : '#ffffff');
+})(BRAND_COLOR);
+document.querySelectorAll('.js-brand').forEach(el => el.textContent = BRAND);
+if (typeof applyBranding === 'function') { try { applyBranding(); } catch (e) {} }
+
+/* ---------- Demo content ---------- */
+const QUESTIONS = [
+  { round: 'Round 1 · General knowledge', branded: false,
+    q: 'Which Jamaican sprinter has won the most Olympic gold medals?',
+    opts: ['Usain Bolt', 'Shelly-Ann Fraser-Pryce', 'Elaine Thompson-Herah', 'Asafa Powell'],
+    a: 0, split: [58, 24, 14, 4],
+    fact: 'Usain Bolt holds 8 Olympic golds.' },
+  { round: 'Round', branded: true,
+    q: 'In what year did Jamaica gain independence?',
+    opts: ['1958', '1962', '1966', '1972'],
+    a: 1, split: [9, 71, 12, 8],
+    fact: 'Jamaica became independent on 6 August 1962.' },
+  { round: 'Bonus', bonus: true,
+    q: "What is Jamaica's national fruit?",
+    opts: ['Mango', 'Breadfruit', 'Ackee', 'Guinep'],
+    a: 2, split: [11, 8, 76, 5],
+    fact: 'Ackee: best with saltfish.' }
+];
+const STEPS = ['intro', 'lobby', 'q0', 'r0', 'break', 'q1', 'r1', 'q2', 'r2', 'final', 'cta'];
+const state = { step: 0, answers: [], score: 0, timer: null };
+const stage = document.getElementById('stage');
+const progress = document.getElementById('progress');
+progress.innerHTML = STEPS.map(() => '<i></i>').join('');
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+const B = () => esc(BRAND);
+function spot(title, body) {
+  return `<div class="spot"><div class="spot-star">★</div><div><b>Sponsor spot · ${title}</b><span>${body}</span></div></div>`;
+}
+function go(i) {
+  clearInterval(state.timer);
+  document.getElementById('confetti').innerHTML = '';
+  state.step = i;
+  [...progress.children].forEach((el, k) => el.classList.toggle('on', k <= i));
+  render[STEPS[i]]();
+  fit();
+}
+const next = () => go(state.step + 1);
+function vibrate(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
+
+const render = {
+  intro() {
+    stage.innerHTML = `<section>
+      <p class="eyebrow">Live demo · 2 minutes</p>
+      <h1>Play a night of Screen Test, as a guest at Table 4.</h1>
+      <p class="lead">Every Thursday at Chilitos, the whole room plays on their phones while the questions run on the TV. Wherever you see a <b style="color:var(--gold)">★ Sponsor spot</b>, that's a place ${B()} appears.</p>
+      ${spot('Table card', `Your logo on the QR card on every table. Guests scan it to join the game.`)}
+      <div class="btn-row"><button class="btn" id="b">Join Table 4</button></div>
+    </section>`;
+    document.getElementById('b').onclick = next;
+  },
+  lobby() {
+    stage.innerHTML = `<section>
+      <div class="you"><div class="avatar">G</div><div><h2>You're in, Guest</h2><p class="lead" style="font-size:15px">Table 4 · "Quiz Khalifa" · 5 players</p></div></div>
+      <div class="mates"><span>Kemar</span><span>Tash</span><span>Rohan</span><span>Dani</span><span>You</span></div>
+      <div class="card tabletab">
+        <div class="tt-screen"><div class="tt-brand">${B()}</div><small>your ad here</small></div>
+        <div><h2 style="font-size:18px">On the table right now</h2><p class="lead" style="font-size:14px">The TableTab on every table plays your ad all day on game day, from open to close.</p></div>
+      </div>
+      ${spot('TableTabs + TV lobby', `${B()}'s ad on every TableTab all day, and your logo on the TV while the room fills up.`)}
+      <div class="btn-row"><button class="btn" id="b">Start Round 1</button></div>
+    </section>`;
+    document.getElementById('b').onclick = next;
+  },
+  q0() { renderQuestion(0); },
+  r0() { renderReveal(0); },
+  break() {
+    const rows = [['1', 'Taco Bout It', 2], ['2', 'Quiz Khalifa (you)', state.score ? 1 : 0, true], ['3', 'The Bar', 1]];
+    if (!state.score) { rows[1] = ['2', 'The Bar', 1]; rows[2] = ['5', 'Quiz Khalifa (you)', 0, true]; }
+    stage.innerHTML = `<section>
+      <p class="eyebrow">Round 1 standings</p>
+      <div class="stand">${rows.map(r => `<div class="stand-row ${r[3] ? 'me' : ''}"><span class="pos">${r[0]}</span><span class="nm">${esc(r[1])}</span><span class="pts">${r[2]} pt</span></div>`).join('')}</div>
+      <div id="pushSlot" style="min-height:120px"></div>
+      ${spot('Push message', `At every break your offer pops up on the TV and every phone in the room, right when the servers come round.`)}
+      <div class="btn-row"><button class="btn" id="b">Start the ${B()} Round</button></div>
+    </section>`;
+    setTimeout(() => {
+      const slot = document.getElementById('pushSlot');
+      if (!slot) return;
+      vibrate(60);
+      setTimeout(fit, 0);
+      slot.innerHTML = `<div class="push"><small>From ${B()}</small><h3>Round 2 starts in 5 minutes</h3><p>Show this screen at the bar for tonight's ${B()} special.</p></div>`;
+    }, 900);
+    document.getElementById('b').onclick = next;
+  },
+  q1() { renderQuestion(1); },
+  r1() { renderReveal(1); },
+  q2() { renderQuestion(2); },
+  r2() { renderReveal(2); },
+  final() {
+    const total = state.score;
+    const place = total >= 2 ? 1 : total === 1 ? 2 : 3;
+    const names = { 1: 'Quiz Khalifa', 2: 'Taco Bout It', 3: 'The Bar' };
+    if (place === 2) { names[1] = 'Taco Bout It'; names[2] = 'Quiz Khalifa'; }
+    if (place === 3) { names[1] = 'Taco Bout It'; names[2] = 'The Bar'; names[3] = 'Quiz Khalifa'; }
+    stage.innerHTML = `<section>
+      <p class="eyebrow">Final results</p>
+      <h1>${place === 1 ? 'Your table wins!' : place === 2 ? 'So close: 2nd place' : 'On the podium: 3rd'}</h1>
+      <div class="podium">
+        <div class="pod p2 ${place === 2 ? 'me' : ''}"><b>2</b><span>${esc(names[2])}</span></div>
+        <div class="pod p1 ${place === 1 ? 'me' : ''}"><b>1</b><span>${esc(names[1])}</span></div>
+        <div class="pod p3 ${place === 3 ? 'me' : ''}"><b>3</b><span>${esc(names[3])}</span></div>
+      </div>
+      <p class="lead" style="text-align:center">Tonight's table prize is presented by <span class="brand-chip">${B()}</span></p>
+      <div class="sharecard">
+        <div class="row"><img src="screenshot-logo.png" alt="Screenshot Interactive"><span>Screen Test · Chilitos</span></div>
+        <div class="big">${total}/3</div>
+        <div style="font-weight:700">I answered ${total} of 3 at Screen Test Thursdays. Beat that.</div>
+        <div class="row"><span>presented by</span><span class="brand-chip">${B()}</span></div>
+      </div>
+      ${spot('Podium + share cards', `Your name on the prize and the final reveal, then on the score card every player posts to WhatsApp and Instagram.`)}
+      <div class="btn-row">
+        <button class="btn ghost" id="share">Share my score card</button>
+        <button class="btn" id="b">What does ${B()} get?</button>
+      </div>
+    </section>`;
+    if (place === 1) confetti();
+    document.getElementById('share').onclick = shareCard;
+    document.getElementById('b').onclick = next;
+  },
+  cta() {
+    const items = ['Table cards', 'TableTab ads all day', 'TV lobby loop', 'Host reads on the mic', 'Push messages', 'Your own named round', 'Bonus giveaway', 'Prize + podium', 'Co-branded share cards', 'Opt-in leads + report'];
+    stage.innerHTML = `<section>
+      <p class="eyebrow">That was one night</p>
+      <h1>${B()} showed up 10 times. Every Thursday.</h1>
+      <div class="card" style="padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px">${items.map((t, i) => `<div style="display:flex;gap:8px;font-weight:600;font-size:14px;line-height:1.25"><span style="color:var(--gold);font-family:var(--mono)">${String(i + 1).padStart(2, '0')}</span>${t}</div>`).join('')}</div></div>
+      <p class="lead">Packages from J$120,000 for an 8-week season. Presenting Partner includes category exclusivity.</p>
+      <div class="btn-row">
+        <a class="btn brand" style="text-align:center;text-decoration:none" href="https://screenshotinteractive.com" target="_blank" rel="noopener">Talk to Screenshot Interactive</a>
+        <button class="btn ghost" id="again">Play again</button>
+      </div>
+    </section>`;
+    document.getElementById('again').onclick = () => { state.answers = []; state.score = 0; go(0); };
+  }
+};
+
+function renderQuestion(n) {
+  const Q = QUESTIONS[n];
+  let banner;
+  if (Q.branded) banner = `<div class="round-banner"><span>The ${B()} Round</span><small>Round 2</small></div>`;
+  else if (Q.bonus) banner = `<div class="round-banner"><span>${B()} Bonus</span><small>First table wins</small></div>`;
+  else banner = `<p class="eyebrow">${Q.round}</p>`;
+  stage.innerHTML = `<section>
+    ${banner}
+    <div class="qhead"><span class="qnum">Question ${n + 1} of 3</span><span class="timer" id="t">15</span></div>
+    <div class="tbar"><i id="tb"></i></div>
+    <div class="question">${esc(Q.q)}</div>
+    <div class="opts" id="opts">${Q.opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span>${esc(o)}</button>`).join('')}</div>
+    <div class="locked-msg" id="lm"></div>
+    ${Q.branded ? spot('Named round', `Five questions written with your team, played by the whole room. Mid-round, the host gives you a shout-out.`) : ''}
+    ${Q.bonus ? spot('Bonus giveaway', `The first table to get it right wins ${B()} product, delivered to the table. It's the loudest moment of the night.`) : ''}
+  </section>`;
+  let left = 15;
+  requestAnimationFrame(() => { const tb = document.getElementById('tb'); if (tb) tb.style.width = (left / 15 * 100) + '%'; });
+  state.timer = setInterval(() => {
+    left--;
+    const t = document.getElementById('t'), tb = document.getElementById('tb');
+    if (t) t.textContent = Math.max(left, 0);
+    if (tb) tb.style.width = Math.max(left, 0) / 15 * 100 + '%';
+    if (left <= 0) { clearInterval(state.timer); lock(n, null); }
+  }, 1000);
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => lock(n, +b.dataset.i));
+}
+function lock(n, pick) {
+  clearInterval(state.timer);
+  const opts = document.getElementById('opts');
+  if (!opts || opts.classList.contains('locked')) return;
+  opts.classList.add('locked');
+  vibrate(30);
+  if (pick !== null) opts.querySelector(`[data-i="${pick}"]`).classList.add('picked');
+  state.answers[n] = pick;
+  if (pick === QUESTIONS[n].a) state.score++;
+  document.getElementById('lm').textContent = pick === null ? "Time's up" : `Locked in: ${'ABCD'[pick]}`;
+  setTimeout(next, 1100);
+}
+function renderReveal(n) {
+  const Q = QUESTIONS[n], pick = state.answers[n], ok = pick === Q.a;
+  const colors = ['var(--purple)', 'var(--coral)', '#E09A1E', '#1FA89B'];
+  let extra = '';
+  if (n === 0) extra = spot('Host read', `"This round was brought to you by ${B()}." Live on the mic, in the host's own voice.`);
+  if (n === 1) extra = spot('Brand recall', `Late in the night, one question tests what the room remembers about ${B()}. The result goes in your report.`);
+  if (Q.bonus) extra = `<div class="push"><small>${B()} Bonus</small><h3>${ok ? 'Table 4 got it first!' : 'Table 9 got it first!'}</h3><p>${ok ? `Tell your server: ${B()} is on its way to your table.` : `${B()} is on its way to Table 9.`}</p></div>`;
+  stage.innerHTML = `<section>
+    <div class="verdict"><div class="mark ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✕'}</div>
+      <div><h2>${ok ? 'Correct!' : pick === null ? 'No answer' : 'Not this time'}</h2><p class="lead" style="font-size:15px">${esc(Q.fact)}</p></div></div>
+    <p class="eyebrow" style="color:var(--dim)">How the room answered</p>
+    <div class="split">${Q.opts.map((o, i) => `<div class="split-row ${i === Q.a ? 'correct' : ''}"><div class="split-bar"><i style="background:${colors[i]};opacity:${i === Q.a ? 1 : .45}" data-w="${Q.split[i]}"></i><span>${i === Q.a ? '✓ ' : ''}${esc(o)}</span></div><em>${Q.split[i]}%</em></div>`).join('')}</div>
+    ${extra}
+    <div class="btn-row"><button class="btn" id="b">${n === 0 ? 'See the standings' : n === 1 ? 'Next: bonus question' : 'Show final results'}</button></div>
+  </section>`;
+  requestAnimationFrame(() => setTimeout(() => document.querySelectorAll('.split-bar i').forEach(el => el.style.width = el.dataset.w + '%'), 60));
+  if (ok) vibrate([40, 40, 40]);
+  document.getElementById('b').onclick = next;
+}
+function confetti() {
+  const box = document.getElementById('confetti');
+  const cols = ['#7C6EF6', '#FF5C8A', '#FFB740', '#3DDC84', BRAND_COLOR];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('i');
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = cols[i % cols.length];
+    c.style.animationDuration = 2 + Math.random() * 2 + 's';
+    c.style.animationDelay = Math.random() * .6 + 's';
+    box.appendChild(c);
+  }
+  setTimeout(() => box.innerHTML = '', 5000);
+}
+function shareCard() {
+  const text = `I scored ${state.score}/3 on the Screen Test sponsor demo. Thursdays at Chilitos, presented by ${BRAND}.`;
+  if (navigator.share) { navigator.share({ title: 'Screen Test', text, url: location.href }).catch(() => {}); }
+  else { window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + location.href), '_blank'); }
+}
+/* ---------- Fit every screen on one page: scale the whole app to the screen ---------- */
+const app = document.querySelector('.app');
+function fit() {
+  app.style.zoom = 1;
+  const w = app.offsetWidth, h = app.scrollHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  // fill tablets (up to 2x), shrink on short phones, never scroll
+  const s = Math.max(0.5, Math.min(vw / w, vh / h, 2) * 0.98);
+  app.style.zoom = s;
+}
+let fitQueued = false;
+if (window.ResizeObserver) new ResizeObserver(() => {
+  if (fitQueued) return; fitQueued = true;
+  requestAnimationFrame(() => { fitQueued = false; fit(); });
+}).observe(document.getElementById('stage'));
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', () => setTimeout(fit, 250));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+window.addEventListener('load', fit);
+go(0);
+</script>
+</body>
+</html>
